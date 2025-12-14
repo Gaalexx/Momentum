@@ -26,14 +26,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.momentum.ConstColours
 
 @Composable
 fun BackCircleButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 65.dp,
-    backgroundColor: Color = Color(0xFF2B2B2B),
-    iconColor: Color = Color.White,
+    backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
+    iconColor: Color = ConstColours.WHITE,
     shadowElevation: Dp = 6.dp,
     enabled: Boolean = true,
 ) {
@@ -65,8 +66,8 @@ fun ProfileCircleButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 65.dp,
-    backgroundColor: Color = Color(0xFF2B2B2B),
-    iconColor: Color = Color.White,
+    backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
+    iconColor: Color = ConstColours.WHITE,
     shadowElevation: Dp = 6.dp,
     enabled: Boolean = true,
 ) {
@@ -98,8 +99,8 @@ fun SettingsCircleButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 65.dp,
-    backgroundColor: Color = Color(0xFF2B2B2B),
-    iconColor: Color = Color.White,
+    backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
+    iconColor: Color = ConstColours.WHITE,
     shadowElevation: Dp = 6.dp,
     enabled: Boolean = true,
     filledIcon: Boolean = true,
@@ -135,8 +136,8 @@ fun FriendsPillButton(
     modifier: Modifier = Modifier,
     text: String = "Друзья",
     height: Dp = 44.dp,
-    backgroundColor: Color = Color(0xFF2B2B2B),
-    contentColor: Color = Color.White,
+    backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
+    contentColor: Color = ConstColours.WHITE,
     elevation: Dp = 6.dp,
     enabled: Boolean = true,
 ) {
@@ -171,8 +172,8 @@ fun FriendsPillButton(
 fun BigCircleForMainScreenAction(
     modifier: Modifier = Modifier,
     size: Dp = 132.dp,
-    outerColor: Color = Color(0xFF2B2B2B),
-    innerColor: Color = Color.White,
+    outerColor: Color = ConstColours.MAIN_BACK_GRAY,
+    innerColor: Color = ConstColours.WHITE,
     ring: Dp = 14.dp,
 ) {
     Box(
