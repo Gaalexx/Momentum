@@ -131,6 +131,41 @@ fun SettingsCircleButton(
 }
 
 @Composable
+fun CircleButton(
+    onClick: () -> Unit,
+    icon: ImageVector,
+    contentDescription: String? = null,
+    modifier: Modifier = Modifier,
+    size: Dp = 65.dp,
+    backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
+    iconColor: Color = ConstColours.WHITE,
+    shadowElevation: Dp = 6.dp,
+    enabled: Boolean = true,
+) {
+    Surface(
+        modifier = modifier.size(size),
+        shape = CircleShape,
+        color = backgroundColor,
+        contentColor = iconColor,
+        tonalElevation = 0.dp,
+        shadowElevation = shadowElevation
+    ) {
+        IconButton(
+            onClick = onClick,
+            enabled = enabled,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription,
+                tint = iconColor,
+                modifier = Modifier.size(size * 0.62f)
+            )
+        }
+    }
+}
+
+@Composable
 fun FriendsPillButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
