@@ -23,72 +23,61 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
+import androidx.navigation.compose.NavHost
 import com.project.momentum.ui.theme.MomentumTheme
-
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MomentumTheme {
-                MomentumApp()
+                AppNav()
             }
         }
     }
 }
 
-@PreviewScreenSizes
-@Composable
-fun MomentumApp() {
-    var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
 
-    NavigationSuiteScaffold(
-        navigationSuiteItems = {
-            AppDestinations.entries.forEach {
-                item(
-                    icon = {
-                        Icon(
-                            it.icon,
-                            contentDescription = it.label
-                        )
-                    },
-                    label = { Text(it.label) },
-                    selected = it == currentDestination,
-                    onClick = { currentDestination = it }
-                )
-            }
-        }
+
+object Routes {
+    const val CAMERA = "camera"
+
+    const val PREVIEW = "preview"
+    const val PREVIEW_WITH_ARG = "preview/{uri}"
+
+    fun previewRoute(uriEncoded: String) = "preview/$uriEncoded"
+}
+
+
+@Composable
+fun AppNav() {
+    val navController = rememberNavController()
+
+    NavHost(
+        navController = navController,
+        startDestination = Routes.CAMERA
     ) {
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            Greeting(
-                name = "Android",
-                modifier = Modifier.padding(innerPadding)
+        composable(Routes.CAMERA) {
+            CameraLikeScreen(
+                onGoToPreview = { uri ->
+                    val encoded = java.net.URLEncoder.encode(uri.toString(), "UTF-8")
+                    navController.navigate(Routes.previewRoute(encoded))
+                }
             )
         }
-    }
-}
 
-enum class AppDestinations(
-    val label: String,
-    val icon: ImageVector,
-) {
-    HOME("Home", Icons.Default.Home),
-    FAVORITES("Favorites", Icons.Default.Favorite),
-    PROFILE("Profile", Icons.Default.AccountBox),
-}
+        composable(Routes.PREVIEW_WITH_ARG) { backStackEntry ->
+            val encoded = backStackEntry.arguments?.getString("uri")
+            val uri = encoded
+                ?.let { java.net.URLDecoder.decode(it, "UTF-8") }
+                ?.let { android.net.Uri.parse(it) }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MomentumTheme {
-        Greeting("Android")
+            SendPhotoScreen(
+                uri = uri,
+                onGoToTakePhoto = { navController.navigate(Routes.CAMERA) }
+            )
+        }
     }
 }

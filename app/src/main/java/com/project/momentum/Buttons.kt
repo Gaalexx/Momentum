@@ -7,8 +7,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Send
+import androidx.compose.material.icons.automirrored.rounded.AirplaneTicket
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.rounded.Send
+import androidx.compose.material.icons.automirrored.rounded.SendToMobile
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Group
@@ -21,11 +26,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.momentum.ConstColours
 
 @Composable
@@ -131,6 +138,41 @@ fun SettingsCircleButton(
 }
 
 @Composable
+fun CircleButton(
+    onClick: () -> Unit,
+    icon: ImageVector,
+    contentDescription: String? = null,
+    modifier: Modifier = Modifier,
+    size: Dp = 65.dp,
+    backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
+    iconColor: Color = ConstColours.WHITE,
+    shadowElevation: Dp = 6.dp,
+    enabled: Boolean = true,
+) {
+    Surface(
+        modifier = modifier.size(size),
+        shape = CircleShape,
+        color = backgroundColor,
+        contentColor = iconColor,
+        tonalElevation = 0.dp,
+        shadowElevation = shadowElevation
+    ) {
+        IconButton(
+            onClick = onClick,
+            enabled = enabled,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription,
+                tint = iconColor,
+                modifier = Modifier.size(size * 0.62f)
+            )
+        }
+    }
+}
+
+@Composable
 fun FriendsPillButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -170,16 +212,22 @@ fun FriendsPillButton(
 
 @Composable
 fun BigCircleForMainScreenAction(
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 132.dp,
     outerColor: Color = ConstColours.MAIN_BACK_GRAY,
     innerColor: Color = ConstColours.WHITE,
     ring: Dp = 14.dp,
+    enabled: Boolean = true,
 ) {
     Box(
         modifier = modifier
             .size(size)
             .clip(CircleShape)
+            .clickable(
+                enabled = enabled,
+                onClick = onClick
+            )
             .background(outerColor),
         contentAlignment = Alignment.Center
     ) {
@@ -192,6 +240,49 @@ fun BigCircleForMainScreenAction(
         )
     }
 }
+
+
+@Composable
+fun BigCircleSendPhotoAction(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    size: Dp = 132.dp,
+    outerColor: Color = ConstColours.MAIN_BACK_GRAY,
+    innerColor: Color = ConstColours.WHITE,
+    ring: Dp = 14.dp,
+    enabled: Boolean = true,
+) {
+    Box(
+        modifier = modifier
+            .size(size)
+            .clip(CircleShape)
+            .clickable(enabled = enabled, onClick = onClick)
+            .background(outerColor),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(ring)
+                .clip(CircleShape)
+                .background(innerColor)
+        )
+
+        Icon(
+            imageVector = Icons.AutoMirrored.Outlined.Send,
+            contentDescription = "Send",
+            tint = ConstColours.BLACK,
+            modifier = Modifier
+                .size(45.dp)
+                .rotate(-30f)
+        )
+    }
+}
+
+
+
+
+
 
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
@@ -207,6 +298,8 @@ private fun PreviewCircleButtons() {
     }
 }
 
+
+
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
 private fun PreviewFriendsPill() {
@@ -220,6 +313,14 @@ private fun PreviewFriendsPill() {
 @Composable
 private fun PreviewBigCircle() {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        BigCircleForMainScreenAction()
+        BigCircleForMainScreenAction({})
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun PreviewBigCircleForPhotoSend() {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        BigCircleSendPhotoAction({})
     }
 }
