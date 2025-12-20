@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -53,11 +54,71 @@ import androidx.camera.core.Preview as CameraXPreview
 
 
 
+//@Composable
+//fun CameraPreview(
+//    modifier: Modifier = Modifier,
+//    lensFacing: Int = CameraSelector.LENS_FACING_BACK,
+//    torchEnabled: Boolean
+//) {
+//    val context = LocalContext.current
+//    val lifecycleOwner = LocalLifecycleOwner.current
+//
+//    var camera by remember { mutableStateOf<Camera?>(null) }
+//
+//    AndroidView(
+//        modifier = modifier,
+//        factory = { ctx ->
+//            PreviewView(ctx).apply {
+//                scaleType = PreviewView.ScaleType.FILL_CENTER
+//            }
+//        },
+//        update = { previewView ->
+//            val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+//
+//            cameraProviderFuture.addListener({
+//                val cameraProvider = cameraProviderFuture.get()
+//
+//                val preview = CameraXPreview.Builder().build().also {
+//                    it.setSurfaceProvider(previewView.surfaceProvider)
+//                }
+//
+//                val selector = CameraSelector.Builder()
+//                    .requireLensFacing(lensFacing)
+//                    .build()
+//
+//                try {
+//                    cameraProvider.unbindAll()
+//                    val boundCamera = cameraProvider.bindToLifecycle(
+//                        lifecycleOwner,
+//                        selector,
+//                        preview
+//                    )
+//                    camera = boundCamera
+//
+//                    if (boundCamera.cameraInfo.hasFlashUnit()) {
+//                        boundCamera.cameraControl.enableTorch(torchEnabled)
+//                    }
+//                } catch (e: Exception) {
+//                    e.printStackTrace()
+//                }
+//            }, ContextCompat.getMainExecutor(context))
+//        }
+//    )
+//
+//    LaunchedEffect(torchEnabled) {
+//        val cam = camera ?: return@LaunchedEffect
+//        if (cam.cameraInfo.hasFlashUnit()) {
+//            cam.cameraControl.enableTorch(torchEnabled)
+//        }
+//    }
+//}
+
 @Composable
 fun CameraPreview(
     modifier: Modifier = Modifier,
     lensFacing: Int = CameraSelector.LENS_FACING_BACK,
-    torchEnabled: Boolean
+    torchEnabled: Boolean,
+    imageCapture: ImageCapture
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -90,7 +151,8 @@ fun CameraPreview(
                     val boundCamera = cameraProvider.bindToLifecycle(
                         lifecycleOwner,
                         selector,
-                        preview
+                        preview,
+                        imageCapture
                     )
                     camera = boundCamera
 
@@ -112,6 +174,48 @@ fun CameraPreview(
     }
 }
 
+private fun takePhoto(
+    context: android.content.Context,
+    imageCapture: ImageCapture,
+    onSaved: (android.net.Uri) -> Unit = {},
+    onError: (Exception) -> Unit = {}
+) {
+    val name = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US)
+        .format(System.currentTimeMillis())
+
+    val contentValues = ContentValues().apply {
+        put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+        put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Momentum")
+        }
+    }
+
+
+    val outputOptions = ImageCapture.OutputFileOptions
+        .Builder(
+            context.contentResolver,
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues
+        )
+        .build()
+
+    imageCapture.takePicture(
+        outputOptions,
+        ContextCompat.getMainExecutor(context),
+        object : ImageCapture.OnImageSavedCallback {
+            override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                val uri = output.savedUri
+                if (uri != null) onSaved(uri)
+            }
+
+            override fun onError(exc: ImageCaptureException) {
+                onError(exc)
+            }
+        }
+    )
+}
+
 
 
 
@@ -131,6 +235,8 @@ fun rememberCameraPermissionState(): State<Boolean> {
         hasPermission.value = granted
     }
 
+
+
     LaunchedEffect(Unit) {
         if (!hasPermission.value) {
             launcher.launch(Manifest.permission.CAMERA)
@@ -144,16 +250,23 @@ fun rememberCameraPermissionState(): State<Boolean> {
 @Composable
 fun CameraLikeScreen(
     previewPainter: Painter? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onGoToPreview: (android.net.Uri) -> Unit
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
     val iconTint = Color(0xFFEDEEF2)
-
+    val context = LocalContext.current
     var torchEnabled by remember { mutableStateOf(false) }
 
     var lensFacing by remember { mutableIntStateOf(CameraSelector.LENS_FACING_BACK) }
     val hasCameraPermission by rememberCameraPermissionState()
+
+    val imageCapture = remember {
+        ImageCapture.Builder()
+            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+            .build()
+    }
 
     Column(
         modifier = modifier
@@ -212,7 +325,8 @@ fun CameraLikeScreen(
                 CameraPreview(
                     modifier = Modifier.fillMaxSize(),
                     lensFacing = lensFacing,
-                    torchEnabled = torchEnabled
+                    torchEnabled = torchEnabled,
+                    imageCapture = imageCapture
                 )
             } else {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -266,7 +380,22 @@ fun CameraLikeScreen(
                 }
 
                 Spacer(Modifier.weight(1f))
-                BigCircleForMainScreenAction()
+                BigCircleForMainScreenAction(onClick = {
+
+                    takePhoto(
+                        context = context,
+                        imageCapture = imageCapture,
+                        onSaved = { uri ->
+                            Toast.makeText(context, "Saved: $uri", Toast.LENGTH_SHORT).show()
+                            // если хочешь — переходи на экран предпросмотра
+                            onGoToPreview(uri)
+                        },
+                        onError = { e ->
+                            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                })
+
                 Spacer(Modifier.weight(1f))
 
                 IconButton(
@@ -330,6 +459,6 @@ private fun PreviewPillIconButton(
 @Composable
 private fun CameraLikeScreenPreview() {
     MaterialTheme {
-        CameraLikeScreen(previewPainter = null)
+        CameraLikeScreen(onGoToPreview = {  }, previewPainter = null)
     }
 }
