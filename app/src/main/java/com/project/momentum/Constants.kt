@@ -12,5 +12,5 @@ object ConstColours {
     val MAIN_GLASS_GRAY_ALPHA62 = Color(0x9E2B2B2B)
     val TRANSPARENT_WHITE_ALPHA0 = Color(0x00FFFFFF)
     val GOLD = Color(0xFFFFAE00)
-    val GOLD_ALPHA30 = Color(0x4CFFAE00)            // 30%
+    val GOLD_ALPHA30 = Color(0x4CFFAE00)
 }
