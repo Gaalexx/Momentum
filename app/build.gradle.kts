@@ -42,6 +42,22 @@ android {
 }
 
 dependencies {
+    // Compose
+    implementation("androidx.compose.ui:ui:1.6.7")
+    implementation("androidx.compose.material:material:1.6.7")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.6.7")
+    implementation("androidx.activity:activity-compose:1.9.3")
+
+    // Для загрузки изображений (ВЫБЕРИТЕ ОДИН ВАРИАНТ):
+
+    // Вариант A: Используйте Coil напрямую (рекомендуется)
+    implementation("io.coil-kt:coil-compose:2.6.0")
+    // И замените CoilImage на AsyncImage в коде
+
+    // Вариант B: Оставьте Landscapist, но добавьте зависимость
+    implementation("com.github.skydoves:landscapist-coil:2.3.3")
+    implementation("io.coil-kt:coil:2.6.0")
+
     implementation("androidx.compose.material:material-icons-core")
     implementation("androidx.compose.material:material-icons-extended")
     implementation(libs.androidx.core.ktx)
