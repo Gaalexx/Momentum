@@ -54,64 +54,6 @@ import androidx.camera.core.Preview as CameraXPreview
 
 
 
-//@Composable
-//fun CameraPreview(
-//    modifier: Modifier = Modifier,
-//    lensFacing: Int = CameraSelector.LENS_FACING_BACK,
-//    torchEnabled: Boolean
-//) {
-//    val context = LocalContext.current
-//    val lifecycleOwner = LocalLifecycleOwner.current
-//
-//    var camera by remember { mutableStateOf<Camera?>(null) }
-//
-//    AndroidView(
-//        modifier = modifier,
-//        factory = { ctx ->
-//            PreviewView(ctx).apply {
-//                scaleType = PreviewView.ScaleType.FILL_CENTER
-//            }
-//        },
-//        update = { previewView ->
-//            val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-//
-//            cameraProviderFuture.addListener({
-//                val cameraProvider = cameraProviderFuture.get()
-//
-//                val preview = CameraXPreview.Builder().build().also {
-//                    it.setSurfaceProvider(previewView.surfaceProvider)
-//                }
-//
-//                val selector = CameraSelector.Builder()
-//                    .requireLensFacing(lensFacing)
-//                    .build()
-//
-//                try {
-//                    cameraProvider.unbindAll()
-//                    val boundCamera = cameraProvider.bindToLifecycle(
-//                        lifecycleOwner,
-//                        selector,
-//                        preview
-//                    )
-//                    camera = boundCamera
-//
-//                    if (boundCamera.cameraInfo.hasFlashUnit()) {
-//                        boundCamera.cameraControl.enableTorch(torchEnabled)
-//                    }
-//                } catch (e: Exception) {
-//                    e.printStackTrace()
-//                }
-//            }, ContextCompat.getMainExecutor(context))
-//        }
-//    )
-//
-//    LaunchedEffect(torchEnabled) {
-//        val cam = camera ?: return@LaunchedEffect
-//        if (cam.cameraInfo.hasFlashUnit()) {
-//            cam.cameraControl.enableTorch(torchEnabled)
-//        }
-//    }
-//}
 
 @Composable
 fun CameraPreview(
@@ -251,7 +193,8 @@ fun rememberCameraPermissionState(): State<Boolean> {
 fun CameraLikeScreen(
     previewPainter: Painter? = null,
     modifier: Modifier = Modifier,
-    onGoToPreview: (android.net.Uri) -> Unit
+    onGoToPreview: (android.net.Uri) -> Unit,
+    onGoToRecorder: () -> Unit
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
@@ -355,7 +298,7 @@ fun CameraLikeScreen(
             )
             CircleButton(
                 size = 60.dp,
-                onClick = {},
+                onClick = onGoToRecorder,
                 icon = Icons.Outlined.Mic
             )
         }
@@ -387,7 +330,6 @@ fun CameraLikeScreen(
                         imageCapture = imageCapture,
                         onSaved = { uri ->
                             Toast.makeText(context, "Saved: $uri", Toast.LENGTH_SHORT).show()
-                            // если хочешь — переходи на экран предпросмотра
                             onGoToPreview(uri)
                         },
                         onError = { e ->
@@ -459,6 +401,6 @@ private fun PreviewPillIconButton(
 @Composable
 private fun CameraLikeScreenPreview() {
     MaterialTheme {
-        CameraLikeScreen(onGoToPreview = {  }, previewPainter = null)
+        CameraLikeScreen(onGoToPreview = {  }, previewPainter = null, onGoToRecorder = {})
     }
 }

@@ -47,6 +47,7 @@ object Routes {
     const val PREVIEW = "preview"
     const val PREVIEW_WITH_ARG = "preview/{uri}"
 
+    const val RECORDER = "recorder"
     fun previewRoute(uriEncoded: String) = "preview/$uriEncoded"
 }
 
@@ -64,6 +65,9 @@ fun AppNav() {
                 onGoToPreview = { uri ->
                     val encoded = java.net.URLEncoder.encode(uri.toString(), "UTF-8")
                     navController.navigate(Routes.previewRoute(encoded))
+                },
+                onGoToRecorder = {
+                    navController.navigate(Routes.RECORDER)
                 }
             )
         }
@@ -78,6 +82,10 @@ fun AppNav() {
                 uri = uri,
                 onGoToTakePhoto = { navController.navigate(Routes.CAMERA) }
             )
+        }
+
+        composable(Routes.RECORDER){
+            Frame75()
         }
     }
 }
