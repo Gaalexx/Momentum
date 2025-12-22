@@ -194,7 +194,8 @@ fun CameraLikeScreen(
     previewPainter: Painter? = null,
     modifier: Modifier = Modifier,
     onGoToPreview: (android.net.Uri) -> Unit,
-    onGoToRecorder: () -> Unit
+    onGoToRecorder: () -> Unit,
+    onProfileClick: () -> Unit
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
@@ -224,14 +225,16 @@ fun CameraLikeScreen(
                 .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = { },
+            ProfileCircleButton(
+                onClick = onProfileClick,
                 modifier = Modifier
                     .size(36.dp)
                     .clip(CircleShape)
                     .background(chrome2)
-                    .border(1.dp, Color(0xFF232634), CircleShape)
-            ) { ProfileCircleButton(onClick = {}, backgroundColor = chrome2) }
+                    .border(1.dp, Color(0xFF232634), CircleShape),
+                size = 36.dp,
+                backgroundColor = chrome2
+            )
 
             Spacer(Modifier.weight(1f))
             FriendsPillButton(onClick = {})
@@ -401,6 +404,6 @@ private fun PreviewPillIconButton(
 @Composable
 private fun CameraLikeScreenPreview() {
     MaterialTheme {
-        CameraLikeScreen(onGoToPreview = {  }, previewPainter = null, onGoToRecorder = {})
+        CameraLikeScreen(onGoToPreview = {  }, previewPainter = null, onGoToRecorder = {}, onProfileClick = {})
     }
 }
