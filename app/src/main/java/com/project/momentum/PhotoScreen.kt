@@ -119,6 +119,7 @@ fun CameraPreview(
 private fun takePhoto(
     context: android.content.Context,
     imageCapture: ImageCapture,
+    isFrontCamera: Boolean,
     onSaved: (android.net.Uri) -> Unit = {},
     onError: (Exception) -> Unit = {}
 ) {
@@ -133,6 +134,9 @@ private fun takePhoto(
         }
     }
 
+    val metadata = ImageCapture.Metadata().apply {
+        isReversedHorizontal = isFrontCamera
+    }
 
     val outputOptions = ImageCapture.OutputFileOptions
         .Builder(
@@ -140,6 +144,7 @@ private fun takePhoto(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             contentValues
         )
+        .setMetadata(metadata)
         .build()
 
     imageCapture.takePicture(
@@ -147,16 +152,15 @@ private fun takePhoto(
         ContextCompat.getMainExecutor(context),
         object : ImageCapture.OnImageSavedCallback {
             override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                val uri = output.savedUri
-                if (uri != null) onSaved(uri)
+                output.savedUri?.let(onSaved)
             }
-
             override fun onError(exc: ImageCaptureException) {
                 onError(exc)
             }
         }
     )
 }
+
 
 
 
@@ -195,7 +199,8 @@ fun CameraLikeScreen(
     modifier: Modifier = Modifier,
     onGoToPreview: (android.net.Uri) -> Unit,
     onGoToRecorder: () -> Unit,
-    onProfileClick: () -> Unit
+    onProfileClick: () -> Unit,
+    onGoToSettings: () -> Unit
 ) {
     val backGround = ConstColours.BLACK
     val mainBackGray = ConstColours.MAIN_BACK_GRAY
@@ -216,8 +221,7 @@ fun CameraLikeScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(backGround
-)
+            .background(backGround)
             .windowInsetsPadding(WindowInsets.systemBars),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -235,14 +239,14 @@ fun CameraLikeScreen(
             FriendsPillButton(onClick = {})
             Spacer(Modifier.weight(1f))
 
-            SettingsCircleButton(onClick = {})
+            SettingsCircleButton(onClick = onGoToSettings)
         }
 
         Spacer(Modifier.height(12.dp))
 
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.88f)
+                .fillMaxWidth(0.98f)
                 .aspectRatio(1.10f)
                 .clip(RoundedCornerShape(28.dp))
                 .background(ConstColours.MAIN_BACK_GRAY
@@ -300,7 +304,7 @@ fun CameraLikeScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .padding(bottom = 40.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
@@ -320,6 +324,7 @@ fun CameraLikeScreen(
                     takePhoto(
                         context = context,
                         imageCapture = imageCapture,
+                        isFrontCamera = (lensFacing == CameraSelector.LENS_FACING_FRONT),
                         onSaved = { uri ->
                             Toast.makeText(context, "Saved: $uri", Toast.LENGTH_SHORT).show()
                             onGoToPreview(uri)
@@ -328,6 +333,7 @@ fun CameraLikeScreen(
                             Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                         }
                     )
+
                 })
 
                 Spacer(Modifier.weight(1f))
@@ -395,6 +401,6 @@ private fun PreviewPillIconButton(
 @Composable
 private fun CameraLikeScreenPreview() {
     MaterialTheme {
-        CameraLikeScreen(onGoToPreview = {  }, previewPainter = null, onGoToRecorder = {}, onProfileClick = {})
+        CameraLikeScreen(onGoToPreview = {  }, previewPainter = null, onGoToRecorder = {}, onProfileClick = {}, onGoToSettings = {})
     }
 }

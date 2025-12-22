@@ -50,6 +50,7 @@ object Routes {
     const val RECORDER = "recorder"
 
     const val ACCOUNT = "account"
+    const val SETTINGS = "settings"
     fun previewRoute(uriEncoded: String) = "preview/$uriEncoded"
 }
 
@@ -73,6 +74,9 @@ fun AppNav() {
                 },
                 onProfileClick = {
                     navController.navigate(Routes.ACCOUNT)
+                },
+                onGoToSettings = {
+                    navController.navigate(Routes.SETTINGS)
                 }
             )
         }
@@ -101,6 +105,10 @@ fun AppNav() {
                     navController.popBackStack() // Возврат на предыдущий экран
                 }
             )
+        }
+
+        composable(Routes.SETTINGS){
+            SettingsMainScreen(onBackClick = {navController.navigate(Routes.CAMERA)})
         }
     }
 }

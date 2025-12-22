@@ -48,20 +48,16 @@ fun SettingsMainScreen(
             .background(
                 color = ConstColours.BLACK,
             )
-            .padding(vertical = 8.dp)
+            .windowInsetsPadding(WindowInsets.systemBars)
     ) {
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 14.dp)
-                .height(81.dp)
+                .padding(horizontal = 14.dp, vertical = 10.dp)
         ) {
             BackCircleButton(
-                onClick = onBackClick,
-                size = 36.dp,
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .padding(start = 24.dp)
+                onClick = onBackClick
             )
 
             CircleButton(
