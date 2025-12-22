@@ -84,7 +84,8 @@ fun SendPhotoScreen(
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
-    val iconTint = Color(0xFFEDEEF2)
+    val iconTint = ConstColours.WHITE
+
     val context = LocalContext.current
     var caption by rememberSaveable { mutableStateOf("") }
     val captionFocusRequester = remember { FocusRequester() }
@@ -114,7 +115,7 @@ fun SendPhotoScreen(
                     .size(36.dp)
                     .clip(CircleShape)
                     .background(chrome2)
-                    .border(1.dp, Color(0xFF232634), CircleShape)
+                    .border(1.dp, ConstColours.MAIN_BACK_GRAY, CircleShape)
             ) { ProfileCircleButton(onClick = {}, backgroundColor = chrome2) }
 
             Spacer(Modifier.weight(1f))
@@ -127,7 +128,7 @@ fun SendPhotoScreen(
                     .size(36.dp)
                     .clip(CircleShape)
                     .background(chrome2)
-                    .border(1.dp, Color(0xFF232634), CircleShape)
+                    .border(1.dp, ConstColours.MAIN_BACK_GRAY, CircleShape)
             ) { SettingsCircleButton(onClick = {}, backgroundColor = chrome2) }
         }
 
@@ -138,7 +139,7 @@ fun SendPhotoScreen(
                 .fillMaxWidth(0.88f)
                 .aspectRatio(1.10f)
                 .clip(RoundedCornerShape(28.dp))
-                .background(Color(0xFF2A2E39))
+                .background(ConstColours.MAIN_BACK_GRAY)
         ) {
             if (hasCameraPermission) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

@@ -197,9 +197,10 @@ fun CameraLikeScreen(
     onGoToRecorder: () -> Unit,
     onProfileClick: () -> Unit
 ) {
-    val bg = ConstColours.BLACK
-    val chrome2 = ConstColours.MAIN_BACK_GRAY
-    val iconTint = Color(0xFFEDEEF2)
+    val backGround = ConstColours.BLACK
+    val mainBackGray = ConstColours.MAIN_BACK_GRAY
+    val iconTint = ConstColours.WHITE
+
     val context = LocalContext.current
     var torchEnabled by remember { mutableStateOf(false) }
 
@@ -215,7 +216,8 @@ fun CameraLikeScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(bg)
+            .background(backGround
+)
             .windowInsetsPadding(WindowInsets.systemBars),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -226,28 +228,14 @@ fun CameraLikeScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ProfileCircleButton(
-                onClick = onProfileClick,
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(chrome2)
-                    .border(1.dp, Color(0xFF232634), CircleShape),
-                size = 36.dp,
-                backgroundColor = chrome2
+                onClick = onProfileClick
             )
 
             Spacer(Modifier.weight(1f))
             FriendsPillButton(onClick = {})
             Spacer(Modifier.weight(1f))
 
-            IconButton(
-                onClick = { },
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(chrome2)
-                    .border(1.dp, Color(0xFF232634), CircleShape)
-            ) { SettingsCircleButton(onClick = {}, backgroundColor = chrome2) }
+            SettingsCircleButton(onClick = {})
         }
 
         Spacer(Modifier.height(12.dp))
@@ -257,7 +245,8 @@ fun CameraLikeScreen(
                 .fillMaxWidth(0.88f)
                 .aspectRatio(1.10f)
                 .clip(RoundedCornerShape(28.dp))
-                .background(Color(0xFF2A2E39))
+                .background(ConstColours.MAIN_BACK_GRAY
+)
         ) {
             if (hasCameraPermission) {
 //                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -375,14 +364,16 @@ fun CameraLikeScreen(
 private fun PreviewPillIconButton(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     contentDescription: String,
-    bg: Color,
+    backGround
+: Color,
     tint: Color,
     onClick: () -> Unit
 ) {
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(14.dp),
-        color = bg.copy(alpha = 0.9f),
+        color = backGround
+.copy(alpha = 0.9f),
         contentColor = tint,
         tonalElevation = 0.dp
     ) {
