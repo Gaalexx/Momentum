@@ -224,7 +224,7 @@ fun RecorderScreen(
                             CircleButton(
                                 size = 60.dp,
                                 onClick = {
-                                    println("Микрофон нажат")
+                                    println("Кнопка микрофона нажата")
                                 },
                                 icon = Icons.Outlined.Mic,
                                 backgroundColor = ConstColours.BLACK,
