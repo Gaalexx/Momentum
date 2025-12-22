@@ -48,11 +48,9 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.camera.core.Camera
-
-
+import android.content.res.Configuration
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.camera.core.Preview as CameraXPreview
-
-
 
 
 @Composable
@@ -119,6 +117,7 @@ fun CameraPreview(
 private fun takePhoto(
     context: android.content.Context,
     imageCapture: ImageCapture,
+    isFrontCamera: Boolean,
     onSaved: (android.net.Uri) -> Unit = {},
     onError: (Exception) -> Unit = {}
 ) {
@@ -133,6 +132,9 @@ private fun takePhoto(
         }
     }
 
+    val metadata = ImageCapture.Metadata().apply {
+        isReversedHorizontal = isFrontCamera
+    }
 
     val outputOptions = ImageCapture.OutputFileOptions
         .Builder(
@@ -140,6 +142,7 @@ private fun takePhoto(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             contentValues
         )
+        .setMetadata(metadata)
         .build()
 
     imageCapture.takePicture(
@@ -147,8 +150,7 @@ private fun takePhoto(
         ContextCompat.getMainExecutor(context),
         object : ImageCapture.OnImageSavedCallback {
             override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                val uri = output.savedUri
-                if (uri != null) onSaved(uri)
+                output.savedUri?.let(onSaved)
             }
 
             override fun onError(exc: ImageCaptureException) {
@@ -157,6 +159,7 @@ private fun takePhoto(
         }
     )
 }
+
 
 
 
@@ -209,15 +212,17 @@ fun CameraLikeScreen(
 
     val imageCapture = remember {
         ImageCapture.Builder()
-            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+            .setCaptureMode(ImageCapture.CAPTURE_MODE_MAXIMIZE_QUALITY)
             .build()
     }
+
+
+    //val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(backGround
-)
+            .background(backGround)
             .windowInsetsPadding(WindowInsets.systemBars),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -242,11 +247,11 @@ fun CameraLikeScreen(
 
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.88f)
+                .fillMaxWidth(0.98f)
                 .aspectRatio(1.10f)
                 .clip(RoundedCornerShape(28.dp))
                 .background(ConstColours.MAIN_BACK_GRAY
-)
+            )
         ) {
             if (hasCameraPermission) {
 //                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -306,7 +311,7 @@ fun CameraLikeScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 28.dp),
+                    .padding(horizontal = 28.dp, vertical = 45.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { torchEnabled = !torchEnabled }, modifier = Modifier.size(50.dp)) {
@@ -316,10 +321,10 @@ fun CameraLikeScreen(
 
                 Spacer(Modifier.weight(1f))
                 BigCircleForMainScreenAction(onClick = {
-
                     takePhoto(
                         context = context,
                         imageCapture = imageCapture,
+                        isFrontCamera = (lensFacing == CameraSelector.LENS_FACING_FRONT),
                         onSaved = { uri ->
                             Toast.makeText(context, "Saved: $uri", Toast.LENGTH_SHORT).show()
                             onGoToPreview(uri)
@@ -329,6 +334,7 @@ fun CameraLikeScreen(
                         }
                     )
                 })
+
 
                 Spacer(Modifier.weight(1f))
 

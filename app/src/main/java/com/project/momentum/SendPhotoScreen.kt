@@ -136,7 +136,7 @@ fun SendPhotoScreen(
 
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.88f)
+                .fillMaxWidth(0.98f)
                 .aspectRatio(1.10f)
                 .clip(RoundedCornerShape(28.dp))
                 .background(ConstColours.MAIN_BACK_GRAY)
@@ -146,11 +146,12 @@ fun SendPhotoScreen(
                     AsyncImage(
                     model = uri,
                     contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer {
-                            scaleX = if (lensFacing == CameraSelector.LENS_FACING_FRONT) 1f else -1f
-                        },
+                        modifier = Modifier
+                            .fillMaxSize()
+//                            .graphicsLayer {
+//                                scaleX = if (lensFacing == CameraSelector.LENS_FACING_FRONT) -1f else 1f
+//                            }
+                        ,
                     contentScale = ContentScale.Crop
                      )
                     CaptionBasicInput(
@@ -194,24 +195,32 @@ fun SendPhotoScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 28.dp),
+                    .padding(horizontal = 28.dp, vertical = 45.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = {
-                    if(uri != null){
-                        deleteByUri(context = context, uri = uri)
-                    }
-                    onGoToTakePhoto()
-                                     }
-                    , modifier = Modifier.size(50.dp)) {
-                    Icon(Icons.Default.Cancel, modifier = Modifier.size(40.dp), contentDescription = "Flash", tint = iconTint)
-
+                IconButton(
+                    onClick = {
+                        if (uri != null) {
+                            deleteByUri(context = context, uri = uri)
+                        }
+                        onGoToTakePhoto()
+                    },
+                    modifier = Modifier.size(50.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Cancel,
+                        modifier = Modifier.size(40.dp),
+                        contentDescription = "Cancel",
+                        tint = iconTint
+                    )
                 }
 
                 Spacer(Modifier.weight(1f))
+
                 BigCircleSendPhotoAction(
                     onClick = onGoToTakePhoto
                 )
+
                 Spacer(Modifier.weight(1f))
 
                 IconButton(
@@ -221,10 +230,14 @@ fun SendPhotoScreen(
                     },
                     modifier = Modifier.size(50.dp)
                 ) {
-                    Icon(Icons.Outlined.TextFields, modifier = Modifier.size(40.dp), contentDescription = "Flip camera", tint = iconTint)
+                    Icon(
+                        Icons.Outlined.TextFields,
+                        modifier = Modifier.size(40.dp),
+                        contentDescription = "Text",
+                        tint = iconTint
+                    )
                 }
             }
-
         }
 
         Spacer(Modifier.height(15.dp))
