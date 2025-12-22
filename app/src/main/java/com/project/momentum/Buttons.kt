@@ -40,7 +40,7 @@ import com.example.momentum.ConstColours
 fun BackCircleButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: Dp = 40.dp,
+    size: Dp = 65.dp,
     backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
     iconColor: Color = ConstColours.WHITE,
     shadowElevation: Dp = 6.dp,
