@@ -48,6 +48,12 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.camera.core.Camera
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import kotlin.math.min
 
 
 import androidx.camera.core.Preview as CameraXPreview
@@ -195,7 +201,8 @@ fun CameraLikeScreen(
     modifier: Modifier = Modifier,
     onGoToPreview: (android.net.Uri) -> Unit,
     onGoToRecorder: () -> Unit,
-    onProfileClick: () -> Unit
+    onProfileClick: () -> Unit,
+    onOpenGallery: () -> Unit
 ) {
     val backGround = ConstColours.BLACK
     val mainBackGray = ConstColours.MAIN_BACK_GRAY
@@ -213,149 +220,190 @@ fun CameraLikeScreen(
             .build()
     }
 
-    Column(
+    // Для свайпа
+    var dragOffset by remember { mutableStateOf(0f) }
+    val swipeThreshold = 50f // Порог свайпа
+
+    Box(
         modifier = modifier
             .fillMaxSize()
-            .background(backGround
-)
-            .windowInsetsPadding(WindowInsets.systemBars),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            ProfileCircleButton(
-                onClick = onProfileClick
-            )
-
-            Spacer(Modifier.weight(1f))
-            FriendsPillButton(onClick = {})
-            Spacer(Modifier.weight(1f))
-
-            SettingsCircleButton(onClick = {})
-        }
-
-        Spacer(Modifier.height(12.dp))
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth(0.88f)
-                .aspectRatio(1.10f)
-                .clip(RoundedCornerShape(28.dp))
-                .background(ConstColours.MAIN_BACK_GRAY
-)
-        ) {
-            if (hasCameraPermission) {
-//                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//                    Icon(
-//                        imageVector = Icons.Outlined.PhotoCamera,
-//                        contentDescription = null,
-//                        tint = Color.White.copy(alpha = 0.35f),
-//                        modifier = Modifier.size(56.dp)
-//                    )
-//                }
-                CameraPreview(
-                    modifier = Modifier.fillMaxSize(),
-                    lensFacing = lensFacing,
-                    torchEnabled = torchEnabled,
-                    imageCapture = imageCapture
+            .background(backGround)
+            .windowInsetsPadding(WindowInsets.systemBars)
+            .pointerInput(Unit) {
+                detectDragGestures(
+                    onDrag = { change, dragAmount ->
+                        // Свайп вверх (отрицательный Y)
+                        val verticalDrag = dragAmount.y
+                        if (verticalDrag < -50) { // Начинаем отслеживать только при значительном движении вверх
+                            dragOffset = -verticalDrag // Делаем положительным для удобства
+                        }
+                    },
+                    onDragEnd = {
+                        // Проверяем, достаточно ли сильный свайп
+                        if (dragOffset > swipeThreshold) {
+                            onOpenGallery()
+                        }
+                        dragOffset = 0f
+                    }
                 )
-            } else {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Outlined.PhotoCamera,
-                        contentDescription = null,
-                        tint = Color.White.copy(alpha = 0.35f),
-                        modifier = Modifier.size(56.dp)
-                    )
-                }
             }
-        }
-
-        Spacer(Modifier.height(16.dp))
-
-        Row(
-            modifier = Modifier.padding(horizontal = 30.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            CircleButton(
-                size = 60.dp,
-                onClick = {},
-                icon = Icons.Outlined.PhotoCamera,
-                backgroundColor = ConstColours.BLACK
-            )
-            CircleButton(
-                size = 60.dp,
-                onClick = onGoToRecorder,
-                icon = Icons.Outlined.Mic
-            )
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
+    ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 28.dp),
+                    .padding(horizontal = 14.dp, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { torchEnabled = !torchEnabled }, modifier = Modifier.size(50.dp)) {
-                    Icon(Icons.Outlined.WbSunny, modifier = Modifier.size(40.dp), contentDescription = "Flash", tint = iconTint)
-
-                }
+                ProfileCircleButton(
+                    onClick = onProfileClick
+                )
 
                 Spacer(Modifier.weight(1f))
-                BigCircleForMainScreenAction(onClick = {
+                FriendsPillButton(onClick = {})
+                Spacer(Modifier.weight(1f))
 
-                    takePhoto(
-                        context = context,
-                        imageCapture = imageCapture,
-                        onSaved = { uri ->
-                            Toast.makeText(context, "Saved: $uri", Toast.LENGTH_SHORT).show()
-                            onGoToPreview(uri)
-                        },
-                        onError = { e ->
-                            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                        }
+                SettingsCircleButton(onClick = {})
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.88f)
+                    .aspectRatio(1.10f)
+                    .clip(RoundedCornerShape(28.dp))
+                    .background(ConstColours.MAIN_BACK_GRAY)
+            ) {
+                if (hasCameraPermission) {
+                    CameraPreview(
+                        modifier = Modifier.fillMaxSize(),
+                        lensFacing = lensFacing,
+                        torchEnabled = torchEnabled,
+                        imageCapture = imageCapture
                     )
-                })
-
-                Spacer(Modifier.weight(1f))
-
-                IconButton(
-                    onClick = {
-                        lensFacing =
-                            if (lensFacing == CameraSelector.LENS_FACING_BACK)
-                                CameraSelector.LENS_FACING_FRONT
-                            else
-                                CameraSelector.LENS_FACING_BACK
-                    },
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Icon(Icons.Outlined.Cached,modifier = Modifier.size(40.dp), contentDescription = "Flip camera", tint = iconTint)
+                } else {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Outlined.PhotoCamera,
+                            contentDescription = null,
+                            tint = Color.White.copy(alpha = 0.35f),
+                            modifier = Modifier.size(56.dp)
+                        )
+                    }
                 }
             }
 
+            Spacer(Modifier.height(16.dp))
+
+            Row(
+                modifier = Modifier.padding(horizontal = 30.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CircleButton(
+                    size = 60.dp,
+                    onClick = {},
+                    icon = Icons.Outlined.PhotoCamera,
+                    backgroundColor = ConstColours.BLACK
+                )
+                CircleButton(
+                    size = 60.dp,
+                    onClick = onGoToRecorder,
+                    icon = Icons.Outlined.Mic
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 28.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = { torchEnabled = !torchEnabled }, modifier = Modifier.size(50.dp)) {
+                        Icon(Icons.Outlined.WbSunny, modifier = Modifier.size(40.dp), contentDescription = "Flash", tint = iconTint)
+
+                    }
+
+                    Spacer(Modifier.weight(1f))
+                    BigCircleForMainScreenAction(onClick = {
+
+                        takePhoto(
+                            context = context,
+                            imageCapture = imageCapture,
+                            onSaved = { uri ->
+                                Toast.makeText(context, "Saved: $uri", Toast.LENGTH_SHORT).show()
+                                onGoToPreview(uri)
+                            },
+                            onError = { e ->
+                                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    })
+
+                    Spacer(Modifier.weight(1f))
+
+                    IconButton(
+                        onClick = {
+                            lensFacing =
+                                if (lensFacing == CameraSelector.LENS_FACING_BACK)
+                                    CameraSelector.LENS_FACING_FRONT
+                                else
+                                    CameraSelector.LENS_FACING_BACK
+                        },
+                        modifier = Modifier.size(50.dp)
+                    ) {
+                        Icon(Icons.Outlined.Cached,modifier = Modifier.size(40.dp), contentDescription = "Flip camera", tint = iconTint)
+                    }
+                }
+
+            }
+
+            Spacer(Modifier.height(15.dp))
+
+            // Просто иконка без интерактивности
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .background(Color.Transparent),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Анимация иконки при свайпе
+                    val progress = minOf(dragOffset / swipeThreshold, 1f)
+
+                    Icon(
+                        imageVector = Icons.Outlined.KeyboardArrowUp,
+                        contentDescription = "Свайп вверх для галереи",
+                        tint = iconTint.copy(alpha = 0.7f + progress * 0.3f),
+                        modifier = Modifier
+                            .size((34 + progress * 10).dp)
+                            .offset(y = (-progress * 20).dp)
+                    )
+
+                    Text(
+                        text = "Свайп вверх для галереи",
+                        color = iconTint.copy(alpha = 0.7f),
+                        fontSize = 12.sp
+                    )
+                }
+            }
         }
-
-        Spacer(Modifier.height(15.dp))
-
-        Icon(
-            imageVector = Icons.Outlined.KeyboardArrowDown,
-            contentDescription = "More",
-            tint = iconTint.copy(alpha = 0.9f),
-            modifier = Modifier.size(34.dp)
-        )
     }
 }
 
@@ -391,10 +439,3 @@ private fun PreviewPillIconButton(
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
-@Composable
-private fun CameraLikeScreenPreview() {
-    MaterialTheme {
-        CameraLikeScreen(onGoToPreview = {  }, previewPainter = null, onGoToRecorder = {}, onProfileClick = {})
-    }
-}

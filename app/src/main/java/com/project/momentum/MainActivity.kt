@@ -50,6 +50,8 @@ object Routes {
     const val RECORDER = "recorder"
 
     const val ACCOUNT = "account"
+
+    const val GALLERY = "gallery"
     fun previewRoute(uriEncoded: String) = "preview/$uriEncoded"
 }
 
@@ -73,6 +75,9 @@ fun AppNav() {
                 },
                 onProfileClick = {
                     navController.navigate(Routes.ACCOUNT)
+                },
+                onOpenGallery = {
+                    navController.navigate(Routes.GALLERY)
                 }
             )
         }
@@ -99,6 +104,20 @@ fun AppNav() {
                 onProfileClick = { /* Обработка профиля */ },
                 onBackClick = { // ← Добавьте этот параметр
                     navController.popBackStack() // Возврат на предыдущий экран
+                }
+            )
+        }
+
+        composable(Routes.GALLERY) {
+            GallaryScreen(
+                onPostClick = { postId ->
+                    // Обработка клика по посту (можно оставить пустым)
+                },
+                onProfileClick = {
+                    navController.navigate(Routes.ACCOUNT)
+                },
+                onBackClick = {
+                    navController.popBackStack() // Возврат на камеру
                 }
             )
         }

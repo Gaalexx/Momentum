@@ -5,6 +5,7 @@ package com.project.momentum
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -15,10 +16,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,78 +52,134 @@ fun GallaryScreen(
         "https://picsum.photos/300/300?random=$index"
     }
 
-    Column(
+    // Для свайпа
+    var dragOffset by remember { mutableStateOf(0f) }
+    val swipeThreshold = 50f
+
+    Box(
         modifier = modifier
             .fillMaxSize()
             .background(bg)
-            .windowInsetsPadding(WindowInsets.systemBars),
-        horizontalAlignment = Alignment.Start
-    ) {
-        // Верхняя панель
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 14.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            ProfileCircleButton(
-                onClick = onProfileClick
-            )
-
-            Spacer(Modifier.weight(1f))
-
-            FriendsPillButton(
-                onClick = {}
-            )
-
-            Spacer(Modifier.weight(1f))
-
-            SettingsCircleButton(
-                onClick = {}
-            )
-        }
-
-        Spacer(Modifier.height(12.dp))
-
-        // Раздел "Публикации"
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .background(chrome2.copy(alpha = 0.3f)),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = "Публикации",
-                color = textColor,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(16.dp)
-            )
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                items(mockPosts) { postUrl ->
-                    Box(
-                        modifier = Modifier
-                            .aspectRatio(1f)
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickable {
-                                onPostClick(mockPosts.indexOf(postUrl))
-                            }
-                    ) {
-                        AsyncImage(
-                            model = postUrl,
-                            contentDescription = "Пост",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
-                        )
+            .windowInsetsPadding(WindowInsets.systemBars)
+            .pointerInput(Unit) {
+                detectDragGestures(
+                    onDrag = { change, dragAmount ->
+                        // Свайп вниз (положительный Y)
+                        val verticalDrag = dragAmount.y
+                        if (verticalDrag > 50) { // Начинаем отслеживать только при значительном движении вниз
+                            dragOffset = verticalDrag
+                        }
+                    },
+                    onDragEnd = {
+                        if (dragOffset > swipeThreshold) {
+                            onBackClick()
+                        }
+                        dragOffset = 0f
                     }
+                )
+            }
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.Start
+        ) {
+            // Верхняя панель
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ProfileCircleButton(
+                    onClick = onProfileClick
+                )
+
+                Spacer(Modifier.weight(1f))
+
+                FriendsPillButton(
+                    onClick = {}
+                )
+
+                Spacer(Modifier.weight(1f))
+
+                SettingsCircleButton(
+                    onClick = {}
+                )
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            // Раздел "Публикации"
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .background(chrome2.copy(alpha = 0.3f)),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Публикации",
+                    color = textColor,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(16.dp)
+                )
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                ) {
+                    items(mockPosts) { postUrl ->
+                        Box(
+                            modifier = Modifier
+                                .aspectRatio(1f)
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable {
+                                    onPostClick(mockPosts.indexOf(postUrl))
+                                }
+                        ) {
+                            AsyncImage(
+                                model = postUrl,
+                                contentDescription = "Пост",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Просто иконка без интерактивности
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp)
+                    .background(Color.Transparent),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    val progress = minOf(dragOffset / swipeThreshold, 1f)
+
+                    Text(
+                        text = "Свайп вниз чтобы вернуться",
+                        color = iconTint.copy(alpha = 0.7f),
+                        fontSize = 12.sp
+                    )
+
+                    Icon(
+                        imageVector = Icons.Outlined.KeyboardArrowDown,
+                        contentDescription = "Свайп вниз",
+                        tint = iconTint.copy(alpha = 0.7f + progress * 0.3f),
+                        modifier = Modifier
+                            .size((34 + progress * 10).dp)
+                            .offset(y = (progress * 20).dp)
+                    )
                 }
             }
         }
