@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Momentum</string>
+    <string name="settings_main_screen_headliner">Настройки</string>
+    <string name="settings_section_privacy">Конфиденциальность</string>
+    <string name="settings_section_notifications">Уведомления и звуки</string>
+    <string name="settings_section_data">Данные и память</string>
+    <string name="settings_section_language">Язык</string>
+    <string name="settings_type_language">Рус</string>
+    <string name="settings_language_description">Выбрать язык</string>
+    <string name="settings_section_premium">Premium</string>
+    <string name="settings_section_quit">Выйти из аккаунта</string>
+    <string name="settings_section_delete">Удалить аккаунт</string>
+
 </resources>
