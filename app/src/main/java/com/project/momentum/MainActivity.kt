@@ -48,6 +48,8 @@ object Routes {
     const val PREVIEW_WITH_ARG = "preview/{uri}"
 
     const val RECORDER = "recorder"
+
+    const val ACCOUNT = "account"
     fun previewRoute(uriEncoded: String) = "preview/$uriEncoded"
 }
 
@@ -68,6 +70,9 @@ fun AppNav() {
                 },
                 onGoToRecorder = {
                     navController.navigate(Routes.RECORDER)
+                },
+                onProfileClick = {
+                    navController.navigate(Routes.ACCOUNT)
                 }
             )
         }
@@ -86,6 +91,16 @@ fun AppNav() {
 
         composable(Routes.RECORDER){
             Frame75()
+        }
+
+        composable(Routes.ACCOUNT) {
+            AccountScreen(
+                onPostClick = { postId -> /* Обработка клика по посту */ },
+                onProfileClick = { /* Обработка профиля */ },
+                onBackClick = { // ← Добавьте этот параметр
+                    navController.popBackStack() // Возврат на предыдущий экран
+                }
+            )
         }
     }
 }

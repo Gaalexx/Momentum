@@ -14,6 +14,7 @@ import androidx.compose.material.icons.automirrored.rounded.AirplaneTicket
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material.icons.automirrored.rounded.SendToMobile
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Group
@@ -322,5 +323,36 @@ private fun PreviewBigCircle() {
 private fun PreviewBigCircleForPhotoSend() {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         BigCircleSendPhotoAction({})
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun PreviewEdit() {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        EditButton({})
+    }
+}
+
+
+//@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+fun EditButton(onEditProfile : () -> Unit) {
+    Button(
+        onClick = onEditProfile,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = ConstColours.MAIN_BRAND_BLUE,
+            contentColor = Color.White
+        ),
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier.width(200.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Edit,
+            contentDescription = "Редактировать",
+            modifier = Modifier.size(18.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        Text("Редактировать")
     }
 }
