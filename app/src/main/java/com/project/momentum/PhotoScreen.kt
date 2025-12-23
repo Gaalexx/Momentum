@@ -206,16 +206,14 @@ fun CameraLikeScreen(
     onGoToPreview: (android.net.Uri) -> Unit,
     onGoToRecorder: () -> Unit,
     onProfileClick: () -> Unit,
-    onOpenGallery: () -> Unit
+    onOpenGallery: () -> Unit,
     onGoToSettings: () -> Unit
 ) {
     val backGround = ConstColours.BLACK
-    val mainBackGray = ConstColours.MAIN_BACK_GRAY
     val iconTint = ConstColours.WHITE
 
     val context = LocalContext.current
     var torchEnabled by remember { mutableStateOf(false) }
-
     var lensFacing by remember { mutableIntStateOf(CameraSelector.LENS_FACING_BACK) }
     val hasCameraPermission by rememberCameraPermissionState()
 
@@ -225,74 +223,55 @@ fun CameraLikeScreen(
             .build()
     }
 
-    // Для свайпа
+    // swipe state
     var dragOffset by remember { mutableStateOf(0f) }
-    val swipeThreshold = 50f // Порог свайпа
+    val swipeThreshold = 80f
 
-    Box(
+    Column(
         modifier = modifier
             .fillMaxSize()
             .background(backGround)
             .windowInsetsPadding(WindowInsets.systemBars)
             .pointerInput(Unit) {
-                detectDragGestures(
-                    onDrag = { change, dragAmount ->
-                        // Свайп вверх (отрицательный Y)
-                        val verticalDrag = dragAmount.y
-                        if (verticalDrag < -50) { // Начинаем отслеживать только при значительном движении вверх
-                            dragOffset = -verticalDrag // Делаем положительным для удобства
-                        }
+                detectVerticalDragGestures(
+                    onVerticalDrag = { _, dragAmount ->
+                        dragOffset += dragAmount
                     },
                     onDragEnd = {
-                        // Проверяем, достаточно ли сильный свайп
-                        if (dragOffset > swipeThreshold) {
-                            onOpenGallery()
-                        }
+                        if (dragOffset < -swipeThreshold) onOpenGallery()
                         dragOffset = 0f
-                    }
+                    },
+                    onDragCancel = { dragOffset = 0f }
                 )
-            }
+            },
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 14.dp, vertical = 10.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ProfileCircleButton(
-                    onClick = onProfileClick
-                )
+            ProfileCircleButton(onClick = onProfileClick)
 
-                Spacer(Modifier.weight(1f))
-                FriendsPillButton(onClick = {})
-                Spacer(Modifier.weight(1f))
+            Spacer(Modifier.weight(1f))
+            FriendsPillButton(onClick = {})
+            Spacer(Modifier.weight(1f))
 
-                SettingsCircleButton(onClick = {})
-            }
+            SettingsCircleButton(onClick = onGoToSettings)
+        }
 
-            Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(12.dp))
 
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.98f)
                 .aspectRatio(1.10f)
                 .clip(RoundedCornerShape(28.dp))
-                .background(ConstColours.MAIN_BACK_GRAY
-)
+                .background(ConstColours.MAIN_BACK_GRAY)
         ) {
             if (hasCameraPermission) {
-//                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-//                    Icon(
-//                        imageVector = Icons.Outlined.PhotoCamera,
-//                        contentDescription = null,
-//                        tint = Color.White.copy(alpha = 0.35f),
-//                        modifier = Modifier.size(56.dp)
-//                    )
-//                }
                 CameraPreview(
                     modifier = Modifier.fillMaxSize(),
                     lensFacing = lensFacing,
@@ -307,39 +286,31 @@ fun CameraLikeScreen(
                         tint = Color.White.copy(alpha = 0.35f),
                         modifier = Modifier.size(56.dp)
                     )
-                } else {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = Icons.Outlined.PhotoCamera,
-                            contentDescription = null,
-                            tint = Color.White.copy(alpha = 0.35f),
-                            modifier = Modifier.size(56.dp)
-                        )
-                    }
                 }
             }
+        }
 
-            Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(16.dp))
 
-            Row(
-                modifier = Modifier.padding(horizontal = 30.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                CircleButton(
-                    size = 60.dp,
-                    onClick = {},
-                    icon = Icons.Outlined.PhotoCamera,
-                    backgroundColor = ConstColours.BLACK
-                )
-                CircleButton(
-                    size = 60.dp,
-                    onClick = onGoToRecorder,
-                    icon = Icons.Outlined.Mic
-                )
-            }
+        Row(
+            modifier = Modifier.padding(horizontal = 30.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            CircleButton(
+                size = 60.dp,
+                onClick = {},
+                icon = Icons.Outlined.PhotoCamera,
+                backgroundColor = ConstColours.BLACK
+            )
+            CircleButton(
+                size = 60.dp,
+                onClick = onGoToRecorder,
+                icon = Icons.Outlined.Mic
+            )
+        }
 
-            Spacer(modifier = Modifier.weight(1f))
+        Spacer(modifier = Modifier.weight(1f))
 
         Column(
             modifier = Modifier
@@ -350,113 +321,88 @@ fun CameraLikeScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(horizontal = 28.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 28.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                IconButton(
+                    onClick = { torchEnabled = !torchEnabled },
+                    modifier = Modifier.size(50.dp)
                 ) {
-                    IconButton(onClick = { torchEnabled = !torchEnabled }, modifier = Modifier.size(50.dp)) {
-                        Icon(Icons.Outlined.WbSunny, modifier = Modifier.size(40.dp), contentDescription = "Flash", tint = iconTint)
-
-                    }
+                    Icon(
+                        Icons.Outlined.WbSunny,
+                        modifier = Modifier.size(40.dp),
+                        contentDescription = "Flash",
+                        tint = iconTint
+                    )
+                }
 
                 Spacer(Modifier.weight(1f))
-                BigCircleForMainScreenAction(onClick = {
 
-                    takePhoto(
-                        context = context,
-                        imageCapture = imageCapture,
-                        isFrontCamera = (lensFacing == CameraSelector.LENS_FACING_FRONT),
-                        onSaved = { uri ->
-                            Toast.makeText(context, "Saved: $uri", Toast.LENGTH_SHORT).show()
-                            onGoToPreview(uri)
-                        },
-                        onError = { e ->
-                            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                        }
-                    )
+                BigCircleForMainScreenAction(
+                    onClick = {
+                        takePhoto(
+                            context = context,
+                            imageCapture = imageCapture,
+                            isFrontCamera = (lensFacing == CameraSelector.LENS_FACING_FRONT),
+                            onSaved = { uri ->
+                                Toast.makeText(context, "Saved: $uri", Toast.LENGTH_SHORT).show()
+                                onGoToPreview(uri)
+                            },
+                            onError = { e ->
+                                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    }
+                )
 
-                })
+                Spacer(Modifier.weight(1f))
 
-            }
-
-            Spacer(Modifier.height(15.dp))
-
-            // Просто иконка без интерактивности
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp)
-                    .background(Color.Transparent),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                IconButton(
+                    onClick = {
+                        lensFacing =
+                            if (lensFacing == CameraSelector.LENS_FACING_BACK)
+                                CameraSelector.LENS_FACING_FRONT
+                            else
+                                CameraSelector.LENS_FACING_BACK
+                    },
+                    modifier = Modifier.size(50.dp)
                 ) {
-                    // Анимация иконки при свайпе
-                    val progress = minOf(dragOffset / swipeThreshold, 1f)
-
                     Icon(
-                        imageVector = Icons.Outlined.KeyboardArrowUp,
-                        contentDescription = "Свайп вверх для галереи",
-                        tint = iconTint.copy(alpha = 0.7f + progress * 0.3f),
-                        modifier = Modifier
-                            .size((34 + progress * 10).dp)
-                            .offset(y = (-progress * 20).dp)
-                    )
-
-                    Text(
-                        text = "Свайп вверх для галереи",
-                        color = iconTint.copy(alpha = 0.7f),
-                        fontSize = 12.sp
+                        Icons.Outlined.Cached,
+                        modifier = Modifier.size(40.dp),
+                        contentDescription = "Flip camera",
+                        tint = iconTint
                     )
                 }
             }
         }
+
+        Spacer(Modifier.height(15.dp))
+
+        val progress = ((-dragOffset) / swipeThreshold).coerceIn(0f, 1f)
+
+        Icon(
+            imageVector = Icons.Outlined.KeyboardArrowUp,
+            contentDescription = "Swipe up",
+            tint = iconTint.copy(alpha = 0.6f + 0.4f * progress),
+            modifier = Modifier
+                .size((34 + 8 * progress).dp)
+                .offset(y = (-10 * progress).dp)
+        )
     }
 }
 
-
-@Composable
-private fun PreviewPillIconButton(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    contentDescription: String,
-    backGround
-: Color,
-    tint: Color,
-    onClick: () -> Unit
-) {
-    Surface(
-        onClick = onClick,
-        shape = RoundedCornerShape(14.dp),
-        color = backGround
-.copy(alpha = 0.9f),
-        contentColor = tint,
-        tonalElevation = 0.dp
-    ) {
-        Box(
-            modifier = Modifier.size(44.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = contentDescription,
-                tint = tint,
-                modifier = Modifier.size(20.dp)
-            )
-        }
-    }
-}
 
 @Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
 @Composable
 private fun CameraLikeScreenPreview() {
     MaterialTheme {
-        CameraLikeScreen(onGoToPreview = {  }, previewPainter = null, onGoToRecorder = {}, onProfileClick = {}, onGoToSettings = {})
+        CameraLikeScreen(
+            onGoToPreview = {},
+            onGoToRecorder = {},
+            onProfileClick = {},
+            onOpenGallery = {},
+            onGoToSettings = {}
+        )
     }
 }

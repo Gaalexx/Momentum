@@ -34,6 +34,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material3.IconButton
+import androidx.compose.ui.tooling.preview.Preview
 
 class Frame75Activity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,10 +60,19 @@ class Frame75Activity : ComponentActivity() {
                             previewPainter = null,
                             onGoToPreview = { uri ->
                                 val encoded = java.net.URLEncoder.encode(uri.toString(), "UTF-8")
-                                navController.navigate("preview/$encoded")
+                                navController.navigate(Routes.previewRoute(encoded))
                             },
                             onGoToRecorder = {
-                                navController.navigate("recorder")
+                                navController.navigate(Routes.RECORDER)
+                            },
+                            onProfileClick = {
+                                navController.navigate(Routes.ACCOUNT)
+                            },
+                            onOpenGallery = {
+                                navController.navigate(Routes.GALLERY)
+                            },
+                            onGoToSettings = {
+                                navController.navigate(Routes.SETTINGS)
                             }
                         )
                     }
@@ -89,158 +99,170 @@ fun RecorderScreen(
     onCameraClick: () -> Unit = {}
 ) {
     val bg = ConstColours.BLACK
-    val gray = ConstColours.MAIN_BACK_GRAY
-    val white = ConstColours.WHITE
+    val iconTint = ConstColours.WHITE
     val chrome2 = ConstColours.MAIN_BACK_GRAY
     val mainState = remember { MainState() }
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
+            .fillMaxSize()
+            .background(bg)
+            .windowInsetsPadding(WindowInsets.systemBars),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
+
+        // TOP BAR — как в CameraLikeScreen
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 14.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Spacer(
+            // Если хочешь 1-в-1 как в камере — убери IconButton-обертку и оставь просто ProfileCircleButton(...)
+            IconButton(
+                onClick = { },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(18.dp)
-                    .background(bg)
-            )
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(bg)
-                    .padding(vertical = 14.dp,)
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .background(chrome2)
+                    .border(1.dp, Color(0xFF232634), CircleShape)
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 14.dp, vertical = 10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                ProfileCircleButton(onClick = {}, backgroundColor = chrome2)
+            }
 
-                    IconButton(
-                        onClick = { },
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(CircleShape)
-                            .background(chrome2)
-                            .border(1.dp, Color(0xFF232634), CircleShape)
-                    ) { ProfileCircleButton(onClick = {}, backgroundColor = chrome2) }
+            Spacer(Modifier.weight(1f))
 
-                    Spacer(Modifier.weight(1f))
-                    FriendsPillButton(
-                        onClick = { println("Друзья нажаты") },
-                        height = 44.dp
-                    )
-                    Spacer(Modifier.weight(1f))
+            FriendsPillButton(
+                onClick = { println("Друзья нажаты") }
+                // height можешь оставить/убрать — на паддинги не влияет
+            )
 
-                    IconButton(
-                        onClick = { },
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(CircleShape)
-                            .background(chrome2)
-                            .border(1.dp, Color(0xFF232634), CircleShape)
-                    ) { SettingsCircleButton(onClick = {}, backgroundColor = chrome2) }
-                }
+            Spacer(Modifier.weight(1f))
 
-                Spacer(Modifier.height(12.dp))
+            IconButton(
+                onClick = { },
+                modifier = Modifier
+                    .size(36.dp)
+                    .clip(CircleShape)
+                    .background(chrome2)
+                    .border(1.dp, Color(0xFF232634), CircleShape)
+            ) {
+                SettingsCircleButton(onClick = {}, backgroundColor = chrome2)
+            }
+        }
+
+        Spacer(Modifier.height(12.dp)) // как в CameraLikeScreen
+
+        // PREVIEW BOX — как в CameraLikeScreen
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.98f)
+                .aspectRatio(1.10f)
+                .clip(RoundedCornerShape(28.dp))
+                .background(Color(0xFF2A2E39))
+        ) {
+            AsyncImage(
+                model = "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/5b2573b6-2575-48f4-b8b4-8d7756ecd5b7",
+                contentDescription = "Основное изображение",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+
+            if (mainState.currentState == "STATE_2") {
+                var caption by remember { mutableStateOf("") }
 
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 92.dp),
-                    contentAlignment = Alignment.Center
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.BottomStart
                 ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth(0.88f)
-                                .aspectRatio(1.10f)
-                                .clip(RoundedCornerShape(28.dp))
-                                .background(Color(0xFF2A2E39))
-                        ) {
-                            AsyncImage(
-                                model = "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/5b2573b6-2575-48f4-b8b4-8d7756ecd5b7",
-                                contentDescription = "Основное изображение",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier.fillMaxSize()
-                            )
-
-                            if (mainState.currentState == "STATE_2") {
-                                var caption by remember { mutableStateOf("") }
-                                val captionFocusRequester = remember { FocusRequester() }
-                                val keyboardController = LocalSoftwareKeyboardController.current
-
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(16.dp),
-                                    contentAlignment = Alignment.BottomStart
-                                ) {
-                                    CaptionBasicInput(
-                                        value = caption,
-                                        onValueChange = { caption = it },
-                                        placeholder = "Введите комментарий...",
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .focusRequester(mainState.captionFocusRequester ?: remember { FocusRequester() })
-                                    )
-                                }
-                            }
-                        }
-                    }
-
-                    if (mainState.currentState == "INITIAL") {
-                        Row(
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .offset(y = 76.dp)
-                                .padding(horizontal = 30.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            CircleButton(
-                                size = 60.dp,
-                                onClick = {
-                                    onCameraClick()
-                                    navController?.navigate(Routes.CAMERA)
-                                },
-                                icon = Icons.Outlined.PhotoCamera,
-                                iconColor = ConstColours.WHITE,
-                                enabled = true
-                            )
-
-                            CircleButton(
-                                size = 60.dp,
-                                onClick = {
-                                    println("Кнопка микрофона нажата")
-                                },
-                                icon = Icons.Outlined.Mic,
-                                backgroundColor = ConstColours.BLACK,
-                                iconColor = ConstColours.WHITE,
-                                enabled = true,
-                            )
-                        }
-                    }
+                    CaptionBasicInput(
+                        value = caption,
+                        onValueChange = { caption = it },
+                        placeholder = "Введите комментарий...",
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
-
-                Spacer(Modifier.height(120.dp))
-                SecondaryImagesSection(mainState = mainState)
             }
         }
+
+        Spacer(Modifier.height(16.dp)) // как в CameraLikeScreen
+
+        // TWO BUTTONS UNDER PREVIEW — как в CameraLikeScreen
+        if (mainState.currentState == "INITIAL") {
+            Row(
+                modifier = Modifier.padding(horizontal = 30.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                CircleButton(
+                    size = 60.dp,
+                    onClick = {
+                        onCameraClick()
+                        navController?.navigate(Routes.CAMERA)
+                    },
+                    icon = Icons.Outlined.PhotoCamera,
+                    iconColor = ConstColours.WHITE,
+                    enabled = true
+                )
+
+                CircleButton(
+                    size = 60.dp,
+                    onClick = { println("Кнопка микрофона нажата") },
+                    icon = Icons.Outlined.Mic,
+                    backgroundColor = ConstColours.BLACK,
+                    iconColor = ConstColours.WHITE,
+                    enabled = true
+                )
+            }
+        }
+
+        // spacer до низа — как в CameraLikeScreen
+        Spacer(modifier = Modifier.weight(1f))
+
+        // Если нужен низ/контролы (как на камере) — оставь этот блок.
+        // Если в RecorderScreen он не нужен — можно удалить целиком.
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 40.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 28.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Здесь можешь разместить свои нижние контролы рекордера,
+                // паддинги будут совпадать с CameraLikeScreen.
+            }
+        }
+
+        // Дальше твой контент (SecondaryImagesSection).
+        // Если хочешь, чтобы он был ниже как раньше — можно оставить Spacer(120.dp).
+        Spacer(Modifier.height(120.dp))
+        SecondaryImagesSection(mainState = mainState)
     }
 }
+
+
+@Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
+@Composable
+private fun CameraLikeScreenPreview() {
+    MaterialTheme {
+        CameraLikeScreen(
+            previewPainter = null,
+            onGoToPreview = {},
+            onGoToRecorder = {},
+            onProfileClick = {},
+            onOpenGallery = {},
+            onGoToSettings = {}
+        )
+    }
+}
+
 
 class MainState {
     var currentState by mutableStateOf("INITIAL")

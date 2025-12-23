@@ -60,7 +60,7 @@ fun AppNav() {
                     navController.navigate(Routes.ACCOUNT)
                 },
                 onOpenGallery = {
-                    navController.navigate(Routes.GALLERY)
+                    navController.navigate(Routes.GALLERY)},
                 onGoToSettings = {
                     navController.navigate(Routes.SETTINGS)
                 }
@@ -110,8 +110,9 @@ fun AppNav() {
                     navController.popBackStack() // Возврат на камеру
                 }
             )
+        }
         composable(Routes.SETTINGS){
-            SettingsMainScreen(onBackClick = {navController.navigate(Routes.CAMERA)})
+                    SettingsMainScreen(onBackClick = {navController.navigate(Routes.CAMERA)})
         }
     }
 }
