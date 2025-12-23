@@ -30,11 +30,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.momentum.ConstColours
+import com.project.momentum.ui.theme.AppTextStyles
+import com.skydoves.landscapist.ImageOptions
 
 @Composable
 fun BackCircleButton(
@@ -174,6 +179,45 @@ fun CircleButton(
 }
 
 @Composable
+fun SettingsButton(
+    onClick: () -> Unit,
+    icon: ImageVector,
+    text: String,
+    textColor: Color = ConstColours.WHITE,
+    iconColor: Color = textColor,
+    contentDescription: String? = null,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(
+                color = ConstColours.BLACK,
+            )
+            .clickable { onClick() }
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = contentDescription,
+                tint = iconColor,
+                modifier = Modifier.size(24.dp)
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Text(
+                text = text,
+                color = textColor,
+                style = AppTextStyles.MainText
+            )
+        }
+    }
+}
+
+@Composable
 fun FriendsPillButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -306,6 +350,19 @@ private fun PreviewCircleButtons() {
 private fun PreviewFriendsPill() {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         FriendsPillButton(onClick = {})
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
+@Composable
+private fun PreviewSettingsButton() {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        SettingsButton(
+            onClick = {},
+            icon = Icons.Filled.Settings,
+            text = "Конфиденциальность",
+            textColor = ConstColours.GOLD
+        )
     }
 }
 

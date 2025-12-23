@@ -109,15 +109,15 @@ fun SendPhotoScreen(
                 .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = { },
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(chrome2)
-                    .border(1.dp, ConstColours.MAIN_BACK_GRAY, CircleShape)
-            ) { ProfileCircleButton(onClick = {}, backgroundColor = chrome2) }
-
+//            IconButton(
+//                onClick = { },
+//                modifier = Modifier
+//                    .size(36.dp)
+//                    .clip(CircleShape)
+//                    .background(chrome2)
+//                    .border(1.dp, ConstColours.MAIN_BACK_GRAY, CircleShape)
+//            ) { ProfileCircleButton(onClick = {}, backgroundColor = chrome2) }
+            ProfileCircleButton(onClick = {}, backgroundColor = chrome2)
             Spacer(Modifier.weight(1f))
             FriendsPillButton(onClick = {})
             Spacer(Modifier.weight(1f))
@@ -136,7 +136,7 @@ fun SendPhotoScreen(
 
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.88f)
+                .fillMaxWidth(0.98f)
                 .aspectRatio(1.10f)
                 .clip(RoundedCornerShape(28.dp))
                 .background(ConstColours.MAIN_BACK_GRAY)
@@ -147,11 +147,8 @@ fun SendPhotoScreen(
                     model = uri,
                     contentDescription = null,
                     modifier = Modifier
-                        .fillMaxSize()
-                        .graphicsLayer {
-                            scaleX = if (lensFacing == CameraSelector.LENS_FACING_FRONT) 1f else -1f
-                        },
-                    contentScale = ContentScale.Crop
+                        .fillMaxSize(),
+                        contentScale = ContentScale.Crop
                      )
                     CaptionBasicInput(
                         caption,
@@ -188,7 +185,7 @@ fun SendPhotoScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
+                .padding(bottom = 40.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(

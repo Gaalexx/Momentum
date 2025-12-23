@@ -125,6 +125,7 @@ fun CameraPreview(
 private fun takePhoto(
     context: android.content.Context,
     imageCapture: ImageCapture,
+    isFrontCamera: Boolean,
     onSaved: (android.net.Uri) -> Unit = {},
     onError: (Exception) -> Unit = {}
 ) {
@@ -139,6 +140,9 @@ private fun takePhoto(
         }
     }
 
+    val metadata = ImageCapture.Metadata().apply {
+        isReversedHorizontal = isFrontCamera
+    }
 
     val outputOptions = ImageCapture.OutputFileOptions
         .Builder(
@@ -146,6 +150,7 @@ private fun takePhoto(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             contentValues
         )
+        .setMetadata(metadata)
         .build()
 
     imageCapture.takePicture(
@@ -153,16 +158,15 @@ private fun takePhoto(
         ContextCompat.getMainExecutor(context),
         object : ImageCapture.OnImageSavedCallback {
             override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                val uri = output.savedUri
-                if (uri != null) onSaved(uri)
+                output.savedUri?.let(onSaved)
             }
-
             override fun onError(exc: ImageCaptureException) {
                 onError(exc)
             }
         }
     )
 }
+
 
 
 
@@ -203,6 +207,7 @@ fun CameraLikeScreen(
     onGoToRecorder: () -> Unit,
     onProfileClick: () -> Unit,
     onOpenGallery: () -> Unit
+    onGoToSettings: () -> Unit
 ) {
     val backGround = ConstColours.BLACK
     val mainBackGray = ConstColours.MAIN_BACK_GRAY
@@ -271,19 +276,36 @@ fun CameraLikeScreen(
 
             Spacer(Modifier.height(12.dp))
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.88f)
-                    .aspectRatio(1.10f)
-                    .clip(RoundedCornerShape(28.dp))
-                    .background(ConstColours.MAIN_BACK_GRAY)
-            ) {
-                if (hasCameraPermission) {
-                    CameraPreview(
-                        modifier = Modifier.fillMaxSize(),
-                        lensFacing = lensFacing,
-                        torchEnabled = torchEnabled,
-                        imageCapture = imageCapture
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(0.98f)
+                .aspectRatio(1.10f)
+                .clip(RoundedCornerShape(28.dp))
+                .background(ConstColours.MAIN_BACK_GRAY
+)
+        ) {
+            if (hasCameraPermission) {
+//                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+//                    Icon(
+//                        imageVector = Icons.Outlined.PhotoCamera,
+//                        contentDescription = null,
+//                        tint = Color.White.copy(alpha = 0.35f),
+//                        modifier = Modifier.size(56.dp)
+//                    )
+//                }
+                CameraPreview(
+                    modifier = Modifier.fillMaxSize(),
+                    lensFacing = lensFacing,
+                    torchEnabled = torchEnabled,
+                    imageCapture = imageCapture
+                )
+            } else {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Icon(
+                        imageVector = Icons.Outlined.PhotoCamera,
+                        contentDescription = null,
+                        tint = Color.White.copy(alpha = 0.35f),
+                        modifier = Modifier.size(56.dp)
                     )
                 } else {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -319,7 +341,13 @@ fun CameraLikeScreen(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Column(
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 40.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
@@ -336,37 +364,23 @@ fun CameraLikeScreen(
 
                     }
 
-                    Spacer(Modifier.weight(1f))
-                    BigCircleForMainScreenAction(onClick = {
+                Spacer(Modifier.weight(1f))
+                BigCircleForMainScreenAction(onClick = {
 
-                        takePhoto(
-                            context = context,
-                            imageCapture = imageCapture,
-                            onSaved = { uri ->
-                                Toast.makeText(context, "Saved: $uri", Toast.LENGTH_SHORT).show()
-                                onGoToPreview(uri)
-                            },
-                            onError = { e ->
-                                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                            }
-                        )
-                    })
-
-                    Spacer(Modifier.weight(1f))
-
-                    IconButton(
-                        onClick = {
-                            lensFacing =
-                                if (lensFacing == CameraSelector.LENS_FACING_BACK)
-                                    CameraSelector.LENS_FACING_FRONT
-                                else
-                                    CameraSelector.LENS_FACING_BACK
+                    takePhoto(
+                        context = context,
+                        imageCapture = imageCapture,
+                        isFrontCamera = (lensFacing == CameraSelector.LENS_FACING_FRONT),
+                        onSaved = { uri ->
+                            Toast.makeText(context, "Saved: $uri", Toast.LENGTH_SHORT).show()
+                            onGoToPreview(uri)
                         },
-                        modifier = Modifier.size(50.dp)
-                    ) {
-                        Icon(Icons.Outlined.Cached,modifier = Modifier.size(40.dp), contentDescription = "Flip camera", tint = iconTint)
-                    }
-                }
+                        onError = { e ->
+                            Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                        }
+                    )
+
+                })
 
             }
 
@@ -439,3 +453,10 @@ private fun PreviewPillIconButton(
     }
 }
 
+@Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
+@Composable
+private fun CameraLikeScreenPreview() {
+    MaterialTheme {
+        CameraLikeScreen(onGoToPreview = {  }, previewPainter = null, onGoToRecorder = {}, onProfileClick = {}, onGoToSettings = {})
+    }
+}

@@ -52,6 +52,7 @@ object Routes {
     const val ACCOUNT = "account"
 
     const val GALLERY = "gallery"
+    const val SETTINGS = "settings"
     fun previewRoute(uriEncoded: String) = "preview/$uriEncoded"
 }
 
@@ -78,6 +79,8 @@ fun AppNav() {
                 },
                 onOpenGallery = {
                     navController.navigate(Routes.GALLERY)
+                onGoToSettings = {
+                    navController.navigate(Routes.SETTINGS)
                 }
             )
         }
@@ -120,6 +123,8 @@ fun AppNav() {
                     navController.popBackStack() // Возврат на камеру
                 }
             )
+        composable(Routes.SETTINGS){
+            SettingsMainScreen(onBackClick = {navController.navigate(Routes.CAMERA)})
         }
     }
 }
