@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import com.project.momentum.ui.theme.MomentumTheme
@@ -53,6 +54,8 @@ object Routes {
 @Composable
 fun AppNav() {
     val navController = rememberNavController()
+    val accountVm: AccountViewModel = viewModel()
+    val galleryVM: GalleryViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -118,9 +121,10 @@ fun AppNav() {
                     navController.navigate(Routes.previewPhotoRoute(arg))
                 },
                 onProfileClick = { /* Обработка профиля */ },
-                onBackClick = { // ← Добавьте этот параметр
-                    navController.popBackStack() // Возврат на предыдущий экран
-                }
+                onBackClick = {
+                    navController.navigate(Routes.CAMERA)
+                },
+                viewModel = accountVm
             )
         }
 
@@ -134,11 +138,12 @@ fun AppNav() {
                     navController.navigate(Routes.ACCOUNT)
                 },
                 onBackClick = {
-                    navController.popBackStack() // Возврат на камеру
+                    navController.popBackStack()
                 },
                 onGoToSettings = {
                     navController.navigate(Routes.settingsRoute(Routes.GALLERY))
-                }
+                },
+                galleryVM = galleryVM
             )
         }
 
@@ -147,7 +152,7 @@ fun AppNav() {
             val url = encoded?.let { java.net.URLDecoder.decode(it, "UTF-8") }
 
             WatchPhotoScreen(
-                onGoToTakePhoto = { navController.popBackStack() },
+                onGoToTakePhoto = { navController.navigate(Routes.CAMERA) },
                 onGoToGallery = { navController.navigate(Routes.GALLERY) },
                 url = url
             )
@@ -161,7 +166,6 @@ fun AppNav() {
 
             SettingsMainScreen(
                 onBackClick = {
-                    // Возвращаемся на экран, указанный в параметре
                     navController.popBackStack()
                 }
             )

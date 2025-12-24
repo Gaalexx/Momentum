@@ -11,6 +11,7 @@ import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -24,7 +25,40 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.momentum.ConstColours
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+
+
+
+class AccountViewModel : ViewModel() {
+
+    // Источник правды для UI
+    val photos = mutableStateListOf<String>()
+
+    fun addPhoto(url: String) {
+        photos.add(0, url)
+    }
+
+    fun addRandomPhoto() {
+        addPhoto("https://picsum.photos/300/300?random=${System.currentTimeMillis()}")
+    }
+
+    fun removePhoto(url: String) {
+        photos.remove(url)
+    }
+
+    fun clear() {
+        photos.clear()
+    }
+}
+
+
+
 
 @Composable
 fun AccountScreen(
@@ -35,19 +69,22 @@ fun AccountScreen(
     onPostClick: (String) -> Unit = {},
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
+    viewModel: AccountViewModel
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
     val iconTint = Color(0xFFEDEEF2)
     val textColor = Color.White
 
-    var photos by remember { mutableStateOf<List<String>>(emptyList()) }
+    //var photos by remember { mutableStateOf<List<String>>(emptyList()) }
+    val photos = viewModel.photos
 
     // Функция для добавления новой фотографии
     fun addNewPhoto() {
         val newPhotoUrl = "https://picsum.photos/300/300?random=${System.currentTimeMillis()}"
         // Добавляем новое фото в начало
-        photos = listOf(newPhotoUrl) + photos
+        //photos = listOf(newPhotoUrl) + photos
+        viewModel.addPhoto(newPhotoUrl)
     }
 
     Column(
@@ -57,17 +94,14 @@ fun AccountScreen(
             .windowInsetsPadding(WindowInsets.systemBars),
         horizontalAlignment = Alignment.Start
     ) {
-        // Верхняя панель
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 14.dp),
+                .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             BackCircleButton(
-                onClick = onBackClick,
-                modifier = Modifier.size(40.dp)
+                onClick = onBackClick
             )
         }
 
@@ -148,7 +182,7 @@ fun AccountScreen(
             PhotoGrid(
                 photos = photos,
                 onPostClick = onPostClick,
-                onAddPhotoClick = { addNewPhoto() },
+                onAddPhotoClick = { viewModel.addRandomPhoto() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
@@ -166,7 +200,8 @@ private fun AccountScreenPreview() {
         AccountScreen(
             onPostClick = {},
             onProfileClick = {},
-            onBackClick = {}
+            onBackClick = {},
+            viewModel = viewModel()
         )
     }
 }
