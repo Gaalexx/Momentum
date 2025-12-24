@@ -46,6 +46,7 @@ object Routes {
     const val PREVIEW_PHOTO = "previewphoto"
     fun previewRoute(uriEncoded: String) = "preview/$uriEncoded"
     fun settingsRoute(backTo: String) = "settings/$backTo"
+    fun previewPhotoRoute(urlEncoded: String) = "previewphoto/$urlEncoded"
 }
 
 
@@ -112,7 +113,10 @@ fun AppNav() {
 
         composable(Routes.ACCOUNT) {
             AccountScreen(
-                onPostClick = { postId -> /* Обработка клика по посту */ },
+                onPostClick = {
+                        postURL -> val arg = java.net.URLEncoder.encode(postURL.toString(), "UTF-8")
+                    navController.navigate(Routes.previewPhotoRoute(arg))
+                },
                 onProfileClick = { /* Обработка профиля */ },
                 onBackClick = { // ← Добавьте этот параметр
                     navController.popBackStack() // Возврат на предыдущий экран
@@ -122,8 +126,9 @@ fun AppNav() {
 
         composable(Routes.GALLERY) {
             GallaryScreen(
-                onPostClick = { postId ->
-                    // Обработка клика по посту (можно оставить пустым)
+                onPostClick = {
+                    postURL -> val arg = java.net.URLEncoder.encode(postURL.toString(), "UTF-8")
+                    navController.navigate(Routes.previewPhotoRoute(arg))
                 },
                 onProfileClick = {
                     navController.navigate(Routes.ACCOUNT)
@@ -136,6 +141,19 @@ fun AppNav() {
                 }
             )
         }
+
+        composable(Routes.PREVIEW_PHOTO_WITH_ARG) { backStackEntry ->
+            val encoded = backStackEntry.arguments?.getString("url")
+            val url = encoded?.let { java.net.URLDecoder.decode(it, "UTF-8") }
+
+            WatchPhotoScreen(
+                onGoToTakePhoto = { navController.popBackStack() },
+                onGoToGallery = { navController.navigate(Routes.GALLERY) },
+                url = url
+            )
+        }
+
+
         composable(route = Routes.SETTINGS_WITH_BACK,
             arguments = listOf(navArgument("backTo") { type = NavType.StringType })){
                 backStackEntry ->
