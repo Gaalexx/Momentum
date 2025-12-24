@@ -151,37 +151,6 @@ fun GallaryScreen(
                     }
                 }
             }
-
-            // Просто иконка без интерактивности
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp)
-                    .background(Color.Transparent),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    val progress = minOf(dragOffset / swipeThreshold, 1f)
-
-                    Text(
-                        text = "Свайп вниз чтобы вернуться",
-                        color = iconTint.copy(alpha = 0.7f),
-                        fontSize = 12.sp
-                    )
-
-                    Icon(
-                        imageVector = Icons.Outlined.KeyboardArrowDown,
-                        contentDescription = "Свайп вниз",
-                        tint = iconTint.copy(alpha = 0.7f + progress * 0.3f),
-                        modifier = Modifier
-                            .size((34 + progress * 10).dp)
-                            .offset(y = (progress * 20).dp)
-                    )
-                }
-            }
         }
     }
 }
