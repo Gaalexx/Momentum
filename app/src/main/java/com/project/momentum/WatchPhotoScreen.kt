@@ -221,10 +221,9 @@ fun WatchPhotoScreen(
                     .padding(horizontal = 28.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = {
-                    onGoToGallery()
-                }
-                    , modifier = Modifier.size(50.dp)) {
+                IconButton(onClick = onGoToGallery,
+                    modifier = Modifier.size(50.dp))
+                {
                     Icon(Icons.Default.Photo, modifier = Modifier.size(40.dp), contentDescription = "Flash", tint = iconTint)
                 }
 

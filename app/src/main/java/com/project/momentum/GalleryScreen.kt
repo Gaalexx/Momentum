@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -20,7 +21,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModel
 import com.example.momentum.ConstColours
+
+
+class GalleryViewModel : ViewModel() {
+
+    val photos = mutableStateListOf<String>()
+
+    fun addPhoto(url: String) {
+        photos.add(0, url)
+    }
+
+    fun addRandomPhoto() {
+        addPhoto("https://picsum.photos/300/300?random=${System.currentTimeMillis()}")
+    }
+
+    fun removePhoto(url: String) {
+        photos.remove(url)
+    }
+
+    fun clear() {
+        photos.clear()
+    }
+}
+
+
 
 @Composable
 fun GallaryScreen(
@@ -29,23 +55,17 @@ fun GallaryScreen(
     onAddPhoto: () -> Unit = {},
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
-    onGoToSettings: () -> Unit
+    onGoToSettings: () -> Unit,
+    galleryVM: GalleryViewModel
 ) {
     val bg = ConstColours.BLACK
     val textColor = Color.White
 
-    // Для свайпа
     var dragOffset by remember { mutableStateOf(0f) }
     val swipeThreshold = 50f
 
-    var photos by remember { mutableStateOf<List<String>>(emptyList()) }
-
-    // Функция для добавления новой фотографии
-    fun addNewPhoto() {
-        val newPhotoUrl = "https://picsum.photos/300/300?random=${System.currentTimeMillis()}"
-        // Добавляем новое фото в начало
-        photos = listOf(newPhotoUrl) + photos
-    }
+    //var photos by remember { mutableStateOf<List<String>>(emptyList()) }
+    val photos = galleryVM.photos
 
 
     Box(
@@ -74,7 +94,6 @@ fun GallaryScreen(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.Start
         ) {
-            // Верхняя панель
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -94,7 +113,6 @@ fun GallaryScreen(
 
             Spacer(Modifier.height(12.dp))
 
-            // Заголовок
             Text(
                 text = stringResource(R.string.gallery_title),
                 color = textColor,
@@ -106,7 +124,7 @@ fun GallaryScreen(
             PhotoGrid(
                 photos = photos,
                 onPostClick = onPostClick,
-                onAddPhotoClick = { addNewPhoto() },
+                onAddPhotoClick = { galleryVM.addRandomPhoto() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
@@ -125,7 +143,8 @@ private fun GallaryScreenPreview() {
             onPostClick = {},
             onProfileClick = {},
             onBackClick = {},
-            onGoToSettings = {}
+            onGoToSettings = {},
+            galleryVM = GalleryViewModel()
         )
     }
 }

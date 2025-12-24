@@ -111,14 +111,12 @@ fun RecorderScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        // TOP BAR — как в CameraLikeScreen
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Если хочешь 1-в-1 как в камере — убери IconButton-обертку и оставь просто ProfileCircleButton(...)
             IconButton(
                 onClick = { },
                 modifier = Modifier
@@ -252,13 +250,8 @@ fun RecorderScreen(
 @Composable
 private fun CameraLikeScreenPreview() {
     MaterialTheme {
-        CameraLikeScreen(
-            previewPainter = null,
-            onGoToPreview = {},
-            onGoToRecorder = {},
-            onProfileClick = {},
-            onOpenGallery = {},
-            onGoToSettings = {}
+        RecorderScreen(
+            onCameraClick = {}
         )
     }
 }
