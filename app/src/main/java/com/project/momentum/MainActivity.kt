@@ -1,5 +1,6 @@
 package com.project.momentum
 
+import WatchPhotoScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -37,6 +38,8 @@ object Routes {
 
     const val GALLERY = "gallery"
     const val SETTINGS = "settings"
+    const val PREVIEW_PHOTO_WITH_ARG = "previewphoto/{url}"
+    const val PREVIEW_PHOTO = "previewphoto"
     fun previewRoute(uriEncoded: String) = "preview/$uriEncoded"
 }
 

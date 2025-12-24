@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.momentum.ConstColours
 import androidx.compose.ui.res.stringResource
+import kotlinx.coroutines.delay
 
 @Composable
 fun AccountScreen(
