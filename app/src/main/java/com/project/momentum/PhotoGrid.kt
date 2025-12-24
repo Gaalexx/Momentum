@@ -5,10 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,27 +19,18 @@ import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.example.momentum.ConstColours
 
-
 @Composable
 fun PhotoGrid(
-    photos: List<String>,
-    onPostClick: (String) -> Unit = {},
+    posts: List<PostData>,
+    onPostClick: (PostData) -> Unit = {},
     onAddPhotoClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     showPlusButton: Boolean = true,
     columns: Int = 3
 ) {
-    // Собираем все элементы для отображения
-    val displayItems = mutableListOf<GridItem>()
-
-    // Если нужно показывать кнопку плюса, добавляем ее первой
-    if (showPlusButton) {
-        displayItems.add(GridItem.PlusButton)
-    }
-
-    // Добавляем все фотографии
-    photos.forEachIndexed { index, url ->
-        displayItems.add(GridItem.Photo(index, url))
+    val displayItems = buildList<GridItem> {
+        if (showPlusButton) add(GridItem.PlusButton)
+        posts.forEach { post -> add(GridItem.Post(post)) }
     }
 
     LazyVerticalGrid(
@@ -48,7 +40,15 @@ fun PhotoGrid(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        itemsIndexed(displayItems) { _, item ->
+        items(
+            items = displayItems,
+            key = { item ->
+                when (item) {
+                    is GridItem.Post -> item.post.url
+                    GridItem.PlusButton -> "PLUS"
+                }
+            }
+        ) { item ->
             Box(
                 modifier = Modifier
                     .aspectRatio(1f)
@@ -56,16 +56,19 @@ fun PhotoGrid(
                     .background(ConstColours.MAIN_BACK_GRAY)
             ) {
                 when (item) {
-                    is GridItem.Photo -> {
+                    is GridItem.Post -> {
+                        val post = item.post
                         SubcomposeAsyncImage(
-                            model = item.url,
-                            contentDescription = stringResource(R.string.photo_grid_photo, item.index),
+                            model = post.url,
+                            contentDescription = stringResource(
+                                R.string.photo_grid_photo,
+                                post.name
+                            ),
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .fillMaxSize()
-                                .clickable { onPostClick(item.url) },
+                                .clickable { onPostClick(post) },
                             loading = {
-                                // Только индикатор загрузки
                                 Box(
                                     modifier = Modifier.fillMaxSize(),
                                     contentAlignment = Alignment.Center
@@ -99,8 +102,7 @@ fun PhotoGrid(
     }
 }
 
-// Модель для элементов сетки
 sealed class GridItem {
-    data class Photo(val index: Int, val url: String) : GridItem()
-    object PlusButton : GridItem()
+    data class Post(val post: PostData) : GridItem()
+    data object PlusButton : GridItem()
 }

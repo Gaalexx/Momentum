@@ -2,7 +2,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+
+    alias(libs.plugins.kotlin.serialization)
 }
+
 
 android {
     namespace = "com.project.momentum"
@@ -46,6 +49,9 @@ dependencies {
     implementation(libs.androidx.compose.animation)
     val cameraxVersion = "1.3.4"
 
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation("com.google.code.gson:gson:2.11.0")
     implementation("androidx.camera:camera-core:$cameraxVersion")
     implementation("androidx.camera:camera-camera2:$cameraxVersion")
     implementation("androidx.camera:camera-lifecycle:$cameraxVersion")

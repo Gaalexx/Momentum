@@ -29,7 +29,6 @@ class MainActivity : ComponentActivity() {
 }
 
 
-
 object Routes {
     const val CAMERA = "camera"
 
@@ -56,6 +55,8 @@ fun AppNav() {
     val navController = rememberNavController()
     val accountVm: AccountViewModel = viewModel()
     val galleryVM: GalleryViewModel = viewModel()
+    var isFromAccount: Boolean =
+        true // ПРОСТИТЕ МЕНЯ ЗА ЭТОТ ТРЕШ, Я БОЛЬШЕ ТАК НЕ БУДУ (!!!!!!!ЭТО НАДО КАК_ТО АДЕКВАТНО ПЕРЕПИСАТЬ!!!!!!)
 
     NavHost(
         navController = navController,
@@ -86,7 +87,8 @@ fun AppNav() {
                     navController.navigate(Routes.ACCOUNT)
                 },
                 onOpenGallery = {
-                    navController.navigate(Routes.GALLERY)},
+                    navController.navigate(Routes.GALLERY)
+                },
                 onGoToSettings = {
                     navController.navigate(Routes.settingsRoute(Routes.CAMERA))
                 }
@@ -105,7 +107,7 @@ fun AppNav() {
             )
         }
 
-        composable(Routes.RECORDER){
+        composable(Routes.RECORDER) {
             RecorderScreen(
                 navController = navController,
                 onCameraClick = {
@@ -116,10 +118,11 @@ fun AppNav() {
 
         composable(Routes.ACCOUNT) {
             AccountScreen(
-                onPostClick = {
-                        postURL -> val arg = java.net.URLEncoder.encode(postURL.toString(), "UTF-8")
-                    navController.navigate(Routes.previewPhotoRoute(arg))
-                },
+                onPostClick =
+                    {
+                        isFromAccount = true
+                        navController.navigate(Routes.PREVIEW_PHOTO_WITH_ARG)
+                    },
                 onProfileClick = { /* Обработка профиля */ },
                 onBackClick = {
                     navController.navigate(Routes.CAMERA)
@@ -131,8 +134,8 @@ fun AppNav() {
         composable(Routes.GALLERY) {
             GallaryScreen(
                 onPostClick = {
-                    postURL -> val arg = java.net.URLEncoder.encode(postURL.toString(), "UTF-8")
-                    navController.navigate(Routes.previewPhotoRoute(arg))
+                    isFromAccount = false
+                    navController.navigate(Routes.PREVIEW_PHOTO_WITH_ARG)
                 },
                 onProfileClick = {
                     navController.navigate(Routes.ACCOUNT)
@@ -143,25 +146,38 @@ fun AppNav() {
                 onGoToSettings = {
                     navController.navigate(Routes.settingsRoute(Routes.GALLERY))
                 },
-                galleryVM = galleryVM
+                viewModel = galleryVM
             )
         }
 
-        composable(Routes.PREVIEW_PHOTO_WITH_ARG) { backStackEntry ->
-            val encoded = backStackEntry.arguments?.getString("url")
-            val url = encoded?.let { java.net.URLDecoder.decode(it, "UTF-8") }
+        composable(Routes.PREVIEW_PHOTO_WITH_ARG) {
+            if (isFromAccount) {
+                WatchPhotoScreen(
+                    onGoToTakePhoto = { navController.navigate(Routes.CAMERA) },
+                    onGoToGallery = { navController.navigate(Routes.GALLERY) },
+                    url = accountVm.selectedPost.url,
+                    description = accountVm.selectedPost.description,
+                    userName = accountVm.selectedPost.name,
+                    date = accountVm.selectedPost.date
+                )
+            } else {
+                WatchPhotoScreen(
+                    onGoToTakePhoto = { navController.navigate(Routes.CAMERA) },
+                    onGoToGallery = { navController.navigate(Routes.GALLERY) },
+                    url = galleryVM.selectedPost.url,
+                    description = galleryVM.selectedPost.description,
+                    userName = galleryVM.selectedPost.name,
+                    date = galleryVM.selectedPost.date
+                )
+            }
 
-            WatchPhotoScreen(
-                onGoToTakePhoto = { navController.navigate(Routes.CAMERA) },
-                onGoToGallery = { navController.navigate(Routes.GALLERY) },
-                url = url
-            )
         }
 
 
-        composable(route = Routes.SETTINGS_WITH_BACK,
-            arguments = listOf(navArgument("backTo") { type = NavType.StringType })){
-                backStackEntry ->
+        composable(
+            route = Routes.SETTINGS_WITH_BACK,
+            arguments = listOf(navArgument("backTo") { type = NavType.StringType })
+        ) { backStackEntry ->
             val backTo = backStackEntry.arguments?.getString("backTo") ?: Routes.CAMERA
 
             SettingsMainScreen(

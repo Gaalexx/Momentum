@@ -74,7 +74,10 @@ fun ProfileLabel(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.padding(top = 7.dp).fillMaxWidth().size(70.dp)
+        modifier = modifier
+            .padding(top = 7.dp)
+            .fillMaxWidth()
+            .size(70.dp)
     ) {
         AsyncImage(
             model = imageUrl,
@@ -100,27 +103,28 @@ fun ProfileLabel(
 fun ReactToPhoto(
     modifier: Modifier = Modifier,
     onReact: () -> Unit
-    ){
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .padding(bottom = 53.dp,start = 26.dp,end = 26.dp, top = 7.dp)
+            .padding(bottom = 53.dp, start = 26.dp, end = 26.dp, top = 7.dp)
             .clip(shape = RoundedCornerShape(25.dp))
             .fillMaxWidth()
             .background(
                 color = ConstColours.MAIN_BACK_GRAY,
                 shape = RoundedCornerShape(25.dp)
             )
-            .padding(vertical = 7.dp,horizontal = 17.dp,)
-    ){
-        Text("Написать сообщение...",
+            .padding(vertical = 7.dp, horizontal = 17.dp)
+    ) {
+        Text(
+            "Написать сообщение...",
             color = ConstColours.WHITE,
             style = AppTextStyles.MainText
         )
         Column(
             modifier = Modifier
                 .weight(1f)
-        ){}
+        ) {}
     }
 }
 
@@ -131,7 +135,10 @@ fun WatchPhotoScreen(
     modifier: Modifier = Modifier,
     onGoToTakePhoto: () -> Unit,
     onGoToGallery: () -> Unit,
-    url: String?
+    url: String?,
+    description: String,
+    userName: String,
+    date: String
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
@@ -192,18 +199,25 @@ fun WatchPhotoScreen(
                     contentScale = ContentScale.Crop
                 )
 
-                CaptionBasicLabel("Текст", modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .focusRequester(captionFocusRequester))
+                CaptionBasicLabel(
+                    text = description, modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                        .focusRequester(captionFocusRequester)
+                )
             }
             //
 
         }
         Spacer(Modifier.height(5.dp))
-        Text(modifier = Modifier.align(Alignment.CenterHorizontally), text = "01.01.2026", color = ConstColours.WHITE, style = AppTextStyles.SupportingText)
-        ProfileLabel(name = "UserName", imageUrl = "https://cataas.com/cat")
+        Text(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            text = date,
+            color = ConstColours.WHITE,
+            style = AppTextStyles.SupportingText
+        )
+        ProfileLabel(name = userName, imageUrl = "https://cataas.com/cat")
 
         ReactToPhoto(onReact = {})
 
@@ -221,10 +235,17 @@ fun WatchPhotoScreen(
                     .padding(horizontal = 28.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onGoToGallery,
-                    modifier = Modifier.size(50.dp))
+                IconButton(
+                    onClick = onGoToGallery,
+                    modifier = Modifier.size(50.dp)
+                )
                 {
-                    Icon(Icons.Default.Photo, modifier = Modifier.size(40.dp), contentDescription = "Flash", tint = iconTint)
+                    Icon(
+                        Icons.Default.Photo,
+                        modifier = Modifier.size(40.dp),
+                        contentDescription = "Flash",
+                        tint = iconTint
+                    )
                 }
 
                 Spacer(Modifier.weight(1f))
@@ -240,7 +261,12 @@ fun WatchPhotoScreen(
                     },
                     modifier = Modifier.size(50.dp)
                 ) {
-                    Icon(Icons.Outlined.MoreHoriz, modifier = Modifier.size(40.dp), contentDescription = "Flip camera", tint = iconTint)
+                    Icon(
+                        Icons.Outlined.MoreHoriz,
+                        modifier = Modifier.size(40.dp),
+                        contentDescription = "Flip camera",
+                        tint = iconTint
+                    )
                 }
             }
 
@@ -261,6 +287,14 @@ fun WatchPhotoScreen(
 @Composable
 private fun WatchPhotoScreenPreview() {
     MaterialTheme {
-        WatchPhotoScreen(previewPainter = null, onGoToTakePhoto = {}, onGoToGallery = {}, url = null)
+        WatchPhotoScreen(
+            previewPainter = null,
+            onGoToTakePhoto = {},
+            onGoToGallery = {},
+            url = null,
+            description = "null",
+            userName = "null",
+            date = "null"
+        )
     }
 }

@@ -10,11 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,42 +18,42 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.serialization.Serializable
 import androidx.compose.ui.unit.sp
 import com.example.momentum.ConstColours
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-
+import android.content.Context
+import androidx.compose.animation.core.withInfiniteAnimationFrameMillis
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.serialization.json.Json
 
 
 class AccountViewModel : ViewModel() {
 
-    // Источник правды для UI
-    val photos = mutableStateListOf<String>()
+    val posts = mutableStateListOf<PostData>()
+    var selectedPost: PostData by mutableStateOf(PostData(" ", " ", " ", " "))
 
-    fun addPhoto(url: String) {
-        photos.add(0, url)
+    fun addPhoto(context: Context, url: String) {
+
+        val event = readRandomEvent(context)
+        val postData: PostData = PostData(url, "userName", event.date, event.description)
+        posts.add(0, postData)
     }
 
-    fun addRandomPhoto() {
-        addPhoto("https://picsum.photos/300/300?random=${System.currentTimeMillis()}")
+    fun addRandomPhoto(context: Context) {
+        addPhoto(context, "https://picsum.photos/300/300?random=${System.currentTimeMillis()}")
     }
 
-    fun removePhoto(url: String) {
-        photos.remove(url)
-    }
 
     fun clear() {
-        photos.clear()
+        posts.clear()
     }
 }
-
-
 
 
 @Composable
@@ -66,7 +62,7 @@ fun AccountScreen(
     userName: String = stringResource(R.string.userName),
     userStatus: String = stringResource(R.string.account_online_status),
     postsCount: Int = 0,
-    onPostClick: (String) -> Unit = {},
+    onPostClick: () -> Unit = {},
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
     viewModel: AccountViewModel
@@ -75,16 +71,18 @@ fun AccountScreen(
     val chrome2 = ConstColours.MAIN_BACK_GRAY
     val iconTint = Color(0xFFEDEEF2)
     val textColor = Color.White
+    val context: Context = LocalContext.current
 
     //var photos by remember { mutableStateOf<List<String>>(emptyList()) }
-    val photos = viewModel.photos
+    //val photos = viewModel.photos
+    val posts = viewModel.posts
 
     // Функция для добавления новой фотографии
     fun addNewPhoto() {
         val newPhotoUrl = "https://picsum.photos/300/300?random=${System.currentTimeMillis()}"
         // Добавляем новое фото в начало
         //photos = listOf(newPhotoUrl) + photos
-        viewModel.addPhoto(newPhotoUrl)
+        viewModel.addPhoto(context, newPhotoUrl)
     }
 
     Column(
@@ -125,7 +123,9 @@ fun AccountScreen(
                     imageVector = Icons.Outlined.AccountCircle,
                     contentDescription = stringResource(R.string.account_avatar),
                     tint = iconTint.copy(alpha = 0.7f),
-                    modifier = Modifier.size(80.dp).align(Alignment.Center)
+                    modifier = Modifier
+                        .size(80.dp)
+                        .align(Alignment.Center)
                 )
             }
 
@@ -180,9 +180,13 @@ fun AccountScreen(
             )
 
             PhotoGrid(
-                photos = photos,
-                onPostClick = onPostClick,
-                onAddPhotoClick = { viewModel.addRandomPhoto() },
+                posts = posts,
+                onPostClick =
+                    {
+                        viewModel.selectedPost = it
+                        onPostClick()
+                    },
+                onAddPhotoClick = { viewModel.addRandomPhoto(context) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),

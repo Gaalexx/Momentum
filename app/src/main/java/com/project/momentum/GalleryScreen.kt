@@ -2,6 +2,8 @@
 
 package com.project.momentum
 
+import android.content.Context
+import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
@@ -16,36 +18,38 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.momentum.ConstColours
 
 
 class GalleryViewModel : ViewModel() {
 
-    val photos = mutableStateListOf<String>()
+    val posts = mutableStateListOf<PostData>()
+    var selectedPost: PostData by mutableStateOf(PostData(" ", " ", " ", " "))
 
-    fun addPhoto(url: String) {
-        photos.add(0, url)
+    fun addPhoto(context: Context, url: String) {
+
+        val event = readRandomEvent(context)
+        val postData: PostData = PostData(url, event.name, event.date, event.description)
+        posts.add(0, postData)
     }
 
-    fun addRandomPhoto() {
-        addPhoto("https://picsum.photos/300/300?random=${System.currentTimeMillis()}")
+    fun addRandomPhoto(context: Context) {
+        addPhoto(context, "https://picsum.photos/300/300?random=${System.currentTimeMillis()}")
     }
 
-    fun removePhoto(url: String) {
-        photos.remove(url)
-    }
 
     fun clear() {
-        photos.clear()
+        posts.clear()
     }
 }
-
 
 
 @Composable
@@ -56,17 +60,18 @@ fun GallaryScreen(
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
     onGoToSettings: () -> Unit,
-    galleryVM: GalleryViewModel
+    viewModel: GalleryViewModel
 ) {
     val bg = ConstColours.BLACK
     val textColor = Color.White
 
     var dragOffset by remember { mutableStateOf(0f) }
     val swipeThreshold = 50f
+    val context: Context = LocalContext.current
 
     //var photos by remember { mutableStateOf<List<String>>(emptyList()) }
-    val photos = galleryVM.photos
-
+    //val photos = viewModel.photos
+    val posts = viewModel.posts
 
     Box(
         modifier = modifier
@@ -122,9 +127,13 @@ fun GallaryScreen(
             )
 
             PhotoGrid(
-                photos = photos,
-                onPostClick = onPostClick,
-                onAddPhotoClick = { galleryVM.addRandomPhoto() },
+                posts = posts,
+                onPostClick =
+                    {
+                        viewModel.selectedPost = it
+                        onPostClick(viewModel.selectedPost.url)
+                    },
+                onAddPhotoClick = { viewModel.addRandomPhoto(context) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
@@ -144,7 +153,7 @@ private fun GallaryScreenPreview() {
             onProfileClick = {},
             onBackClick = {},
             onGoToSettings = {},
-            galleryVM = GalleryViewModel()
+            viewModel = viewModel()
         )
     }
 }
