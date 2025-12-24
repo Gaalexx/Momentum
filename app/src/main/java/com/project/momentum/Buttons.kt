@@ -14,6 +14,7 @@ import androidx.compose.material.icons.automirrored.rounded.AirplaneTicket
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material.icons.automirrored.rounded.SendToMobile
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
@@ -31,6 +32,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -221,7 +223,7 @@ fun SettingsButton(
 fun FriendsPillButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    text: String = "Друзья",
+    text: String = stringResource(R.string.button_friends),
     height: Dp = 50.dp,
     backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
     contentColor: Color = ConstColours.WHITE,
@@ -325,9 +327,59 @@ fun BigCircleSendPhotoAction(
 }
 
 
+@Composable
+fun EditButton(onEditProfile : () -> Unit) {
+    Button(
+        onClick = onEditProfile,
+        colors = ButtonDefaults.buttonColors(
+            containerColor = ConstColours.MAIN_BRAND_BLUE,
+            contentColor = Color.White
+        ),
+        shape = RoundedCornerShape(20.dp),
+        modifier = Modifier.width(200.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Filled.Edit,
+            contentDescription = "Редактировать",
+            modifier = Modifier.size(18.dp)
+        )
+        Spacer(Modifier.width(8.dp))
+        Text("Редактировать")
+    }
+}
 
-
-
+@Composable
+fun PlusButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    size: Dp = 50.dp,
+    backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
+    iconColor: Color = ConstColours.WHITE,
+    shadowElevation: Dp = 6.dp,
+    enabled: Boolean = true,
+) {
+    Surface(
+        modifier = modifier.size(size),
+        shape = CircleShape,
+        color = backgroundColor,
+        contentColor = iconColor,
+        tonalElevation = 0.dp,
+        shadowElevation = shadowElevation
+    ) {
+        IconButton(
+            onClick = onClick,
+            enabled = enabled,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Add,
+                contentDescription = stringResource(R.string.add_photo),
+                tint = iconColor,
+                modifier = Modifier.size(size * 0.62f)
+            )
+        }
+    }
+}
 
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
@@ -388,28 +440,5 @@ private fun PreviewBigCircleForPhotoSend() {
 private fun PreviewEdit() {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         EditButton({})
-    }
-}
-
-
-//@Preview(showBackground = true, backgroundColor = 0xFF000000)
-@Composable
-fun EditButton(onEditProfile : () -> Unit) {
-    Button(
-        onClick = onEditProfile,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = ConstColours.MAIN_BRAND_BLUE,
-            contentColor = Color.White
-        ),
-        shape = RoundedCornerShape(20.dp),
-        modifier = Modifier.width(200.dp)
-    ) {
-        Icon(
-            imageVector = Icons.Filled.Edit,
-            contentDescription = "Редактировать",
-            modifier = Modifier.size(18.dp)
-        )
-        Spacer(Modifier.width(8.dp))
-        Text("Редактировать")
     }
 }
