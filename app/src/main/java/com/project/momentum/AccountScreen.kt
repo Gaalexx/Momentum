@@ -4,37 +4,34 @@ package com.project.momentum
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
 import com.example.momentum.ConstColours
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun AccountScreen(
     modifier: Modifier = Modifier,
-    userName: String = "userName",
-    userStatus: String = "В сети",
+    userName: String = stringResource(R.string.userName),
+    userStatus: String = stringResource(R.string.account_online_status),
     postsCount: Int = 0,
-    //onEditProfile: () -> Unit = {},
-    onPostClick: (Int) -> Unit = {},
+    onPostClick: (String) -> Unit = {},
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
 ) {
@@ -43,9 +40,13 @@ fun AccountScreen(
     val iconTint = Color(0xFFEDEEF2)
     val textColor = Color.White
 
-    // Моковые данные для постов
-    val mockPosts = List(18) { index ->
-        "https://picsum.photos/300/300?random=$index"
+    var photos by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    // Функция для добавления новой фотографии
+    fun addNewPhoto() {
+        val newPhotoUrl = "https://picsum.photos/300/300?random=${System.currentTimeMillis()}"
+        // Добавляем новое фото в начало
+        photos = listOf(newPhotoUrl) + photos
     }
 
     Column(
@@ -87,7 +88,7 @@ fun AccountScreen(
                 // Здесь можно добавить реальное изображение профиля
                 Icon(
                     imageVector = Icons.Outlined.AccountCircle,
-                    contentDescription = "Аватар",
+                    contentDescription = stringResource(R.string.account_avatar),
                     tint = iconTint.copy(alpha = 0.7f),
                     modifier = Modifier.size(80.dp).align(Alignment.Center)
                 )
@@ -136,38 +137,23 @@ fun AccountScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Мои публикации",
+                text = stringResource(R.string.account_my_publications),
                 color = textColor,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(16.dp)
             )
 
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                items(mockPosts) { postUrl ->
-                    Box(
-                        modifier = Modifier
-                            .aspectRatio(1f)
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickable {
-                                onPostClick(mockPosts.indexOf(postUrl))
-                            }
-                    ) {
-                        AsyncImage(
-                            model = postUrl,
-                            contentDescription = "Пост",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                }
-            }
+            PhotoGrid(
+                photos = photos,
+                onPostClick = onPostClick,
+                onAddPhotoClick = { addNewPhoto() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
+                showPlusButton = true,
+                columns = 3
+            )
         }
     }
 }
@@ -177,7 +163,6 @@ fun AccountScreen(
 private fun AccountScreenPreview() {
     MaterialTheme {
         AccountScreen(
-            //onEditProfile = {},
             onPostClick = {},
             onProfileClick = {},
             onBackClick = {}
