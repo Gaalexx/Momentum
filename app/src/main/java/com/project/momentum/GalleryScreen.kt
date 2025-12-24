@@ -29,6 +29,7 @@ fun GallaryScreen(
     onAddPhoto: () -> Unit = {},
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
+    onGoToSettings: () -> Unit
 ) {
     val bg = ConstColours.BLACK
     val textColor = Color.White
@@ -88,7 +89,7 @@ fun GallaryScreen(
 
                 Spacer(Modifier.weight(1f))
 
-                SettingsCircleButton(onClick = {})
+                SettingsCircleButton(onClick = onGoToSettings)
             }
 
             Spacer(Modifier.height(12.dp))
@@ -123,7 +124,8 @@ private fun GallaryScreenPreview() {
         GallaryScreen(
             onPostClick = {},
             onProfileClick = {},
-            onBackClick = {}
+            onBackClick = {},
+            onGoToSettings = {}
         )
     }
 }
