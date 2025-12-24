@@ -8,10 +8,13 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import com.project.momentum.ui.theme.MomentumTheme
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,9 +41,11 @@ object Routes {
 
     const val GALLERY = "gallery"
     const val SETTINGS = "settings"
+    const val SETTINGS_WITH_BACK = "settings/{backTo}"
     const val PREVIEW_PHOTO_WITH_ARG = "previewphoto/{url}"
     const val PREVIEW_PHOTO = "previewphoto"
     fun previewRoute(uriEncoded: String) = "preview/$uriEncoded"
+    fun settingsRoute(backTo: String) = "settings/$backTo"
 }
 
 
@@ -79,7 +84,7 @@ fun AppNav() {
                 onOpenGallery = {
                     navController.navigate(Routes.GALLERY)},
                 onGoToSettings = {
-                    navController.navigate(Routes.SETTINGS)
+                    navController.navigate(Routes.settingsRoute(Routes.CAMERA))
                 }
             )
         }
@@ -125,11 +130,23 @@ fun AppNav() {
                 },
                 onBackClick = {
                     navController.popBackStack() // Возврат на камеру
+                },
+                onGoToSettings = {
+                    navController.navigate(Routes.settingsRoute(Routes.GALLERY))
                 }
             )
         }
-        composable(Routes.SETTINGS){
-                    SettingsMainScreen(onBackClick = {navController.navigate(Routes.CAMERA)})
+        composable(route = Routes.SETTINGS_WITH_BACK,
+            arguments = listOf(navArgument("backTo") { type = NavType.StringType })){
+                backStackEntry ->
+            val backTo = backStackEntry.arguments?.getString("backTo") ?: Routes.CAMERA
+
+            SettingsMainScreen(
+                onBackClick = {
+                    // Возвращаемся на экран, указанный в параметре
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }
