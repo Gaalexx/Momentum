@@ -4,11 +4,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideIn
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import com.project.momentum.ui.theme.MomentumTheme
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavGraphBuilder
+import androidx.navigation.compose.composable
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +52,19 @@ fun AppNav() {
 
     NavHost(
         navController = navController,
-        startDestination = Routes.CAMERA
+        startDestination = Routes.CAMERA,
+        enterTransition = {
+            EnterTransition.None
+        },
+        exitTransition = {
+            ExitTransition.None
+        },
+        popEnterTransition = {
+            EnterTransition.None
+        },
+        popExitTransition = {
+            ExitTransition.None
+        }
     ) {
         composable(Routes.CAMERA) {
             CameraLikeScreen(

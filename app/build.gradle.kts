@@ -43,6 +43,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.ui)
+    implementation(libs.androidx.compose.animation)
     val cameraxVersion = "1.3.4"
 
     implementation("androidx.camera:camera-core:$cameraxVersion")
@@ -63,6 +64,8 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("com.github.skydoves:landscapist-coil:2.3.3")
+    implementation("com.google.accompanist:accompanist-pager:0.32.0")
+    implementation("com.google.accompanist:accompanist-pager-indicators:0.32.0")
     implementation("io.coil-kt:coil:2.6.0")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
