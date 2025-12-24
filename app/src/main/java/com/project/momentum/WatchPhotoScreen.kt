@@ -203,7 +203,7 @@ fun WatchPhotoScreen(
         }
         Spacer(Modifier.height(5.dp))
         Text(modifier = Modifier.align(Alignment.CenterHorizontally), text = "01.01.2026", color = ConstColours.WHITE, style = AppTextStyles.SupportingText)
-        ProfileLabel(name = "Hui s gormoshkoi", imageUrl = "https://cataas.com/cat")
+        ProfileLabel(name = "UserName", imageUrl = "https://cataas.com/cat")
 
         ReactToPhoto(onReact = {})
 
