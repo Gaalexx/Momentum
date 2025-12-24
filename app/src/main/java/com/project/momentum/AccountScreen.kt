@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.momentum.ConstColours
+import kotlinx.coroutines.delay
 
 @Composable
 fun AccountScreen(
@@ -46,6 +47,7 @@ fun AccountScreen(
     // Моковые данные для постов
     val mockPosts = List(18) { index ->
         "https://picsum.photos/300/300?random=$index"
+
     }
 
     Column(
