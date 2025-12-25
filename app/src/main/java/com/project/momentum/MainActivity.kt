@@ -37,13 +37,15 @@ object Routes {
 
     const val RECORDER = "recorder"
 
-    const val ACCOUNT = "account"
+    //const val ACCOUNT = "account"
     const val ACCOUNT_WITH_BACK = "account/{backTo}"
     const val GALLERY = "gallery"
-    const val SETTINGS = "settings"
+
+    //const val SETTINGS = "settings"
     const val SETTINGS_WITH_BACK = "settings/{backTo}"
     const val PREVIEW_PHOTO_WITH_ARG = "previewphoto/{url}"
-    const val PREVIEW_PHOTO = "previewphoto"
+
+    //const val PREVIEW_PHOTO = "previewphoto"
     fun previewRoute(uriEncoded: String) = "preview/$uriEncoded"
     fun accountRoute(backTo: String) = "account/$backTo"
     fun settingsRoute(backTo: String) = "settings/$backTo"
@@ -102,7 +104,9 @@ fun AppNav() {
 
             SendPhotoScreen(
                 uri = uri,
-                onGoToTakePhoto = { navController.navigate(Routes.CAMERA) }
+                onGoToTakePhoto = { navController.navigate(Routes.CAMERA) },
+                onGoToSettings = { navController.navigate(Routes.SETTINGS_WITH_BACK) },
+                onProfileClick = { navController.navigate(Routes.ACCOUNT_WITH_BACK) }
             )
         }
 
@@ -180,6 +184,8 @@ fun AppNav() {
                 WatchPhotoScreen(
                     onGoToTakePhoto = { navController.navigate(Routes.CAMERA) },
                     onGoToGallery = { navController.navigate(Routes.GALLERY) },
+                    onGoToSettings = { navController.navigate(Routes.SETTINGS_WITH_BACK) },
+                    onProfileClick = { navController.navigate(Routes.ACCOUNT_WITH_BACK) },
                     url = it.url,
                     description = it.description,
                     userName = it.name,
