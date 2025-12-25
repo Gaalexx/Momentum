@@ -135,6 +135,8 @@ fun WatchPhotoScreen(
     modifier: Modifier = Modifier,
     onGoToTakePhoto: () -> Unit,
     onGoToGallery: () -> Unit,
+    onProfileClick: () -> Unit,
+    onGoToSettings: () -> Unit,
     url: String?,
     description: String,
     userName: String,
@@ -166,19 +168,13 @@ fun WatchPhotoScreen(
                 .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ProfileCircleButton(onClick = {}, backgroundColor = chrome2)
+            ProfileCircleButton(onClick = onProfileClick)
+
             Spacer(Modifier.weight(1f))
             FriendsPillButton(onClick = {})
             Spacer(Modifier.weight(1f))
 
-            IconButton(
-                onClick = { },
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(chrome2)
-                    .border(1.dp, ConstColours.MAIN_BACK_GRAY, CircleShape)
-            ) { SettingsCircleButton(onClick = {}, backgroundColor = chrome2) }
+            SettingsCircleButton(onClick = onGoToSettings)
         }
 
         Spacer(Modifier.height(12.dp))
@@ -291,6 +287,8 @@ private fun WatchPhotoScreenPreview() {
             previewPainter = null,
             onGoToTakePhoto = {},
             onGoToGallery = {},
+            onGoToSettings = {},
+            onProfileClick = {},
             url = null,
             description = "null",
             userName = "null",

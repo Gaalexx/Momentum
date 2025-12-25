@@ -80,6 +80,8 @@ fun SendPhotoScreen(
     previewPainter: Painter? = null,
     modifier: Modifier = Modifier,
     onGoToTakePhoto: () -> Unit,
+    onProfileClick: () -> Unit,
+    onGoToSettings: () -> Unit,
     uri: android.net.Uri?
 ) {
     val bg = ConstColours.BLACK
@@ -109,27 +111,13 @@ fun SendPhotoScreen(
                 .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-//            IconButton(
-//                onClick = { },
-//                modifier = Modifier
-//                    .size(36.dp)
-//                    .clip(CircleShape)
-//                    .background(chrome2)
-//                    .border(1.dp, ConstColours.MAIN_BACK_GRAY, CircleShape)
-//            ) { ProfileCircleButton(onClick = {}, backgroundColor = chrome2) }
-            ProfileCircleButton(onClick = {}, backgroundColor = chrome2)
+            ProfileCircleButton(onClick = onProfileClick)
+
             Spacer(Modifier.weight(1f))
             FriendsPillButton(onClick = {})
             Spacer(Modifier.weight(1f))
 
-            IconButton(
-                onClick = { },
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(chrome2)
-                    .border(1.dp, ConstColours.MAIN_BACK_GRAY, CircleShape)
-            ) { SettingsCircleButton(onClick = {}, backgroundColor = chrome2) }
+            SettingsCircleButton(onClick = onGoToSettings)
         }
 
         Spacer(Modifier.height(12.dp))
@@ -144,15 +132,15 @@ fun SendPhotoScreen(
             if (hasCameraPermission) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     AsyncImage(
-                    model = uri,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxSize(),
+                        model = uri,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxSize(),
                         contentScale = ContentScale.Crop
-                     )
+                    )
                     CaptionBasicInput(
                         caption,
-                        {caption = it},
+                        { caption = it },
                         placeholder = "Введите комментарий...",
                         modifier = Modifier
                             .align(Alignment.BottomStart)
@@ -195,13 +183,17 @@ fun SendPhotoScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = {
-                    if(uri != null){
+                    if (uri != null) {
                         deleteByUri(context = context, uri = uri)
                     }
                     onGoToTakePhoto()
-                                     }
-                    , modifier = Modifier.size(50.dp)) {
-                    Icon(Icons.Default.Cancel, modifier = Modifier.size(40.dp), contentDescription = "Flash", tint = iconTint)
+                }, modifier = Modifier.size(50.dp)) {
+                    Icon(
+                        Icons.Default.Cancel,
+                        modifier = Modifier.size(40.dp),
+                        contentDescription = "Flash",
+                        tint = iconTint
+                    )
 
                 }
 
@@ -218,7 +210,12 @@ fun SendPhotoScreen(
                     },
                     modifier = Modifier.size(50.dp)
                 ) {
-                    Icon(Icons.Outlined.TextFields, modifier = Modifier.size(40.dp), contentDescription = "Flip camera", tint = iconTint)
+                    Icon(
+                        Icons.Outlined.TextFields,
+                        modifier = Modifier.size(40.dp),
+                        contentDescription = "Flip camera",
+                        tint = iconTint
+                    )
                 }
             }
 
@@ -240,6 +237,6 @@ fun SendPhotoScreen(
 @Composable
 private fun CameraLikeScreenPreview() {
     MaterialTheme {
-        SendPhotoScreen(previewPainter = null, onGoToTakePhoto = {}, uri = null)
+        SendPhotoScreen(previewPainter = null, onGoToTakePhoto = {}, onProfileClick = {}, onGoToSettings = {}, uri = null)
     }
 }

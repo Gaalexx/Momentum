@@ -96,7 +96,7 @@ fun RecorderScreen(
         ) {
             ProfileCircleButton(
                 onClick = {
-                    navController?.navigate(Routes.ACCOUNT)
+                    navController?.navigate(Routes.ACCOUNT_WITH_BACK)
                 },
                 backgroundColor = chrome2
             )
