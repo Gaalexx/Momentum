@@ -309,7 +309,7 @@ fun SecondaryImagesSection(mainState: MainState) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(bottom = 31.dp)
+        modifier = Modifier.padding(bottom = 23.dp)
     ) {
         if (currentState == "STATE_2") {
             timerJob?.cancel()
@@ -392,8 +392,10 @@ fun SecondaryImagesSection(mainState: MainState) {
             }
         } else {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+                modifier = Modifier.padding(/*bottom = 20.dp*/),
+                horizontalAlignment = Alignment.CenterHorizontally,
+
+                ) {
                 if (currentState == "STATE_1")
                     Spacer(Modifier.height(63.dp))
 
@@ -420,6 +422,7 @@ fun SecondaryImagesSection(mainState: MainState) {
                                 }
                                 println("Первое нажатие - состояние 1")
                             }
+
                             "STATE_1" -> {
 
                                 firstClickTime?.let { firstTime ->
@@ -437,7 +440,7 @@ fun SecondaryImagesSection(mainState: MainState) {
                     modifier = Modifier
                         .width(132.dp)
                         .height(132.dp),
-                            isRecording = isRecording
+                    isRecording = isRecording
                 )
 
                 when (currentState) {
@@ -453,12 +456,12 @@ fun SecondaryImagesSection(mainState: MainState) {
                                 modifier = Modifier.padding(top = 8.dp)
                             )
 
-                                /*Text(
-                                text = "таймер работает",
-                                color = Color.Gray,
-                                fontSize = 12.sp,
-                                modifier = Modifier.padding(top = 2.dp)
-                            )*/
+                            /*Text(
+                            text = "таймер работает",
+                            color = Color.Gray,
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(top = 2.dp)
+                        )*/
 
                             /*
                             Text(
@@ -476,6 +479,7 @@ fun SecondaryImagesSection(mainState: MainState) {
                             )*/
                         }
                     }
+
                     "INITIAL" -> {
                         /*Text(
                             text = "Нажмите для начала",
@@ -493,7 +497,8 @@ fun SecondaryImagesSection(mainState: MainState) {
                     },
                     modifier = Modifier
                         .size(50.dp)
-                        .offset(y=35.dp)
+                        .offset(y = 35.dp)
+                        .padding(bottom = 9.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.KeyboardArrowUp,
@@ -519,4 +524,13 @@ private fun formatElapsedTime(milliseconds: Long): String {
     } else {
         String.format("%02d:%02d", seconds, millis)
     }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
+@Composable
+fun RecorderScreenPreview(
+    navController: NavController? = null,
+    onCameraClick: () -> Unit = {}
+) {
+    RecorderScreen()
 }
