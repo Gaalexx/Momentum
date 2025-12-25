@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import com.example.momentum.ConstColours
 import com.project.momentum.ui.theme.AppTextStyles
 import com.skydoves.landscapist.ImageOptions
+import androidx.compose.ui.graphics.ColorFilter
 
 @Composable
 fun BackCircleButton(
@@ -322,6 +323,45 @@ fun BigCircleSendPhotoAction(
             modifier = Modifier
                 .size(45.dp)
                 .rotate(-30f)
+        )
+    }
+}
+
+@Composable
+fun BigCircleMicroButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    size: Dp = 132.dp,
+    outerColor: Color = ConstColours.MAIN_BACK_GRAY,
+    innerColor: Color = ConstColours.WHITE,
+    ring: Dp = 14.dp,
+    enabled: Boolean = true,
+    colorFilter: ColorFilter? = null,
+    isRecording: Boolean = false
+) {
+    val actualInnerColor = if (isRecording) Color.Red else innerColor
+    Box(
+        modifier = modifier
+            .size(size)
+            .clip(CircleShape)
+            .clickable(enabled = enabled, onClick = onClick)
+            .background(outerColor),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(ring)
+                .clip(CircleShape)
+                .background(actualInnerColor)
+        )
+
+        Icon(
+            imageVector = Icons.Outlined.Mic,
+            contentDescription = "Mic",
+            tint = if (isRecording) Color.White else ConstColours.BLACK,
+            modifier = Modifier
+                .size(45.dp)
         )
     }
 }

@@ -82,9 +82,19 @@ fun AppNav() {
                     navController.navigate(Routes.ACCOUNT)
                 },
                 onOpenGallery = {
-                    navController.navigate(Routes.GALLERY)},
+                    navController.navigate(Routes.GALLERY)
+                },
                 onGoToSettings = {
                     navController.navigate(Routes.settingsRoute(Routes.CAMERA))
+                }
+            )
+        }
+
+        composable(Routes.RECORDER) {
+            RecorderScreen(
+                navController = navController,
+                onCameraClick = {
+                    navController.navigate(Routes.CAMERA)
                 }
             )
         }
@@ -101,21 +111,12 @@ fun AppNav() {
             )
         }
 
-        composable(Routes.RECORDER){
-            RecorderScreen(
-                navController = navController,
-                onCameraClick = {
-                    navController.navigate(Routes.CAMERA)
-                }
-            )
-        }
-
         composable(Routes.ACCOUNT) {
             AccountScreen(
                 onPostClick = { postId -> /* Обработка клика по посту */ },
                 onProfileClick = { /* Обработка профиля */ },
-                onBackClick = { // ← Добавьте этот параметр
-                    navController.popBackStack() // Возврат на предыдущий экран
+                onBackClick = {
+                    navController.popBackStack()
                 }
             )
         }
@@ -123,28 +124,64 @@ fun AppNav() {
         composable(Routes.GALLERY) {
             GallaryScreen(
                 onPostClick = { postId ->
-                    // Обработка клика по посту (можно оставить пустым)
+                    val encoded = java.net.URLEncoder.encode(postId, "UTF-8")
+                    navController.navigate("previewphoto/$encoded")
                 },
                 onProfileClick = {
                     navController.navigate(Routes.ACCOUNT)
                 },
                 onBackClick = {
-                    navController.popBackStack() // Возврат на камеру
+                    navController.popBackStack()
                 },
                 onGoToSettings = {
                     navController.navigate(Routes.settingsRoute(Routes.GALLERY))
                 }
             )
         }
-        composable(route = Routes.SETTINGS_WITH_BACK,
-            arguments = listOf(navArgument("backTo") { type = NavType.StringType })){
-                backStackEntry ->
+
+
+        composable(
+            route = Routes.PREVIEW_PHOTO_WITH_ARG,
+            arguments = listOf(navArgument("url") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val encoded = backStackEntry.arguments?.getString("url")
+            val url = encoded?.let { java.net.URLDecoder.decode(it, "UTF-8") }
+
+            WatchPhotoScreen(
+                url = url,
+                onGoToTakePhoto = {
+                    navController.navigate(Routes.CAMERA)
+                },
+                onGoToGallery = {
+                    navController.navigate(Routes.GALLERY)
+                }
+            )
+        }
+
+        composable(
+            route = Routes.SETTINGS_WITH_BACK,
+            arguments = listOf(navArgument("backTo") { type = NavType.StringType })
+        ) { backStackEntry ->
             val backTo = backStackEntry.arguments?.getString("backTo") ?: Routes.CAMERA
 
             SettingsMainScreen(
                 onBackClick = {
-                    // Возвращаемся на экран, указанный в параметре
                     navController.popBackStack()
+                },
+                onPrivacyClick = {
+                },
+                onNotificationsClick = {
+                },
+                onDataClick = {
+                },
+                onLanguageClick = {
+                },
+                onPremiumClick = {
+                },
+                onLogoutClick = {
+                    navController.popBackStack(Routes.CAMERA, false)
+                },
+                onDeleteAccountClick = {
                 }
             )
         }

@@ -30,4 +30,6 @@
     <string name="photo_grid_photo">Фото %d</string>
     <string name="photo_grid_error">Ошибка загрузки</string>
     <string name="add_photo">Добавление фото</string>
+
+    <string name="rec_img_model_">https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/5b2573b6-2575-48f4-b8b4-8d7756ecd5b7</string>
 </resources>
