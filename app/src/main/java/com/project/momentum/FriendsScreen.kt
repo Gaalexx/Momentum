@@ -101,7 +101,6 @@ data class User(
     val friends: List<Friend>
 )
 
-// В вашем ViewModel или Composable функции
 @Composable
 fun FriendsScreen(
     modifier: Modifier = Modifier,
@@ -112,22 +111,18 @@ fun FriendsScreen(
     val bg = ConstColours.BLACK
     val textColor = Color.White
 
-    // Загружаем друзей для текущего пользователя при первом показе
     LaunchedEffect(user.id) {
         viewModel.loadFriendsForUser(user)
     }
 
-    // Наблюдаем за состоянием из ViewModel
     val userFriends by viewModel.userFriends
     val isLoading by viewModel.isLoading
 
     var searchQuery by remember { mutableStateOf("") }
 
-    // Для свайпа вниз
     var dragOffset by remember { mutableStateOf(0f) }
     val swipeThreshold = 50f
 
-    // Фильтрация друзей по поисковому запросу
     val filteredFriends = remember(userFriends, searchQuery) {
         if (searchQuery.isEmpty()) {
             userFriends
@@ -139,7 +134,6 @@ fun FriendsScreen(
         }
     }
 
-    // Определяем ориентацию экрана
     val configuration = LocalConfiguration.current
     val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
@@ -151,9 +145,8 @@ fun FriendsScreen(
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDrag = { _, dragAmount ->
-                        // Свайп вниз (положительный Y)
                         val verticalDrag = dragAmount.y
-                        if (verticalDrag > 50) { // Начинаем отслеживать только при значительном движении вниз
+                        if (verticalDrag > 50) {
                             dragOffset = verticalDrag
                         }
                     },
@@ -207,17 +200,15 @@ fun FriendsScreen(
 
             Spacer(modifier = Modifier.height(if (isPortrait) 40.dp else 24.dp))
 
-            // Поле поиска
             FriendSearchField(
                 query = searchQuery,
                 onQueryChange = { searchQuery = it },
                 modifier = Modifier.padding(horizontal = 16.dp),
-                onSearch = { /* Можно добавить логику поиска */ }
+                onSearch = {  }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Показать индикатор загрузки
             if (isLoading) {
                 Box(
                     modifier = Modifier
@@ -241,7 +232,6 @@ fun FriendsScreen(
                     }
                 }
             } else {
-                // Заголовок с количеством друзей
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -268,10 +258,8 @@ fun FriendsScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Список друзей или пустое состояние
                 if (filteredFriends.isEmpty()) {
                     if (searchQuery.isNotEmpty()) {
-                        // Нет результатов поиска
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -299,7 +287,6 @@ fun FriendsScreen(
                             )
                         }
                     } else {
-                        // Список друзей пуст
                         Column(
                             modifier = Modifier
                                 .fillMaxSize()
@@ -347,7 +334,6 @@ fun FriendsScreen(
                             )
                         }
 
-                        // Добавляем отступ в конце списка
                         item {
                             Spacer(modifier = Modifier.height(if (isPortrait) 24.dp else 32.dp))
                         }
@@ -358,7 +344,6 @@ fun FriendsScreen(
     }
 }
 
-// Функция для получения контекста (добавьте в начале файла)
 @Composable
 fun rememberApplicationContext(): Context {
     val context = LocalContext.current
@@ -371,7 +356,6 @@ fun FriendButton(
     imageUrl: String,
     modifier: Modifier = Modifier
 ) {
-    //TODO: Картинку запихнуть вместо Box
     Box(
         modifier = modifier
             .clip(CircleShape)
@@ -384,7 +368,6 @@ fun FriendButton(
     }
 }
 
-// Отдельный компонент для отображения друга
 @Composable
 fun FriendItem(friend: User) {
     Row(
