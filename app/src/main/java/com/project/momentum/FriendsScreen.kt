@@ -374,9 +374,14 @@ fun FriendButton(
     //TODO: Картинку запихнуть вместо Box
     Box(
         modifier = modifier
-            .background(Color.Gray, CircleShape)
             .clip(CircleShape)
-    )
+    ) {
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+        )
+    }
 }
 
 // Отдельный компонент для отображения друга

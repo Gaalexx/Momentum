@@ -1,0 +1,333 @@
+[
+  {
+    "id": "u01",
+    "name": "Мирослав",
+    "avatarUrl": "https://avatars.mds.yandex.net/i?id=c6366f7e56c0cab815e9bdb38cb80352d09ef9b6-5657852-images-thumbs&n=13",
+    "isOnline": true,
+    "description": "Люблю горы, кофе и хорошие книги.",
+    "friends": [
+      {
+        "id": "u02",
+        "name": "Мария"
+      },
+      {
+        "id": "u05",
+        "name": "Иван"
+      },
+      {
+        "id": "u10",
+        "name": "Дарья"
+      },
+      {
+        "id": "u03",
+        "name": "Никита"
+      },
+      {
+        "id": "u08",
+        "name": "Анна"
+      },
+      {
+        "id": "u11",
+        "name": "Павел"
+      },
+      {
+        "id": "u06",
+        "name": "Екатерина"
+      }
+    ]
+  },
+  {
+    "id": "u02",
+    "name": "Мария",
+    "avatarUrl": "https://i.pinimg.com/736x/23/4c/fe/234cfed5eb7dd135a1904dff27130be9.jpg",
+    "isOnline": false,
+    "description": "Собираю плейлисты и бегаю по утрам.",
+    "friends": [
+      {
+        "id": "u01",
+        "name": "Мирослав"
+      },
+      {
+        "id": "u03",
+        "name": "Никита"
+      },
+      {
+        "id": "u06",
+        "name": "Екатерина"
+      }
+    ]
+  },
+  {
+    "id": "u03",
+    "name": "Никита",
+    "avatarUrl": "https://i.pinimg.com/736x/59/d8/5c/59d85c143caadfc3cd0d9eb78848abc1.jpg",
+    "isOnline": true,
+    "description": null,
+    "friends": [
+      {
+        "id": "u02",
+        "name": "Мария"
+      },
+      {
+        "id": "u04",
+        "name": "Ольга"
+      },
+      {
+        "id": "u07",
+        "name": "Сергей"
+      }
+    ]
+  },
+  {
+    "id": "u04",
+    "name": "Ольга",
+    "avatarUrl": "https://avatars.mds.yandex.net/i?id=bc301920902f8fa7b628d8b28a55bc0ea46cb85f-5693613-images-thumbs&n=13",
+    "isOnline": false,
+    "description": "Учу языки и рисую скетчи.",
+    "friends": [
+      {
+        "id": "u03",
+        "name": "Никита"
+      },
+      {
+        "id": "u08",
+        "name": "Анна"
+      },
+      {
+        "id": "u11",
+        "name": "Павел"
+      }
+    ]
+  },
+  {
+    "id": "u05",
+    "name": "Иван",
+    "avatarUrl": "https://avatars.mds.yandex.net/i?id=bc7d71d668642af67b2ad7f8a134ceae_l-4566480-images-thumbs&n=13",
+    "isOnline": true,
+    "description": "Фанат настолок и фантастики.",
+    "friends": [
+      {
+        "id": "u01",
+        "name": "Мирослав"
+      },
+      {
+        "id": "u06",
+        "name": "Екатерина"
+      },
+      {
+        "id": "u09",
+        "name": "Алексей"
+      }
+    ]
+  },
+  {
+    "id": "u06",
+    "name": "Екатерина",
+    "avatarUrl": "https://avatars.mds.yandex.net/i?id=b14d6dda09e73536d2d39afdbeeb6cdd138c2202-4290003-images-thumbs&n=13",
+    "isOnline": false,
+    "description": null,
+    "friends": [
+      {
+        "id": "u02",
+        "name": "Мария"
+      },
+      {
+        "id": "u05",
+        "name": "Иван"
+      },
+      {
+        "id": "u12",
+        "name": "Виктория"
+      }
+    ]
+  },
+  {
+    "id": "u07",
+    "name": "Сергей",
+    "avatarUrl": "https://avatars.mds.yandex.net/i?id=3ead3856c5b0c9c29296d1549d6c7df9da50c30a-5232174-images-thumbs&n=13",
+    "isOnline": true,
+    "description": "Люблю велопрогулки и подкасты.",
+    "friends": [
+      {
+        "id": "u03",
+        "name": "Никита"
+      },
+      {
+        "id": "u08",
+        "name": "Анна"
+      },
+      {
+        "id": "u13",
+        "name": "Артём"
+      }
+    ]
+  },
+  {
+    "id": "u08",
+    "name": "Анна",
+    "avatarUrl": "https://avatars.mds.yandex.net/i?id=b061f55e7fb90c3ca6d7765af48f1fb34552b3dd-12602290-images-thumbs&n=13",
+    "isOnline": false,
+    "description": "Пеку хлеб и фотографирую город.",
+    "friends": [
+      {
+        "id": "u04",
+        "name": "Ольга"
+      },
+      {
+        "id": "u07",
+        "name": "Сергей"
+      },
+      {
+        "id": "u14",
+        "name": "Полина"
+      }
+    ]
+  },
+  {
+    "id": "u09",
+    "name": "Алексей",
+    "avatarUrl": "https://avatars.mds.yandex.net/i?id=5d0cc4f5dd0a3a2e7b2d101f7d13878b70b3255f-11376718-images-thumbs&n=13",
+    "isOnline": true,
+    "description": null,
+    "friends": [
+      {
+        "id": "u05",
+        "name": "Иван"
+      },
+      {
+        "id": "u10",
+        "name": "Дарья"
+      },
+      {
+        "id": "u15",
+        "name": "Кирилл"
+      }
+    ]
+  },
+  {
+    "id": "u10",
+    "name": "Дарья",
+    "avatarUrl": "https://avatars.mds.yandex.net/i?id=56ddb1aa58feac00b108c0a253c47455bf505704-4957727-images-thumbs&n=13",
+    "isOnline": false,
+    "description": "Смотрю кино и учусь готовить.",
+    "friends": [
+      {
+        "id": "u01",
+        "name": "Мирослав"
+      },
+      {
+        "id": "u09",
+        "name": "Алексей"
+      },
+      {
+        "id": "u11",
+        "name": "Павел"
+      }
+    ]
+  },
+  {
+    "id": "u11",
+    "name": "Павел",
+    "avatarUrl": "https://avatars.mds.yandex.net/i?id=5b0ee3d7d1d04889884efc3fb86df2ba242078a4-5679824-images-thumbs&n=13",
+    "isOnline": true,
+    "description": "Интересуюсь продуктами и UX.",
+    "friends": [
+      {
+        "id": "u04",
+        "name": "Ольга"
+      },
+      {
+        "id": "u10",
+        "name": "Дарья"
+      },
+      {
+        "id": "u12",
+        "name": "Виктория"
+      }
+    ]
+  },
+  {
+    "id": "u12",
+    "name": "Виктория",
+    "avatarUrl": "https://avatars.mds.yandex.net/i?id=6b7abe5cdbbf8c7d7fb12ba48cabf0fe5f3a6a01-6478260-images-thumbs&n=13",
+    "isOnline": false,
+    "description": "Йога, чай и спокойные вечера.",
+    "friends": [
+      {
+        "id": "u06",
+        "name": "Екатерина"
+      },
+      {
+        "id": "u11",
+        "name": "Павел"
+      },
+      {
+        "id": "u13",
+        "name": "Артём"
+      }
+    ]
+  },
+  {
+    "id": "u13",
+    "name": "Артём",
+    "avatarUrl": "https://avatars.mds.yandex.net/i?id=a54dac646dd35e47afb323e7ebe6f35f2f912f2a-5317527-images-thumbs&n=13",
+    "isOnline": true,
+    "description": null,
+    "friends": [
+      {
+        "id": "u07",
+        "name": "Сергей"
+      },
+      {
+        "id": "u12",
+        "name": "Виктория"
+      },
+      {
+        "id": "u14",
+        "name": "Полина"
+      }
+    ]
+  },
+  {
+    "id": "u14",
+    "name": "Полина",
+    "avatarUrl": "https://avatars.mds.yandex.net/i?id=742e79d2f02b73379a0c4075ef2ee3e0b2e98f40-5491132-images-thumbs&n=13",
+    "isOnline": false,
+    "description": "Люблю путешествия и новые места.",
+    "friends": [
+      {
+        "id": "u08",
+        "name": "Анна"
+      },
+      {
+        "id": "u13",
+        "name": "Артём"
+      },
+      {
+        "id": "u15",
+        "name": "Кирилл"
+      }
+    ]
+  },
+  {
+    "id": "u15",
+    "name": "Кирилл",
+    "avatarUrl": "https://avatars.mds.yandex.net/i?id=c815d650feabe081eb7382d7eb31c3a3015f1b0a-10226583-images-thumbs&n=13",
+    "isOnline": true,
+    "description": "Геймдев, музыка и кот.",
+    "friends": [
+      {
+        "id": "u09",
+        "name": "Алексей"
+      },
+      {
+        "id": "u14",
+        "name": "Полина"
+      },
+      {
+        "id": "u02",
+        "name": "Мария"
+      }
+    ]
+  }
+]
