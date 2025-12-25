@@ -55,6 +55,9 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import kotlin.math.min
 
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.ui.input.pointer.pointerInput
+
 
 import androidx.camera.core.Preview as CameraXPreview
 

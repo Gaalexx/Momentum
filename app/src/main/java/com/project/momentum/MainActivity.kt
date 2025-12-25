@@ -8,7 +8,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import com.project.momentum.ui.theme.MomentumTheme
@@ -29,6 +28,7 @@ class MainActivity : ComponentActivity() {
 }
 
 
+
 object Routes {
     const val CAMERA = "camera"
 
@@ -46,17 +46,12 @@ object Routes {
     const val PREVIEW_PHOTO = "previewphoto"
     fun previewRoute(uriEncoded: String) = "preview/$uriEncoded"
     fun settingsRoute(backTo: String) = "settings/$backTo"
-    fun previewPhotoRoute(urlEncoded: String) = "previewphoto/$urlEncoded"
 }
 
 
 @Composable
 fun AppNav() {
     val navController = rememberNavController()
-    val accountVm: AccountViewModel = viewModel()
-    val galleryVM: GalleryViewModel = viewModel()
-    var isFromAccount: Boolean =
-        true // ПРОСТИТЕ МЕНЯ ЗА ЭТОТ ТРЕШ, Я БОЛЬШЕ ТАК НЕ БУДУ (!!!!!!!ЭТО НАДО КАК_ТО АДЕКВАТНО ПЕРЕПИСАТЬ!!!!!!)
 
     NavHost(
         navController = navController,
@@ -183,6 +178,21 @@ fun AppNav() {
             SettingsMainScreen(
                 onBackClick = {
                     navController.popBackStack()
+                },
+                onPrivacyClick = {
+                },
+                onNotificationsClick = {
+                },
+                onDataClick = {
+                },
+                onLanguageClick = {
+                },
+                onPremiumClick = {
+                },
+                onLogoutClick = {
+                    navController.popBackStack(Routes.CAMERA, false)
+                },
+                onDeleteAccountClick = {
                 }
             )
         }
