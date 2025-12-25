@@ -8,6 +8,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -41,6 +42,8 @@ object Routes {
     const val ACCOUNT_WITH_BACK = "account/{backTo}"
     const val GALLERY = "gallery"
 
+    const val FRIENDS = "friends"
+
     //const val SETTINGS = "settings"
     const val SETTINGS_WITH_BACK = "settings/{backTo}"
     const val PREVIEW_PHOTO_WITH_ARG = "previewphoto/{url}"
@@ -58,6 +61,7 @@ fun AppNav() {
     val navController = rememberNavController()
     val accountVm: AccountViewModel = viewModel()
     val galleryVM: GalleryViewModel = viewModel()
+    val friendsVM: UserViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -92,6 +96,9 @@ fun AppNav() {
                 },
                 onGoToSettings = {
                     navController.navigate(Routes.settingsRoute(Routes.CAMERA))
+                },
+                onGoToFriends = {
+                    navController.navigate(Routes.FRIENDS)
                 }
             )
         }
@@ -106,7 +113,8 @@ fun AppNav() {
                 uri = uri,
                 onGoToTakePhoto = { navController.navigate(Routes.CAMERA) },
                 onGoToSettings = { navController.navigate(Routes.SETTINGS_WITH_BACK) },
-                onProfileClick = { navController.navigate(Routes.ACCOUNT_WITH_BACK) }
+                onProfileClick = { navController.navigate(Routes.ACCOUNT_WITH_BACK) },
+                onGoToFriends = { navController.navigate(Routes.FRIENDS) }
             )
         }
 
@@ -115,7 +123,8 @@ fun AppNav() {
                 navController = navController,
                 onCameraClick = {
                     navController.navigate(Routes.CAMERA)
-                }
+                },
+                onGoToFriends = { navController.navigate(Routes.FRIENDS) }
             )
         }
 
@@ -138,7 +147,7 @@ fun AppNav() {
                 },
                 onProfileClick = { /* Обработка профиля */ },
                 onBackClick = {
-                    navController.popBackStack()
+                    navController.navigate(Routes.CAMERA)
                 },
                 viewModel = accountVm
             )
@@ -165,6 +174,9 @@ fun AppNav() {
                 onGoToSettings = {
                     navController.navigate(Routes.settingsRoute(Routes.GALLERY))
                 },
+                onGoToFriends = {
+                    navController.navigate(Routes.FRIENDS)
+                },
                 viewModel = galleryVM
             )
         }
@@ -186,6 +198,7 @@ fun AppNav() {
                     onGoToGallery = { navController.navigate(Routes.GALLERY) },
                     onGoToSettings = { navController.navigate(Routes.SETTINGS_WITH_BACK) },
                     onProfileClick = { navController.navigate(Routes.ACCOUNT_WITH_BACK) },
+                    onGoToFriends = { navController.navigate(Routes.FRIENDS) },
                     url = it.url,
                     description = it.description,
                     userName = it.name,
@@ -220,6 +233,18 @@ fun AppNav() {
                 },
                 onDeleteAccountClick = {
                 }
+            )
+        }
+
+        composable(route = Routes.FRIENDS) {
+            val users by friendsVM.users
+
+            FriendsScreen(
+                user = users.first(),
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                viewModel = friendsVM
             )
         }
     }
