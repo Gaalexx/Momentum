@@ -31,5 +31,13 @@
     <string name="photo_grid_error">Ошибка загрузки</string>
     <string name="add_photo">Добавление фото</string>
 
+    <string name="friends_screen_headliner">Друзья</string>
+    <string name="friends_screen_sub_headliner">Мои друзья</string>
+    <string name="friends_screen_search_loading">Загрузка друзей…</string>
+    <string name="friends_screen_search_nothing">Друзья не найдены</string>
+    <string name="friends_screen_search_support_mess">Попробуйте изменить запрос</string>
+    <string name="friends_screen_no_friends">У вас пока нет друзей</string>
+    <string name="friends_screen_no_friends_support_mess">Попробуйте изменить запрос</string>
+
     <string name="rec_img_model_">https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/5b2573b6-2575-48f4-b8b4-8d7756ecd5b7</string>
 </resources>
