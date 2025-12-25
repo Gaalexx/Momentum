@@ -113,7 +113,8 @@ fun AppNav() {
                 uri = uri,
                 onGoToTakePhoto = { navController.navigate(Routes.CAMERA) },
                 onGoToSettings = { navController.navigate(Routes.SETTINGS_WITH_BACK) },
-                onProfileClick = { navController.navigate(Routes.ACCOUNT_WITH_BACK) }
+                onProfileClick = { navController.navigate(Routes.ACCOUNT_WITH_BACK) },
+                onGoToFriends = { navController.navigate(Routes.FRIENDS) }
             )
         }
 
@@ -122,7 +123,8 @@ fun AppNav() {
                 navController = navController,
                 onCameraClick = {
                     navController.navigate(Routes.CAMERA)
-                }
+                },
+                onGoToFriends = { navController.navigate(Routes.FRIENDS) }
             )
         }
 
@@ -172,6 +174,9 @@ fun AppNav() {
                 onGoToSettings = {
                     navController.navigate(Routes.settingsRoute(Routes.GALLERY))
                 },
+                onGoToFriends = {
+                    navController.navigate(Routes.FRIENDS)
+                },
                 viewModel = galleryVM
             )
         }
@@ -193,6 +198,7 @@ fun AppNav() {
                     onGoToGallery = { navController.navigate(Routes.GALLERY) },
                     onGoToSettings = { navController.navigate(Routes.SETTINGS_WITH_BACK) },
                     onProfileClick = { navController.navigate(Routes.ACCOUNT_WITH_BACK) },
+                    onGoToFriends = { navController.navigate(Routes.FRIENDS) },
                     url = it.url,
                     description = it.description,
                     userName = it.name,
@@ -236,7 +242,7 @@ fun AppNav() {
             FriendsScreen(
                 user = users.first(),
                 onBackClick = {
-                    navController.navigate(Routes.CAMERA)
+                    navController.popBackStack()
                 },
                 viewModel = friendsVM
             )

@@ -51,6 +51,7 @@ fun GallaryScreen(
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
     onGoToSettings: () -> Unit,
+    onGoToFriends: () -> Unit,
     viewModel: GalleryViewModel
 ) {
     val bg = ConstColours.BLACK
@@ -100,7 +101,7 @@ fun GallaryScreen(
 
                 Spacer(Modifier.weight(1f))
 
-                FriendsPillButton(onClick = {})
+                FriendsPillButton(onClick = onGoToFriends)
 
                 Spacer(Modifier.weight(1f))
 
@@ -144,6 +145,7 @@ private fun GallaryScreenPreview() {
             onProfileClick = {},
             onBackClick = {},
             onGoToSettings = {},
+            onGoToFriends = {},
             viewModel = viewModel()
         )
     }

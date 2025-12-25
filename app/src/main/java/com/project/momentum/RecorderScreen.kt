@@ -58,7 +58,8 @@ class Frame75Activity : ComponentActivity() {
 @Composable
 fun RecorderScreen(
     navController: NavController? = null,
-    onCameraClick: () -> Unit = {}
+    onCameraClick: () -> Unit = {},
+    onGoToFriends: () -> Unit = {}
 ) {
     val bg = ConstColours.BLACK
     val iconTint = ConstColours.WHITE
@@ -104,7 +105,7 @@ fun RecorderScreen(
             Spacer(Modifier.weight(1f))
 
             FriendsPillButton(
-                onClick = {}
+                onClick = onGoToFriends
             )
 
             Spacer(Modifier.weight(1f))

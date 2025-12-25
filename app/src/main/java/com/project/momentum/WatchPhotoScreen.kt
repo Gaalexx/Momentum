@@ -137,6 +137,7 @@ fun WatchPhotoScreen(
     onGoToGallery: () -> Unit,
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
+    onGoToFriends: () -> Unit,
     url: String?,
     description: String,
     userName: String,
@@ -171,7 +172,7 @@ fun WatchPhotoScreen(
             ProfileCircleButton(onClick = onProfileClick)
 
             Spacer(Modifier.weight(1f))
-            FriendsPillButton(onClick = {})
+            FriendsPillButton(onClick = onGoToFriends)
             Spacer(Modifier.weight(1f))
 
             SettingsCircleButton(onClick = onGoToSettings)
@@ -289,6 +290,7 @@ private fun WatchPhotoScreenPreview() {
             onGoToGallery = {},
             onGoToSettings = {},
             onProfileClick = {},
+            onGoToFriends = {},
             url = null,
             description = "null",
             userName = "null",

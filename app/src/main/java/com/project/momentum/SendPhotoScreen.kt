@@ -82,6 +82,7 @@ fun SendPhotoScreen(
     onGoToTakePhoto: () -> Unit,
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
+    onGoToFriends: () -> Unit,
     uri: android.net.Uri?
 ) {
     val bg = ConstColours.BLACK
@@ -114,7 +115,7 @@ fun SendPhotoScreen(
             ProfileCircleButton(onClick = onProfileClick)
 
             Spacer(Modifier.weight(1f))
-            FriendsPillButton(onClick = {})
+            FriendsPillButton(onClick = onGoToFriends)
             Spacer(Modifier.weight(1f))
 
             SettingsCircleButton(onClick = onGoToSettings)
@@ -237,6 +238,12 @@ fun SendPhotoScreen(
 @Composable
 private fun CameraLikeScreenPreview() {
     MaterialTheme {
-        SendPhotoScreen(previewPainter = null, onGoToTakePhoto = {}, onProfileClick = {}, onGoToSettings = {}, uri = null)
+        SendPhotoScreen(
+            previewPainter = null,
+            onGoToTakePhoto = {},
+            onProfileClick = {},
+            onGoToSettings = {},
+            onGoToFriends = {},
+            uri = null)
     }
 }
