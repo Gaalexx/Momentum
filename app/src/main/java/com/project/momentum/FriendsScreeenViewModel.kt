@@ -102,7 +102,6 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         )
     }
 
-    // Парсинг списка друзей
     private fun parseFriendsFromJson(friendsArray: JSONArray?): List<Friend> {
         val friendsList = mutableListOf<Friend>()
 
