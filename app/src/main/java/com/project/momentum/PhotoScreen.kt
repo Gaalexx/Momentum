@@ -210,7 +210,8 @@ fun CameraLikeScreen(
     onGoToRecorder: () -> Unit,
     onProfileClick: () -> Unit,
     onOpenGallery: () -> Unit,
-    onGoToSettings: () -> Unit
+    onGoToSettings: () -> Unit,
+    onGoToFriends: () -> Unit
 ) {
     val backGround = ConstColours.BLACK
     val iconTint = ConstColours.WHITE
@@ -259,7 +260,7 @@ fun CameraLikeScreen(
             ProfileCircleButton(onClick = onProfileClick)
 
             Spacer(Modifier.weight(1f))
-            FriendsPillButton(onClick = {})
+            FriendsPillButton(onClick = onGoToFriends)
             Spacer(Modifier.weight(1f))
 
             SettingsCircleButton(onClick = onGoToSettings)
@@ -405,7 +406,8 @@ private fun CameraLikeScreenPreview() {
             onGoToRecorder = {},
             onProfileClick = {},
             onOpenGallery = {},
-            onGoToSettings = {}
+            onGoToSettings = {},
+            onGoToFriends = {}
         )
     }
 }
