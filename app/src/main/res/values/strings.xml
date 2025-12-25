@@ -11,4 +11,25 @@
     <string name="settings_section_quit">Выйти из аккаунта</string>
     <string name="settings_section_delete">Удалить аккаунт</string>
 
+    <string name="button_back">Назад</string>
+    <string name="button_profile">Профиль</string>
+    <string name="button_settings">Настройки</string>
+    <string name="button_friends">Друзья</string>
+    <string name="button_edit">Редактировать</string>
+    <string name="button_plus">Добавить</string>
+    <string name="button_send">Отправить</string>
+
+    <string name="account_online_status">В сети</string>
+    <string name="account_my_publications">Мои публикации</string>
+    <string name="account_avatar">Аватар</string>
+    <string name="userName">userName</string>
+
+    <string name="gallery_title">Галерея</string>
+    <string name="gallery_photo">Фото</string>
+
+    <string name="photo_grid_photo">Фото %s</string>
+    <string name="photo_grid_error">Ошибка загрузки</string>
+    <string name="add_photo">Добавление фото</string>
+
+    <string name="rec_img_model_">https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/5b2573b6-2575-48f4-b8b4-8d7756ecd5b7</string>
 </resources>

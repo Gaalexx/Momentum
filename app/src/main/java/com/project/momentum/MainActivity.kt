@@ -1,21 +1,21 @@
 package com.project.momentum
 
+import WatchPhotoScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideIn
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import com.project.momentum.ui.theme.MomentumTheme
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,7 +29,6 @@ class MainActivity : ComponentActivity() {
 }
 
 
-
 object Routes {
     const val CAMERA = "camera"
 
@@ -38,17 +37,27 @@ object Routes {
 
     const val RECORDER = "recorder"
 
-    const val ACCOUNT = "account"
-
+    //const val ACCOUNT = "account"
+    const val ACCOUNT_WITH_BACK = "account/{backTo}"
     const val GALLERY = "gallery"
-    const val SETTINGS = "settings"
+
+    //const val SETTINGS = "settings"
+    const val SETTINGS_WITH_BACK = "settings/{backTo}"
+    const val PREVIEW_PHOTO_WITH_ARG = "previewphoto/{url}"
+
+    //const val PREVIEW_PHOTO = "previewphoto"
     fun previewRoute(uriEncoded: String) = "preview/$uriEncoded"
+    fun accountRoute(backTo: String) = "account/$backTo"
+    fun settingsRoute(backTo: String) = "settings/$backTo"
+    fun previewPhotoRoute(urlEncoded: String) = "previewphoto/$urlEncoded"
 }
 
 
 @Composable
 fun AppNav() {
     val navController = rememberNavController()
+    val accountVm: AccountViewModel = viewModel()
+    val galleryVM: GalleryViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -76,12 +85,13 @@ fun AppNav() {
                     navController.navigate(Routes.RECORDER)
                 },
                 onProfileClick = {
-                    navController.navigate(Routes.ACCOUNT)
+                    navController.navigate(Routes.accountRoute(Routes.CAMERA))
                 },
                 onOpenGallery = {
-                    navController.navigate(Routes.GALLERY)},
+                    navController.navigate(Routes.GALLERY)
+                },
                 onGoToSettings = {
-                    navController.navigate(Routes.SETTINGS)
+                    navController.navigate(Routes.settingsRoute(Routes.CAMERA))
                 }
             )
         }
@@ -94,11 +104,13 @@ fun AppNav() {
 
             SendPhotoScreen(
                 uri = uri,
-                onGoToTakePhoto = { navController.navigate(Routes.CAMERA) }
+                onGoToTakePhoto = { navController.navigate(Routes.CAMERA) },
+                onGoToSettings = { navController.navigate(Routes.SETTINGS_WITH_BACK) },
+                onProfileClick = { navController.navigate(Routes.ACCOUNT_WITH_BACK) }
             )
         }
 
-        composable(Routes.RECORDER){
+        composable(Routes.RECORDER) {
             RecorderScreen(
                 navController = navController,
                 onCameraClick = {
@@ -107,31 +119,108 @@ fun AppNav() {
             )
         }
 
-        composable(Routes.ACCOUNT) {
+        composable(
+            route = Routes.ACCOUNT_WITH_BACK,
+            arguments = listOf(navArgument("backTo") { type = NavType.StringType })
+        )
+        { backStackEntry ->
+            val backTo = backStackEntry.arguments?.getString("backTo") ?: Routes.CAMERA
+
             AccountScreen(
-                onPostClick = { postId -> /* Обработка клика по посту */ },
+                onPostClick = {
+                    accountVm.selectedPost?.let { post ->
+                        navController.navigate(
+                            Routes.previewPhotoRoute(
+                                java.net.URLEncoder.encode(post.url, "UTF-8")
+                            )
+                        )
+                    }
+                },
                 onProfileClick = { /* Обработка профиля */ },
-                onBackClick = { // ← Добавьте этот параметр
-                    navController.popBackStack() // Возврат на предыдущий экран
-                }
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                viewModel = accountVm
             )
         }
 
         composable(Routes.GALLERY) {
             GallaryScreen(
-                onPostClick = { postId ->
-                    // Обработка клика по посту (можно оставить пустым)
+                onPostClick = { url ->
+                    // Получаем выбранный пост из ViewModel галереи
+                    galleryVM.selectedPost?.let { post ->
+                        navController.navigate(
+                            Routes.previewPhotoRoute(
+                                java.net.URLEncoder.encode(post.url, "UTF-8")
+                            )
+                        )
+                    }
                 },
                 onProfileClick = {
-                    navController.navigate(Routes.ACCOUNT)
+                    navController.navigate(Routes.accountRoute(Routes.GALLERY))
                 },
                 onBackClick = {
-                    navController.popBackStack() // Возврат на камеру
-                }
+                    navController.popBackStack()
+                },
+                onGoToSettings = {
+                    navController.navigate(Routes.settingsRoute(Routes.GALLERY))
+                },
+                viewModel = galleryVM
             )
         }
-        composable(Routes.SETTINGS){
-                    SettingsMainScreen(onBackClick = {navController.navigate(Routes.CAMERA)})
+
+        composable(
+            Routes.PREVIEW_PHOTO_WITH_ARG,
+            arguments = listOf(navArgument("url") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val encodedUrl = backStackEntry.arguments?.getString("url") ?: ""
+            val url = java.net.URLDecoder.decode(encodedUrl, "UTF-8")
+
+            // Ищем пост по URL во всех ViewModel
+            val post = accountVm.posts.find { it.url == url }
+                ?: galleryVM.posts.find { it.url == url }
+
+            post?.let {
+                WatchPhotoScreen(
+                    onGoToTakePhoto = { navController.navigate(Routes.CAMERA) },
+                    onGoToGallery = { navController.navigate(Routes.GALLERY) },
+                    onGoToSettings = { navController.navigate(Routes.SETTINGS_WITH_BACK) },
+                    onProfileClick = { navController.navigate(Routes.ACCOUNT_WITH_BACK) },
+                    url = it.url,
+                    description = it.description,
+                    userName = it.name,
+                    date = it.date
+                )
+            }
+        }
+
+
+        composable(
+            route = Routes.SETTINGS_WITH_BACK,
+            arguments = listOf(navArgument("backTo") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val backTo = backStackEntry.arguments?.getString("backTo") ?: Routes.CAMERA
+
+            SettingsMainScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onPrivacyClick = {
+                },
+                onNotificationsClick = {
+                },
+                onDataClick = {
+                },
+                onLanguageClick = {
+                },
+                onPremiumClick = {
+                },
+                onLogoutClick = {
+                    navController.popBackStack(Routes.CAMERA, false)
+                },
+                onDeleteAccountClick = {
+                }
+            )
         }
     }
 }
