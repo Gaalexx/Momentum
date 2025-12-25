@@ -189,15 +189,8 @@ fun RecorderScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 40.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-        }
 
-        Spacer(Modifier.height(32.dp))
+
         SecondaryImagesSection(mainState = mainState)
     }
 }
@@ -213,7 +206,8 @@ private fun CameraLikeScreenPreview() {
             onGoToRecorder = {},
             onProfileClick = {},
             onOpenGallery = {},
-            onGoToSettings = {}
+            onGoToSettings = {},
+            onGoToFriends = {}
         )
     }
 }
