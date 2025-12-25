@@ -23,70 +23,32 @@ import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.outlined.TextFields
-import androidx.compose.material.icons.outlined.Send
 
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material3.IconButton
 import androidx.compose.ui.tooling.preview.Preview
+import com.project.momentum.ui.theme.MomentumTheme
+
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.stringResource
 
 class Frame75Activity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val black = ConstColours.BLACK
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(black)
-            ) {
-                val navController = rememberNavController()
-
-                NavHost(
-                    navController = navController,
-                    startDestination = "recorder"
+            MomentumTheme {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(ConstColours.BLACK)
                 ) {
-                    composable("recorder") {
-                        RecorderScreen(navController = navController)
-                    }
-                    composable("camera") {
-                        CameraLikeScreen(
-                            previewPainter = null,
-                            onGoToPreview = { uri ->
-                                val encoded = java.net.URLEncoder.encode(uri.toString(), "UTF-8")
-                                navController.navigate(Routes.previewRoute(encoded))
-                            },
-                            onGoToRecorder = {
-                                navController.navigate(Routes.RECORDER)
-                            },
-                            onProfileClick = {
-                                navController.navigate(Routes.ACCOUNT)
-                            },
-                            onOpenGallery = {
-                                navController.navigate(Routes.GALLERY)
-                            },
-                            onGoToSettings = {
-                                navController.navigate(Routes.SETTINGS)
-                            }
-                        )
-                    }
-                    composable("preview/{uri}") { backStackEntry ->
-                        val encoded = backStackEntry.arguments?.getString("uri")
-                        val uri = encoded
-                            ?.let { java.net.URLDecoder.decode(it, "UTF-8") }
-                            ?.let { android.net.Uri.parse(it) }
-
-                        SendPhotoScreen(
-                            uri = uri,
-                            onGoToTakePhoto = { navController.navigate("camera") }
-                        )
-                    }
+                    AppNav()
                 }
             }
         }
@@ -103,55 +65,60 @@ fun RecorderScreen(
     val chrome2 = ConstColours.MAIN_BACK_GRAY
     val mainState = remember { MainState() }
 
+    var dragOffset by remember { mutableStateOf(0f) }
+    val swipeThreshold = 80f
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(bg)
-            .windowInsetsPadding(WindowInsets.systemBars),
+            .windowInsetsPadding(WindowInsets.systemBars)
+            .pointerInput(Unit) {
+                detectVerticalDragGestures(
+                    onVerticalDrag = { _, dragAmount ->
+                        dragOffset += dragAmount
+                    },
+                    onDragEnd = {
+                        if (dragOffset < -swipeThreshold) {
+                            navController?.navigate(Routes.GALLERY)
+                        }
+                        dragOffset = 0f
+                    },
+                    onDragCancel = { dragOffset = 0f }
+                )
+            },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
         Row(
             modifier = Modifier
-                .fillMaxWidth()
                 .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = { },
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(chrome2)
-                    .border(1.dp, Color(0xFF232634), CircleShape)
-            ) {
-                ProfileCircleButton(onClick = {}, backgroundColor = chrome2)
-            }
-
-            Spacer(Modifier.weight(1f))
-
-            FriendsPillButton(
-                onClick = { println("Друзья нажаты") }
-                // height можешь оставить/убрать — на паддинги не влияет
+            ProfileCircleButton(
+                onClick = {
+                    navController?.navigate(Routes.ACCOUNT)
+                },
+                backgroundColor = chrome2
             )
 
             Spacer(Modifier.weight(1f))
 
-            IconButton(
-                onClick = { },
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(chrome2)
-                    .border(1.dp, Color(0xFF232634), CircleShape)
-            ) {
-                SettingsCircleButton(onClick = {}, backgroundColor = chrome2)
-            }
+            FriendsPillButton(
+                onClick = {}
+            )
+
+            Spacer(Modifier.weight(1f))
+
+            SettingsCircleButton(
+                onClick = {
+                    navController?.navigate(Routes.settingsRoute(Routes.RECORDER))
+                },
+                backgroundColor = chrome2
+            )
         }
 
-        Spacer(Modifier.height(12.dp)) // как в CameraLikeScreen
+        Spacer(Modifier.height(12.dp))
 
-        // PREVIEW BOX — как в CameraLikeScreen
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.98f)
@@ -167,6 +134,7 @@ fun RecorderScreen(
             )
 
             if (mainState.currentState == "STATE_2") {
+                val captionFocusRequester = remember { FocusRequester() }
                 var caption by remember { mutableStateOf("") }
 
                 Box(
@@ -179,15 +147,19 @@ fun RecorderScreen(
                         value = caption,
                         onValueChange = { caption = it },
                         placeholder = "Введите комментарий...",
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(captionFocusRequester)
                     )
+                }
+                LaunchedEffect(Unit) {
+                    mainState.captionFocusRequester = captionFocusRequester
                 }
             }
         }
 
-        Spacer(Modifier.height(16.dp)) // как в CameraLikeScreen
+        Spacer(Modifier.height(16.dp))
 
-        // TWO BUTTONS UNDER PREVIEW — как в CameraLikeScreen
         if (mainState.currentState == "INITIAL") {
             Row(
                 modifier = Modifier.padding(horizontal = 30.dp),
@@ -197,7 +169,6 @@ fun RecorderScreen(
                 CircleButton(
                     size = 60.dp,
                     onClick = {
-                        onCameraClick()
                         navController?.navigate(Routes.CAMERA)
                     },
                     icon = Icons.Outlined.PhotoCamera,
@@ -216,31 +187,17 @@ fun RecorderScreen(
             }
         }
 
-        // spacer до низа — как в CameraLikeScreen
         Spacer(modifier = Modifier.weight(1f))
 
-        // Если нужен низ/контролы (как на камере) — оставь этот блок.
-        // Если в RecorderScreen он не нужен — можно удалить целиком.
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 40.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 28.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                // Здесь можешь разместить свои нижние контролы рекордера,
-                // паддинги будут совпадать с CameraLikeScreen.
-            }
         }
 
-        // Дальше твой контент (SecondaryImagesSection).
-        // Если хочешь, чтобы он был ниже как раньше — можно оставить Spacer(120.dp).
-        Spacer(Modifier.height(120.dp))
+        Spacer(Modifier.height(32.dp))
         SecondaryImagesSection(mainState = mainState)
     }
 }
@@ -250,8 +207,13 @@ fun RecorderScreen(
 @Composable
 private fun CameraLikeScreenPreview() {
     MaterialTheme {
-        RecorderScreen(
-            onCameraClick = {}
+        CameraLikeScreen(
+            previewPainter = null,
+            onGoToPreview = {},
+            onGoToRecorder = {},
+            onProfileClick = {},
+            onOpenGallery = {},
+            onGoToSettings = {}
         )
     }
 }
@@ -275,12 +237,33 @@ fun SecondaryImagesSection(mainState: MainState) {
     var caption by remember { mutableStateOf("") }
 
     val captionFocusRequester = remember { FocusRequester() }
-    val keyboardController = LocalSoftwareKeyboardController.current
 
     val scope = rememberCoroutineScope()
     var timerJob by remember { mutableStateOf<Job?>(null) }
 
     val iconTint = Color(0xFFEDEEF2)
+    var showKeyboardTrigger by remember { mutableStateOf(false) }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    LaunchedEffect(showKeyboardTrigger) {
+        if (showKeyboardTrigger) {
+            delay(100)
+
+            val focusReq = mainState.captionFocusRequester
+            if (focusReq != null) {
+                repeat(3) { attempt ->
+                    focusReq.requestFocus()
+                    delay(50L * (attempt + 1))
+                    keyboardController?.show()
+                }
+            } else {
+
+                keyboardController?.show()
+            }
+
+            showKeyboardTrigger = false
+        }
+    }
 
     LaunchedEffect(Unit) {
         mainState.captionFocusRequester = captionFocusRequester
@@ -382,10 +365,11 @@ fun SecondaryImagesSection(mainState: MainState) {
 
                         IconButton(
                             onClick = {
-                                captionFocusRequester.requestFocus()
-                                keyboardController?.show()
+                                showKeyboardTrigger = true
                             },
-                            modifier = Modifier.size(50.dp)
+                            modifier = Modifier
+                                .size(50.dp)
+                                .clickable { showKeyboardTrigger = true }
                         ) {
                             Icon(
                                 Icons.Outlined.TextFields,
@@ -410,7 +394,11 @@ fun SecondaryImagesSection(mainState: MainState) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                IconButton(
+                if (currentState == "STATE_1")
+                    Spacer(Modifier.height(63.dp))
+
+                val isRecording = currentState == "STATE_1"
+                BigCircleMicroButton(
                     onClick = {
                         val currentTime = System.currentTimeMillis()
                         clickCount++
@@ -433,6 +421,7 @@ fun SecondaryImagesSection(mainState: MainState) {
                                 println("Первое нажатие - состояние 1")
                             }
                             "STATE_1" -> {
+
                                 firstClickTime?.let { firstTime ->
                                     fixedTime = currentTime - firstTime
                                 }
@@ -447,20 +436,9 @@ fun SecondaryImagesSection(mainState: MainState) {
                     },
                     modifier = Modifier
                         .width(132.dp)
-                        .height(132.dp)
-                ) {
-                    AsyncImage(
-                        model = "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/616a6572-e465-41dc-9dd9-4a51ecddbf9a",
-                        contentDescription = "Вторичное изображение 1",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        colorFilter = if (isImage1Tinted) ColorFilter.tint(
-                            color = Color.Red,
-                            blendMode = BlendMode.SrcAtop
-                        ) else null
-                    )
-                }
+                        .height(132.dp),
+                            isRecording = isRecording
+                )
 
                 when (currentState) {
                     "STATE_1" -> {
@@ -515,13 +493,14 @@ fun SecondaryImagesSection(mainState: MainState) {
                     },
                     modifier = Modifier
                         .size(50.dp)
-                        .offset(y=8.dp)
+                        .offset(y=35.dp)
                 ) {
                     Icon(
-                        imageVector = Icons.Outlined.KeyboardArrowDown,
+                        imageVector = Icons.Outlined.KeyboardArrowUp,
                         contentDescription = "Ещё",
-                        tint = Color(0xFFEDEEF2).copy(alpha = 0.9f),
+                        tint = Color(0xFFEDEEF2).copy(alpha = 0.65f),
                         modifier = Modifier.size(34.dp)
+
                     )
                 }
             }
