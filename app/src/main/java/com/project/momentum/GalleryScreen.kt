@@ -29,25 +29,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.momentum.ConstColours
 
 
-class GalleryViewModel : ViewModel() {
-
-    val posts = mutableStateListOf<PostData>()
-    var selectedPost: PostData by mutableStateOf(PostData(" ", " ", " ", " "))
-
-    fun addPhoto(context: Context, url: String) {
-
+class GalleryViewModel : BasePostViewModel() {
+    override fun addPhoto(context: Context, url: String) {
         val event = readRandomEvent(context)
-        val postData: PostData = PostData(url, event.name, event.date, event.description)
-        posts.add(0, postData)
-    }
-
-    fun addRandomPhoto(context: Context) {
-        addPhoto(context, "https://picsum.photos/300/300?random=${System.currentTimeMillis()}")
-    }
-
-
-    fun clear() {
-        posts.clear()
+        val postData = PostData(
+            url = url,
+            name = event.name, // В галерее имя из JSON
+            date = event.date,
+            description = event.description
+        )
+        _posts.add(0, postData)
     }
 }
 
@@ -127,11 +118,11 @@ fun GallaryScreen(
             )
 
             PhotoGrid(
-                posts = posts,
+                posts = viewModel.posts,
                 onPostClick =
-                    {
-                        viewModel.selectedPost = it
-                        onPostClick(viewModel.selectedPost.url)
+                    { post ->
+                        viewModel.selectPost(post)
+                        onPostClick(post.url)
                     },
                 onAddPhotoClick = { viewModel.addRandomPhoto(context) },
                 modifier = Modifier

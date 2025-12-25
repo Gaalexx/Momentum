@@ -38,13 +38,14 @@ object Routes {
     const val RECORDER = "recorder"
 
     const val ACCOUNT = "account"
-
+    const val ACCOUNT_WITH_BACK = "account/{backTo}"
     const val GALLERY = "gallery"
     const val SETTINGS = "settings"
     const val SETTINGS_WITH_BACK = "settings/{backTo}"
     const val PREVIEW_PHOTO_WITH_ARG = "previewphoto/{url}"
     const val PREVIEW_PHOTO = "previewphoto"
     fun previewRoute(uriEncoded: String) = "preview/$uriEncoded"
+    fun accountRoute(backTo: String) = "account/$backTo"
     fun settingsRoute(backTo: String) = "settings/$backTo"
 }
 
@@ -52,6 +53,8 @@ object Routes {
 @Composable
 fun AppNav() {
     val navController = rememberNavController()
+    val accountVm: AccountViewModel = viewModel()
+    val galleryVM: GalleryViewModel = viewModel()
 
     NavHost(
         navController = navController,
@@ -79,7 +82,7 @@ fun AppNav() {
                     navController.navigate(Routes.RECORDER)
                 },
                 onProfileClick = {
-                    navController.navigate(Routes.ACCOUNT)
+                    navController.navigate(Routes.accountRoute(Routes.CAMERA))
                 },
                 onOpenGallery = {
                     navController.navigate(Routes.GALLERY)
@@ -111,16 +114,25 @@ fun AppNav() {
             )
         }
 
-        composable(Routes.ACCOUNT) {
+        composable(
+            route = Routes.ACCOUNT_WITH_BACK,
+            arguments = listOf(navArgument("backTo") { type = NavType.StringType }))
+        { backStackEntry ->
+            val backTo = backStackEntry.arguments?.getString("backTo") ?: Routes.CAMERA
+
             AccountScreen(
-                onPostClick =
-                    {
-                        isFromAccount = true
-                        navController.navigate(Routes.PREVIEW_PHOTO_WITH_ARG)
-                    },
+                onPostClick = {
+                    accountVm.selectedPost?.let { post ->
+                        navController.navigate(
+                            Routes.previewPhotoRoute(
+                                java.net.URLEncoder.encode(post.url, "UTF-8")
+                            )
+                        )
+                    }
+                },
                 onProfileClick = { /* Обработка профиля */ },
                 onBackClick = {
-                    navController.navigate(Routes.CAMERA)
+                    navController.popBackStack()
                 },
                 viewModel = accountVm
             )
@@ -128,12 +140,18 @@ fun AppNav() {
 
         composable(Routes.GALLERY) {
             GallaryScreen(
-                onPostClick = {
-                    isFromAccount = false
-                    navController.navigate(Routes.PREVIEW_PHOTO_WITH_ARG)
+                onPostClick = { url ->
+                    // Получаем выбранный пост из ViewModel галереи
+                    galleryVM.selectedPost?.let { post ->
+                        navController.navigate(
+                            Routes.previewPhotoRoute(
+                                java.net.URLEncoder.encode(post.url, "UTF-8")
+                            )
+                        )
+                    }
                 },
                 onProfileClick = {
-                    navController.navigate(Routes.ACCOUNT)
+                    navController.navigate(Routes.accountRoute(Routes.GALLERY))
                 },
                 onBackClick = {
                     navController.popBackStack()
@@ -145,27 +163,27 @@ fun AppNav() {
             )
         }
 
-        composable(Routes.PREVIEW_PHOTO_WITH_ARG) {
-            if (isFromAccount) {
+        composable(
+            Routes.PREVIEW_PHOTO_WITH_ARG,
+            arguments = listOf(navArgument("url") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val encodedUrl = backStackEntry.arguments?.getString("url") ?: ""
+            val url = java.net.URLDecoder.decode(encodedUrl, "UTF-8")
+
+            // Ищем пост по URL во всех ViewModel
+            val post = accountVm.posts.find { it.url == url }
+                ?: galleryVM.posts.find { it.url == url }
+
+            post?.let {
                 WatchPhotoScreen(
                     onGoToTakePhoto = { navController.navigate(Routes.CAMERA) },
                     onGoToGallery = { navController.navigate(Routes.GALLERY) },
-                    url = accountVm.selectedPost.url,
-                    description = accountVm.selectedPost.description,
-                    userName = accountVm.selectedPost.name,
-                    date = accountVm.selectedPost.date
-                )
-            } else {
-                WatchPhotoScreen(
-                    onGoToTakePhoto = { navController.navigate(Routes.CAMERA) },
-                    onGoToGallery = { navController.navigate(Routes.GALLERY) },
-                    url = galleryVM.selectedPost.url,
-                    description = galleryVM.selectedPost.description,
-                    userName = galleryVM.selectedPost.name,
-                    date = galleryVM.selectedPost.date
+                    url = it.url,
+                    description = it.description,
+                    userName = it.name,
+                    date = it.date
                 )
             }
-
         }
 
 
