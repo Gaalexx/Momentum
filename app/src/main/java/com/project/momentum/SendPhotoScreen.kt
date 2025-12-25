@@ -58,6 +58,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.stringResource
 
 
 import androidx.camera.core.Preview as CameraXPreview
@@ -142,7 +143,7 @@ fun SendPhotoScreen(
                     CaptionBasicInput(
                         caption,
                         { caption = it },
-                        placeholder = "Введите комментарий...",
+                        placeholder = stringResource(R.string.label_write_comment),
                         modifier = Modifier
                             .align(Alignment.BottomStart)
                             .fillMaxWidth()
@@ -192,7 +193,7 @@ fun SendPhotoScreen(
                     Icon(
                         Icons.Default.Cancel,
                         modifier = Modifier.size(40.dp),
-                        contentDescription = "Flash",
+                        contentDescription = stringResource(R.string.icon_flash),
                         tint = iconTint
                     )
 
@@ -214,7 +215,7 @@ fun SendPhotoScreen(
                     Icon(
                         Icons.Outlined.TextFields,
                         modifier = Modifier.size(40.dp),
-                        contentDescription = "Flip camera",
+                        contentDescription = stringResource(R.string.icon_flip_camera),
                         tint = iconTint
                     )
                 }
