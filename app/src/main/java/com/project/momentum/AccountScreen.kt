@@ -33,25 +33,16 @@ import androidx.compose.ui.platform.LocalContext
 import kotlinx.serialization.json.Json
 
 
-class AccountViewModel : ViewModel() {
-
-    val posts = mutableStateListOf<PostData>()
-    var selectedPost: PostData by mutableStateOf(PostData(" ", " ", " ", " "))
-
-    fun addPhoto(context: Context, url: String) {
-
+class AccountViewModel : BasePostViewModel() {
+    override fun addPhoto(context: Context, url: String) {
         val event = readRandomEvent(context)
-        val postData: PostData = PostData(url, "userName", event.date, event.description)
-        posts.add(0, postData)
-    }
-
-    fun addRandomPhoto(context: Context) {
-        addPhoto(context, "https://picsum.photos/300/300?random=${System.currentTimeMillis()}")
-    }
-
-
-    fun clear() {
-        posts.clear()
+        val postData = PostData(
+            url = url,
+            name = "userName", // В аккаунте всегда userName
+            date = event.date,
+            description = event.description
+        )
+        _posts.add(0, postData)
     }
 }
 
@@ -180,12 +171,11 @@ fun AccountScreen(
             )
 
             PhotoGrid(
-                posts = posts,
-                onPostClick =
-                    {
-                        viewModel.selectedPost = it
-                        onPostClick()
-                    },
+                posts = viewModel.posts,
+                onPostClick = { post ->
+                    viewModel.selectPost(post)
+                    onPostClick()
+                },
                 onAddPhotoClick = { viewModel.addRandomPhoto(context) },
                 modifier = Modifier
                     .fillMaxWidth()
