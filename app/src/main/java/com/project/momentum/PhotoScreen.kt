@@ -57,7 +57,6 @@ import kotlin.math.min
 
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.res.stringResource
 
 
 import androidx.camera.core.Preview as CameraXPreview
@@ -336,7 +335,7 @@ fun CameraLikeScreen(
                     Icon(
                         Icons.Outlined.WbSunny,
                         modifier = Modifier.size(40.dp),
-                        contentDescription = stringResource(R.string.icon_flash),
+                        contentDescription = "Flash",
                         tint = iconTint
                     )
                 }
@@ -350,12 +349,11 @@ fun CameraLikeScreen(
                             imageCapture = imageCapture,
                             isFrontCamera = (lensFacing == CameraSelector.LENS_FACING_FRONT),
                             onSaved = { uri ->
-                                //Toast.makeText(context, "Saved: $uri", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Saved: $uri", Toast.LENGTH_SHORT).show()
                                 onGoToPreview(uri)
                             },
-                            onError = {
-//                                e ->
-//                                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                            onError = { e ->
+                                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                             }
                         )
                     }

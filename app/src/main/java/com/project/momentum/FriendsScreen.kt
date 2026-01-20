@@ -229,24 +229,10 @@ fun FriendsScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(if (isPortrait) 40.dp else 24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            FriendSearchField(
-                query = searchQuery,
-                onQueryChange = { searchQuery = it },
-                modifier = Modifier.padding(horizontal = 16.dp),
-                onSearch = {  }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (isLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
+            if (filteredFriends.isEmpty()) {
+                if (searchQuery.isNotEmpty()) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()

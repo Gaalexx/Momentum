@@ -25,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -74,7 +73,7 @@ fun FriendSearchField(
     query: String,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = stringResource(R.string.find_or_add_friend),
+    placeholder: String = "Найти или добавить друга",
     onSearch: (() -> Unit)? = null,
 ) {
     val shape = RoundedCornerShape(28.dp)
@@ -128,9 +127,7 @@ fun FriendSearchField(
 @Composable
 private fun PreviewInputs() {
     Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        Modifier.fillMaxWidth().padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {

@@ -60,10 +60,8 @@ import com.project.momentum.rememberCameraPermissionState
 import com.project.momentum.CaptionBasicLabel
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
-import com.project.momentum.R
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.AppTypography
 
@@ -119,7 +117,7 @@ fun ReactToPhoto(
             .padding(vertical = 7.dp, horizontal = 17.dp)
     ) {
         Text(
-            stringResource(R.string.label_write_message),
+            "Написать сообщение...",
             color = ConstColours.WHITE,
             style = AppTextStyles.MainText
         )
@@ -216,7 +214,7 @@ fun WatchPhotoScreen(
             color = ConstColours.WHITE,
             style = AppTextStyles.SupportingText
         )
-        ProfileLabel(name = userName, imageUrl = stringResource(R.string.cats_url))
+        ProfileLabel(name = userName, imageUrl = "https://cataas.com/cat")
 
         ReactToPhoto(onReact = {})
 
@@ -242,7 +240,7 @@ fun WatchPhotoScreen(
                     Icon(
                         Icons.Default.Photo,
                         modifier = Modifier.size(40.dp),
-                        contentDescription = stringResource(R.string.icon_flash),
+                        contentDescription = "Flash",
                         tint = iconTint
                     )
                 }
@@ -263,7 +261,7 @@ fun WatchPhotoScreen(
                     Icon(
                         Icons.Outlined.MoreHoriz,
                         modifier = Modifier.size(40.dp),
-                        contentDescription = stringResource(R.string.icon_flip_camera),
+                        contentDescription = "Flip camera",
                         tint = iconTint
                     )
                 }
@@ -275,7 +273,7 @@ fun WatchPhotoScreen(
 
         Icon(
             imageVector = Icons.Outlined.KeyboardArrowDown,
-            contentDescription = stringResource(R.string.icon_more),
+            contentDescription = "More",
             tint = iconTint.copy(alpha = 0.9f),
             modifier = Modifier.size(34.dp)
         )
