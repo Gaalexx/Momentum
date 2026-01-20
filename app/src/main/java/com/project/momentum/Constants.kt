@@ -13,9 +13,6 @@ object ConstColours {
     val MAIN_BRAND_BLUE_ALPHA40 = Color(0x663766FF)
     val MAIN_GLASS_GRAY_ALPHA62 = Color(0x9E2B2B2B)
     val TRANSPARENT_WHITE_ALPHA0 = Color(0x00FFFFFF)
-
-    val SUPPORTING_TEXT = Color(0xFF888888)
-    val SUPPORTING_SUB_TEXT = Color(0xFF666666)
     val GOLD = Color(0xFFFFAE00)
     val GOLD_ALPHA30 = Color(0x4CFFAE00)
 }
