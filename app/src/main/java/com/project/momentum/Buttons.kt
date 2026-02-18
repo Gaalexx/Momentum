@@ -6,6 +6,9 @@ import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.camera.video.VideoRecordEvent
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,6 +24,11 @@ import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material.icons.automirrored.rounded.SendToMobile
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
@@ -50,10 +58,17 @@ import com.project.momentum.ui.theme.AppTextStyles
 import com.skydoves.landscapist.ImageOptions
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.runtime.remember
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.input.pointer.pointerInput
+import kotlinx.coroutines.launch
 
 @Composable
 fun BackCircleButton(
@@ -272,8 +287,6 @@ fun FriendsPillButton(
 @Composable
 fun BigCircleForMainScreenAction(
     onClick: () -> Unit,
-//    onLongPressStart: (Context, VideoCapture<Recorder>/*, (VideoRecordEvent) -> Unit*/) -> Recording,
-//    onLongPressEnd: (Recording?) -> Recording?,
     onLongPressStart: () -> Unit,
     onLongPressEnd: () -> Unit,
     modifier: Modifier = Modifier,
@@ -283,9 +296,37 @@ fun BigCircleForMainScreenAction(
     innerPressed: Color = ConstColours.RED,
     ring: Dp = 14.dp,
     enabled: Boolean = true,
+    maxRecordMs: Int = 60_000,
+    progressionStroke: Dp = 6.dp
 ) {
     var pressed by remember { mutableStateOf(false) }
     var longMode by remember { mutableStateOf(false) }
+
+    val progress = remember { androidx.compose.animation.core.Animatable(0f) }
+    val scope = rememberCoroutineScope()
+
+    fun startProgress() {
+        scope.launch {
+            progress.snapTo(0f)
+            progress.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(
+                    durationMillis = maxRecordMs,
+                    easing = LinearEasing
+                )
+            )
+            // TODO(сделать сброс записи по окончании)
+        }
+    }
+
+    fun stopProgress(reset: Boolean = true) {
+        scope.launch {
+            progress.stop()
+            if (reset) progress.snapTo(0f)
+        }
+    }
+
+
 
     Box(
         modifier = modifier
@@ -294,6 +335,24 @@ fun BigCircleForMainScreenAction(
             .background(outerColor),
         contentAlignment = Alignment.Center
     ) {
+
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            val strokePx = progressionStroke.toPx()
+            val ringPx = ring.toPx()
+            val inset = ringPx / 2f
+            val diameter = this.size.minDimension - 2f * inset
+
+            drawArc(
+                color = innerPressed,
+                startAngle = -90f,
+                sweepAngle = 360f * progress.value,
+                useCenter = false,
+                topLeft = Offset(inset, inset),
+                size = Size(diameter, diameter),
+                style = Stroke(width = strokePx, cap = StrokeCap.Round)
+            )
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -306,14 +365,16 @@ fun BigCircleForMainScreenAction(
                         onLongPress = {
                             longMode = true
                             onLongPressStart()
+                            startProgress()
                         },
                         onPress = {
                             pressed = true
-                            tryAwaitRelease()
+                            val released = tryAwaitRelease()
                             pressed = false
                             if (longMode) {
                                 onLongPressEnd()
                                 longMode = false
+                                stopProgress(reset = true)
                             }
                         }
                     )

@@ -37,6 +37,8 @@ import java.util.Locale
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.util.Rational
+import android.util.Size
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 
@@ -70,6 +72,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.camera.core.Preview as CameraXPreview
 
 
+import androidx.camera.core.AspectRatio
+import androidx.camera.core.UseCaseGroup
+import androidx.camera.core.ViewPort
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+
+
 @Composable
 fun CameraPreview(
     modifier: Modifier = Modifier,
@@ -80,6 +92,7 @@ fun CameraPreview(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+
 
     val previewView = remember(context) {
         PreviewView(context).apply {
@@ -110,12 +123,28 @@ fun CameraPreview(
 
             try {
                 cameraProvider.unbindAll()
+
+                val rotation = previewView.display.rotation
+                imageCapture.setTargetRotation(rotation)
+                imageCapture.setCropAspectRatio(Rational(1, 1))
+
+                val viewPort = ViewPort.Builder(Rational(1, 1), rotation)
+                    .setScaleType(ViewPort.FILL_CENTER)
+                    .build()
+
+                val group = UseCaseGroup.Builder()
+                    .setViewPort(viewPort)
+                    .addUseCase(preview)
+                    .addUseCase(imageCapture)
+                    .addUseCase(videoCapture)
+                    .build()
+
+
                 val boundCamera = cameraProvider.bindToLifecycle(
                     lifecycleOwner,
                     selector,
-                    preview,
-                    imageCapture,
-                    videoCapture
+                    group
+
                 )
                 camera = boundCamera
 
@@ -186,7 +215,7 @@ private fun startVideoRecording(
     context: Context,
     videoCapture: VideoCapture<Recorder>,
     onEvent: (VideoRecordEvent) -> Unit = {}
-): Recording? {
+): Recording {
     val hasAudioPermission = ContextCompat.checkSelfPermission(
         context,
         Manifest.permission.RECORD_AUDIO
@@ -365,7 +394,7 @@ fun CameraLikeScreen(
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.98f)
-                .aspectRatio(1.10f)
+                .aspectRatio(1f)
                 .clip(RoundedCornerShape(28.dp))
                 .background(ConstColours.MAIN_BACK_GRAY)
         ) {
