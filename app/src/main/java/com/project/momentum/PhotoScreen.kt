@@ -27,6 +27,7 @@ import com.example.momentum.ConstColours
 import android.content.ContentValues
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -34,6 +35,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -48,6 +50,11 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.camera.core.Camera
+import androidx.camera.video.Recorder
+import androidx.camera.video.Recording
+import androidx.camera.video.VideoCapture
+import androidx.camera.video.VideoRecordEvent
+import androidx.camera.video.MediaStoreOutputOptions
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
@@ -63,60 +70,63 @@ import androidx.compose.ui.res.stringResource
 import androidx.camera.core.Preview as CameraXPreview
 
 
-
-
 @Composable
 fun CameraPreview(
     modifier: Modifier = Modifier,
     lensFacing: Int = CameraSelector.LENS_FACING_BACK,
     torchEnabled: Boolean,
-    imageCapture: ImageCapture
+    imageCapture: ImageCapture,
+    videoCapture: VideoCapture<Recorder>
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
+    val previewView = remember(context) {
+        PreviewView(context).apply {
+            scaleType = PreviewView.ScaleType.FILL_CENTER
+        }
+    }
+    val cameraProviderFuture = remember(context) {
+        ProcessCameraProvider.getInstance(context)
+    }
     var camera by remember { mutableStateOf<Camera?>(null) }
 
     AndroidView(
         modifier = modifier,
-        factory = { ctx ->
-            PreviewView(ctx).apply {
-                scaleType = PreviewView.ScaleType.FILL_CENTER
-            }
-        },
-        update = { previewView ->
-            val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-
-            cameraProviderFuture.addListener({
-                val cameraProvider = cameraProviderFuture.get()
-
-                val preview = CameraXPreview.Builder().build().also {
-                    it.setSurfaceProvider(previewView.surfaceProvider)
-                }
-
-                val selector = CameraSelector.Builder()
-                    .requireLensFacing(lensFacing)
-                    .build()
-
-                try {
-                    cameraProvider.unbindAll()
-                    val boundCamera = cameraProvider.bindToLifecycle(
-                        lifecycleOwner,
-                        selector,
-                        preview,
-                        imageCapture
-                    )
-                    camera = boundCamera
-
-                    if (boundCamera.cameraInfo.hasFlashUnit()) {
-                        boundCamera.cameraControl.enableTorch(torchEnabled)
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }, ContextCompat.getMainExecutor(context))
-        }
+        factory = { previewView }
     )
+
+    LaunchedEffect(lensFacing, imageCapture, videoCapture) {
+        cameraProviderFuture.addListener({
+            val cameraProvider = cameraProviderFuture.get()
+
+            val preview = CameraXPreview.Builder().build().also {
+                it.setSurfaceProvider(previewView.surfaceProvider)
+            }
+
+            val selector = CameraSelector.Builder()
+                .requireLensFacing(lensFacing)
+                .build()
+
+            try {
+                cameraProvider.unbindAll()
+                val boundCamera = cameraProvider.bindToLifecycle(
+                    lifecycleOwner,
+                    selector,
+                    preview,
+                    imageCapture,
+                    videoCapture
+                )
+                camera = boundCamera
+
+                if (boundCamera.cameraInfo.hasFlashUnit()) {
+                    boundCamera.cameraControl.enableTorch(torchEnabled)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }, ContextCompat.getMainExecutor(context))
+    }
 
     LaunchedEffect(torchEnabled) {
         val cam = camera ?: return@LaunchedEffect
@@ -164,6 +174,7 @@ private fun takePhoto(
             override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                 output.savedUri?.let(onSaved)
             }
+
             override fun onError(exc: ImageCaptureException) {
                 onError(exc)
             }
@@ -171,8 +182,80 @@ private fun takePhoto(
     )
 }
 
+private fun startVideoRecording(
+    context: Context,
+    videoCapture: VideoCapture<Recorder>,
+    onEvent: (VideoRecordEvent) -> Unit = {}
+): Recording? {
+    val hasAudioPermission = ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.RECORD_AUDIO
+    ) == PackageManager.PERMISSION_GRANTED
 
+    val name = "MOMENTUM_VID_${System.currentTimeMillis()}.mp4"
 
+    val contentValues = ContentValues().apply {
+        put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+        put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/Momentum")
+        }
+    }
+
+    val mediaStoreOutput = MediaStoreOutputOptions.Builder(
+        context.contentResolver,
+        MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+    ).setContentValues(contentValues)
+        .build()
+
+    val pending =
+        if (hasAudioPermission) videoCapture.output.prepareRecording(context, mediaStoreOutput)
+            .withAudioEnabled() else videoCapture.output.prepareRecording(context, mediaStoreOutput)
+
+    return pending.start(ContextCompat.getMainExecutor(context)) { event ->
+        onEvent(event)
+        if (event is VideoRecordEvent.Finalize) {
+            if (event.hasError()) {
+                Log.e(
+                    "CameraLikeScreen",
+                    "Video record error=${event.error}",
+                    event.cause
+                )
+                Toast.makeText(
+                    context,
+                    videoRecordErrorMessage(context, event.error),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.recorder_video_saved),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+}
+
+private fun videoRecordErrorMessage(context: Context, error: Int): String {
+    return when (error) {
+        VideoRecordEvent.Finalize.ERROR_NO_VALID_DATA -> {
+            context.getString(
+                R.string.recorder_video_error,
+                context.getString(R.string.recorder_video_error_no_data)
+            )
+        }
+
+        else -> context.getString(R.string.recorder_video_error, error.toString())
+    }
+}
+
+private fun stopVideoRecording(
+    recording: Recording?
+): Recording? {
+    recording?.stop()
+    return null
+}
 
 
 @Composable
@@ -228,6 +311,13 @@ fun CameraLikeScreen(
             .build()
     }
 
+    val videoCapture = remember {
+        VideoCapture.withOutput(Recorder.Builder().build())
+    }
+    var recording by remember { mutableStateOf<Recording?>(null) }
+    var recordingStarted by remember { mutableStateOf(false) }
+    var stopRequested by remember { mutableStateOf(false) }
+
     // swipe state
     var dragOffset by remember { mutableStateOf(0f) }
     val swipeThreshold = 80f
@@ -281,7 +371,8 @@ fun CameraLikeScreen(
                     modifier = Modifier.fillMaxSize(),
                     lensFacing = lensFacing,
                     torchEnabled = torchEnabled,
-                    imageCapture = imageCapture
+                    imageCapture = imageCapture,
+                    videoCapture = videoCapture
                 )
             } else {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -358,6 +449,45 @@ fun CameraLikeScreen(
 //                                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                             }
                         )
+                    },
+                    {
+                        if (recording == null) {
+                            var newRecording: Recording? = null
+                            recordingStarted = false
+                            stopRequested = false
+                            newRecording = startVideoRecording(
+                                context = context,
+                                videoCapture = videoCapture
+                            ) { event ->
+                                when (event) {
+                                    is VideoRecordEvent.Start -> {
+                                        recordingStarted = true
+                                        if (stopRequested) {
+                                            newRecording?.stop()
+                                            stopRequested = false
+                                        }
+                                    }
+
+                                    is VideoRecordEvent.Finalize -> {
+                                        recordingStarted = false
+                                        stopRequested = false
+                                        recording = null
+                                    }
+
+                                    else -> Unit
+                                }
+                            }
+                            recording = newRecording
+                        }
+                    },
+                    {
+                        if (recording != null) {
+                            if (recordingStarted) {
+                                recording = stopVideoRecording(recording)
+                            } else {
+                                stopRequested = true
+                            }
+                        }
                     }
                 )
 

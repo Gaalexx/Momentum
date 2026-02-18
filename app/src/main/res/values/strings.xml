@@ -48,4 +48,9 @@
     <string name="recorder_show_keyboard_content_description">Показать клавиатуру</string>
     <string name="recorder_more_content_description">Ещё</string>
     <string name="recorder_duration_label">Длительность: %s</string>
+
+    <string name="recorder_video_error">Ошибка видео: %s</string>
+    <string name="recorder_video_error_unknown">Ошибка записи видео</string>
+    <string name="recorder_video_error_no_data">Нет данных (слишком короткое видео)</string>
+    <string name="recorder_video_saved">Видео сохранено</string>
 </resources>

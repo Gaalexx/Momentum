@@ -1,9 +1,20 @@
 package com.project.momentum
 
 
+import android.content.Context
+import androidx.camera.video.Recorder
+import androidx.camera.video.Recording
+import androidx.camera.video.VideoCapture
+import androidx.camera.video.VideoRecordEvent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,6 +54,11 @@ import com.example.momentum.ConstColours
 import com.project.momentum.ui.theme.AppTextStyles
 import com.skydoves.landscapist.ImageOptions
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.input.pointer.pointerInput
 
 @Composable
 fun BackCircleButton(
@@ -261,22 +277,48 @@ fun FriendsPillButton(
 @Composable
 fun BigCircleForMainScreenAction(
     onClick: () -> Unit,
+//    onLongPressStart: (Context, VideoCapture<Recorder>/*, (VideoRecordEvent) -> Unit*/) -> Recording,
+//    onLongPressEnd: (Recording?) -> Recording?,
+    onLongPressStart: () -> Unit,
+    onLongPressEnd: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 132.dp,
     outerColor: Color = ConstColours.MAIN_BACK_GRAY,
     innerColor: Color = ConstColours.WHITE,
+    innerPressed: Color = ConstColours.RED,
     ring: Dp = 14.dp,
     enabled: Boolean = true,
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val pressed by interactionSource.collectIsPressedAsState()
+    var longMode by remember { mutableStateOf(false) }
+
     Box(
         modifier = modifier
             .size(size)
             .clip(CircleShape)
-            .clickable(
+            .combinedClickable(
                 enabled = enabled,
-                onClick = onClick
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = { if (!longMode) onClick() },
+                onLongClick = {
+                    longMode = true
+                    onLongPressStart()
+                }
             )
-            .background(outerColor),
+            .pointerInput(enabled) {
+                if (!enabled) return@pointerInput
+                awaitEachGesture {
+                    awaitFirstDown(requireUnconsumed = false)
+                    val up = waitForUpOrCancellation()
+                    if (longMode) {
+                        onLongPressEnd()
+                        longMode = false
+                    }
+                }
+            }
+            .background(if (pressed) innerPressed else innerColor),
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -284,7 +326,7 @@ fun BigCircleForMainScreenAction(
                 .fillMaxSize()
                 .padding(ring)
                 .clip(CircleShape)
-                .background(innerColor)
+                .background(if (pressed) innerPressed else innerColor)
         )
     }
 }
@@ -368,7 +410,7 @@ fun BigCircleMicroButton(
 
 
 @Composable
-fun EditButton(onEditProfile : () -> Unit) {
+fun EditButton(onEditProfile: () -> Unit) {
     Button(
         onClick = onEditProfile,
         colors = ButtonDefaults.buttonColors(
@@ -425,7 +467,9 @@ fun PlusButton(
 @Composable
 private fun PreviewCircleButtons() {
     Row(
-        Modifier.fillMaxWidth().padding(16.dp),
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -434,7 +478,6 @@ private fun PreviewCircleButtons() {
         SettingsCircleButton(onClick = {})
     }
 }
-
 
 
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
@@ -463,7 +506,7 @@ private fun PreviewSettingsButton() {
 @Composable
 private fun PreviewBigCircle() {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        BigCircleForMainScreenAction({})
+        BigCircleForMainScreenAction({}, {}, {})
     }
 }
 

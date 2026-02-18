@@ -140,6 +140,8 @@ fun WatchPhotoScreen(
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
+    onStartRecordVideo: () -> Unit = {},
+    onStorRecordVideo: () -> Unit = {},
     url: String?,
     description: String,
     userName: String,
@@ -249,7 +251,9 @@ fun WatchPhotoScreen(
 
                 Spacer(Modifier.weight(1f))
                 BigCircleForMainScreenAction(
-                    onClick = onGoToTakePhoto
+                    onClick = onGoToTakePhoto,
+                    onStartRecordVideo,
+                    onStorRecordVideo
                 )
                 Spacer(Modifier.weight(1f))
 

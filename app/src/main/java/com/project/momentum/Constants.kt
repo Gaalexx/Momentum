@@ -8,6 +8,7 @@ object ConstColours {
     val MAIN_BRAND_BLUE = Color(0xFF3766FF)
     val MAIN_BACK_GRAY = Color(0xFF2B2B2B)
     val ERROR_RED = Color(0xFFB3261E)
+    val RED = Color.Red
 
     val DELETE = Color(0xFFFF0000)
     val MAIN_BRAND_BLUE_ALPHA40 = Color(0x663766FF)
