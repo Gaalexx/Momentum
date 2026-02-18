@@ -322,12 +322,15 @@ fun CameraLikeScreen(
     var dragOffset by remember { mutableStateOf(0f) }
     val swipeThreshold = 80f
 
+    val swipeEnabled = recording == null
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(backGround)
             .windowInsetsPadding(WindowInsets.systemBars)
-            .pointerInput(Unit) {
+            .pointerInput(swipeEnabled) {
+                if (!swipeEnabled) return@pointerInput
                 detectVerticalDragGestures(
                     onVerticalDrag = { _, dragAmount ->
                         dragOffset += dragAmount

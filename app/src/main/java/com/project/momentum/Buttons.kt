@@ -9,12 +9,7 @@ import androidx.camera.video.VideoRecordEvent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -289,36 +284,14 @@ fun BigCircleForMainScreenAction(
     ring: Dp = 14.dp,
     enabled: Boolean = true,
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val pressed by interactionSource.collectIsPressedAsState()
+    var pressed by remember { mutableStateOf(false) }
     var longMode by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier
             .size(size)
             .clip(CircleShape)
-            .combinedClickable(
-                enabled = enabled,
-                interactionSource = interactionSource,
-                indication = null,
-                onClick = { if (!longMode) onClick() },
-                onLongClick = {
-                    longMode = true
-                    onLongPressStart()
-                }
-            )
-            .pointerInput(enabled) {
-                if (!enabled) return@pointerInput
-                awaitEachGesture {
-                    awaitFirstDown(requireUnconsumed = false)
-                    val up = waitForUpOrCancellation()
-                    if (longMode) {
-                        onLongPressEnd()
-                        longMode = false
-                    }
-                }
-            }
-            .background(if (pressed) innerPressed else innerColor),
+            .background(outerColor),
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -326,6 +299,25 @@ fun BigCircleForMainScreenAction(
                 .fillMaxSize()
                 .padding(ring)
                 .clip(CircleShape)
+                .pointerInput(enabled) {
+                    if (!enabled) return@pointerInput
+                    detectTapGestures(
+                        onTap = { onClick() },
+                        onLongPress = {
+                            longMode = true
+                            onLongPressStart()
+                        },
+                        onPress = {
+                            pressed = true
+                            tryAwaitRelease()
+                            pressed = false
+                            if (longMode) {
+                                onLongPressEnd()
+                                longMode = false
+                            }
+                        }
+                    )
+                }
                 .background(if (pressed) innerPressed else innerColor)
         )
     }
