@@ -67,6 +67,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.input.pointer.pointerInput
 import kotlinx.coroutines.launch
 
@@ -315,7 +316,9 @@ fun BigCircleForMainScreenAction(
                     easing = LinearEasing
                 )
             )
-            // TODO(сделать сброс записи по окончании)
+            onLongPressEnd()
+            longMode = false
+            progress.snapTo(0f)
         }
     }
 
@@ -379,7 +382,7 @@ fun BigCircleForMainScreenAction(
                         }
                     )
                 }
-                .background(if (pressed) innerPressed else innerColor)
+                .background(innerColor)
         )
     }
 }
