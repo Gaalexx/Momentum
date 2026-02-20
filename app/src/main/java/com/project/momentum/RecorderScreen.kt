@@ -1,42 +1,62 @@
 package com.project.momentum
 
-import androidx.compose.runtime.*
-import androidx.compose.foundation.*
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.*
-import androidx.compose.material.*
-import androidx.compose.ui.*
-import androidx.compose.ui.draw.*
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.unit.*
-import androidx.compose.ui.layout.*
-import androidx.compose.ui.text.font.FontWeight
-import coil.compose.AsyncImage
-import kotlinx.coroutines.*
-
+import android.content.ContentValues
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.example.momentum.ConstColours
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.PhotoCamera
-import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.outlined.TextFields
-
-import androidx.navigation.NavController
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
+import androidx.compose.material.icons.outlined.Mic
+import androidx.compose.material.icons.outlined.PhotoCamera
+import androidx.compose.material.icons.outlined.TextFields
 import androidx.compose.material3.IconButton
-import androidx.compose.ui.tooling.preview.Preview
-import com.project.momentum.ui.theme.MomentumTheme
-
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import com.example.momentum.ConstColours
+import com.project.momentum.ui.theme.MomentumTheme
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+
+import android.media.MediaRecorder
+import android.os.Environment
+import android.provider.MediaStore
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Locale
+import android.Manifest
 
 class Frame75Activity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,18 +76,111 @@ class Frame75Activity : ComponentActivity() {
 }
 
 @Composable
+fun rememberMicrophonePermissionState(): State<Boolean> {
+    val context = LocalContext.current
+    val hasPermission = remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
+                    PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        hasPermission.value = granted
+    }
+
+    LaunchedEffect(Unit) {
+        if (!hasPermission.value) {
+            launcher.launch(Manifest.permission.RECORD_AUDIO)
+        }
+    }
+
+    return hasPermission
+}
+
+fun startRecording(context: android.content.Context, mainState: MainState) {
+    val fileName = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.US)
+        .format(System.currentTimeMillis()) + ".3gp"
+
+    val audioFile = File(context.getExternalFilesDir(Environment.DIRECTORY_MUSIC), fileName)
+
+    try {
+        val recorder = MediaRecorder().apply {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+            setOutputFile(audioFile.absolutePath)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+
+            prepare()
+            start()
+        }
+
+        mainState.mediaRecorder = recorder
+        mainState.audioFile = audioFile
+        mainState.isRecording = true
+
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+}
+
+fun stopRecording(mainState: MainState) {
+    try {
+        mainState.mediaRecorder?.apply {
+            stop()
+            release()
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    } finally {
+        mainState.mediaRecorder = null
+        mainState.isRecording = false
+    }
+}
+
+fun saveToMediaStore(context: android.content.Context, audioFile: File): android.net.Uri? {
+    val values = ContentValues().apply {
+        put(MediaStore.MediaColumns.DISPLAY_NAME, audioFile.name)
+        put(MediaStore.MediaColumns.MIME_TYPE, "audio/3gpp")
+        put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_MUSIC + "/Momentum")
+    }
+
+    val resolver = context.contentResolver
+    val uri = resolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values)
+
+    uri?.let {
+        try {
+            resolver.openOutputStream(it)?.use { outputStream ->
+                audioFile.inputStream().use { inputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            resolver.delete(uri, null, null)
+            return null
+        }
+    }
+
+    return uri
+}
+
+@Composable
 fun RecorderScreen(
     navController: NavController? = null,
     onCameraClick: () -> Unit = {},
     onGoToFriends: () -> Unit = {}
 ) {
     val bg = ConstColours.BLACK
-    val iconTint = ConstColours.WHITE
     val chrome2 = ConstColours.MAIN_BACK_GRAY
     val mainState = remember { MainState() }
 
     var dragOffset by remember { mutableStateOf(0f) }
     val swipeThreshold = 80f
+
+
 
     Column(
         modifier = Modifier
@@ -91,29 +204,22 @@ fun RecorderScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
-            modifier = Modifier
-                .padding(horizontal = 14.dp, vertical = 10.dp),
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             ProfileCircleButton(
-                onClick = {
-                    navController?.navigate(Routes.ACCOUNT_WITH_BACK)
-                },
+                onClick = { navController?.navigate(Routes.ACCOUNT_WITH_BACK) },
                 backgroundColor = chrome2
             )
 
             Spacer(Modifier.weight(1f))
 
-            FriendsPillButton(
-                onClick = onGoToFriends
-            )
+            FriendsPillButton(onClick = onGoToFriends)
 
             Spacer(Modifier.weight(1f))
 
             SettingsCircleButton(
-                onClick = {
-                    navController?.navigate(Routes.settingsRoute(Routes.RECORDER))
-                },
+                onClick = { navController?.navigate(Routes.settingsRoute(Routes.RECORDER)) },
                 backgroundColor = chrome2
             )
         }
@@ -128,8 +234,8 @@ fun RecorderScreen(
                 .background(Color(0xFF2A2E39))
         ) {
             AsyncImage(
-                model = "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/5b2573b6-2575-48f4-b8b4-8d7756ecd5b7",
-                contentDescription = "Основное изображение",
+                model = stringResource(R.string.rec_img_model_),
+                contentDescription = stringResource(R.string.recorder_main_image_content_description),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
@@ -147,12 +253,13 @@ fun RecorderScreen(
                     CaptionBasicInput(
                         value = caption,
                         onValueChange = { caption = it },
-                        placeholder = "Введите комментарий...",
+                        placeholder = stringResource(R.string.label_write_comment),
                         modifier = Modifier
                             .fillMaxWidth()
                             .focusRequester(captionFocusRequester)
                     )
                 }
+
                 LaunchedEffect(Unit) {
                     mainState.captionFocusRequester = captionFocusRequester
                 }
@@ -169,9 +276,7 @@ fun RecorderScreen(
             ) {
                 CircleButton(
                     size = 60.dp,
-                    onClick = {
-                        navController?.navigate(Routes.CAMERA)
-                    },
+                    onClick = { navController?.navigate(Routes.CAMERA) },
                     icon = Icons.Outlined.PhotoCamera,
                     iconColor = ConstColours.WHITE,
                     enabled = true
@@ -179,7 +284,7 @@ fun RecorderScreen(
 
                 CircleButton(
                     size = 60.dp,
-                    onClick = { println("Кнопка микрофона нажата") },
+                    onClick = {},
                     icon = Icons.Outlined.Mic,
                     backgroundColor = ConstColours.BLACK,
                     iconColor = ConstColours.WHITE,
@@ -190,12 +295,9 @@ fun RecorderScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-
-
         SecondaryImagesSection(mainState = mainState)
     }
 }
-
 
 @Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
 @Composable
@@ -214,31 +316,37 @@ private fun CameraLikeScreenPreview() {
 }
 
 
+
 class MainState {
     var currentState by mutableStateOf("INITIAL")
     var captionFocusRequester: FocusRequester? by mutableStateOf(null)
+
+    var mediaRecorder: MediaRecorder? by mutableStateOf(null)
+    var audioFile: File? by mutableStateOf(null)
+    var isRecording by mutableStateOf(false)
+
+
 }
 
 @Composable
 fun SecondaryImagesSection(mainState: MainState) {
-
     var isImage1Tinted by remember { mutableStateOf(false) }
     var isImage2Visible by remember { mutableStateOf(true) }
-    var lastClickTime by remember { mutableStateOf<Long?>(null) }
     var elapsedTime by remember { mutableStateOf(0L) }
     var clickCount by remember { mutableStateOf(0) }
     var fixedTime by remember { mutableStateOf<Long?>(null) }
     var firstClickTime by remember { mutableStateOf<Long?>(null) }
-    var caption by remember { mutableStateOf("") }
 
     val captionFocusRequester = remember { FocusRequester() }
-
     val scope = rememberCoroutineScope()
     var timerJob by remember { mutableStateOf<Job?>(null) }
 
     val iconTint = Color(0xFFEDEEF2)
     var showKeyboardTrigger by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    val context = LocalContext.current
+    val hasMicPermission by rememberMicrophonePermissionState()
 
     LaunchedEffect(showKeyboardTrigger) {
         if (showKeyboardTrigger) {
@@ -252,7 +360,6 @@ fun SecondaryImagesSection(mainState: MainState) {
                     keyboardController?.show()
                 }
             } else {
-
                 keyboardController?.show()
             }
 
@@ -280,17 +387,34 @@ fun SecondaryImagesSection(mainState: MainState) {
         }
     }
 
+    DisposableEffect(Unit) {
+        onDispose {
+            if (mainState.isRecording) {
+                try {
+                    mainState.mediaRecorder?.apply {
+                        stop()
+                        release()
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                } finally {
+                    mainState.mediaRecorder = null
+                    mainState.isRecording = false
+                }
+            }
+            mainState.audioFile?.delete()
+        }
+    }
+
     fun resetToInitialState() {
         isImage1Tinted = false
         isImage2Visible = true
-        lastClickTime = null
         elapsedTime = 0L
         clickCount = 0
         fixedTime = null
         firstClickTime = null
         timerJob?.cancel()
         timerJob = null
-        caption = ""
         keyboardController?.hide()
     }
 
@@ -309,12 +433,13 @@ fun SecondaryImagesSection(mainState: MainState) {
         if (currentState == "STATE_2") {
             timerJob?.cancel()
 
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 fixedTime?.let { time ->
                     Text(
-                        text = "Длительность: ${formatElapsedTime(time)}",
+                        text = stringResource(
+                            R.string.recorder_duration_label,
+                            formatElapsedTime(time)
+                        ),
                         color = Color.Yellow,
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
@@ -322,8 +447,7 @@ fun SecondaryImagesSection(mainState: MainState) {
                 }
 
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Row(
@@ -333,16 +457,13 @@ fun SecondaryImagesSection(mainState: MainState) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(
-                            onClick = {
-                                resetToInitialState()
-                                println("Кнопка сброса нажата")
-                            },
+                            onClick = { resetToInitialState() },
                             modifier = Modifier.size(50.dp)
                         ) {
                             Icon(
                                 Icons.Default.Cancel,
                                 modifier = Modifier.size(40.dp),
-                                contentDescription = "Сбросить",
+                                contentDescription = stringResource(R.string.recorder_reset_content_description),
                                 tint = iconTint
                             )
                         }
@@ -351,17 +472,18 @@ fun SecondaryImagesSection(mainState: MainState) {
 
                         BigCircleSendPhotoAction(
                             onClick = {
-                                println("Основное действие выполнено")
-                                resetToInitialState()
-                            }
+                                mainState.audioFile?.let { file ->
+                                    saveToMediaStore(context, file)?.let { uri ->
+                                        Toast.makeText(context, "Аудио сохранено: $uri", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                                resetToInitialState()  }
                         )
 
                         Spacer(Modifier.weight(1f))
 
                         IconButton(
-                            onClick = {
-                                showKeyboardTrigger = true
-                            },
+                            onClick = { showKeyboardTrigger = true },
                             modifier = Modifier
                                 .size(50.dp)
                                 .clickable { showKeyboardTrigger = true }
@@ -369,7 +491,7 @@ fun SecondaryImagesSection(mainState: MainState) {
                             Icon(
                                 Icons.Outlined.TextFields,
                                 modifier = Modifier.size(40.dp),
-                                contentDescription = "Показать клавиатуру",
+                                contentDescription = stringResource(R.string.recorder_show_keyboard_content_description),
                                 tint = iconTint
                             )
                         }
@@ -380,23 +502,22 @@ fun SecondaryImagesSection(mainState: MainState) {
 
                 Icon(
                     imageVector = Icons.Outlined.KeyboardArrowDown,
-                    contentDescription = "Ещё",
+                    contentDescription = stringResource(R.string.recorder_more_content_description),
                     tint = iconTint.copy(alpha = 0.9f),
                     modifier = Modifier.size(34.dp)
                 )
             }
         } else {
-            Column(
-                modifier = Modifier.padding(/*bottom = 20.dp*/),
-                horizontalAlignment = Alignment.CenterHorizontally,
-
-                ) {
-                if (currentState == "STATE_1")
-                    Spacer(Modifier.height(63.dp))
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                if (currentState == "STATE_1") Spacer(Modifier.height(63.dp))
 
                 val isRecording = currentState == "STATE_1"
                 BigCircleMicroButton(
                     onClick = {
+                        if (!hasMicPermission) {
+                            return@BigCircleMicroButton
+                        }
+
                         val currentTime = System.currentTimeMillis()
                         clickCount++
 
@@ -405,7 +526,8 @@ fun SecondaryImagesSection(mainState: MainState) {
                                 isImage1Tinted = true
                                 isImage2Visible = false
                                 firstClickTime = currentTime
-                                lastClickTime = currentTime
+
+                                startRecording(context, mainState)
 
                                 timerJob?.cancel()
                                 timerJob = scope.launch {
@@ -415,20 +537,17 @@ fun SecondaryImagesSection(mainState: MainState) {
                                         delay(100)
                                     }
                                 }
-                                println("Первое нажатие - состояние 1")
                             }
 
                             "STATE_1" -> {
-
                                 firstClickTime?.let { firstTime ->
                                     fixedTime = currentTime - firstTime
                                 }
 
-                                isImage1Tinted = false
-                                lastClickTime = null
-                                elapsedTime = 0L
+                                stopRecording(mainState)
 
-                                println("Второе нажатие - состояние 2. Разница: ${fixedTime}ms")
+                                isImage1Tinted = false
+                                elapsedTime = 0L
                             }
                         }
                     },
@@ -438,58 +557,20 @@ fun SecondaryImagesSection(mainState: MainState) {
                     isRecording = isRecording
                 )
 
-                when (currentState) {
-                    "STATE_1" -> {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(
-                                text = formatElapsedTime(elapsedTime),
-                                color = Color.White,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Medium,
-                                modifier = Modifier.padding(top = 8.dp)
-                            )
-
-                            /*Text(
-                            text = "таймер работает",
-                            color = Color.Gray,
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(top = 2.dp)
-                        )*/
-
-                            /*
-                            Text(
-                                text = "Нажмите снова для перехода в состояние 2",
-                                color = Color(0xFF4CAF50),
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium,
-                                modifier = Modifier.padding(top = 12.dp)
-                                    .padding(horizontal = 16.dp)
-                                    .background(
-                                        color = Color(0x334CAF50),
-                                        shape = RoundedCornerShape(8.dp)
-                                    )
-                                    .padding(horizontal = 8.dp, vertical = 4.dp)
-                            )*/
-                        }
-                    }
-
-                    "INITIAL" -> {
-                        /*Text(
-                            text = "Нажмите для начала",
-                            color = Color.Gray,
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )*/
-                    }
+                if (currentState == "STATE_1") {
+                    Text(
+                        text = formatElapsedTime(elapsedTime),
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
                 }
             }
 
             if (isImage2Visible && currentState == "INITIAL") {
                 IconButton(
-                    onClick = {
-                    },
+                    onClick = { },
                     modifier = Modifier
                         .size(50.dp)
                         .offset(y = 35.dp)
@@ -497,10 +578,9 @@ fun SecondaryImagesSection(mainState: MainState) {
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.KeyboardArrowUp,
-                        contentDescription = "Ещё",
+                        contentDescription = stringResource(R.string.recorder_more_content_description),
                         tint = Color(0xFFEDEEF2).copy(alpha = 0.65f),
                         modifier = Modifier.size(34.dp)
-
                     )
                 }
             }
