@@ -1,15 +1,11 @@
 package com.project.momentum
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
@@ -35,34 +31,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.momentum.ConstColours
-import com.project.momentum.ui.theme.MomentumTheme
+import com.project.momentum.navigation.NavRoutes
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-class Frame75Activity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            MomentumTheme {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(ConstColours.BLACK)
-                ) {
-                    AppNav()
-                }
-            }
-        }
-    }
-}
-
 @Composable
 fun RecorderScreen(
-    navController: NavController? = null,
+    navController: NavController,
     onCameraClick: () -> Unit = {},
     onGoToFriends: () -> Unit = {}
 ) {
@@ -85,7 +65,7 @@ fun RecorderScreen(
                     },
                     onDragEnd = {
                         if (dragOffset < -swipeThreshold) {
-                            navController?.navigate(Routes.GALLERY)
+                            navController.navigate(NavRoutes.Gallery)
                         }
                         dragOffset = 0f
                     },
@@ -94,29 +74,39 @@ fun RecorderScreen(
             },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Верхняя панель с кнопками
         Row(
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             ProfileCircleButton(
-                onClick = { navController?.navigate(Routes.ACCOUNT_WITH_BACK) },
+                onClick = {
+                    navController.navigate(NavRoutes.Account(NavRoutes.Recorder::class.qualifiedName!!))
+                },
                 backgroundColor = chrome2
             )
 
             Spacer(Modifier.weight(1f))
 
-            FriendsPillButton(onClick = onGoToFriends)
+            FriendsPillButton(onClick = {
+                navController.navigate(NavRoutes.Friends)
+            })
 
             Spacer(Modifier.weight(1f))
 
             SettingsCircleButton(
-                onClick = { navController?.navigate(Routes.settingsRoute(Routes.RECORDER)) },
+                onClick = {
+                    navController.navigate(NavRoutes.Settings(NavRoutes.Recorder::class.qualifiedName!!))
+                },
                 backgroundColor = chrome2
             )
         }
 
         Spacer(Modifier.height(12.dp))
 
+        // Основное изображение
         Box(
             modifier = Modifier
                 .fillMaxWidth(0.98f)
@@ -159,6 +149,7 @@ fun RecorderScreen(
 
         Spacer(Modifier.height(16.dp))
 
+        // Кнопки камера/микрофон в начальном состоянии
         if (mainState.currentState == "INITIAL") {
             Row(
                 modifier = Modifier.padding(horizontal = 30.dp),
@@ -167,9 +158,10 @@ fun RecorderScreen(
             ) {
                 CircleButton(
                     size = 60.dp,
-                    onClick = { navController?.navigate(Routes.CAMERA) },
+                    onClick = { navController.navigate(NavRoutes.Camera) },
                     icon = Icons.Outlined.PhotoCamera,
                     iconColor = ConstColours.WHITE,
+                    backgroundColor = ConstColours.BLACK,
                     enabled = true
                 )
 
@@ -186,22 +178,10 @@ fun RecorderScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        SecondaryImagesSection(mainState = mainState)
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
-@Composable
-private fun CameraLikeScreenPreview() {
-    MaterialTheme {
-        CameraLikeScreen(
-            previewPainter = null,
-            onGoToPreview = {},
-            onGoToRecorder = {},
-            onProfileClick = {},
-            onOpenGallery = {},
-            onGoToSettings = {},
-            onGoToFriends = {}
+        // Нижняя секция с микрофоном и состояниями
+        SecondaryImagesSection(
+            mainState = mainState,
+            navController = navController
         )
     }
 }
@@ -212,7 +192,10 @@ class MainState {
 }
 
 @Composable
-fun SecondaryImagesSection(mainState: MainState) {
+fun SecondaryImagesSection(
+    mainState: MainState,
+    navController: NavController
+) {
     var isImage1Tinted by remember { mutableStateOf(false) }
     var isImage2Visible by remember { mutableStateOf(true) }
     var elapsedTime by remember { mutableStateOf(0L) }
@@ -450,9 +433,8 @@ private fun formatElapsedTime(milliseconds: Long): String {
 
 @Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
 @Composable
-fun RecorderScreenPreview(
-    navController: NavController? = null,
-    onCameraClick: () -> Unit = {}
-) {
-    RecorderScreen()
+fun RecorderScreenPreview() {
+    RecorderScreen(
+        navController = rememberNavController()
+    )
 }
