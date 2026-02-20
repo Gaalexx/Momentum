@@ -31,6 +31,24 @@
     <string name="photo_grid_error">Ошибка загрузки</string>
     <string name="add_photo">Добавление фото</string>
 
+    <string name="rec_img_model_">https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/5b2573b6-2575-48f4-b8b4-8d7756ecd5b7</string>
+
+    <string name="icon_more">More</string>
+    <string name="icon_flash">Flash</string>
+    <string name="icon_flip_camera">Flip camera</string>
+
+    <string name="label_write_message">Написать сообщение...</string>
+    <string name="label_write_comment">Введите комментарий...</string>
+    <string name="find_or_add_friend">Найти или добавить друга</string>
+
+    <string name="cats_url">"https://cataas.com/cat"</string>
+
+    <string name="recorder_main_image_content_description">Основное изображение</string>
+    <string name="recorder_reset_content_description">Сбросить</string>
+    <string name="recorder_show_keyboard_content_description">Показать клавиатуру</string>
+    <string name="recorder_more_content_description">Ещё</string>
+    <string name="recorder_duration_label">Длительность: %s</string>
+
     <string name="friends_screen_headliner">Друзья</string>
     <string name="friends_screen_sub_headliner">Мои друзья</string>
     <string name="friends_screen_search_loading">Загрузка друзей…</string>
@@ -39,5 +57,4 @@
     <string name="friends_screen_no_friends">У вас пока нет друзей</string>
     <string name="friends_screen_no_friends_support_mess">Попробуйте изменить запрос</string>
 
-    <string name="rec_img_model_">https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/5b2573b6-2575-48f4-b8b4-8d7756ecd5b7</string>
 </resources>
