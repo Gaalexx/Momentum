@@ -56,5 +56,6 @@
     <string name="friends_screen_search_support_mess">Попробуйте изменить запрос</string>
     <string name="friends_screen_no_friends">У вас пока нет друзей</string>
     <string name="friends_screen_no_friends_support_mess">Попробуйте изменить запрос</string>
+    <string name="Continue">Продолжить</string>
 
 </resources>

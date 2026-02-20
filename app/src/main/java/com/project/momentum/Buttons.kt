@@ -421,11 +421,48 @@ fun PlusButton(
     }
 }
 
+@Composable
+fun ContinueButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    text: String = stringResource(R.string.Continue),
+    colors: ButtonColors = ButtonDefaults.buttonColors(
+        containerColor = ConstColours.MAIN_BRAND_BLUE
+    )
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(50.dp),
+        colors = colors
+    ) {
+        Text (
+            text = text,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = AppTextStyles.ButtonText.copy(
+                textAlign = TextAlign.Center
+            )
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ContinueButtonPreview() {
+    ContinueButton(
+        {}
+    )
+}
+
+
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
 private fun PreviewCircleButtons() {
     Row(
-        Modifier.fillMaxWidth().padding(16.dp),
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -440,7 +477,7 @@ private fun PreviewCircleButtons() {
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
 private fun PreviewFriendsPill() {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(contentAlignment = Alignment.Center) {
         FriendsPillButton(onClick = {})
     }
 }
@@ -448,7 +485,7 @@ private fun PreviewFriendsPill() {
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
 private fun PreviewSettingsButton() {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(contentAlignment = Alignment.Center) {
         SettingsButton(
             onClick = {},
             icon = Icons.Filled.Settings,
@@ -462,7 +499,7 @@ private fun PreviewSettingsButton() {
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun PreviewBigCircle() {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(contentAlignment = Alignment.Center) {
         BigCircleForMainScreenAction({})
     }
 }
@@ -470,7 +507,7 @@ private fun PreviewBigCircle() {
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun PreviewBigCircleForPhotoSend() {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(contentAlignment = Alignment.Center) {
         BigCircleSendPhotoAction({})
     }
 }
@@ -478,7 +515,7 @@ private fun PreviewBigCircleForPhotoSend() {
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun PreviewEdit() {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(contentAlignment = Alignment.Center) {
         EditButton({})
     }
 }
