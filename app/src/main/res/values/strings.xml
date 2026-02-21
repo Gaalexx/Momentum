@@ -58,5 +58,6 @@
     <string name="friends_screen_no_friends_support_mess">Попробуйте изменить запрос</string>
     <string name="Continue">Продолжить</string>
     <string name="CreateAccount">Создание аккаунта</string>
+    <string name="insert_password">Введите пароль</string>
 
 </resources>
