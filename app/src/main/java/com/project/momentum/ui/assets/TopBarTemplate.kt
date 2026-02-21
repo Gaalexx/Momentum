@@ -1,4 +1,4 @@
-package com.project.momentum.ui
+package com.project.momentum.ui.assets
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
