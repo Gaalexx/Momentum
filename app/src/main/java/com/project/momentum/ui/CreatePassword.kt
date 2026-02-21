@@ -53,28 +53,30 @@ fun CreatePasswordScreen(
 ) {
     val bg = ConstColours.BLACK
 
-    Scaffold(
+    TopBarTemplate (
+        title = R.string.CreateAccount,
+        onBackClick = onBackClick,
         modifier = modifier
-            .background(bg)
-            .padding(16.dp),
-        backgroundColor = bg,
-        topBar = {
-            CreatePasswordTopBar(
-                onBackClick = onBackClick
-            )
-        }
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .background(bg)
                 .padding(paddingValues)
-//                .windowInsetsPadding(WindowInsets.systemBars) ,
+//                .windowIn  setsPadding(WindowInsets.systemBars) ,
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
                 verticalArrangement = Arrangement.Center
             ) {
+                Text (
+                    text = stringResource(R.string.insert_password),
+                    color = ConstColours.WHITE,
+                    textAlign = TextAlign.Center,
+                    style = AppTextStyles.Headlines,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(16.dp))
                 TextFieldRegistration(
                     //TODO: Сохрание + изменение состояния во viewModel
                     value = "qwertyuio",
@@ -95,28 +97,6 @@ fun CreatePasswordScreen(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun CreatePasswordTopBar(
-    onBackClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier
-            .fillMaxWidth()
-    ) {
-        BackCircleButton(
-            onClick = onBackClick
-        )
-        Text (
-            text = stringResource(R.string.insert_password),
-            color = ConstColours.WHITE,
-            textAlign = TextAlign.Center,
-            style = AppTextStyles.Headlines,
-            modifier = Modifier.align(Alignment.Center)
-        )
     }
 }
 

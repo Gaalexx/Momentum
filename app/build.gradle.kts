@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.ui.text)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.compose.foundation.layout)
     val cameraxVersion = "1.3.4"
 
     implementation("androidx.camera:camera-core:$cameraxVersion")

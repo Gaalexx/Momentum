@@ -53,16 +53,10 @@ fun CreateAccountScreen(
 ) {
     val bg = ConstColours.BLACK
 
-    Scaffold(
+    TopBarTemplate (
+        title = R.string.CreateAccount,
+        onBackClick = onBackClick,
         modifier = modifier
-            .background(bg)
-            .padding(16.dp),
-        backgroundColor = bg,
-        topBar = {
-            CreateAccountTopBar(
-                onBackClick = onBackClick
-            )
-        }
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -120,28 +114,6 @@ fun CreateAccountScreen(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun CreateAccountTopBar(
-    onBackClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier
-            .fillMaxWidth()
-    ) {
-        BackCircleButton(
-            onClick = onBackClick
-        )
-        Text (
-            text = stringResource(R.string.CreateAccount),
-            color = ConstColours.WHITE,
-            textAlign = TextAlign.Center,
-            style = AppTextStyles.Headlines,
-            modifier = Modifier.align(Alignment.Center)
-        )
     }
 }
 
