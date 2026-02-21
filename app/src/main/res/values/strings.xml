@@ -53,7 +53,6 @@
     <string name="recorder_video_error_unknown">Ошибка записи видео</string>
     <string name="recorder_video_error_no_data">Нет данных (слишком короткое видео)</string>
     <string name="recorder_video_saved">Видео сохранено</string>
-</resources>
     <string name="friends_screen_headliner">Друзья</string>
     <string name="friends_screen_sub_headliner">Мои друзья</string>
     <string name="friends_screen_search_loading">Загрузка друзей…</string>
