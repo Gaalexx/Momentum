@@ -427,7 +427,8 @@ fun ContinueButton(
     modifier: Modifier = Modifier,
     text: String = stringResource(R.string.Continue),
     colors: ButtonColors = ButtonDefaults.buttonColors(
-        containerColor = ConstColours.MAIN_BRAND_BLUE
+        containerColor = ConstColours.MAIN_BRAND_BLUE,
+        contentColor = ConstColours.WHITE
     )
 ) {
     Button(

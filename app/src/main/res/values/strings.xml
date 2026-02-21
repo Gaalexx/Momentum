@@ -57,5 +57,6 @@
     <string name="friends_screen_no_friends">У вас пока нет друзей</string>
     <string name="friends_screen_no_friends_support_mess">Попробуйте изменить запрос</string>
     <string name="Continue">Продолжить</string>
+    <string name="CreateAccount">Создание аккаунта</string>
 
 </resources>

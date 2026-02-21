@@ -134,7 +134,7 @@ fun FriendsScreen(
     val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(bg)
             .windowInsetsPadding(WindowInsets.systemBars)
