@@ -3,6 +3,7 @@ package com.project.momentum.ui.assets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldColors
 import androidx.compose.material.TextFieldDefaults
@@ -20,7 +21,9 @@ import com.project.momentum.ui.theme.AppTextStyles
 fun TextFieldRegistration(
     value: String,
     onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isError: Boolean = false,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
     TextField(
         value = value,
@@ -30,6 +33,8 @@ fun TextFieldRegistration(
         textStyle = AppTextStyles.MainText.copy(
             textAlign = TextAlign.Center
         ),
+        isError = isError,
+        keyboardOptions = keyboardOptions,
         maxLines = 1,
         shape = RoundedCornerShape(50.dp),
         colors = TextFieldDefaults.textFieldColors(

@@ -59,5 +59,7 @@
     <string name="Continue">Продолжить</string>
     <string name="CreateAccount">Создание аккаунта</string>
     <string name="insert_password">Введите пароль</string>
+    <string name="insert_code_mail">Введите код с почты</string>
+    <string name="send_code_again">Отправить код повторно</string>
 
 </resources>
