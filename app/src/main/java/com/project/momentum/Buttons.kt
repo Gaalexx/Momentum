@@ -326,7 +326,6 @@ fun BigCircleForMainScreenAction(
                         onLongPress = {
                             longMode = true
                             onLongPressStart()
-                            //startProgress()
                             onStartProgress()
                         },
                         onPress = {
@@ -336,7 +335,6 @@ fun BigCircleForMainScreenAction(
                             if (longMode) {
                                 onLongPressEnd()
                                 longMode = false
-                                //stopProgress(reset = true)
                                 onEndProgress()
                             }
                         }

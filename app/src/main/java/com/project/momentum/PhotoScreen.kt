@@ -370,7 +370,7 @@ fun CameraLikeScreen(
     val progressPath = remember { PathMeasure() }
     val scope = rememberCoroutineScope()
 
-    fun longPress(){
+    fun longPress() {
         if (recording == null) {
             var newRecording: Recording? = null
             recordingStarted = false
@@ -401,7 +401,7 @@ fun CameraLikeScreen(
         }
     }
 
-    fun longPressEnd(){
+    fun longPressEnd() {
         if (recording != null) {
             if (recordingStarted) {
                 recording = stopVideoRecording(recording)
@@ -489,11 +489,7 @@ fun CameraLikeScreen(
                     .fillMaxSize()
 
             ) {
-//                drawRoundRect(
-//                    color = ConstColours.MAIN_BRAND_BLUE,
-//                    cornerRadius = CornerRadius(x = 65.dp.toPx(), y = 65.dp.toPx()),
-//                    style = Stroke(width = 8.dp.toPx())
-//                )
+
                 val fullPath = Path().apply {
                     addRoundRect(
                         RoundRect(
@@ -502,25 +498,50 @@ fun CameraLikeScreen(
                                 bottomRight = Offset(size.width, size.height)
                             ),
                             cornerRadius = CornerRadius(x = 65.dp.toPx(), y = 65.dp.toPx())
-                        )
+                        ),
+                        direction = Path.Direction.Clockwise
                     )
                 }
 
                 progressPath.setPath(fullPath, forceClosed = true)
                 val totalLength = progressPath.length
-                val stop = totalLength * progress.value
+                val startShiftFraction = 0.3425f
+
+                val start = totalLength * startShiftFraction
+                val visibleLength = totalLength * progress.value
+                val end = start + visibleLength
 
                 val segmentPath = Path()
-                progressPath.getSegment(
-                    startDistance = -90f,
-                    stopDistance = stop,
-                    destination = segmentPath,
-                    startWithMoveTo = true
-                )
+
+                if (end <= totalLength) {
+                    progressPath.getSegment(
+                        startDistance = start,
+                        stopDistance = end,
+                        destination = segmentPath,
+                        startWithMoveTo = true
+                    )
+                } else {
+                    progressPath.getSegment(
+                        startDistance = start,
+                        stopDistance = totalLength,
+                        destination = segmentPath,
+                        startWithMoveTo = true
+                    )
+
+                    val secondPart = Path()
+                    progressPath.getSegment(
+                        startDistance = 0f,
+                        stopDistance = end - totalLength,
+                        destination = secondPart,
+                        startWithMoveTo = true
+                    )
+
+                    segmentPath.addPath(secondPart)
+                }
 
                 drawPath(
                     path = segmentPath,
-                    ConstColours.MAIN_BRAND_BLUE,
+                    color = ConstColours.MAIN_BRAND_BLUE,
                     style = Stroke(width = 8.dp.toPx())
                 )
 
