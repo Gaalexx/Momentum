@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -27,6 +26,7 @@ import com.example.momentum.ConstColours
 import android.content.ContentValues
 import android.os.Build
 import android.provider.MediaStore
+import android.util.Log
 import android.widget.Toast
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -34,7 +34,11 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 import android.Manifest
+import android.R.attr.progress
+import android.content.Context
 import android.content.pm.PackageManager
+import android.util.Rational
+import android.util.Size
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 
@@ -48,6 +52,11 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.camera.core.Camera
+import androidx.camera.video.Recorder
+import androidx.camera.video.Recording
+import androidx.camera.video.VideoCapture
+import androidx.camera.video.VideoRecordEvent
+import androidx.camera.video.MediaStoreOutputOptions
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
@@ -63,6 +72,26 @@ import androidx.compose.ui.res.stringResource
 import androidx.camera.core.Preview as CameraXPreview
 
 
+import androidx.camera.core.AspectRatio
+import androidx.camera.core.UseCaseGroup
+import androidx.camera.core.ViewPort
+import androidx.camera.core.resolutionselector.AspectRatioStrategy
+import androidx.camera.core.resolutionselector.ResolutionSelector
+import androidx.camera.core.resolutionselector.ResolutionStrategy
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathMeasure
+import androidx.compose.ui.graphics.drawscope.Stroke
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 
 @Composable
@@ -70,53 +99,75 @@ fun CameraPreview(
     modifier: Modifier = Modifier,
     lensFacing: Int = CameraSelector.LENS_FACING_BACK,
     torchEnabled: Boolean,
-    imageCapture: ImageCapture
+    imageCapture: ImageCapture,
+    videoCapture: VideoCapture<Recorder>
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
+
+    val previewView = remember(context) {
+        PreviewView(context).apply {
+            scaleType = PreviewView.ScaleType.FILL_CENTER
+        }
+    }
+    val cameraProviderFuture = remember(context) {
+        ProcessCameraProvider.getInstance(context)
+    }
     var camera by remember { mutableStateOf<Camera?>(null) }
 
     AndroidView(
         modifier = modifier,
-        factory = { ctx ->
-            PreviewView(ctx).apply {
-                scaleType = PreviewView.ScaleType.FILL_CENTER
+        factory = { previewView }
+    )
+
+    LaunchedEffect(lensFacing, imageCapture, videoCapture) {
+        cameraProviderFuture.addListener({
+            val cameraProvider = cameraProviderFuture.get()
+
+            val preview = CameraXPreview.Builder().build().also {
+                it.setSurfaceProvider(previewView.surfaceProvider)
             }
-        },
-        update = { previewView ->
-            val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
 
-            cameraProviderFuture.addListener({
-                val cameraProvider = cameraProviderFuture.get()
+            val selector = CameraSelector.Builder()
+                .requireLensFacing(lensFacing)
+                .build()
 
-                val preview = CameraXPreview.Builder().build().also {
-                    it.setSurfaceProvider(previewView.surfaceProvider)
-                }
+            try {
+                cameraProvider.unbindAll()
 
-                val selector = CameraSelector.Builder()
-                    .requireLensFacing(lensFacing)
+                val rotation = previewView.display.rotation
+                imageCapture.setTargetRotation(rotation)
+                imageCapture.setCropAspectRatio(Rational(1, 1))
+
+                val viewPort = ViewPort.Builder(Rational(1, 1), rotation)
+                    .setScaleType(ViewPort.FILL_CENTER)
                     .build()
 
-                try {
-                    cameraProvider.unbindAll()
-                    val boundCamera = cameraProvider.bindToLifecycle(
-                        lifecycleOwner,
-                        selector,
-                        preview,
-                        imageCapture
-                    )
-                    camera = boundCamera
+                val group = UseCaseGroup.Builder()
+                    .setViewPort(viewPort)
+                    .addUseCase(preview)
+                    .addUseCase(imageCapture)
+                    .addUseCase(videoCapture)
+                    .build()
 
-                    if (boundCamera.cameraInfo.hasFlashUnit()) {
-                        boundCamera.cameraControl.enableTorch(torchEnabled)
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
+
+                val boundCamera = cameraProvider.bindToLifecycle(
+                    lifecycleOwner,
+                    selector,
+                    group
+
+                )
+                camera = boundCamera
+
+                if (boundCamera.cameraInfo.hasFlashUnit()) {
+                    boundCamera.cameraControl.enableTorch(torchEnabled)
                 }
-            }, ContextCompat.getMainExecutor(context))
-        }
-    )
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }, ContextCompat.getMainExecutor(context))
+    }
 
     LaunchedEffect(torchEnabled) {
         val cam = camera ?: return@LaunchedEffect
@@ -164,6 +215,7 @@ private fun takePhoto(
             override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                 output.savedUri?.let(onSaved)
             }
+
             override fun onError(exc: ImageCaptureException) {
                 onError(exc)
             }
@@ -171,8 +223,80 @@ private fun takePhoto(
     )
 }
 
+private fun startVideoRecording(
+    context: Context,
+    videoCapture: VideoCapture<Recorder>,
+    onEvent: (VideoRecordEvent) -> Unit = {}
+): Recording {
+    val hasAudioPermission = ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.RECORD_AUDIO
+    ) == PackageManager.PERMISSION_GRANTED
 
+    val name = "MOMENTUM_VID_${System.currentTimeMillis()}.mp4"
 
+    val contentValues = ContentValues().apply {
+        put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+        put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/Momentum")
+        }
+    }
+
+    val mediaStoreOutput = MediaStoreOutputOptions.Builder(
+        context.contentResolver,
+        MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+    ).setContentValues(contentValues)
+        .build()
+
+    val pending =
+        if (hasAudioPermission) videoCapture.output.prepareRecording(context, mediaStoreOutput)
+            .withAudioEnabled() else videoCapture.output.prepareRecording(context, mediaStoreOutput)
+
+    return pending.start(ContextCompat.getMainExecutor(context)) { event ->
+        onEvent(event)
+        if (event is VideoRecordEvent.Finalize) {
+            if (event.hasError()) {
+                Log.e(
+                    "CameraLikeScreen",
+                    "Video record error=${event.error}",
+                    event.cause
+                )
+                Toast.makeText(
+                    context,
+                    videoRecordErrorMessage(context, event.error),
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.recorder_video_saved),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+}
+
+private fun videoRecordErrorMessage(context: Context, error: Int): String {
+    return when (error) {
+        VideoRecordEvent.Finalize.ERROR_NO_VALID_DATA -> {
+            context.getString(
+                R.string.recorder_video_error,
+                context.getString(R.string.recorder_video_error_no_data)
+            )
+        }
+
+        else -> context.getString(R.string.recorder_video_error, error.toString())
+    }
+}
+
+private fun stopVideoRecording(
+    recording: Recording?
+): Recording? {
+    recording?.stop()
+    return null
+}
 
 
 @Composable
@@ -212,7 +336,8 @@ fun CameraLikeScreen(
     onProfileClick: () -> Unit,
     onOpenGallery: () -> Unit,
     onGoToSettings: () -> Unit,
-    onGoToFriends: () -> Unit
+    onGoToFriends: () -> Unit,
+    maxRecordMs: Int = 10_000
 ) {
     val backGround = ConstColours.BLACK
     val iconTint = ConstColours.WHITE
@@ -228,16 +353,98 @@ fun CameraLikeScreen(
             .build()
     }
 
+    val videoCapture = remember {
+        VideoCapture.withOutput(Recorder.Builder().build())
+    }
+    var recording by remember { mutableStateOf<Recording?>(null) }
+    var recordingStarted by remember { mutableStateOf(false) }
+    var stopRequested by remember { mutableStateOf(false) }
+
     // swipe state
     var dragOffset by remember { mutableStateOf(0f) }
     val swipeThreshold = 80f
+
+    val swipeEnabled = recording == null
+
+    val progress = remember { androidx.compose.animation.core.Animatable(0f) }
+    val progressPath = remember { PathMeasure() }
+    val scope = rememberCoroutineScope()
+
+    fun longPress() {
+        if (recording == null) {
+            var newRecording: Recording? = null
+            recordingStarted = false
+            stopRequested = false
+            newRecording = startVideoRecording(
+                context = context,
+                videoCapture = videoCapture
+            ) { event ->
+                when (event) {
+                    is VideoRecordEvent.Start -> {
+                        recordingStarted = true
+                        if (stopRequested) {
+                            newRecording?.stop()
+                            stopRequested = false
+                        }
+                    }
+
+                    is VideoRecordEvent.Finalize -> {
+                        recordingStarted = false
+                        stopRequested = false
+                        recording = null
+                    }
+
+                    else -> Unit
+                }
+            }
+            recording = newRecording
+        }
+    }
+
+    fun longPressEnd() {
+        if (recording != null) {
+            if (recordingStarted) {
+                recording = stopVideoRecording(recording)
+            } else {
+                stopRequested = true
+            }
+        }
+    }
+
+    fun startProgress() {
+        scope.launch {
+            progress.snapTo(0f)
+            progress.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(
+                    durationMillis = maxRecordMs,
+                    easing = LinearEasing
+                )
+            )
+            longPressEnd()
+            //longMode = false
+            progress.snapTo(0f)
+        }
+    }
+
+    fun stopProgress(reset: Boolean = true) {
+        scope.launch {
+            progress.stop()
+            if (reset) progress.snapTo(0f)
+        }
+    }
+
+
+
+
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(backGround)
             .windowInsetsPadding(WindowInsets.systemBars)
-            .pointerInput(Unit) {
+            .pointerInput(swipeEnabled) {
+                if (!swipeEnabled) return@pointerInput
                 detectVerticalDragGestures(
                     onVerticalDrag = { _, dragAmount ->
                         dragOffset += dragAmount
@@ -271,28 +478,103 @@ fun CameraLikeScreen(
 
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.98f)
-                .aspectRatio(1.10f)
-                .clip(RoundedCornerShape(28.dp))
-                .background(ConstColours.MAIN_BACK_GRAY)
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(60.dp))
+                .background(ConstColours.BLACK)
         ) {
-            if (hasCameraPermission) {
-                CameraPreview(
-                    modifier = Modifier.fillMaxSize(),
-                    lensFacing = lensFacing,
-                    torchEnabled = torchEnabled,
-                    imageCapture = imageCapture
-                )
-            } else {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Outlined.PhotoCamera,
-                        contentDescription = null,
-                        tint = Color.White.copy(alpha = 0.35f),
-                        modifier = Modifier.size(56.dp)
+
+            Canvas(
+                modifier = Modifier
+                    .fillMaxSize()
+
+            ) {
+
+                val fullPath = Path().apply {
+                    addRoundRect(
+                        RoundRect(
+                            rect = Rect(
+                                topLeft = Offset(0f, 0f),
+                                bottomRight = Offset(size.width, size.height)
+                            ),
+                            cornerRadius = CornerRadius(x = 65.dp.toPx(), y = 65.dp.toPx())
+                        ),
+                        direction = Path.Direction.Clockwise
                     )
                 }
+
+                progressPath.setPath(fullPath, forceClosed = true)
+                val totalLength = progressPath.length
+                val startShiftFraction = 0.3425f
+
+                val start = totalLength * startShiftFraction
+                val visibleLength = totalLength * progress.value
+                val end = start + visibleLength
+
+                val segmentPath = Path()
+
+                if (end <= totalLength) {
+                    progressPath.getSegment(
+                        startDistance = start,
+                        stopDistance = end,
+                        destination = segmentPath,
+                        startWithMoveTo = true
+                    )
+                } else {
+                    progressPath.getSegment(
+                        startDistance = start,
+                        stopDistance = totalLength,
+                        destination = segmentPath,
+                        startWithMoveTo = true
+                    )
+
+                    val secondPart = Path()
+                    progressPath.getSegment(
+                        startDistance = 0f,
+                        stopDistance = end - totalLength,
+                        destination = secondPart,
+                        startWithMoveTo = true
+                    )
+
+                    segmentPath.addPath(secondPart)
+                }
+
+                drawPath(
+                    path = segmentPath,
+                    color = ConstColours.MAIN_BRAND_BLUE,
+                    style = Stroke(width = 8.dp.toPx())
+                )
+
             }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.95f)
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(60.dp))
+                    .background(ConstColours.MAIN_BACK_GRAY)
+                    .align(Alignment.Center)
+            ) {
+                if (hasCameraPermission) {
+                    CameraPreview(
+                        modifier = Modifier.fillMaxSize(),
+                        lensFacing = lensFacing,
+                        torchEnabled = torchEnabled,
+                        imageCapture = imageCapture,
+                        videoCapture = videoCapture
+                    )
+                } else {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Outlined.PhotoCamera,
+                            contentDescription = null,
+                            tint = Color.White.copy(alpha = 0.35f),
+                            modifier = Modifier.size(56.dp)
+                        )
+                    }
+                }
+            }
+
         }
 
         Spacer(Modifier.height(16.dp))
@@ -358,7 +640,16 @@ fun CameraLikeScreen(
 //                                Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                             }
                         )
-                    }
+                    },
+                    onLongPressStart = {
+                        longPress()
+                    },
+                    onLongPressEnd = {
+                        longPressEnd()
+                    },
+                    onStartProgress = { startProgress() },
+                    onEndProgress = { stopProgress() },
+                    maxRecordMs = maxRecordMs
                 )
 
                 Spacer(Modifier.weight(1f))

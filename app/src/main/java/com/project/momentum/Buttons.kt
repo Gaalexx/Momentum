@@ -1,9 +1,18 @@
 package com.project.momentum
 
 
+import android.content.Context
+import androidx.camera.video.Recorder
+import androidx.camera.video.Recording
+import androidx.camera.video.VideoCapture
+import androidx.camera.video.VideoRecordEvent
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,6 +24,11 @@ import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.rounded.Send
 import androidx.compose.material.icons.automirrored.rounded.SendToMobile
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
@@ -43,6 +57,19 @@ import com.example.momentum.ConstColours
 import com.project.momentum.ui.theme.AppTextStyles
 import com.skydoves.landscapist.ImageOptions
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.runtime.remember
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.drawscope.DrawStyle
+import androidx.compose.ui.input.pointer.pointerInput
+import kotlinx.coroutines.launch
 
 @Composable
 fun BackCircleButton(
@@ -260,30 +287,59 @@ fun FriendsPillButton(
 
 @Composable
 fun BigCircleForMainScreenAction(
-    onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    onLongPressStart: () -> Unit,
+    onLongPressEnd: () -> Unit,
+    onStartProgress: () -> Unit = {},
+    onEndProgress: () -> Unit = {},
     size: Dp = 132.dp,
     outerColor: Color = ConstColours.MAIN_BACK_GRAY,
     innerColor: Color = ConstColours.WHITE,
+    innerPressed: Color = ConstColours.RED,
     ring: Dp = 14.dp,
     enabled: Boolean = true,
+    maxRecordMs: Int = 60_000,
+    progressionStroke: Dp = 6.dp
 ) {
+    var pressed by remember { mutableStateOf(false) }
+    var longMode by remember { mutableStateOf(false) }
+
+
     Box(
         modifier = modifier
             .size(size)
             .clip(CircleShape)
-            .clickable(
-                enabled = enabled,
-                onClick = onClick
-            )
-            .background(outerColor),
+            .background(if (pressed) ConstColours.RED else outerColor),
         contentAlignment = Alignment.Center
     ) {
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(ring)
                 .clip(CircleShape)
+                .pointerInput(enabled) {
+                    if (!enabled) return@pointerInput
+                    detectTapGestures(
+                        onTap = { onClick() },
+                        onLongPress = {
+                            longMode = true
+                            onLongPressStart()
+                            onStartProgress()
+                        },
+                        onPress = {
+                            pressed = true
+                            val released = tryAwaitRelease()
+                            pressed = false
+                            if (longMode) {
+                                onLongPressEnd()
+                                longMode = false
+                                onEndProgress()
+                            }
+                        }
+                    )
+                }
                 .background(innerColor)
         )
     }
@@ -368,7 +424,7 @@ fun BigCircleMicroButton(
 
 
 @Composable
-fun EditButton(onEditProfile : () -> Unit) {
+fun EditButton(onEditProfile: () -> Unit) {
     Button(
         onClick = onEditProfile,
         colors = ButtonDefaults.buttonColors(
@@ -425,7 +481,9 @@ fun PlusButton(
 @Composable
 private fun PreviewCircleButtons() {
     Row(
-        Modifier.fillMaxWidth().padding(16.dp),
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -434,7 +492,6 @@ private fun PreviewCircleButtons() {
         SettingsCircleButton(onClick = {})
     }
 }
-
 
 
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
@@ -463,7 +520,7 @@ private fun PreviewSettingsButton() {
 @Composable
 private fun PreviewBigCircle() {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        BigCircleForMainScreenAction({})
+        BigCircleForMainScreenAction(onClick = {}, onLongPressStart = {}, onLongPressEnd = {})
     }
 }
 
