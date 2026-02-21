@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -35,6 +34,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 import android.Manifest
+import android.R.attr.progress
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Rational
@@ -78,6 +78,18 @@ import androidx.camera.core.ViewPort
 import androidx.camera.core.resolutionselector.AspectRatioStrategy
 import androidx.camera.core.resolutionselector.ResolutionSelector
 import androidx.camera.core.resolutionselector.ResolutionStrategy
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathMeasure
+import androidx.compose.ui.graphics.drawscope.Stroke
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
@@ -324,7 +336,8 @@ fun CameraLikeScreen(
     onProfileClick: () -> Unit,
     onOpenGallery: () -> Unit,
     onGoToSettings: () -> Unit,
-    onGoToFriends: () -> Unit
+    onGoToFriends: () -> Unit,
+    maxRecordMs: Int = 10_000
 ) {
     val backGround = ConstColours.BLACK
     val iconTint = ConstColours.WHITE
@@ -352,6 +365,78 @@ fun CameraLikeScreen(
     val swipeThreshold = 80f
 
     val swipeEnabled = recording == null
+
+    val progress = remember { androidx.compose.animation.core.Animatable(0f) }
+    val progressPath = remember { PathMeasure() }
+    val scope = rememberCoroutineScope()
+
+    fun longPress(){
+        if (recording == null) {
+            var newRecording: Recording? = null
+            recordingStarted = false
+            stopRequested = false
+            newRecording = startVideoRecording(
+                context = context,
+                videoCapture = videoCapture
+            ) { event ->
+                when (event) {
+                    is VideoRecordEvent.Start -> {
+                        recordingStarted = true
+                        if (stopRequested) {
+                            newRecording?.stop()
+                            stopRequested = false
+                        }
+                    }
+
+                    is VideoRecordEvent.Finalize -> {
+                        recordingStarted = false
+                        stopRequested = false
+                        recording = null
+                    }
+
+                    else -> Unit
+                }
+            }
+            recording = newRecording
+        }
+    }
+
+    fun longPressEnd(){
+        if (recording != null) {
+            if (recordingStarted) {
+                recording = stopVideoRecording(recording)
+            } else {
+                stopRequested = true
+            }
+        }
+    }
+
+    fun startProgress() {
+        scope.launch {
+            progress.snapTo(0f)
+            progress.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(
+                    durationMillis = maxRecordMs,
+                    easing = LinearEasing
+                )
+            )
+            longPressEnd()
+            //longMode = false
+            progress.snapTo(0f)
+        }
+    }
+
+    fun stopProgress(reset: Boolean = true) {
+        scope.launch {
+            progress.stop()
+            if (reset) progress.snapTo(0f)
+        }
+    }
+
+
+
+
 
     Column(
         modifier = modifier
@@ -393,29 +478,82 @@ fun CameraLikeScreen(
 
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.98f)
+                .fillMaxWidth()
                 .aspectRatio(1f)
-                .clip(RoundedCornerShape(28.dp))
-                .background(ConstColours.MAIN_BACK_GRAY)
+                .clip(RoundedCornerShape(60.dp))
+                .background(ConstColours.BLACK)
         ) {
-            if (hasCameraPermission) {
-                CameraPreview(
-                    modifier = Modifier.fillMaxSize(),
-                    lensFacing = lensFacing,
-                    torchEnabled = torchEnabled,
-                    imageCapture = imageCapture,
-                    videoCapture = videoCapture
-                )
-            } else {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Outlined.PhotoCamera,
-                        contentDescription = null,
-                        tint = Color.White.copy(alpha = 0.35f),
-                        modifier = Modifier.size(56.dp)
+
+            Canvas(
+                modifier = Modifier
+                    .fillMaxSize()
+
+            ) {
+//                drawRoundRect(
+//                    color = ConstColours.MAIN_BRAND_BLUE,
+//                    cornerRadius = CornerRadius(x = 65.dp.toPx(), y = 65.dp.toPx()),
+//                    style = Stroke(width = 8.dp.toPx())
+//                )
+                val fullPath = Path().apply {
+                    addRoundRect(
+                        RoundRect(
+                            rect = Rect(
+                                topLeft = Offset(0f, 0f),
+                                bottomRight = Offset(size.width, size.height)
+                            ),
+                            cornerRadius = CornerRadius(x = 65.dp.toPx(), y = 65.dp.toPx())
+                        )
                     )
                 }
+
+                progressPath.setPath(fullPath, forceClosed = true)
+                val totalLength = progressPath.length
+                val stop = totalLength * progress.value
+
+                val segmentPath = Path()
+                progressPath.getSegment(
+                    startDistance = -90f,
+                    stopDistance = stop,
+                    destination = segmentPath,
+                    startWithMoveTo = true
+                )
+
+                drawPath(
+                    path = segmentPath,
+                    ConstColours.MAIN_BRAND_BLUE,
+                    style = Stroke(width = 8.dp.toPx())
+                )
+
             }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.95f)
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(60.dp))
+                    .background(ConstColours.MAIN_BACK_GRAY)
+                    .align(Alignment.Center)
+            ) {
+                if (hasCameraPermission) {
+                    CameraPreview(
+                        modifier = Modifier.fillMaxSize(),
+                        lensFacing = lensFacing,
+                        torchEnabled = torchEnabled,
+                        imageCapture = imageCapture,
+                        videoCapture = videoCapture
+                    )
+                } else {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Outlined.PhotoCamera,
+                            contentDescription = null,
+                            tint = Color.White.copy(alpha = 0.35f),
+                            modifier = Modifier.size(56.dp)
+                        )
+                    }
+                }
+            }
+
         }
 
         Spacer(Modifier.height(16.dp))
@@ -482,45 +620,15 @@ fun CameraLikeScreen(
                             }
                         )
                     },
-                    {
-                        if (recording == null) {
-                            var newRecording: Recording? = null
-                            recordingStarted = false
-                            stopRequested = false
-                            newRecording = startVideoRecording(
-                                context = context,
-                                videoCapture = videoCapture
-                            ) { event ->
-                                when (event) {
-                                    is VideoRecordEvent.Start -> {
-                                        recordingStarted = true
-                                        if (stopRequested) {
-                                            newRecording?.stop()
-                                            stopRequested = false
-                                        }
-                                    }
-
-                                    is VideoRecordEvent.Finalize -> {
-                                        recordingStarted = false
-                                        stopRequested = false
-                                        recording = null
-                                    }
-
-                                    else -> Unit
-                                }
-                            }
-                            recording = newRecording
-                        }
+                    onLongPressStart = {
+                        longPress()
                     },
-                    {
-                        if (recording != null) {
-                            if (recordingStarted) {
-                                recording = stopVideoRecording(recording)
-                            } else {
-                                stopRequested = true
-                            }
-                        }
-                    }
+                    onLongPressEnd = {
+                        longPressEnd()
+                    },
+                    onStartProgress = { startProgress() },
+                    onEndProgress = { stopProgress() },
+                    maxRecordMs = maxRecordMs
                 )
 
                 Spacer(Modifier.weight(1f))

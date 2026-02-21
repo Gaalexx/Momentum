@@ -287,10 +287,12 @@ fun FriendsPillButton(
 
 @Composable
 fun BigCircleForMainScreenAction(
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
     onLongPressStart: () -> Unit,
     onLongPressEnd: () -> Unit,
-    modifier: Modifier = Modifier,
+    onStartProgress: () -> Unit = {},
+    onEndProgress: () -> Unit = {},
     size: Dp = 132.dp,
     outerColor: Color = ConstColours.MAIN_BACK_GRAY,
     innerColor: Color = ConstColours.WHITE,
@@ -303,58 +305,14 @@ fun BigCircleForMainScreenAction(
     var pressed by remember { mutableStateOf(false) }
     var longMode by remember { mutableStateOf(false) }
 
-    val progress = remember { androidx.compose.animation.core.Animatable(0f) }
-    val scope = rememberCoroutineScope()
-
-    fun startProgress() {
-        scope.launch {
-            progress.snapTo(0f)
-            progress.animateTo(
-                targetValue = 1f,
-                animationSpec = tween(
-                    durationMillis = maxRecordMs,
-                    easing = LinearEasing
-                )
-            )
-            onLongPressEnd()
-            longMode = false
-            progress.snapTo(0f)
-        }
-    }
-
-    fun stopProgress(reset: Boolean = true) {
-        scope.launch {
-            progress.stop()
-            if (reset) progress.snapTo(0f)
-        }
-    }
-
-
 
     Box(
         modifier = modifier
             .size(size)
             .clip(CircleShape)
-            .background(outerColor),
+            .background(if (pressed) ConstColours.RED else outerColor),
         contentAlignment = Alignment.Center
     ) {
-
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val strokePx = progressionStroke.toPx()
-            val ringPx = ring.toPx()
-            val inset = ringPx / 2f
-            val diameter = this.size.minDimension - 2f * inset
-
-            drawArc(
-                color = innerPressed,
-                startAngle = -90f,
-                sweepAngle = 360f * progress.value,
-                useCenter = false,
-                topLeft = Offset(inset, inset),
-                size = Size(diameter, diameter),
-                style = Stroke(width = strokePx, cap = StrokeCap.Round)
-            )
-        }
 
         Box(
             modifier = Modifier
@@ -368,7 +326,8 @@ fun BigCircleForMainScreenAction(
                         onLongPress = {
                             longMode = true
                             onLongPressStart()
-                            startProgress()
+                            //startProgress()
+                            onStartProgress()
                         },
                         onPress = {
                             pressed = true
@@ -377,7 +336,8 @@ fun BigCircleForMainScreenAction(
                             if (longMode) {
                                 onLongPressEnd()
                                 longMode = false
-                                stopProgress(reset = true)
+                                //stopProgress(reset = true)
+                                onEndProgress()
                             }
                         }
                     )
@@ -562,7 +522,7 @@ private fun PreviewSettingsButton() {
 @Composable
 private fun PreviewBigCircle() {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        BigCircleForMainScreenAction({}, {}, {})
+        BigCircleForMainScreenAction(onClick = {}, onLongPressStart = {}, onLongPressEnd = {})
     }
 }
 
