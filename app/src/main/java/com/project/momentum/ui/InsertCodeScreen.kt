@@ -35,12 +35,13 @@ fun InsertCodeScreen(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
     onSendCodeAgainClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isEmail: Boolean = true,
 ) {
     val bg = ConstColours.BLACK
 
     TopBarTemplate(
-        title = R.string.CreateAccount,
+        title = R.string.label_create_account,
         onBackClick = onBackClick,
         modifier = modifier
     ) { paddingValues ->
@@ -57,7 +58,9 @@ fun InsertCodeScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = stringResource(R.string.insert_code_mail),
+                    text =
+                        if (isEmail) stringResource(R.string.insert_code_email)
+                        else stringResource(R.string.insert_code_phone),
                     color = ConstColours.WHITE,
                     textAlign = TextAlign.Center,
                     style = AppTextStyles.Headlines,
@@ -83,14 +86,14 @@ fun InsertCodeScreen(
                 )
                 Box(
                     modifier = Modifier
-                        .height(dimensionResource(R.dimen.sub_button_size))
                         .clickable(
                             onClick = onSendCodeAgainClick
                         ),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = stringResource(R.string.send_code_again),
+                        text = stringResource(R.string.button_send_code_again),
+                        modifier = Modifier.padding(dimensionResource(R.dimen.medium_padding)),
                         color = ConstColours.WHITE,
                         textAlign = TextAlign.Center,
                         style = AppTextStyles.SubButtonText,

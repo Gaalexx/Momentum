@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -32,7 +33,7 @@ fun CreatePasswordScreen(
     val bg = ConstColours.BLACK
 
     TopBarTemplate(
-        title = R.string.CreateAccount,
+        title = R.string.label_create_account,
         onBackClick = onBackClick,
         modifier = modifier
     ) { paddingValues ->
@@ -52,26 +53,28 @@ fun CreatePasswordScreen(
                     color = ConstColours.WHITE,
                     textAlign = TextAlign.Center,
                     style = AppTextStyles.Headlines,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = dimensionResource(R.dimen.medium_padding))
                 )
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
                 TextFieldRegistration(
                     //TODO: Сохрание + изменение состояния во viewModel
                     value = "qwertyuio",
                     onValueChange = {},
-                    modifier = Modifier.height(56.dp)
+                    modifier = Modifier.height(dimensionResource(R.dimen.button_size))
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
                 TextFieldRegistration(
                     //TODO: Сохрание + изменение состояния во viewModel
                     value = "qwertyuio",
                     onValueChange = {},
-                    modifier = Modifier.height(56.dp)
+                    modifier = Modifier.height(dimensionResource(R.dimen.button_size))
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
                 ContinueButton(
                     onClick = onContinueClick,
-                    modifier = Modifier.height(56.dp)
+                    modifier = Modifier.height(dimensionResource(R.dimen.button_size))
                 )
             }
         }

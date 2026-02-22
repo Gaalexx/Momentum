@@ -425,7 +425,7 @@ fun PlusButton(
 fun ContinueButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    text: String = stringResource(R.string.Continue),
+    text: String = stringResource(R.string.button_continue),
     colors: ButtonColors = ButtonDefaults.buttonColors(
         containerColor = ConstColours.MAIN_BRAND_BLUE,
         contentColor = ConstColours.WHITE

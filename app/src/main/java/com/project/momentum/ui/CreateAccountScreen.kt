@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,7 +35,7 @@ fun CreateAccountScreen(
     val bg = ConstColours.BLACK
 
     TopBarTemplate(
-        title = R.string.CreateAccount,
+        title = R.string.label_create_account,
         onBackClick = onBackClick,
         modifier = modifier
     ) { paddingValues ->
@@ -64,7 +65,7 @@ fun CreateAccountScreen(
                         contentDescription = null,
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
-                            .padding(8.dp)
+                            .padding(dimensionResource(R.dimen.small_padding))
                             .size(20.dp)
                             .border(
                                 width = 2.dp,
@@ -85,12 +86,12 @@ fun CreateAccountScreen(
                     //TODO: Сохрание + изменение состояния во viewModel
                     value = "qwertyuio",
                     onValueChange = {},
-                    modifier = Modifier.height(56.dp)
+                    modifier = Modifier.height(dimensionResource(R.dimen.button_size))
                 )
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
                 ContinueButton(
                     onClick = onContinueClick,
-                    modifier = Modifier.height(56.dp)
+                    modifier = Modifier.height(dimensionResource(R.dimen.button_size))
                 )
             }
         }
