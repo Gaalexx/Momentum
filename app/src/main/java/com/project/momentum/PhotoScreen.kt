@@ -238,16 +238,6 @@ fun CameraLikeScreen(
             .background(backGround)
             .windowInsetsPadding(WindowInsets.systemBars)
             .pointerInput(Unit) {
-                detectVerticalDragGestures(
-                    onVerticalDrag = { _, dragAmount ->
-                        dragOffset += dragAmount
-                    },
-                    onDragEnd = {
-                        if (dragOffset < -swipeThreshold) onOpenGallery()
-                        dragOffset = 0f
-                    },
-                    onDragCancel = { dragOffset = 0f }
-                )
             },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {

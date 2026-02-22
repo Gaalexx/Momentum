@@ -50,27 +50,12 @@ fun RecorderScreen(
     val chrome2 = ConstColours.MAIN_BACK_GRAY
     val mainState = remember { MainState() }
 
-    var dragOffset by remember { mutableStateOf(0f) }
-    val swipeThreshold = 80f
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(bg)
             .windowInsetsPadding(WindowInsets.systemBars)
             .pointerInput(Unit) {
-                detectVerticalDragGestures(
-                    onVerticalDrag = { _, dragAmount ->
-                        dragOffset += dragAmount
-                    },
-                    onDragEnd = {
-                        if (dragOffset < -swipeThreshold) {
-                            navController.navigate(NavRoutes.Gallery)
-                        }
-                        dragOffset = 0f
-                    },
-                    onDragCancel = { dragOffset = 0f }
-                )
             },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
