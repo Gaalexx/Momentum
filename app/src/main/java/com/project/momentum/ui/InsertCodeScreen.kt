@@ -41,7 +41,7 @@ fun InsertCodeScreen(
     val bg = ConstColours.BLACK
 
     TopBarTemplate(
-        title = R.string.label_create_account,
+        label = R.string.label_create_account,
         onBackClick = onBackClick,
         modifier = modifier
     ) { paddingValues ->

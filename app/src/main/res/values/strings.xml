@@ -57,6 +57,11 @@
     <string name="friends_screen_no_friends">У вас пока нет друзей</string>
     <string name="friends_screen_no_friends_support_mess">Попробуйте изменить запрос</string>
 
+    //Templates
+    <string name="template_label">Заголовок экрана</string>
+    <string name="template_page_title">Название действия</string>
+    <string name="template_sub_button">Вспомогательное действие</string>
+
     // Registration/authorization
     <string name="label_create_account">Создание аккаунта</string>
     <string name="label_password_recovery">Восстановление пароля</string>
@@ -69,5 +74,8 @@
     <string name="insert_email">Введите почту</string>
     <string name="insert_phone_number">Введите номер телефона</string>
     <string name="insert_code_phone">Введите код с телефона</string>
+    <string name="label_authorization">Вход</string>
+    <string name="button_authorization_by_phone_number">Войти по номеру телефона</string>
+    <string name="button_authorization_by_email">Введите почту</string>
 
 </resources>

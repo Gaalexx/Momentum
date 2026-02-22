@@ -13,15 +13,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.momentum.ConstColours
 import com.project.momentum.BackCircleButton
+import com.project.momentum.R
 import com.project.momentum.ui.theme.AppTextStyles
 
 
 @Composable
 fun TopBarTemplate(
-    @StringRes title: Int,
+    @StringRes label: Int,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable ((PaddingValues) -> Unit)
@@ -42,7 +44,7 @@ fun TopBarTemplate(
                     onClick = onBackClick
                 )
                 Text (
-                    text = stringResource(title),
+                    text = stringResource(label),
                     color = ConstColours.WHITE,
                     textAlign = TextAlign.Center,
                     style = AppTextStyles.Headlines,
@@ -52,4 +54,13 @@ fun TopBarTemplate(
         },
         content = content
     )
+}
+
+@Preview
+@Composable
+fun TopBarTemplatePreview() {
+    TopBarTemplate(
+        label = R.string.template_label,
+        onBackClick = {}
+    ) {}
 }

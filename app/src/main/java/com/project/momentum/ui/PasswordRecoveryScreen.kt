@@ -41,7 +41,7 @@ fun PasswordRecoveryScreen(
     val bg = ConstColours.BLACK
 
     TopBarTemplate(
-        title = R.string.label_password_recovery,
+        label = R.string.label_password_recovery,
         onBackClick = onBackClick,
         modifier = modifier
     ) { paddingValues ->
@@ -87,7 +87,6 @@ fun PasswordRecoveryScreen(
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size))
                 )
 
-                //TODO: Как-будто лишнее на этом экране
                 Box(
                     modifier = Modifier
                         .clickable(
