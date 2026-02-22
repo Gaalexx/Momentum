@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.example.momentum.ConstColours
 import com.project.momentum.ContinueButton
 import com.project.momentum.R
+import com.project.momentum.ui.assets.TemplateAuthorizationScreen
 import com.project.momentum.ui.assets.TextFieldRegistration
 import com.project.momentum.ui.assets.TopBarTemplate
 import com.project.momentum.ui.theme.AppTextStyles
@@ -36,77 +37,27 @@ fun PasswordRecoveryScreen(
     onContinueClick: () -> Unit,
     onSendCodeAgainClick: () -> Unit,
     modifier: Modifier = Modifier,
-    isEmail: Boolean = true,
+    isUsingEmail: Boolean = true,
 ) {
-    val bg = ConstColours.BLACK
-
-    TopBarTemplate(
+    TemplateAuthorizationScreen(
         label = R.string.label_password_recovery,
+        title =
+            if (isUsingEmail) R.string.insert_email
+            else R.string.insert_phone_number,
+        subButtonText =
+            if (isUsingEmail) R.string.button_use_phone_number
+            else R.string.button_use_email,
         onBackClick = onBackClick,
-        modifier = modifier
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .background(bg)
-                .padding(paddingValues)
-//                .windowIn  setsPadding(WindowInsets.systemBars) ,
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text =
-                        if (isEmail) stringResource(R.string.insert_email)
-                         else stringResource(R.string.insert_phone_number),
-                    color = ConstColours.WHITE,
-                    textAlign = TextAlign.Center,
-                    style = AppTextStyles.Headlines,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = dimensionResource(R.dimen.medium_padding))
-                )
-                Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
-                TextFieldRegistration(
-                    //TODO: Сохрание + изменение состояния во viewModel
-                    value = "+79999999999",
-                    onValueChange = {},
-                    modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType =
-                            if (isEmail) KeyboardType.Email
-                            else KeyboardType.Phone,
-                        imeAction = ImeAction.Done
-                    ),
-                )
-                Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
-                ContinueButton(
-                    onClick = onContinueClick,
-                    modifier = Modifier.height(dimensionResource(R.dimen.button_size))
-                )
-
-                Box(
-                    modifier = Modifier
-                        .clickable(
-                            onClick = onSendCodeAgainClick
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text =
-                            if (isEmail) stringResource(R.string.button_use_phone_number)
-                            else stringResource(R.string.button_use_email),
-                        modifier = Modifier.padding(dimensionResource(R.dimen.medium_padding)),
-                        color = ConstColours.WHITE,
-                        textAlign = TextAlign.Center,
-                        style = AppTextStyles.SubButtonText,
-                    )
-                }
-            }
-        }
-    }
+        onContinueClick = onContinueClick,
+        onSubButtonClick = onSendCodeAgainClick,
+        modifier = modifier,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType =
+                if (isUsingEmail) KeyboardType.Email
+                else KeyboardType.Phone,
+            imeAction = ImeAction.Done
+        ),
+    )
 }
 
 @Preview(showBackground = true)
