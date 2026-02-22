@@ -77,5 +77,6 @@
     <string name="label_authorization">Вход</string>
     <string name="button_authorization_by_phone_number">Войти по номеру телефона</string>
     <string name="button_authorization_by_email">Введите почту</string>
+    <string name="button_password_recovery">Восстановить пароль</string>
 
 </resources>
