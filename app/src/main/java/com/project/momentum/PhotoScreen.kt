@@ -370,6 +370,8 @@ fun CameraLikeScreen(
     val progressPath = remember { PathMeasure() }
     val scope = rememberCoroutineScope()
 
+    val progressStarted = remember { mutableStateOf(false) }
+
     fun longPress() {
         if (recording == null) {
             var newRecording: Recording? = null
@@ -414,6 +416,7 @@ fun CameraLikeScreen(
     fun startProgress() {
         scope.launch {
             progress.snapTo(0f)
+            progressStarted.value = true
             progress.animateTo(
                 targetValue = 1f,
                 animationSpec = tween(
@@ -422,7 +425,7 @@ fun CameraLikeScreen(
                 )
             )
             longPressEnd()
-            //longMode = false
+            progressStarted.value = false
             progress.snapTo(0f)
         }
     }
@@ -497,7 +500,7 @@ fun CameraLikeScreen(
                                 topLeft = Offset(0f, 0f),
                                 bottomRight = Offset(size.width, size.height)
                             ),
-                            cornerRadius = CornerRadius(x = 65.dp.toPx(), y = 65.dp.toPx())
+                            cornerRadius = CornerRadius(x = 65.dp.toPx())
                         ),
                         direction = Path.Direction.Clockwise
                     )
@@ -541,7 +544,7 @@ fun CameraLikeScreen(
 
                 drawPath(
                     path = segmentPath,
-                    color = ConstColours.MAIN_BRAND_BLUE,
+                    color = ConstColours.GOLD,
                     style = Stroke(width = 8.dp.toPx())
                 )
 
@@ -649,7 +652,7 @@ fun CameraLikeScreen(
                     },
                     onStartProgress = { startProgress() },
                     onEndProgress = { stopProgress() },
-                    maxRecordMs = maxRecordMs
+                    progressStarted = progressStarted
                 )
 
                 Spacer(Modifier.weight(1f))

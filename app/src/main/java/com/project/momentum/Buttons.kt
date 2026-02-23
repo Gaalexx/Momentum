@@ -60,6 +60,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.runtime.remember
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 
@@ -299,8 +300,7 @@ fun BigCircleForMainScreenAction(
     innerPressed: Color = ConstColours.RED,
     ring: Dp = 14.dp,
     enabled: Boolean = true,
-    maxRecordMs: Int = 60_000,
-    progressionStroke: Dp = 6.dp
+    progressStarted: MutableState<Boolean> = mutableStateOf(false)
 ) {
     var pressed by remember { mutableStateOf(false) }
     var longMode by remember { mutableStateOf(false) }
@@ -310,7 +310,7 @@ fun BigCircleForMainScreenAction(
         modifier = modifier
             .size(size)
             .clip(CircleShape)
-            .background(if (pressed) ConstColours.RED else outerColor),
+            .background(if (progressStarted.value && pressed) ConstColours.GOLD else outerColor),
         contentAlignment = Alignment.Center
     ) {
 
@@ -330,6 +330,7 @@ fun BigCircleForMainScreenAction(
                         },
                         onPress = {
                             pressed = true
+                            progressStarted.value = true
                             val released = tryAwaitRelease()
                             pressed = false
                             if (longMode) {
@@ -493,7 +494,7 @@ fun ContinueButton(
         shape = RoundedCornerShape(50.dp),
         colors = colors
     ) {
-        Text (
+        Text(
             text = text,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
