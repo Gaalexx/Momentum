@@ -324,6 +324,9 @@ fun BigCircleForMainScreenAction(
                         easing = LinearEasing
                     )
                 )
+                if(!(progressStarted.value && pressed)){
+                    break
+                }
             }
 
             progressStarted.value = false
