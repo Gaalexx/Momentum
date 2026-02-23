@@ -544,7 +544,7 @@ fun CameraLikeScreen(
 
                 drawPath(
                     path = segmentPath,
-                    color = ConstColours.GOLD,
+                    color = ConstColours.WHITE,
                     style = Stroke(width = 8.dp.toPx())
                 )
 
