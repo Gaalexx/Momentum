@@ -60,6 +60,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.runtime.remember
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 
@@ -294,30 +295,61 @@ fun BigCircleForMainScreenAction(
     onStartProgress: () -> Unit = {},
     onEndProgress: () -> Unit = {},
     size: Dp = 132.dp,
-    outerColor: Color = ConstColours.MAIN_BACK_GRAY,
-    innerColor: Color = ConstColours.WHITE,
-    innerPressed: Color = ConstColours.RED,
     ring: Dp = 14.dp,
     enabled: Boolean = true,
-    maxRecordMs: Int = 60_000,
-    progressionStroke: Dp = 6.dp
+    progressStarted: MutableState<Boolean> = mutableStateOf(false)
 ) {
     var pressed by remember { mutableStateOf(false) }
     var longMode by remember { mutableStateOf(false) }
 
+    val progress = remember { androidx.compose.animation.core.Animatable(0f) }
+    val scope = rememberCoroutineScope()
+
+    fun startPulsations(){
+        scope.launch {
+            progress.snapTo(0f)
+            progressStarted.value = true
+            while(pressed){
+                progress.animateTo(
+                    targetValue = 1f,
+                    animationSpec = tween(
+                        durationMillis = 750,
+                        easing = LinearEasing
+                    )
+                )
+                progress.animateTo(
+                    targetValue = 0f,
+                    animationSpec = tween(
+                        durationMillis = 750,
+                        easing = LinearEasing
+                    )
+                )
+            }
+
+            progressStarted.value = false
+            progress.snapTo(0f)
+        }
+    }
+
+    fun stopPulsations(reset: Boolean = true) {
+        scope.launch {
+            progress.stop()
+            if (reset) progress.snapTo(0f)
+        }
+    }
 
     Box(
         modifier = modifier
             .size(size)
             .clip(CircleShape)
-            .background(if (pressed) ConstColours.RED else outerColor),
+            .background(if (progressStarted.value && pressed) ConstColours.MAIN_BRAND_BLUE_ALPHA40 else ConstColours.MAIN_BACK_GRAY),
         contentAlignment = Alignment.Center
     ) {
 
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(ring)
+                .padding(ring - (ring.value * progress.value).dp)
                 .clip(CircleShape)
                 .pointerInput(enabled) {
                     if (!enabled) return@pointerInput
@@ -327,20 +359,23 @@ fun BigCircleForMainScreenAction(
                             longMode = true
                             onLongPressStart()
                             onStartProgress()
+                            startPulsations()
                         },
                         onPress = {
                             pressed = true
+                            progressStarted.value = true
                             val released = tryAwaitRelease()
                             pressed = false
                             if (longMode) {
                                 onLongPressEnd()
                                 longMode = false
                                 onEndProgress()
+                                stopPulsations()
                             }
                         }
                     )
                 }
-                .background(innerColor)
+                .background(ConstColours.WHITE)
         )
     }
 }
@@ -493,7 +528,7 @@ fun ContinueButton(
         shape = RoundedCornerShape(50.dp),
         colors = colors
     ) {
-        Text (
+        Text(
             text = text,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
