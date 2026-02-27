@@ -2,7 +2,6 @@ package com.project.momentum
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
@@ -30,11 +29,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.example.momentum.ConstColours
-import com.project.momentum.navigation.NavRoutes
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -42,20 +38,23 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun RecorderScreen(
-    navController: NavController,
-    onCameraClick: () -> Unit = {},
-    onGoToFriends: () -> Unit = {}
+    onCameraClick: () -> Unit,              // Для переключения на камеру
+    onGoToFriends: () -> Unit,              // Для перехода к друзьям
+    onProfileClick: () -> Unit,              // Для перехода в профиль
+    onGoToSettings: () -> Unit,              // Для перехода в настройки
+    modifier: Modifier = Modifier
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
     val mainState = remember { MainState() }
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(bg)
             .windowInsetsPadding(WindowInsets.systemBars)
             .pointerInput(Unit) {
+                // Здесь можно добавить обработку жестов
             },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -67,24 +66,18 @@ fun RecorderScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ProfileCircleButton(
-                onClick = {
-                    navController.navigate(NavRoutes.Account(NavRoutes.Recorder::class.qualifiedName!!))
-                },
+                onClick = onProfileClick,  // Используем колбэк
                 backgroundColor = chrome2
             )
 
             Spacer(Modifier.weight(1f))
 
-            FriendsPillButton(onClick = {
-                navController.navigate(NavRoutes.Friends)
-            })
+            FriendsPillButton(onClick = onGoToFriends)  // Используем колбэк
 
             Spacer(Modifier.weight(1f))
 
             SettingsCircleButton(
-                onClick = {
-                    navController.navigate(NavRoutes.Settings(NavRoutes.Recorder::class.qualifiedName!!))
-                },
+                onClick = onGoToSettings,  // Используем колбэк
                 backgroundColor = chrome2
             )
         }
@@ -143,7 +136,7 @@ fun RecorderScreen(
             ) {
                 CircleButton(
                     size = 60.dp,
-                    onClick = { navController.navigate(NavRoutes.Camera) },
+                    onClick = onCameraClick,  // Используем колбэк для переключения на камеру
                     icon = Icons.Outlined.PhotoCamera,
                     iconColor = ConstColours.WHITE,
                     backgroundColor = ConstColours.BLACK,
@@ -152,7 +145,7 @@ fun RecorderScreen(
 
                 CircleButton(
                     size = 60.dp,
-                    onClick = {},
+                    onClick = {},  // Микрофон уже активен, ничего не делаем
                     icon = Icons.Outlined.Mic,
                     backgroundColor = ConstColours.BLACK,
                     iconColor = ConstColours.WHITE,
@@ -165,8 +158,7 @@ fun RecorderScreen(
 
         // Нижняя секция с микрофоном и состояниями
         SecondaryImagesSection(
-            mainState = mainState,
-            navController = navController
+            mainState = mainState
         )
     }
 }
@@ -178,8 +170,7 @@ class MainState {
 
 @Composable
 fun SecondaryImagesSection(
-    mainState: MainState,
-    navController: NavController
+    mainState: MainState
 ) {
     var isImage1Tinted by remember { mutableStateOf(false) }
     var isImage2Visible by remember { mutableStateOf(true) }
@@ -420,6 +411,9 @@ private fun formatElapsedTime(milliseconds: Long): String {
 @Composable
 fun RecorderScreenPreview() {
     RecorderScreen(
-        navController = rememberNavController()
+        onCameraClick = {},
+        onGoToFriends = {},
+        onProfileClick = {},
+        onGoToSettings = {}
     )
 }

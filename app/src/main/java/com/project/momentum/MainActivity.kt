@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.project.momentum.navigation.PagerNavGraph
+import com.project.momentum.navigation.MainScreen
 import com.project.momentum.ui.theme.MomentumTheme
 
 class MainActivity : ComponentActivity() {
@@ -13,7 +13,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MomentumTheme {
-                PagerNavGraph()
+                MainScreen()
             }
         }
     }
