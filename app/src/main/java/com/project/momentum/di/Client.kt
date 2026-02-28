@@ -37,18 +37,13 @@ object NetworkModule {
                     host = "193.233.20.47/api/momentum"
                 }
             }
-//            engine {
-//                connectTimeout = 100_000
-//                socketTimeout = 100_000
-//                proxy = Proxy(Proxy.Type.HTTP, InetSocketAddress("localhost", 8080))
-//            }
         }
     }
 }
 
 
 @Serializable
-data class SDTO(
+data class SDTO( //для теста :)
     val text: String
 ) {
 
