@@ -364,7 +364,6 @@ fun RecorderScreen(
                     onClick = onCameraClick,  // Используем колбэк для переключения на камеру
                     icon = Icons.Outlined.PhotoCamera,
                     iconColor = ConstColours.WHITE,
-                    backgroundColor = ConstColours.BLACK,
                     enabled = true
                 )
 
