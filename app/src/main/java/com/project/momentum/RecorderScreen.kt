@@ -1,5 +1,10 @@
 package com.project.momentum
 
+import android.content.ContentValues
+import android.content.pm.PackageManager
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -35,6 +40,111 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.content.ContextCompat
+
+import android.media.MediaRecorder
+import android.os.Environment
+import android.provider.MediaStore
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Locale
+import android.Manifest
+
+@Composable
+fun rememberMicrophonePermissionState(): State<Boolean> {
+    val context = LocalContext.current
+    val hasPermission = remember {
+        mutableStateOf(
+            ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) ==
+                    PackageManager.PERMISSION_GRANTED
+        )
+    }
+
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        hasPermission.value = granted
+    }
+
+    LaunchedEffect(Unit) {
+        if (!hasPermission.value) {
+            launcher.launch(Manifest.permission.RECORD_AUDIO)
+        }
+    }
+
+    return hasPermission
+}
+
+fun startRecording(context: android.content.Context, mainState: MainState) {
+    val fileName = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.US)
+        .format(System.currentTimeMillis()) + ".3gp"
+
+    val audioFile = File(context.getExternalFilesDir(Environment.DIRECTORY_MUSIC), fileName)
+
+    try {
+        val recorder = MediaRecorder().apply {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+            setOutputFile(audioFile.absolutePath)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+
+            prepare()
+            start()
+        }
+
+        mainState.mediaRecorder = recorder
+        mainState.audioFile = audioFile
+        mainState.isRecording = true
+
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+}
+
+fun stopRecording(mainState: MainState) {
+    try {
+        mainState.mediaRecorder?.apply {
+            stop()
+            release()
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    } finally {
+        mainState.mediaRecorder = null
+        mainState.isRecording = false
+    }
+}
+
+fun saveToMediaStore(context: android.content.Context, audioFile: File): android.net.Uri? {
+    val values = ContentValues().apply {
+        put(MediaStore.MediaColumns.DISPLAY_NAME, audioFile.name)
+        put(MediaStore.MediaColumns.MIME_TYPE, "audio/3gpp")
+        put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_MUSIC + "/Momentum")
+    }
+
+    val resolver = context.contentResolver
+    val uri = resolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values)
+
+    uri?.let {
+        try {
+            resolver.openOutputStream(it)?.use { outputStream ->
+                audioFile.inputStream().use { inputStream ->
+                    inputStream.copyTo(outputStream)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            resolver.delete(uri, null, null)
+            return null
+        }
+    }
+
+    return uri
+}
 
 @Composable
 fun RecorderScreen(
@@ -163,9 +273,17 @@ fun RecorderScreen(
     }
 }
 
+
+
 class MainState {
     var currentState by mutableStateOf("INITIAL")
     var captionFocusRequester: FocusRequester? by mutableStateOf(null)
+
+    var mediaRecorder: MediaRecorder? by mutableStateOf(null)
+    var audioFile: File? by mutableStateOf(null)
+    var isRecording by mutableStateOf(false)
+
+
 }
 
 @Composable
@@ -186,6 +304,9 @@ fun SecondaryImagesSection(
     val iconTint = Color(0xFFEDEEF2)
     var showKeyboardTrigger by remember { mutableStateOf(false) }
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    val context = LocalContext.current
+    val hasMicPermission by rememberMicrophonePermissionState()
 
     LaunchedEffect(showKeyboardTrigger) {
         if (showKeyboardTrigger) {
@@ -223,6 +344,25 @@ fun SecondaryImagesSection(
             delay(100)
             captionFocusRequester.requestFocus()
             keyboardController?.show()
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            if (mainState.isRecording) {
+                try {
+                    mainState.mediaRecorder?.apply {
+                        stop()
+                        release()
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                } finally {
+                    mainState.mediaRecorder = null
+                    mainState.isRecording = false
+                }
+            }
+            mainState.audioFile?.delete()
         }
     }
 
@@ -291,7 +431,13 @@ fun SecondaryImagesSection(
                         Spacer(Modifier.weight(1f))
 
                         BigCircleSendPhotoAction(
-                            onClick = { resetToInitialState() }
+                            onClick = {
+                                mainState.audioFile?.let { file ->
+                                    saveToMediaStore(context, file)?.let { uri ->
+                                        Toast.makeText(context, "Аудио сохранено: $uri", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                                resetToInitialState()  }
                         )
 
                         Spacer(Modifier.weight(1f))
@@ -328,6 +474,10 @@ fun SecondaryImagesSection(
                 val isRecording = currentState == "STATE_1"
                 BigCircleMicroButton(
                     onClick = {
+                        if (!hasMicPermission) {
+                            return@BigCircleMicroButton
+                        }
+
                         val currentTime = System.currentTimeMillis()
                         clickCount++
 
@@ -336,6 +486,8 @@ fun SecondaryImagesSection(
                                 isImage1Tinted = true
                                 isImage2Visible = false
                                 firstClickTime = currentTime
+
+                                startRecording(context, mainState)
 
                                 timerJob?.cancel()
                                 timerJob = scope.launch {
@@ -351,6 +503,8 @@ fun SecondaryImagesSection(
                                 firstClickTime?.let { firstTime ->
                                     fixedTime = currentTime - firstTime
                                 }
+
+                                stopRecording(mainState)
 
                                 isImage1Tinted = false
                                 elapsedTime = 0L
