@@ -71,20 +71,6 @@ fun GallaryScreen(
             .background(bg)
             .windowInsetsPadding(WindowInsets.systemBars)
             .pointerInput(Unit) {
-                detectDragGestures(
-                    onDrag = { change, dragAmount ->
-                        val verticalDrag = dragAmount.y
-                        if (verticalDrag > 50) {
-                            dragOffset = verticalDrag
-                        }
-                    },
-                    onDragEnd = {
-                        if (dragOffset > swipeThreshold) {
-                            onBackClick()
-                        }
-                        dragOffset = 0f
-                    }
-                )
             }
     ) {
         Column(

@@ -7,11 +7,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
@@ -36,10 +34,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.momentum.ConstColours
-import com.project.momentum.ui.theme.MomentumTheme
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -251,63 +247,53 @@ fun RecordingProgressRing(
 
 @Composable
 fun RecorderScreen(
-    navController: NavController? = null,
-    onCameraClick: () -> Unit = {},
-    onGoToFriends: () -> Unit = {}
+    onCameraClick: () -> Unit,              // Для переключения на камеру
+    onGoToFriends: () -> Unit,              // Для перехода к друзьям
+    onProfileClick: () -> Unit,              // Для перехода в профиль
+    onGoToSettings: () -> Unit,              // Для перехода в настройки
+    modifier: Modifier = Modifier
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
     val mainState = remember { MainState() }
 
-    var dragOffset by remember { mutableStateOf(0f) }
-    val swipeThreshold = 80f
-
-
-
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .background(bg)
             .windowInsetsPadding(WindowInsets.systemBars)
             .pointerInput(Unit) {
-                detectVerticalDragGestures(
-                    onVerticalDrag = { _, dragAmount ->
-                        dragOffset += dragAmount
-                    },
-                    onDragEnd = {
-                        if (dragOffset < -swipeThreshold) {
-                            navController?.navigate(Routes.GALLERY)
-                        }
-                        dragOffset = 0f
-                    },
-                    onDragCancel = { dragOffset = 0f }
-                )
+                // Здесь можно добавить обработку жестов
             },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Верхняя панель с кнопками
         Row(
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             ProfileCircleButton(
-                onClick = { navController?.navigate(Routes.ACCOUNT_WITH_BACK) },
+                onClick = onProfileClick,  // Используем колбэк
                 backgroundColor = chrome2
             )
 
             Spacer(Modifier.weight(1f))
 
-            FriendsPillButton(onClick = onGoToFriends)
+            FriendsPillButton(onClick = onGoToFriends)  // Используем колбэк
 
             Spacer(Modifier.weight(1f))
 
             SettingsCircleButton(
-                onClick = { navController?.navigate(Routes.settingsRoute(Routes.RECORDER)) },
+                onClick = onGoToSettings,  // Используем колбэк
                 backgroundColor = chrome2
             )
         }
 
         Spacer(Modifier.height(12.dp))
 
+        // Основное изображение
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -375,15 +361,16 @@ fun RecorderScreen(
             ) {
                 CircleButton(
                     size = 60.dp,
-                    onClick = { navController?.navigate(Routes.CAMERA) },
+                    onClick = onCameraClick,  // Используем колбэк для переключения на камеру
                     icon = Icons.Outlined.PhotoCamera,
                     iconColor = ConstColours.WHITE,
+                    backgroundColor = ConstColours.BLACK,
                     enabled = true
                 )
 
                 CircleButton(
                     size = 60.dp,
-                    onClick = {},
+                    onClick = {},  // Микрофон уже активен, ничего не делаем
                     icon = Icons.Outlined.Mic,
                     backgroundColor = ConstColours.BLACK,
                     iconColor = ConstColours.WHITE,
@@ -394,22 +381,9 @@ fun RecorderScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        SecondaryImagesSection(mainState = mainState)
-    }
-}
-
-@Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
-@Composable
-private fun CameraLikeScreenPreview() {
-    MaterialTheme {
-        CameraLikeScreen(
-            previewPainter = null,
-            onGoToPreview = {},
-            onGoToRecorder = {},
-            onProfileClick = {},
-            onOpenGallery = {},
-            onGoToSettings = {},
-            onGoToFriends = {}
+        // Нижняя секция с микрофоном и состояниями
+        SecondaryImagesSection(
+            mainState = mainState
         )
     }
 }
@@ -429,7 +403,9 @@ class MainState {
 }
 
 @Composable
-fun SecondaryImagesSection(mainState: MainState) {
+fun SecondaryImagesSection(
+    mainState: MainState
+) {
     var isImage1Tinted by remember { mutableStateOf(false) }
     var isImage2Visible by remember { mutableStateOf(true) }
     var isLongPressActive by remember { mutableStateOf(false) }

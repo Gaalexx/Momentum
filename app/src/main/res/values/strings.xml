@@ -48,4 +48,39 @@
     <string name="recorder_show_keyboard_content_description">Показать клавиатуру</string>
     <string name="recorder_more_content_description">Ещё</string>
     <string name="recorder_duration_label">Длительность: %s</string>
+
+    <string name="recorder_video_error">Ошибка видео: %s</string>
+    <string name="recorder_video_error_unknown">Ошибка записи видео</string>
+    <string name="recorder_video_error_no_data">Нет данных (слишком короткое видео)</string>
+    <string name="recorder_video_saved">Видео сохранено</string>
+    <string name="friends_screen_headliner">Друзья</string>
+    <string name="friends_screen_sub_headliner">Мои друзья</string>
+    <string name="friends_screen_search_loading">Загрузка друзей…</string>
+    <string name="friends_screen_search_nothing">Друзья не найдены</string>
+    <string name="friends_screen_search_support_mess">Попробуйте изменить запрос</string>
+    <string name="friends_screen_no_friends">У вас пока нет друзей</string>
+    <string name="friends_screen_no_friends_support_mess">Попробуйте изменить запрос</string>
+
+    //Templates
+    <string name="template_label">Заголовок экрана</string>
+    <string name="template_page_title">Название действия</string>
+    <string name="template_sub_button">Вспомогательное действие</string>
+
+    // Registration/authorization
+    <string name="label_create_account">Создание аккаунта</string>
+    <string name="label_password_recovery">Восстановление пароля</string>
+    <string name="button_continue">Продолжить</string>
+    <string name="button_send_code_again">Отправить код повторно</string>
+    <string name="button_use_phone_number">Использовать номер телефона</string>
+    <string name="button_use_email">Использовать почту</string>
+    <string name="insert_password">Введите пароль</string>
+    <string name="insert_code_email">Введите код с почты</string>
+    <string name="insert_email">Введите почту</string>
+    <string name="insert_phone_number">Введите номер телефона</string>
+    <string name="insert_code_phone">Введите код с телефона</string>
+    <string name="label_authorization">Вход</string>
+    <string name="button_authorization_by_phone_number">Войти по номеру телефона</string>
+    <string name="button_authorization_by_email">Введите почту</string>
+    <string name="button_password_recovery">Восстановить пароль</string>
+
 </resources>
