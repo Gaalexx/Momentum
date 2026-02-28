@@ -423,40 +423,114 @@ fun BigCircleSendPhotoAction(
 
 @Composable
 fun BigCircleMicroButton(
-    onClick: () -> Unit,
+    onClick: () -> Unit = {},
+    onLongPress: () -> Unit = {},
+    onLongPressEnd: () -> Unit = {},
+    onStartProgress: () -> Unit = {},
+    onEndProgress: () -> Unit = {},
     modifier: Modifier = Modifier,
     size: Dp = 132.dp,
     outerColor: Color = ConstColours.MAIN_BACK_GRAY,
     innerColor: Color = ConstColours.WHITE,
     ring: Dp = 14.dp,
     enabled: Boolean = true,
-    colorFilter: ColorFilter? = null,
-    isRecording: Boolean = false
+    isRecording: Boolean = false,
+    progressStarted: MutableState<Boolean> = mutableStateOf(false)
 ) {
-    val actualInnerColor = if (isRecording) Color.Red else innerColor
+    var pressed by remember { mutableStateOf(false) }
+    var longMode by remember { mutableStateOf(false) }
+
+    val progress = remember { androidx.compose.animation.core.Animatable(0f) }
+    val scope = rememberCoroutineScope()
+
+    fun startPulsations() {
+        scope.launch {
+            progress.snapTo(0f)
+            progressStarted.value = true
+            while(pressed) {
+                progress.animateTo(
+                    targetValue = 1f,
+                    animationSpec = tween(
+                        durationMillis = 750,
+                        easing = LinearEasing
+                    )
+                )
+                progress.animateTo(
+                    targetValue = 0f,
+                    animationSpec = tween(
+                        durationMillis = 750,
+                        easing = LinearEasing
+                    )
+                )
+                if(!(progressStarted.value && pressed)) {
+                    break
+                }
+            }
+            progressStarted.value = false
+            progress.snapTo(0f)
+        }
+    }
+
+    fun stopPulsations(reset: Boolean = true) {
+        scope.launch {
+            progress.stop()
+            if (reset) progress.snapTo(0f)
+            progressStarted.value = false
+        }
+    }
+
+    val backgroundColor = when {
+        isRecording -> ConstColours.MAIN_BRAND_BLUE_ALPHA40
+        else -> outerColor
+    }
+
     Box(
         modifier = modifier
             .size(size)
             .clip(CircleShape)
-            .clickable(enabled = enabled, onClick = onClick)
-            .background(outerColor),
+            .background(backgroundColor)
+            .pointerInput(enabled) {
+                if (!enabled) return@pointerInput
+
+                detectTapGestures(
+                    onTap = { onClick() },
+                    onLongPress = {
+                        longMode = true
+                        onLongPress()
+                        onStartProgress()
+                        startPulsations()
+                    },
+                    onPress = {
+                        pressed = true
+                        progressStarted.value = true
+                        val released = tryAwaitRelease()
+                        pressed = false
+                        if (longMode) {
+                            onLongPressEnd()
+                            longMode = false
+                            onEndProgress()
+                            stopPulsations()
+                        }
+                    }
+                )
+            },
         contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(ring)
+                .padding(ring - (ring.value * progress.value).dp)
                 .clip(CircleShape)
-                .background(actualInnerColor)
-        )
-
-        Icon(
-            imageVector = Icons.Outlined.Mic,
-            contentDescription = "Mic",
-            tint = if (isRecording) Color.White else ConstColours.BLACK,
-            modifier = Modifier
-                .size(45.dp)
-        )
+                .background(innerColor),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Mic,
+                contentDescription = "Mic",
+                tint = ConstColours.BLACK,
+                modifier = Modifier.size(45.dp)
+            )
+        }
     }
 }
 

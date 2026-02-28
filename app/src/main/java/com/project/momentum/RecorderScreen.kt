@@ -54,6 +54,33 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import android.Manifest
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.PathMeasure
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.unit.dp
+
+class Frame75Activity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            MomentumTheme {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(ConstColours.BLACK)
+                ) {
+                    AppNav()
+                }
+            }
+        }
+    }
+}
+
 @Composable
 fun rememberMicrophonePermissionState(): State<Boolean> {
     val context = LocalContext.current
@@ -108,8 +135,14 @@ fun startRecording(context: android.content.Context, mainState: MainState) {
 fun stopRecording(mainState: MainState) {
     try {
         mainState.mediaRecorder?.apply {
-            stop()
-            release()
+            if (mainState.isRecording) {
+                try {
+                    stop()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+                release()
+            }
         }
     } catch (e: Exception) {
         e.printStackTrace()
@@ -144,6 +177,72 @@ fun saveToMediaStore(context: android.content.Context, audioFile: File): android
     }
 
     return uri
+}
+
+@Composable
+fun RecordingProgressRing(
+    progress: Float,
+    modifier: Modifier = Modifier,
+    strokeWidth: Float = 8f,
+    color: Color = ConstColours.WHITE
+) {
+    Canvas(modifier = modifier) {
+        val fullPath = Path().apply {
+            addRoundRect(
+                RoundRect(
+                    rect = Rect(
+                        topLeft = Offset(0f, 0f),
+                        bottomRight = Offset(size.width, size.height)
+                    ),
+                    cornerRadius = CornerRadius(x = 60.dp.toPx())
+                ),
+                direction = Path.Direction.Clockwise
+            )
+        }
+
+        val pathMeasure = PathMeasure()
+        pathMeasure.setPath(fullPath, forceClosed = true)
+        val totalLength = pathMeasure.length
+        val startShiftFraction = 0.3425f
+
+        val start = totalLength * startShiftFraction
+        val visibleLength = totalLength * progress
+        val end = start + visibleLength
+
+        val segmentPath = Path()
+
+        if (end <= totalLength) {
+            pathMeasure.getSegment(
+                startDistance = start,
+                stopDistance = end,
+                destination = segmentPath,
+                startWithMoveTo = true
+            )
+        } else {
+            pathMeasure.getSegment(
+                startDistance = start,
+                stopDistance = totalLength,
+                destination = segmentPath,
+                startWithMoveTo = true
+            )
+
+            val secondPart = Path()
+            pathMeasure.getSegment(
+                startDistance = 0f,
+                stopDistance = end - totalLength,
+                destination = secondPart,
+                startWithMoveTo = true
+            )
+
+            segmentPath.addPath(secondPart)
+        }
+
+        drawPath(
+            path = segmentPath,
+            color = color,
+            style = Stroke(width = strokeWidth.dp.toPx())
+        )
+    }
 }
 
 @Composable
@@ -197,48 +296,64 @@ fun RecorderScreen(
         // Основное изображение
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.98f)
-                .aspectRatio(1.10f)
-                .clip(RoundedCornerShape(28.dp))
-                .background(Color(0xFF2A2E39))
+                .fillMaxWidth()
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(60.dp))
+                .background(ConstColours.BLACK)
         ) {
-            AsyncImage(
-                model = stringResource(R.string.rec_img_model_),
-                contentDescription = stringResource(R.string.recorder_main_image_content_description),
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
+            if (mainState.currentState == "STATE_1" && mainState.isRecording) {
+                RecordingProgressRing(
+                    progress = mainState.recordingProgress,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
 
-            if (mainState.currentState == "STATE_2") {
-                val captionFocusRequester = remember { FocusRequester() }
-                var caption by remember { mutableStateOf("") }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.95f)
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(60.dp))
+                    .background(Color(0xFF2A2E39))
+                    .align(Alignment.Center)
+            ) {
+                AsyncImage(
+                    model = stringResource(R.string.rec_img_model_),
+                    contentDescription = stringResource(R.string.recorder_main_image_content_description),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.BottomStart
-                ) {
-                    CaptionBasicInput(
-                        value = caption,
-                        onValueChange = { caption = it },
-                        placeholder = stringResource(R.string.label_write_comment),
+                if (mainState.currentState == "STATE_2") {
+                    val captionFocusRequester = remember { FocusRequester() }
+                    var caption by remember { mutableStateOf("") }
+
+                    Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(captionFocusRequester)
-                    )
-                }
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.BottomStart
+                    ) {
+                        CaptionBasicInput(
+                            value = caption,
+                            onValueChange = { caption = it },
+                            placeholder = stringResource(R.string.label_write_comment),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .focusRequester(captionFocusRequester)
+                        )
+                    }
 
-                LaunchedEffect(Unit) {
-                    mainState.captionFocusRequester = captionFocusRequester
+                    LaunchedEffect(Unit) {
+                        mainState.captionFocusRequester = captionFocusRequester
+                    }
                 }
             }
         }
 
+
         Spacer(Modifier.height(16.dp))
 
-        // Кнопки камера/микрофон в начальном состоянии
-        if (mainState.currentState == "INITIAL") {
+        if (mainState.currentState != "STATE_2") {
             Row(
                 modifier = Modifier.padding(horizontal = 30.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -283,7 +398,8 @@ class MainState {
     var audioFile: File? by mutableStateOf(null)
     var isRecording by mutableStateOf(false)
 
-
+    var recordingProgress by mutableStateOf(0f)
+    val maxRecordMs: Int = 10_000
 }
 
 @Composable
@@ -292,14 +408,13 @@ fun SecondaryImagesSection(
 ) {
     var isImage1Tinted by remember { mutableStateOf(false) }
     var isImage2Visible by remember { mutableStateOf(true) }
-    var elapsedTime by remember { mutableStateOf(0L) }
-    var clickCount by remember { mutableStateOf(0) }
-    var fixedTime by remember { mutableStateOf<Long?>(null) }
-    var firstClickTime by remember { mutableStateOf<Long?>(null) }
+    var isLongPressActive by remember { mutableStateOf(false) }
+    var recordingStarted by remember { mutableStateOf(false) }
+    var stopRequested by remember { mutableStateOf(false) }
 
     val captionFocusRequester = remember { FocusRequester() }
     val scope = rememberCoroutineScope()
-    var timerJob by remember { mutableStateOf<Job?>(null) }
+    var progressJob by remember { mutableStateOf<Job?>(null) }
 
     val iconTint = Color(0xFFEDEEF2)
     var showKeyboardTrigger by remember { mutableStateOf(false) }
@@ -331,16 +446,15 @@ fun SecondaryImagesSection(
         mainState.captionFocusRequester = captionFocusRequester
     }
 
-    LaunchedEffect(clickCount, isImage1Tinted) {
-        val newState = when {
-            clickCount == 0 -> "INITIAL"
-            clickCount == 1 && isImage1Tinted -> "STATE_1"
-            clickCount == 2 -> "STATE_2"
+    LaunchedEffect(isImage1Tinted, isLongPressActive) {
+        mainState.currentState = when {
+            !isImage1Tinted && !isLongPressActive -> "INITIAL"
+            isImage1Tinted && isLongPressActive -> "STATE_1"
+            isImage1Tinted && !isLongPressActive -> "STATE_2"
             else -> "INITIAL"
         }
-        mainState.currentState = newState
 
-        if (newState == "STATE_2") {
+        if (mainState.currentState == "STATE_2") {
             delay(100)
             captionFocusRequester.requestFocus()
             keyboardController?.show()
@@ -349,63 +463,80 @@ fun SecondaryImagesSection(
 
     DisposableEffect(Unit) {
         onDispose {
-            if (mainState.isRecording) {
-                try {
-                    mainState.mediaRecorder?.apply {
-                        stop()
-                        release()
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                } finally {
-                    mainState.mediaRecorder = null
-                    mainState.isRecording = false
-                }
-            }
+            stopRecording(mainState)
             mainState.audioFile?.delete()
+            progressJob?.cancel()
         }
     }
 
     fun resetToInitialState() {
+        stopRecording(mainState)
         isImage1Tinted = false
         isImage2Visible = true
-        elapsedTime = 0L
-        clickCount = 0
-        fixedTime = null
-        firstClickTime = null
-        timerJob?.cancel()
-        timerJob = null
+        isLongPressActive = false
+        recordingStarted = false
+        stopRequested = false
+        progressJob?.cancel()
+        progressJob = null
+        mainState.recordingProgress = 0f
         keyboardController?.hide()
     }
 
-    val currentState = when {
-        clickCount == 0 -> "INITIAL"
-        clickCount == 1 && isImage1Tinted -> "STATE_1"
-        clickCount == 2 -> "STATE_2"
-        else -> "INITIAL"
+    fun longPressEnd() {
+        if (isImage1Tinted) {
+            if (mainState.isRecording) {
+                stopRecording(mainState)
+                isLongPressActive = false
+            } else {
+                stopRequested = true
+            }
+            progressJob?.cancel()
+            mainState.recordingProgress = 0f
+        }
     }
+
+    fun startProgressAnimation() {
+        progressJob?.cancel()
+        progressJob = scope.launch {
+            val startTime = System.currentTimeMillis()
+            while (isActive && mainState.isRecording) {
+                val elapsed = System.currentTimeMillis() - startTime
+                mainState.recordingProgress = (elapsed.toFloat() / mainState.maxRecordMs).coerceIn(0f, 1f)
+
+                if (elapsed >= mainState.maxRecordMs) {
+                    longPressEnd()
+                    break
+                }
+                delay(16)
+            }
+        }
+    }
+
+    fun longPressStart() {
+        if (!hasMicPermission) return
+
+        if (!isImage1Tinted) {
+            recordingStarted = false
+            stopRequested = false
+
+            isImage1Tinted = true
+            isLongPressActive = true
+
+            startRecording(context, mainState)
+            startProgressAnimation()
+        }
+    }
+
+
+
 
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(bottom = 23.dp)
     ) {
-        if (currentState == "STATE_2") {
-            timerJob?.cancel()
-
+        if (mainState.currentState == "STATE_2") {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                fixedTime?.let { time ->
-                    Text(
-                        text = stringResource(
-                            R.string.recorder_duration_label,
-                            formatElapsedTime(time)
-                        ),
-                        color = Color.Yellow,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -437,7 +568,8 @@ fun SecondaryImagesSection(
                                         Toast.makeText(context, "Аудио сохранено: $uri", Toast.LENGTH_SHORT).show()
                                     }
                                 }
-                                resetToInitialState()  }
+                                resetToInitialState()
+                            }
                         )
 
                         Spacer(Modifier.weight(1f))
@@ -458,77 +590,45 @@ fun SecondaryImagesSection(
                     }
                 }
 
-                Spacer(Modifier.height(15.dp))
+                Spacer(Modifier.height(16.dp))
 
-                Icon(
-                    imageVector = Icons.Outlined.KeyboardArrowDown,
-                    contentDescription = stringResource(R.string.recorder_more_content_description),
-                    tint = iconTint.copy(alpha = 0.9f),
-                    modifier = Modifier.size(34.dp)
-                )
-            }
-        } else {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                if (currentState == "STATE_1") Spacer(Modifier.height(63.dp))
-
-                val isRecording = currentState == "STATE_1"
-                BigCircleMicroButton(
-                    onClick = {
-                        if (!hasMicPermission) {
-                            return@BigCircleMicroButton
-                        }
-
-                        val currentTime = System.currentTimeMillis()
-                        clickCount++
-
-                        when (currentState) {
-                            "INITIAL" -> {
-                                isImage1Tinted = true
-                                isImage2Visible = false
-                                firstClickTime = currentTime
-
-                                startRecording(context, mainState)
-
-                                timerJob?.cancel()
-                                timerJob = scope.launch {
-                                    val startTime = currentTime
-                                    while (isActive && clickCount == 1) {
-                                        elapsedTime = System.currentTimeMillis() - startTime
-                                        delay(100)
-                                    }
-                                }
-                            }
-
-                            "STATE_1" -> {
-                                firstClickTime?.let { firstTime ->
-                                    fixedTime = currentTime - firstTime
-                                }
-
-                                stopRecording(mainState)
-
-                                isImage1Tinted = false
-                                elapsedTime = 0L
-                            }
-                        }
-                    },
+                IconButton(
+                    onClick = { },
                     modifier = Modifier
-                        .width(132.dp)
-                        .height(132.dp),
-                    isRecording = isRecording
-                )
-
-                if (currentState == "STATE_1") {
-                    Text(
-                        text = formatElapsedTime(elapsedTime),
-                        color = Color.White,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium,
-                        modifier = Modifier.padding(top = 8.dp)
+                        .size(50.dp)
+                        .offset(y = 35.dp)
+                        .padding(bottom = 9.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.KeyboardArrowDown,
+                        contentDescription = stringResource(R.string.recorder_more_content_description),
+                        tint = Color(0xFFEDEEF2).copy(alpha = 0.65f),
+                        modifier = Modifier.size(34.dp)
                     )
                 }
             }
+        } else {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                //if (mainState.currentState == "STATE_1") Spacer(Modifier.height(63.dp))
 
-            if (isImage2Visible && currentState == "INITIAL") {
+                val isRecording = mainState.currentState == "STATE_1" && mainState.isRecording
+
+                BigCircleMicroButton(
+                    onClick = {
+                        // on_long_press
+                    },
+                    onLongPress = {
+                        longPressStart()
+                    },
+                    onLongPressEnd = {
+                        longPressEnd()
+                    },
+                    modifier = Modifier,
+                    isRecording = isRecording
+                )
+            }
+
+            if (isImage2Visible && mainState.currentState != "STATE_2") {
                 IconButton(
                     onClick = { },
                     modifier = Modifier
@@ -563,11 +663,9 @@ private fun formatElapsedTime(milliseconds: Long): String {
 
 @Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
 @Composable
-fun RecorderScreenPreview() {
-    RecorderScreen(
-        onCameraClick = {},
-        onGoToFriends = {},
-        onProfileClick = {},
-        onGoToSettings = {}
-    )
+fun RecorderScreenPreview(
+    navController: NavController? = null,
+    onCameraClick: () -> Unit = {}
+) {
+    RecorderScreen()
 }
