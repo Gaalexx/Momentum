@@ -63,23 +63,8 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
+import com.project.momentum.ui.theme.MomentumTheme
 
-class Frame75Activity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContent {
-            MomentumTheme {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(ConstColours.BLACK)
-                ) {
-                    AppNav()
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun rememberMicrophonePermissionState(): State<Boolean> {
@@ -661,11 +646,8 @@ private fun formatElapsedTime(milliseconds: Long): String {
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
+@Preview()
 @Composable
-fun RecorderScreenPreview(
-    navController: NavController? = null,
-    onCameraClick: () -> Unit = {}
-) {
-    RecorderScreen()
+fun preview(){
+    RecorderScreen({}, {}, {}, {}, )
 }
