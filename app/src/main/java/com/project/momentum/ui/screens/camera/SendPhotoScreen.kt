@@ -1,12 +1,9 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.project.momentum
+package com.project.momentum.ui.screens.camera
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
@@ -17,51 +14,31 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.momentum.ConstColours
-import android.content.ContentValues
-import android.os.Build
-import android.provider.MediaStore
-import android.widget.Toast
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import java.text.SimpleDateFormat
-import java.util.Locale
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import android.net.Uri
 import coil.compose.AsyncImage
-import java.net.URLEncoder
-import java.net.URLDecoder
 import androidx.camera.core.CameraSelector
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.PreviewView
 import androidx.compose.runtime.*
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
-import androidx.camera.core.Camera
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
-
-
-import androidx.camera.core.Preview as CameraXPreview
+import com.project.momentum.BigCircleSendPhotoAction
+import com.project.momentum.CaptionBasicInput
+import com.project.momentum.FriendsPillButton
+import com.project.momentum.ProfileCircleButton
+import com.project.momentum.R
+import com.project.momentum.SettingsCircleButton
+import com.project.momentum.rememberCameraPermissionState
 
 
 fun deleteByUri(context: Context, uri: Uri): Boolean {
@@ -84,7 +61,7 @@ fun SendPhotoScreen(
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
-    uri: android.net.Uri?
+    uri: Uri?
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
