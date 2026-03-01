@@ -1,4 +1,4 @@
-package com.project.momentum.ui
+package com.project.momentum.ui.screens.login
 
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable

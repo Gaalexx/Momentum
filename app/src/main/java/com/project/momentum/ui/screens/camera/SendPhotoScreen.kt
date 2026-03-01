@@ -32,13 +32,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
-import com.project.momentum.BigCircleSendPhotoAction
-import com.project.momentum.CaptionBasicInput
-import com.project.momentum.FriendsPillButton
-import com.project.momentum.ProfileCircleButton
 import com.project.momentum.R
-import com.project.momentum.SettingsCircleButton
-import com.project.momentum.rememberCameraPermissionState
+import com.project.momentum.ui.assets.BigCircleSendPhotoAction
+import com.project.momentum.ui.assets.CaptionBasicInput
+import com.project.momentum.ui.assets.FriendsPillButton
+import com.project.momentum.ui.assets.ProfileCircleButton
+import com.project.momentum.ui.assets.SettingsCircleButton
 
 
 fun deleteByUri(context: Context, uri: Uri): Boolean {

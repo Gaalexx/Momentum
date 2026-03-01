@@ -1,4 +1,4 @@
-package com.project.momentum.ui
+package com.project.momentum.ui.screens.registration
 
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
@@ -10,24 +10,22 @@ import com.project.momentum.R
 import com.project.momentum.ui.assets.TemplateAuthorizationScreen
 
 @Composable
-fun AuthorizationAccountScreen(
+fun InsertCodeScreen(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
-    onSwitchLoginTypeClick: () -> Unit,
+    onSendCodeAgainClick: () -> Unit,
     modifier: Modifier = Modifier,
     isUsingEmail: Boolean = true,
 ) {
     TemplateAuthorizationScreen(
-        label = R.string.label_authorization,
+        label = R.string.label_create_account,
         title =
-            if (isUsingEmail) R.string.insert_email
-            else R.string.insert_phone_number,
-        subButtonText =
-            if (isUsingEmail) R.string.button_authorization_by_phone_number
-            else R.string.button_authorization_by_email,
+            if (isUsingEmail) R.string.insert_code_email
+            else R.string.insert_code_phone,
+        subButtonText = R.string.button_send_code_again,
         onBackClick = onBackClick,
         onContinueClick = onContinueClick,
-        onSubButtonClick = onSwitchLoginTypeClick,
+        onSubButtonClick = onSendCodeAgainClick,
         modifier = modifier,
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType =
@@ -38,12 +36,12 @@ fun AuthorizationAccountScreen(
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-fun AuthorizationAccountScreenPreview() {
-    AuthorizationAccountScreen(
+fun InsertCodeScreenPreview() {
+    InsertCodeScreen(
         onBackClick = {},
         onContinueClick = {},
-        onSwitchLoginTypeClick = {}
+        onSendCodeAgainClick = {}
     )
 }

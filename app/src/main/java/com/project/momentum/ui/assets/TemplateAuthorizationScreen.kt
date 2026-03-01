@@ -21,7 +21,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.momentum.ConstColours
-import com.project.momentum.ContinueButton
 import com.project.momentum.R
 import com.project.momentum.ui.theme.AppTextStyles
 

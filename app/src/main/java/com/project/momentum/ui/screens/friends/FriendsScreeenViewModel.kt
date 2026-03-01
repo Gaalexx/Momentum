@@ -1,4 +1,4 @@
-package com.project.momentum
+package com.project.momentum.ui.screens.friends
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -97,7 +97,8 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
             name = jsonObject.getString("name"),
             avatarUrl = jsonObject.getString("avatarUrl"),
             isOnline = jsonObject.optBoolean("isOnline", false),
-            description = jsonObject.optString("description", null).takeIf { it != "null" && it.isNotEmpty() },
+            description = jsonObject.optString("description", null)
+                .takeIf { it != "null" && it.isNotEmpty() },
             friends = parseFriendsFromJson(jsonObject.optJSONArray("friends"))
         )
     }

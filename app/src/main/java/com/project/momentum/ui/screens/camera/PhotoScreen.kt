@@ -1,12 +1,9 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.project.momentum
+package com.project.momentum.ui.screens.camera
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
@@ -14,12 +11,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.momentum.ConstColours
@@ -34,11 +28,10 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 import android.Manifest
-import android.R.attr.progress
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.util.Rational
-import android.util.Size
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 
@@ -46,8 +39,6 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.runtime.*
-import androidx.compose.ui.modifier.modifierLocalConsumer
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
@@ -57,27 +48,18 @@ import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.camera.video.VideoRecordEvent
 import androidx.camera.video.MediaStoreOutputOptions
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
-import kotlin.math.min
 
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 
 
 import androidx.camera.core.Preview as CameraXPreview
 
 
-import androidx.camera.core.AspectRatio
 import androidx.camera.core.UseCaseGroup
 import androidx.camera.core.ViewPort
-import androidx.camera.core.resolutionselector.AspectRatioStrategy
-import androidx.camera.core.resolutionselector.ResolutionSelector
-import androidx.camera.core.resolutionselector.ResolutionStrategy
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -89,9 +71,13 @@ import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.drawscope.Stroke
+import com.project.momentum.R
+import com.project.momentum.ui.assets.BigCircleForMainScreenAction
+import com.project.momentum.ui.assets.CircleButton
+import com.project.momentum.ui.assets.FriendsPillButton
+import com.project.momentum.ui.assets.ProfileCircleButton
+import com.project.momentum.ui.assets.SettingsCircleButton
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
 
 
 @Composable
@@ -178,10 +164,10 @@ fun CameraPreview(
 }
 
 private fun takePhoto(
-    context: android.content.Context,
+    context: Context,
     imageCapture: ImageCapture,
     isFrontCamera: Boolean,
-    onSaved: (android.net.Uri) -> Unit = {},
+    onSaved: (Uri) -> Unit = {},
     onError: (Exception) -> Unit = {}
 ) {
     val name = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US)
@@ -331,7 +317,7 @@ fun rememberCameraPermissionState(): State<Boolean> {
 fun CameraLikeScreen(
     previewPainter: Painter? = null,
     modifier: Modifier = Modifier,
-    onGoToPreview: (android.net.Uri) -> Unit,
+    onGoToPreview: (Uri) -> Unit,
     onGoToRecorder: () -> Unit,
     onProfileClick: () -> Unit,
     onOpenGallery: () -> Unit,
@@ -366,7 +352,7 @@ fun CameraLikeScreen(
 
     val swipeEnabled = recording == null
 
-    val progress = remember { androidx.compose.animation.core.Animatable(0f) }
+    val progress = remember { Animatable(0f) }
     val progressPath = remember { PathMeasure() }
     val scope = rememberCoroutineScope()
 

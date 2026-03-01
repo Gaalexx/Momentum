@@ -1,12 +1,9 @@
-package com.project.momentum
+package com.project.momentum.ui.screens.posts
 
 import android.content.Context
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.decodeFromString
 import androidx.lifecycle.ViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
@@ -71,6 +68,6 @@ abstract class BasePostViewModel : ViewModel() {
 
     // Общий метод для получения данных из JSON
     protected fun readRandomEvent(context: Context): PostItem {
-        return com.project.momentum.readRandomEvent(context)
+        return com.project.momentum.ui.screens.posts.readRandomEvent(context)
     }
 }
