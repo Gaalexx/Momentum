@@ -126,17 +126,13 @@ fun SendPhotoScreen(
 
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-                .clip(RoundedCornerShape(60.dp))
-                .background(ConstColours.BLACK)
+                .fillMaxWidth(0.98f)
+                .aspectRatio(1.10f)
+                .clip(RoundedCornerShape(28.dp))
+                .background(ConstColours.MAIN_BACK_GRAY)
         ) {
             if (hasCameraPermission) {
-                Box(Modifier.fillMaxWidth(0.95f)
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(60.dp))
-                    .background(Color(0xFF2A2E39))
-                    .align(Alignment.Center)) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     AsyncImage(
                         model = uri,
                         contentDescription = null,
@@ -159,11 +155,7 @@ fun SendPhotoScreen(
                 }
 
             } else {
-                Box(Modifier.fillMaxWidth(0.95f)
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(60.dp))
-                    .background(Color(0xFF2A2E39))
-                    .align(Alignment.Center)) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Outlined.PhotoCamera,
                         contentDescription = null,
