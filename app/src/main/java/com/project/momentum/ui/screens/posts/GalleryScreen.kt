@@ -1,16 +1,13 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.project.momentum
+package com.project.momentum.ui.screens.posts
 
 import android.content.Context
-import android.view.View
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -24,9 +21,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.momentum.ConstColours
+import com.project.momentum.PhotoGrid
+import com.project.momentum.R
+import com.project.momentum.ui.assets.FriendsPillButton
+import com.project.momentum.ui.assets.ProfileCircleButton
+import com.project.momentum.ui.assets.SettingsCircleButton
 
 
 class GalleryViewModel : BasePostViewModel() {

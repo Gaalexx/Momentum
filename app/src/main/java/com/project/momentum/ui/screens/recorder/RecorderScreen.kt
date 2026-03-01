@@ -1,16 +1,12 @@
-package com.project.momentum
+package com.project.momentum.ui.screens.recorder
 
 import android.content.ContentValues
 import android.content.pm.PackageManager
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
@@ -30,10 +26,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.momentum.ConstColours
 import kotlinx.coroutines.Job
@@ -53,6 +47,8 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
 import android.Manifest
+import android.content.Context
+import android.net.Uri
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.ui.geometry.CornerRadius
@@ -62,8 +58,14 @@ import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.unit.dp
-import com.project.momentum.ui.theme.MomentumTheme
+import com.project.momentum.R
+import com.project.momentum.ui.assets.BigCircleMicroButton
+import com.project.momentum.ui.assets.BigCircleSendPhotoAction
+import com.project.momentum.ui.assets.CaptionBasicInput
+import com.project.momentum.ui.assets.CircleButton
+import com.project.momentum.ui.assets.FriendsPillButton
+import com.project.momentum.ui.assets.ProfileCircleButton
+import com.project.momentum.ui.assets.SettingsCircleButton
 
 
 @Composable
@@ -91,7 +93,7 @@ fun rememberMicrophonePermissionState(): State<Boolean> {
     return hasPermission
 }
 
-fun startRecording(context: android.content.Context, mainState: MainState) {
+fun startRecording(context: Context, mainState: MainState) {
     val fileName = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.US)
         .format(System.currentTimeMillis()) + ".3gp"
 
@@ -137,7 +139,7 @@ fun stopRecording(mainState: MainState) {
     }
 }
 
-fun saveToMediaStore(context: android.content.Context, audioFile: File): android.net.Uri? {
+fun saveToMediaStore(context: Context, audioFile: File): Uri? {
     val values = ContentValues().apply {
         put(MediaStore.MediaColumns.DISPLAY_NAME, audioFile.name)
         put(MediaStore.MediaColumns.MIME_TYPE, "audio/3gpp")
@@ -549,7 +551,11 @@ fun SecondaryImagesSection(
                             onClick = {
                                 mainState.audioFile?.let { file ->
                                     saveToMediaStore(context, file)?.let { uri ->
-                                        Toast.makeText(context, "Аудио сохранено: $uri", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(
+                                            context,
+                                            "Аудио сохранено: $uri",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
                                     }
                                 }
                                 resetToInitialState()
