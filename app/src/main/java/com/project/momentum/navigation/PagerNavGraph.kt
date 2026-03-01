@@ -16,12 +16,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
-import com.project.momentum.*
-import kotlinx.coroutines.delay
+import com.project.momentum.ui.screens.account.AccountScreen
+import com.project.momentum.ui.screens.account.AccountViewModel
+import com.project.momentum.ui.screens.camera.CameraLikeScreen
+import com.project.momentum.ui.screens.camera.SendPhotoScreen
+import com.project.momentum.ui.screens.friends.FriendsScreen
+import com.project.momentum.ui.screens.friends.User
+import com.project.momentum.ui.screens.friends.UserViewModel
+import com.project.momentum.ui.screens.posts.GallaryScreen
+import com.project.momentum.ui.screens.posts.GalleryViewModel
+import com.project.momentum.ui.screens.posts.WatchPhotoScreen
+import com.project.momentum.ui.screens.recorder.RecorderScreen
+import com.project.momentum.ui.screens.settings.SettingsMainScreen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)
