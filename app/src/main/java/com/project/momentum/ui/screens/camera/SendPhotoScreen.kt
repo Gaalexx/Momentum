@@ -99,7 +99,7 @@ fun SendPhotoScreen(
         }
 
         Spacer(Modifier.height(12.dp))
-
+        // updated preview frame
         Box(
             modifier = Modifier
                 .fillMaxWidth()
