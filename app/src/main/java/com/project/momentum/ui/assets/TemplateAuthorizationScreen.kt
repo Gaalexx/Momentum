@@ -26,9 +26,11 @@ import com.project.momentum.ui.theme.AppTextStyles
 
 @Composable
 fun TemplateAuthorizationScreen(
+//    value: String,
     @StringRes label: Int,
     @StringRes title: Int,
     @StringRes subButtonText: Int,
+//    onValueChange: (String) -> Unit,
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
     onSubButtonClick: () -> Unit,
@@ -66,8 +68,11 @@ fun TemplateAuthorizationScreen(
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
                 TextFieldRegistration(
                     //TODO: Сохрание + изменение состояния во viewModel
-                    value = "+79999999999",
+//                    value = value,
+//                    onValueChange = onValueChange,
+                    value = "value",
                     onValueChange = {},
+
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
                     keyboardOptions = keyboardOptions,
                 )
@@ -101,9 +106,11 @@ fun TemplateAuthorizationScreen(
 @Composable
 fun TemplateAuthorizationScreenPreview() {
     TemplateAuthorizationScreen(
+//        value = "input text",
         label = R.string.template_label,
         title = R.string.template_page_title,
         subButtonText = R.string.template_sub_button,
+//        onValueChange = {},
         onBackClick = {},
         onContinueClick = {},
         onSubButtonClick = {}

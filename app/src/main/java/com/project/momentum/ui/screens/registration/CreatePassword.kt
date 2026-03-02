@@ -11,11 +11,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.momentum.ConstColours
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.R
@@ -27,9 +30,12 @@ import com.project.momentum.ui.theme.AppTextStyles
 fun CreatePasswordScreen(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: RegistrationViewModel = viewModel()
 ) {
     val bg = ConstColours.BLACK
+    val userDataUiState by viewModel.userData.collectAsState()
+
 
     TopBarTemplate(
         label = R.string.label_create_account,
