@@ -76,6 +76,9 @@ dependencies {
     implementation(libs.bundles.accompanist)
 
     implementation(libs.ktor.client.android)
+    implementation(libs.ktor.client.contentnegotiation)
+    implementation(libs.ktor.serialization.kotlinx.json)
+
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
