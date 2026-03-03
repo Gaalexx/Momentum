@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldColors
 import androidx.compose.material.TextFieldDefaults
@@ -22,6 +23,7 @@ fun TextFieldRegistration(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    placeholder: String? = null,
     isError: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
@@ -30,6 +32,14 @@ fun TextFieldRegistration(
         onValueChange = onValueChange,
         modifier = modifier
             .fillMaxWidth(),
+        placeholder = { if (placeholder != null)
+            Text (
+                text = placeholder,
+                modifier = Modifier.fillMaxWidth(),
+                style = AppTextStyles.MainText,
+                textAlign = TextAlign.Center
+            )
+        },
         textStyle = AppTextStyles.MainText.copy(
             textAlign = TextAlign.Center
         ),
@@ -50,7 +60,8 @@ fun TextFieldRegistration(
 @Composable
 fun TextFieldRegistrationPreview() {
     TextFieldRegistration(
-        value = "vjmievnjebnvj",
-        onValueChange = {}
+        value = "",
+        onValueChange = {},
+        placeholder = "Введите текст..."
     )
 }

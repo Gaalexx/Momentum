@@ -1,5 +1,6 @@
 package com.project.momentum.ui.screens.registration
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,6 +14,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.Text
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -99,15 +103,33 @@ fun CreateAccountScreen(
                 TextFieldRegistration(
                     value = userDataUiState.email,
                     onValueChange = { viewModel.updateUserEmail(it) },
-                    modifier = Modifier.height(dimensionResource(R.dimen.button_size))
+                    modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
+                    placeholder = "Введеите почту",
+                    isError = viewModel.isError
                 )
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
-                //TODO: проверкаа состояния текста в поле
-                //TODO: по нажатию проверитб существует ли почта
-                ContinueButton(
-                    onClick = onContinueClick,
-                    modifier = Modifier.height(dimensionResource(R.dimen.button_size))
-                )
+
+                if (viewModel.isValidEmail(userDataUiState.email)) {
+                    ContinueButton(
+                        onClick = {
+                            viewModel.checkEmailExists()
+                            if (!viewModel.isError) { onContinueClick() }
+                        },
+                        modifier = Modifier.height(dimensionResource(R.dimen.button_size))
+                    )
+                } else {
+                    ContinueButton(
+                        //TODO: пояснение пользователю,
+                        // что почта невалидного формата
+                        onClick = {},
+                        modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = ConstColours.MAIN_BACK_GRAY,
+                            contentColor = ConstColours.WHITE
+                        )
+                    )
+                }
+
             }
         }
     }

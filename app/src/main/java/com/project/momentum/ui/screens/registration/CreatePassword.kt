@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -63,22 +64,27 @@ fun CreatePasswordScreen(
                         .padding(vertical = dimensionResource(R.dimen.medium_padding))
                 )
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
+
                 TextFieldRegistration(
-                    //TODO: Сохрание + изменение состояния во viewModel
-                    value = "qwertyuio",
-                    onValueChange = {},
+                    value = userDataUiState.password,
+                    onValueChange = { viewModel.updateUserPassword(it) },
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size))
                 )
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
+
                 TextFieldRegistration(
-                    //TODO: Сохрание + изменение состояния во viewModel
-                    value = "qwertyuio",
-                    onValueChange = {},
+                    value = viewModel.passwordRepetition,
+                    onValueChange = { viewModel.updateUserPasswordRepetition(it) },
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size))
                 )
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
+
                 ContinueButton(
-                    onClick = onContinueClick,
+                    onClick = {
+                        if (userDataUiState.password == viewModel.passwordRepetition) {
+                            onContinueClick()
+                        }
+                    },
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size))
                 )
             }
