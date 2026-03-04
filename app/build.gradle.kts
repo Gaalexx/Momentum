@@ -52,6 +52,9 @@ android {
     buildFeatures {
         compose = true
     }
+    kotlinOptions {
+        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+    }
 }
 
 dependencies {
@@ -75,6 +78,8 @@ dependencies {
     implementation(libs.landscapist.coil)
     implementation(libs.bundles.accompanist)
 
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.okhttp)
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.client.contentnegotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
