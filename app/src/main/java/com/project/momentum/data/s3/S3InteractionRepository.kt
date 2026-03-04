@@ -1,15 +1,7 @@
 package com.project.momentum.data.s3
 
 import android.net.Uri
-import com.project.momentum.di.Backend
-import com.project.momentum.di.S3
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
 import javax.inject.Inject
-import javax.inject.Named
-import com.project.momentum.data.s3.UploadInfoDTO
 import javax.inject.Singleton
 
 data class PostInformation(
@@ -22,7 +14,7 @@ data class PostInformation(
 )
 
 @Singleton
-class S3InteractionAPI @Inject constructor(
+class S3InteractionRepository @Inject constructor(
     private val client: UploadMediaClient,
     private val s3Client: S3Client
 ) {
@@ -38,6 +30,7 @@ class S3InteractionAPI @Inject constructor(
                 )
             )
 
+
         s3Client.sendFileToS3(
             presignedURLDTO.urlToLoad,
             postInfo.uri,
@@ -45,7 +38,14 @@ class S3InteractionAPI @Inject constructor(
             postInfo.size
         )
 
-        client.sendMessageOnComplete(S3UpdateStatusDTO(UploadingStatus.READY, postInfo.label))
+        val body =
+            client.sendMessageOnComplete(    // TODO в зависимости от того какой ответ, то и будем отображать на экране
+                S3UpdateStatusDTO(
+                    UploadingStatus.READY,
+                    presignedURLDTO.mediaId,
+                    postInfo.label
+                )
+            )
     }
 
 }

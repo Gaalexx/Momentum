@@ -11,11 +11,4 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
 
-//    @Provides
-//    @Singleton
-//    fun provideSignInUpRepository(httpClient: HttpClient): Int {
-//        return
-//    }
-
-
 }

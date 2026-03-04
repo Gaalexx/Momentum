@@ -32,12 +32,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.momentum.R
+import com.project.momentum.data.s3.MediaType
+import com.project.momentum.data.s3.PostInformation
 import com.project.momentum.ui.assets.BigCircleSendPhotoAction
 import com.project.momentum.ui.assets.CaptionBasicInput
 import com.project.momentum.ui.assets.FriendsPillButton
 import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
+import com.project.momentum.ui.viewmodel.ContentCreationViewModel
+import com.project.momentum.ui.viewmodel.UploadEvent
 
 
 fun deleteByUri(context: Context, uri: Uri): Boolean {
@@ -62,6 +67,8 @@ fun SendPhotoScreen(
     onGoToFriends: () -> Unit,
     uri: Uri?
 ) {
+    val vm: ContentCreationViewModel = viewModel()
+
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
     val iconTint = ConstColours.WHITE
@@ -108,11 +115,14 @@ fun SendPhotoScreen(
                 .background(ConstColours.BLACK)
         ) {
             if (hasCameraPermission) {
-                Box(Modifier.fillMaxWidth(0.95f)
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(60.dp))
-                    .background(Color(0xFF2A2E39))
-                    .align(Alignment.Center)) {
+                Box(
+                    Modifier
+                        .fillMaxWidth(0.95f)
+                        .aspectRatio(1f)
+                        .clip(RoundedCornerShape(60.dp))
+                        .background(Color(0xFF2A2E39))
+                        .align(Alignment.Center)
+                ) {
                     AsyncImage(
                         model = uri,
                         contentDescription = null,
@@ -135,11 +145,14 @@ fun SendPhotoScreen(
                 }
 
             } else {
-                Box(Modifier.fillMaxWidth(0.95f)
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(60.dp))
-                    .background(Color(0xFF2A2E39))
-                    .align(Alignment.Center)) {
+                Box(
+                    Modifier
+                        .fillMaxWidth(0.95f)
+                        .aspectRatio(1f)
+                        .clip(RoundedCornerShape(60.dp))
+                        .background(Color(0xFF2A2E39))
+                        .align(Alignment.Center)
+                ) {
                     Icon(
                         imageVector = Icons.Outlined.PhotoCamera,
                         contentDescription = null,
@@ -185,7 +198,25 @@ fun SendPhotoScreen(
 
                 Spacer(Modifier.weight(1f))
                 BigCircleSendPhotoAction(
-                    onClick = onGoToTakePhoto
+                    onClick = {
+                        val safeUri = uri ?: return@BigCircleSendPhotoAction
+                        val mimeType = context.contentResolver.getType(safeUri) ?: "image/jpeg"
+                        val size = context.contentResolver.openFileDescriptor(safeUri, "r")
+                            ?.use { pfd -> pfd.statSize }?.takeIf { it >= 0 } ?: 0L
+
+                        vm.onEvent(
+                            UploadEvent.Send(
+                                PostInformation(
+                                    safeUri,
+                                    mimeType,
+                                    MediaType.IMAGE,
+                                    size = size,
+                                    label = caption
+                                )
+                            )
+                        )
+                        onGoToTakePhoto()
+                    }
                 )
                 Spacer(Modifier.weight(1f))
 
@@ -229,6 +260,7 @@ private fun CameraLikeScreenPreview() {
             onProfileClick = {},
             onGoToSettings = {},
             onGoToFriends = {},
-            uri = null)
+            uri = null
+        )
     }
 }

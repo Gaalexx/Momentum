@@ -13,7 +13,10 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
 import io.ktor.http.URLProtocol
+import io.ktor.http.contentType
+import io.ktor.http.encodedPath
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -40,6 +43,7 @@ object NetworkModule {
                     protocol = URLProtocol.HTTP
                     host = "193.233.20.47/api/momentum"
                 }
+                contentType(ContentType.Application.Json)
             }
         }
     }
