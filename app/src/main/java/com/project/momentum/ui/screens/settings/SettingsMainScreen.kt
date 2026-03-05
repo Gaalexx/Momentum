@@ -8,6 +8,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,19 +24,23 @@ import com.project.momentum.R
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.CircleButton
 import com.project.momentum.ui.assets.SettingsButton
+import com.project.momentum.ui.assets.SwitchRow
 import com.project.momentum.ui.theme.AppTextStyles
 
 @Composable
 fun SettingsMainScreen(
     onBackClick: () -> Unit = {},
-    onPrivacyClick: () -> Unit = {},
-    onNotificationsClick: () -> Unit = {},
-    onDataClick: () -> Unit = {},
-    onLanguageClick: () -> Unit = {},
     onPremiumClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     onDeleteAccountClick: () -> Unit = {}
 ) {
+
+    var publicationsEnabled by remember { mutableStateOf(true) }
+    var reactionsEnabled by remember { mutableStateOf(true) }
+    var inAppNotifications by remember { mutableStateOf(true) }
+    var recommendToContacts by remember { mutableStateOf(true) }
+    var allowAddFromAnyone by remember { mutableStateOf(true) }
+    var confirmBeforePosting by remember { mutableStateOf(true) }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -42,6 +50,7 @@ fun SettingsMainScreen(
                 color = ConstColours.BLACK,
             )
             .windowInsetsPadding(WindowInsets.systemBars)
+            .padding(bottom = 90.dp)
     ) {
 
         Box(
@@ -53,93 +62,86 @@ fun SettingsMainScreen(
                 onClick = onBackClick
             )
 
-            CircleButton(
-                onClick = {},
-                icon = Icons.Default.Settings,
-                size = 81.dp,
+            Text(
+                text = stringResource(R.string.settings_main_screen_headliner),
+                style = AppTextStyles.Headlines,
+                color = ConstColours.WHITE,
                 modifier = Modifier.align(Alignment.Center)
             )
         }
 
         Column(
             modifier = Modifier
-                .padding(bottom = 8.dp, start = 24.dp)
                 .fillMaxWidth()
+                .padding(horizontal = 20.dp)
         ) {
             Text(
-                text = stringResource(R.string.settings_main_screen_headliner),
-                style = AppTextStyles.Headlines,
-                color = ConstColours.WHITE
-            )
-        }
-
-        SettingsButton(
-            onClick = onPrivacyClick,
-            icon = Icons.Default.Security,
-            text = stringResource(R.string.settings_section_privacy),
-            modifier = Modifier.padding(horizontal = 24.dp)
-        )
-
-        SettingsButton(
-            onClick = onNotificationsClick,
-            icon = Icons.Default.Notifications,
-            text = stringResource(R.string.settings_section_notifications),
-            modifier = Modifier.padding(horizontal = 24.dp)
-        )
-
-        SettingsButton(
-            onClick = onDataClick,
-            icon = Icons.Default.Storage,
-            text = stringResource(R.string.settings_section_data),
-            modifier = Modifier.padding(horizontal = 24.dp)
-        )
-
-        Row(
-            modifier = Modifier
-                .padding(horizontal = 24.dp)
-                .fillMaxWidth()
-                .clickable { onLanguageClick() },
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Default.Language,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier.size(24.dp)
+                text = stringResource(R.string.settings_notifications_section),
+                style = AppTextStyles.SubHeadlines,
+                color = ConstColours.MAIN_BRAND_BLUE,
+                modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            Spacer(modifier = Modifier.width(16.dp))
+            SwitchRow(
+                text = stringResource(R.string.settings_notifications_in_app_switch),
+                checked = inAppNotifications,
+                onCheckedChange = { inAppNotifications = it }
+            )
+
+            SwitchRow(
+                text = stringResource(R.string.settings_notifications_publications),
+                checked = publicationsEnabled,
+                onCheckedChange = { publicationsEnabled = it }
+            )
+
+            SwitchRow(
+                text = stringResource(R.string.settings_notifications_reactions),
+                checked = reactionsEnabled,
+                onCheckedChange = { reactionsEnabled = it }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                stringResource(R.string.settings_section_language),
-                color = ConstColours.WHITE,
-                style = AppTextStyles.MainText,
-                modifier = Modifier.weight(1f)
+                text = stringResource(R.string.settings_privacy_account_visibility),
+                style = AppTextStyles.SubHeadlines,
+                color = ConstColours.MAIN_BRAND_BLUE,
+                modifier = Modifier.padding(bottom = 16.dp)
             )
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .clip(shape = RoundedCornerShape(24.dp))
-                    .background(
-                        color = ConstColours.MAIN_BACK_GRAY,
-                        shape = RoundedCornerShape(24.dp)
-                    )
-                    .padding(horizontal = 8.dp)
-            ) {
-                Text(
-                    stringResource(R.string.settings_type_language),
-                    color = ConstColours.WHITE,
-                    style = AppTextStyles.MainText
-                )
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = stringResource(R.string.settings_language_description),
-                    tint = ConstColours.WHITE,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
+            SwitchRow(
+                text = stringResource(R.string.settings_privacy_recommend_to_contacts),
+                checked = recommendToContacts,
+                onCheckedChange = { recommendToContacts = it }
+            )
+
+            SwitchRow(
+                text = stringResource(R.string.settings_privacy_allow_add_from_anyone),
+                checked = allowAddFromAnyone,
+                onCheckedChange = { allowAddFromAnyone = it }
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            Text(
+                text = stringResource(R.string.settings_privacy_caution),
+                style = AppTextStyles.SubHeadlines,
+                color = ConstColours.MAIN_BRAND_BLUE,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            SwitchRow(
+                text = stringResource(R.string.settings_privacy_confirm_before_posting),
+                checked = confirmBeforePosting,
+                onCheckedChange = { confirmBeforePosting = it }
+            )
+
         }
+
+
+        Spacer(modifier = Modifier.weight(1f))
+
+
 
         SettingsButton(
             onClick = onPremiumClick,
@@ -148,6 +150,8 @@ fun SettingsMainScreen(
             textColor = ConstColours.GOLD,
             modifier = Modifier.padding(horizontal = 24.dp)
         )
+
+        Spacer(modifier = Modifier.weight(1f))
 
         SettingsButton(
             onClick = onLogoutClick,
@@ -165,8 +169,6 @@ fun SettingsMainScreen(
             textColor = ConstColours.DELETE,
             modifier = Modifier.padding(horizontal = 24.dp)
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 

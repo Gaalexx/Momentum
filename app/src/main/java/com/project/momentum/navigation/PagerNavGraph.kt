@@ -94,10 +94,6 @@ fun MainScreen() {
                                 currentRoute = null
                             }
                         },
-                        onPrivacyClick = {},
-                        onNotificationsClick = {},
-                        onDataClick = {},
-                        onLanguageClick = {},
                         onPremiumClick = {},
                         onLogoutClick = {
                             scope.launch {
