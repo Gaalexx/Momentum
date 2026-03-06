@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.momentum.data.s3.PostInformation
 import com.project.momentum.data.s3.S3InteractionRepository
+import com.project.momentum.ui.screens.camera.deleteByUri
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,6 +34,7 @@ class ContentCreationViewModel @Inject constructor(
     fun onEvent(event: UploadEvent) {
         when (event) {
             is UploadEvent.Send -> upload(event.postInfo)
+            else -> {}
         }
     }
 

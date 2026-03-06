@@ -36,3 +36,14 @@ data class PresignedURLDTO(
     val urlToLoad: String,
     val mediaId: String
 )
+
+@Serializable
+data class PostDTO(
+    val id: String,
+    val userId: String,
+    val title: String,
+    val inUse: Boolean,
+    val presignedURL: String,
+    val createdAt: String? = null
+)
+

@@ -25,23 +25,26 @@ import android.content.Context
 import androidx.compose.ui.platform.LocalContext
 import com.project.momentum.PhotoGrid
 import com.project.momentum.R
+import com.project.momentum.S3PhotoGrid
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.screens.posts.BasePostViewModel
 import com.project.momentum.ui.screens.posts.PostData
+import com.project.momentum.ui.viewmodel.AccountViewModel
+import androidx.compose.runtime.collectAsState
 
 
-class AccountViewModel : BasePostViewModel() {
-    override fun addPhoto(context: Context, url: String) {
-        val event = readRandomEvent(context)
-        val postData = PostData(
-            url = url,
-            name = "userName", // В аккаунте всегда userName
-            date = event.date,
-            description = event.description
-        )
-        _posts.add(0, postData)
-    }
-}
+//class AccountViewModel : BasePostViewModel() {
+//    override fun addPhoto(context: Context, url: String) {
+//        val event = readRandomEvent(context)
+//        val postData = PostData(
+//            url = url,
+//            name = "userName", // В аккаунте всегда userName
+//            date = event.date,
+//            description = event.description
+//        )
+//        _posts.add(0, postData)
+//    }
+//}
 
 
 @Composable
@@ -52,8 +55,8 @@ fun AccountScreen(
     postsCount: Int = 0,
     onPostClick: () -> Unit = {},
     onProfileClick: () -> Unit = {},
-    onBackClick: () -> Unit,
-    viewModel: AccountViewModel
+    onBackClick: () -> Unit
+    //viewModel: AccountViewModel
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
@@ -61,16 +64,12 @@ fun AccountScreen(
     val textColor = Color.White
     val context: Context = LocalContext.current
 
-    //var photos by remember { mutableStateOf<List<String>>(emptyList()) }
-    //val photos = viewModel.photos
+    val viewModel: AccountViewModel = viewModel()
+
     val posts = viewModel.posts
 
-    // Функция для добавления новой фотографии
     fun addNewPhoto() {
-        val newPhotoUrl = "https://picsum.photos/300/300?random=${System.currentTimeMillis()}"
-        // Добавляем новое фото в начало
-        //photos = listOf(newPhotoUrl) + photos
-        viewModel.addPhoto(context, newPhotoUrl)
+        viewModel.loadPosts()
     }
 
     Column(
@@ -167,13 +166,10 @@ fun AccountScreen(
                 modifier = Modifier.padding(16.dp)
             )
 
-            PhotoGrid(
-                posts = viewModel.posts,
-                onPostClick = { post ->
-                    viewModel.selectPost(post)
-                    onPostClick()
-                },
-                onAddPhotoClick = { viewModel.addRandomPhoto(context) },
+            S3PhotoGrid(
+                posts = viewModel.posts.collectAsState().value,
+                onPostClick = {},
+                onAddPhotoClick = { viewModel.loadPosts() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
@@ -191,8 +187,7 @@ private fun AccountScreenPreview() {
         AccountScreen(
             onPostClick = {},
             onProfileClick = {},
-            onBackClick = {},
-            viewModel = viewModel()
+            onBackClick = {}
         )
     }
 }
