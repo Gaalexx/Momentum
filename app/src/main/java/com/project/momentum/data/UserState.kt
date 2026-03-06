@@ -13,6 +13,7 @@ data class RegistrationState (
     val userData: UserData = UserData(),
     val isLoading: Boolean = false,
     val isError: Boolean = false,
+    val isUsingEmail: Boolean = true,
     val errorMessage: String? = null,
     val isStepValid: Boolean = false,
     val canGoNext: Boolean = false,

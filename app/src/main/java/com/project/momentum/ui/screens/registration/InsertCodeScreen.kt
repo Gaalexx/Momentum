@@ -20,7 +20,6 @@ fun InsertCodeScreen(
     onSendCodeAgainClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: RegistrationViewModel = viewModel(),
-    isUsingEmail: Boolean = true,
 ) {
     val uiState by viewModel.state.collectAsState()
 
@@ -28,7 +27,7 @@ fun InsertCodeScreen(
         value = uiState.userData.verificationCode,
         label = R.string.label_create_account,
         title =
-            if (isUsingEmail) R.string.insert_code_email
+            if (uiState.isUsingEmail) R.string.insert_code_email
             else R.string.insert_code_phone,
         subButtonText = R.string.button_send_code_again,
         onValueChange = { viewModel.updateUserCode(it) },
@@ -44,7 +43,7 @@ fun InsertCodeScreen(
         modifier = modifier,
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType =
-                if (isUsingEmail) KeyboardType.Email
+                if (uiState.isUsingEmail) KeyboardType.Email
                 else KeyboardType.Phone,
             imeAction = ImeAction.Done
         ),

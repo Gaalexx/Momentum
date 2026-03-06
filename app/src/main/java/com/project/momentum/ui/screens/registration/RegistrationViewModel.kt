@@ -116,6 +116,14 @@ class RegistrationViewModel: ViewModel() {
         passwordRepetition = password
     }
 
+    fun switchLoginType() {
+        _state.update {
+            it.copy(
+                isUsingEmail = !it.isUsingEmail
+            )
+        }
+    }
+
     fun nextStep() {
         if (!_state.value.isStepValid) return
 
@@ -146,6 +154,14 @@ class RegistrationViewModel: ViewModel() {
                     }
                 }
             }
+            RegistrationStep.PHONE -> {
+                //TODO: проверка телефона на валидность
+                _state.update {
+                    it.copy(
+                        currentStep = RegistrationStep.PASSWORD
+                    )
+                }
+            }
             RegistrationStep.PASSWORD -> {
                 _state.update {
                     it.copy(
@@ -170,7 +186,9 @@ class RegistrationViewModel: ViewModel() {
         _state.update {
             it.copy(
                 currentStep = when (it.currentStep) {
-                    RegistrationStep.PASSWORD -> RegistrationStep.EMAIL
+                    RegistrationStep.PASSWORD ->
+                        if (it.isUsingEmail) RegistrationStep.EMAIL
+                        else RegistrationStep.PHONE
                     RegistrationStep.VERIFICATION -> RegistrationStep.PASSWORD
                     else -> it.currentStep
                 }
