@@ -35,12 +35,14 @@ fun CreatePasswordScreen(
     viewModel: RegistrationViewModel = viewModel()
 ) {
     val bg = ConstColours.BLACK
-    val userDataUiState by viewModel.userData.collectAsState()
-
+    val userDataUiState by viewModel.state.collectAsState()
 
     TopBarTemplate(
         label = R.string.label_create_account,
-        onBackClick = onBackClick,
+        onBackClick = {
+            viewModel.previousStep()
+            onBackClick()
+        },
         modifier = modifier
     ) { paddingValues ->
         Box(
@@ -66,7 +68,7 @@ fun CreatePasswordScreen(
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
 
                 TextFieldRegistration(
-                    value = userDataUiState.password,
+                    value = userDataUiState.userData.password,
                     onValueChange = { viewModel.updateUserPassword(it) },
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size))
                 )
@@ -81,9 +83,8 @@ fun CreatePasswordScreen(
 
                 ContinueButton(
                     onClick = {
-                        if (userDataUiState.password == viewModel.passwordRepetition) {
-                            onContinueClick()
-                        }
+                        viewModel.nextStep()
+                        onContinueClick()
                     },
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size))
                 )

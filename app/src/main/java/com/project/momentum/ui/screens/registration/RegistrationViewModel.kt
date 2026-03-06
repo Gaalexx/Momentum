@@ -6,69 +6,58 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.project.momentum.data.UserData
+import com.project.momentum.data.RegistrationState
+import com.project.momentum.data.RegistrationStep
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.io.PrintWriter
-import java.net.Socket
 
 class RegistrationViewModel: ViewModel() {
-    private var _userData = MutableStateFlow(UserData())
+    private var _state = MutableStateFlow(RegistrationState())
 
-    val userData: StateFlow<UserData> = _userData.asStateFlow()
+    val state: StateFlow<RegistrationState> = _state.asStateFlow()
 
     private val emailChecker = EmailChecker()
-    var isError by mutableStateOf(false)
-        private set
 
     var passwordRepetition by mutableStateOf("")
         private set
 
-    fun updateUserEmail(email: String) {
-        _userData.update { currantState ->
-            currantState.copy (
-                email = email
+
+    fun validateCurrentStep() {
+        val isValid = when(_state.value.currentStep) {
+            RegistrationStep.EMAIL -> isValidEmail()
+            RegistrationStep.PHONE -> isValidPhone()
+            RegistrationStep.PASSWORD -> isValidPassword() == PasswordState.VALID
+            RegistrationStep.VERIFICATION -> isValidCode()
+            RegistrationStep.COMPLETED -> true
+        }
+
+        _state.update {
+            it.copy(
+                isStepValid = isValid,
+                canGoNext = isValid && !it.isLoading,
+                canGoBack = it.currentStep != RegistrationStep.EMAIL
             )
         }
     }
 
-    fun updateUserPhone(phone: String) {
-        _userData.update { currantState ->
-            currantState.copy (
-                phone = phone
-            )
-        }
+    fun isValidEmail(): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(_state.value.userData.email).matches()
     }
 
-    fun updateUserPassword(password: String) {
-        _userData.update { currantState ->
-            currantState.copy (
-                password = password
-            )
-        }
+    fun isValidPhone(): Boolean {
+        //TODO
+        return true
     }
 
-    fun updateUserPasswordRepetition(password: String) {
-        passwordRepetition = password
-    }
-
-    fun isValidEmail(email: String): Boolean {
-        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
-    }
-
-    fun checkEmailExists() {
-        viewModelScope.launch {
-            isError = !emailChecker.canReceiveEmail(_userData.value.email)
-        }
+    enum class PasswordState {
+        VALID, NOT_MATCH, EMPTY, TOO_SHORT, NO_DIGITS, NO_LOWERCASE_LETTERS, NO_UPPERCASE_LETTERS
     }
 
     fun isValidPassword(): PasswordState {
-        val password = _userData.value.password
+        val password = _state.value.userData.password
 
         if (password != passwordRepetition) {
             return PasswordState.NOT_MATCH
@@ -87,7 +76,106 @@ class RegistrationViewModel: ViewModel() {
         }
     }
 
-    enum class PasswordState {
-        VALID, NOT_MATCH, EMPTY, TOO_SHORT, NO_DIGITS, NO_LOWERCASE_LETTERS, NO_UPPERCASE_LETTERS
+    fun isValidCode(): Boolean {
+        //TODO: ресерч (наверняка через репозиторий)
+        return true
+    }
+    fun updateUserEmail(email: String) {
+        _state.update { currentState ->
+            currentState.copy (
+                userData = currentState.userData.copy(email = email)
+            )
+        }
+    }
+
+    fun updateUserPhone(phone: String) {
+        _state.update { currentState ->
+            currentState.copy (
+                userData = currentState.userData.copy(phone = phone)
+            )
+        }
+    }
+
+    fun updateUserPassword(password: String) {
+        _state.update { currentState ->
+            currentState.copy (
+                userData = currentState.userData.copy(password = password)
+            )
+        }
+    }
+
+    fun updateUserCode(code: String) {
+        _state.update { currentState ->
+            currentState.copy (
+                userData = currentState.userData.copy(verificationCode = code)
+            )
+        }
+    }
+
+    fun updateUserPasswordRepetition(password: String) {
+        passwordRepetition = password
+    }
+
+    fun nextStep() {
+        if (!_state.value.isStepValid) return
+
+        when (_state.value.currentStep) {
+            RegistrationStep.EMAIL -> {
+                _state.update { it.copy(isLoading = true) }
+
+                viewModelScope.launch {
+                    //TODO: доработать через репозиторий
+                    val exists = emailChecker.canReceiveEmail(_state.value.userData.email)
+
+                    if (exists) {
+                        _state.update {
+                            it.copy(
+                                currentStep = RegistrationStep.PASSWORD,
+                                isError = false,
+                                isLoading = false
+                            )
+                        }
+                    } else {
+                        _state.update {
+                            it.copy(
+                                isError = true,
+                                isLoading = false,
+                                errorMessage = "Email не найден"
+                            )
+                        }
+                    }
+                }
+            }
+            RegistrationStep.PASSWORD -> {
+                _state.update {
+                    it.copy(
+                        currentStep = RegistrationStep.VERIFICATION
+                    )
+                }
+            }
+            RegistrationStep.VERIFICATION -> {
+                _state.update {
+                    it.copy(
+                        currentStep = RegistrationStep.COMPLETED
+                    )
+                }
+            }
+            else -> {}
+        }
+    }
+
+    fun previousStep() {
+        if (!_state.value.canGoBack) return
+
+        _state.update {
+            it.copy(
+                currentStep = when (it.currentStep) {
+                    RegistrationStep.PASSWORD -> RegistrationStep.EMAIL
+                    RegistrationStep.VERIFICATION -> RegistrationStep.PASSWORD
+                    else -> it.currentStep
+                }
+            )
+        }
+        validateCurrentStep()
     }
 }

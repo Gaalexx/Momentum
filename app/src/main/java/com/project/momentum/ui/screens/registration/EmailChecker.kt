@@ -1,11 +1,13 @@
 package com.project.momentum.ui.screens.registration
 
 import jakarta.inject.Inject
+import jakarta.inject.Singleton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.InetAddress
 import java.net.UnknownHostException
 
+@Singleton
 class EmailChecker {
     suspend fun canReceiveEmail(email: String): Boolean = withContext(Dispatchers.IO) {
         try {

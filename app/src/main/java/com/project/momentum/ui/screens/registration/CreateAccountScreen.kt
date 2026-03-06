@@ -50,11 +50,14 @@ fun CreateAccountScreen(
     viewModel: RegistrationViewModel = viewModel(),
 ) {
     val bg = ConstColours.BLACK
-    val userDataUiState by viewModel.userData.collectAsState()
+    val userDataUiState by viewModel.state.collectAsState()
 
     TopBarTemplate(
         label = R.string.label_create_account,
-        onBackClick = onBackClick,
+        onBackClick = {
+            viewModel.previousStep()
+            onBackClick()
+        },
         modifier = modifier
     ) { paddingValues ->
         Box(
@@ -101,35 +104,21 @@ fun CreateAccountScreen(
                 verticalArrangement = Arrangement.Center
             ) {
                 TextFieldRegistration(
-                    value = userDataUiState.email,
+                    value = userDataUiState.userData.email,
                     onValueChange = { viewModel.updateUserEmail(it) },
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
                     placeholder = "Введеите почту",
-                    isError = viewModel.isError
+                    isError = userDataUiState.isError
                 )
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
 
-                if (viewModel.isValidEmail(userDataUiState.email)) {
-                    ContinueButton(
-                        onClick = {
-                            viewModel.checkEmailExists()
-                            if (!viewModel.isError) { onContinueClick() }
-                        },
-                        modifier = Modifier.height(dimensionResource(R.dimen.button_size))
-                    )
-                } else {
-                    ContinueButton(
-                        //TODO: пояснение пользователю,
-                        // что почта невалидного формата
-                        onClick = {},
-                        modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = ConstColours.MAIN_BACK_GRAY,
-                            contentColor = ConstColours.WHITE
-                        )
-                    )
-                }
-
+                ContinueButton(
+                    onClick = {
+                        viewModel.nextStep()
+                        onContinueClick()
+                    },
+                    modifier = Modifier.height(dimensionResource(R.dimen.button_size))
+                )
             }
         }
     }
