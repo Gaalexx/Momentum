@@ -32,21 +32,6 @@ import com.project.momentum.ui.screens.posts.PostData
 import com.project.momentum.ui.viewmodel.AccountViewModel
 import androidx.compose.runtime.collectAsState
 
-
-//class AccountViewModel : BasePostViewModel() {
-//    override fun addPhoto(context: Context, url: String) {
-//        val event = readRandomEvent(context)
-//        val postData = PostData(
-//            url = url,
-//            name = "userName", // В аккаунте всегда userName
-//            date = event.date,
-//            description = event.description
-//        )
-//        _posts.add(0, postData)
-//    }
-//}
-
-
 @Composable
 fun AccountScreen(
     modifier: Modifier = Modifier,
@@ -56,7 +41,6 @@ fun AccountScreen(
     onPostClick: () -> Unit = {},
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit
-    //viewModel: AccountViewModel
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
@@ -92,12 +76,10 @@ fun AccountScreen(
 
         Spacer(Modifier.height(12.dp))
 
-        // Информация профиля
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Аватарка
             Box(
                 modifier = Modifier
                     .size(120.dp)
@@ -105,7 +87,6 @@ fun AccountScreen(
                     .background(chrome2)
                     .border(2.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
             ) {
-                // Здесь можно добавить реальное изображение профиля
                 Icon(
                     imageVector = Icons.Outlined.AccountCircle,
                     contentDescription = stringResource(R.string.account_avatar),
@@ -118,7 +99,6 @@ fun AccountScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // Имя пользователя
             Text(
                 text = userName,
                 color = textColor,
@@ -128,7 +108,6 @@ fun AccountScreen(
 
             Spacer(Modifier.height(8.dp))
 
-            // Статус
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
@@ -150,7 +129,6 @@ fun AccountScreen(
 
         Spacer(Modifier.height(32.dp))
 
-        // Раздел "Мои публикации"
         Column(
             modifier = Modifier
                 .fillMaxWidth()
