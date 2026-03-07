@@ -3,8 +3,10 @@ package com.project.momentum.ui.assets
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -45,7 +47,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.sp
 import com.project.momentum.R
+import com.project.momentum.ui.screens.settings.SubscriptionOption
 
 @Composable
 fun BackCircleButton(
@@ -576,7 +581,8 @@ fun ContinueButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth()
+            .height(dimensionResource(R.dimen.button_size)),
         shape = RoundedCornerShape(50.dp),
         colors = colors
     ) {
@@ -589,6 +595,206 @@ fun ContinueButton(
             )
         )
     }
+}
+
+@Composable
+fun BuyButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    text: String = stringResource(R.string.settings_premium_buy),
+    colors: ButtonColors = ButtonDefaults.buttonColors(
+        containerColor = ConstColours.GOLD,
+        contentColor = ConstColours.WHITE
+    )
+) {
+    Button(
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth()
+            .height(dimensionResource(R.dimen.button_size)),
+        shape = RoundedCornerShape(50.dp),
+        colors = colors
+    ) {
+        Text(
+            text = text,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = AppTextStyles.ButtonText.copy(
+                textAlign = TextAlign.Center
+            )
+        )
+    }
+}
+
+@Composable
+fun StableSwitch(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    width: Dp = 52.dp,
+    height: Dp = 32.dp,
+    thumbSize: Dp = 24.dp,
+    checkedTrackColor: Color = ConstColours.MAIN_BRAND_BLUE,
+    uncheckedTrackColor: Color = ConstColours.MAIN_BACK_GRAY,
+    thumbColor: Color = ConstColours.WHITE
+) {
+    val trackRadius = height / 2
+    val thumbRadius = thumbSize / 2
+
+    val thumbOffset by animateDpAsState(
+        targetValue = if (checked) width - thumbSize - 6.dp else 6.dp,
+        label = "thumbOffset"
+    )
+
+    Box(
+        modifier = modifier
+            .width(width)
+            .height(height)
+            .clip(RoundedCornerShape(trackRadius))
+            .background(if (checked) checkedTrackColor else uncheckedTrackColor)
+            .clickable { onCheckedChange(!checked) }
+            .padding(horizontal = 0.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Box(
+            modifier = Modifier
+                .offset(x = thumbOffset)
+                .size(thumbSize)
+                .clip(CircleShape)
+                .background(thumbColor)
+        )
+    }
+}
+
+
+@Composable
+fun SwitchRow(
+    text: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 6.dp, bottom = 6.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = text,
+            style = AppTextStyles.MainText,
+            color = ConstColours.WHITE,
+            modifier = Modifier
+                .weight(1f)
+        )
+
+        StableSwitch(
+            checked = checked,
+            onCheckedChange = onCheckedChange
+        )
+    }
+}
+
+@Composable
+fun PremiumFeatureItem(
+    text: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = ConstColours.GOLD,
+            modifier = Modifier.size(24.dp)
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Text(
+            text = text,
+            style = AppTextStyles.MainText,
+            color = ConstColours.WHITE
+        )
+    }
+}
+
+@Composable
+fun SubscriptionOptionCard(
+    option: SubscriptionOption,
+    isSelected: Boolean,
+    onSelect: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(0.8f)
+            .clickable(onClick = onSelect),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected)
+                ConstColours.MAIN_BRAND_BLUE.copy(alpha = 0.2f)
+            else ConstColours.MAIN_BACK_GRAY
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .then(
+                    if (isSelected) {
+                        Modifier.border(
+                            width = 2.dp,
+                            color = ConstColours.MAIN_BRAND_BLUE,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                    } else {
+                        Modifier
+                    }
+                )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = option.title,
+                    style = AppTextStyles.SubHeadlines.copy(fontSize = 14.sp),
+                    color = if (isSelected) ConstColours.MAIN_BRAND_BLUE else ConstColours.WHITE
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = option.price,
+                    style = AppTextStyles.Headlines.copy(fontSize = 16.sp),
+                    color = ConstColours.WHITE
+                )
+
+                Text(
+                    text = option.month_cost,
+                    style = AppTextStyles.SupportingText.copy(fontSize = 12.sp),
+                    color = ConstColours.SUPPORTING_TEXT
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun BuyButtonPreview() {
+    BuyButton(
+        modifier = Modifier,
+        {}
+    )
 }
 
 @Preview

@@ -83,4 +83,42 @@
     <string name="button_authorization_by_email">Введите почту</string>
     <string name="button_password_recovery">Восстановить пароль</string>
 
+
+    // Settings Privacy Screen
+    <string name="settings_privacy_title">Конфиденциальность</string>
+    <string name="settings_privacy_account_visibility">Видимость аккаунта</string>
+    <string name="settings_privacy_recommend_to_contacts">Рекомендовать меня контактам</string>
+    <string name="settings_privacy_allow_add_from_anyone">Разрешить добавлять себя в друзья пользователям не из контактов</string>
+    <string name="settings_privacy_caution">Осторожность</string>
+    <string name="settings_privacy_confirm_before_posting">Подтверждение перед тем как выложить пост</string>
+
+
+    // Settings Premium Screen
+    <string name="settings_premium_title">Premium </string>
+    <string name="settings_premium_description_1">- больше тепла,</string>
+    <string name="settings_premium_description_2">меньше ограничений</string>
+    <string name="settings_premium_feature_voice">Расшифровка голосовых в 1 клик</string>
+    <string name="settings_premium_feature_no_limits">Без лимитов на видео и голосовые</string>
+    <string name="settings_premium_feature_friends">Без лимитов друзей</string>
+    <string name="settings_premium_feature_no_ads">Без рекламы</string>
+    <string name="settings_premium_feature_cloud">Безлимитное облачное хранение</string>
+    <string name="settings_premium_duration">Длительность подписки:</string>
+    <string name="settings_premium_one_month">Месяц</string>
+    <string name="settings_premium_one_month_cost">299₽</string>
+    <string name="settings_premium_three_month">3 месяца</string>
+    <string name="settings_premium_three_month_cost">799₽</string>
+    <string name="settings_premium_three_month_cost_per_month">266,3₽/мес</string>
+    <string name="settings_premium_one_year">Год</string>
+    <string name="settings_premium_one_year_cost">2990₽</string>
+    <string name="settings_premium_one_year_cost_per_month">249,1₽/мес</string>
+    <string name="settings_premium_buy">Купить премиум</string>
+
+    // Settings Notifications Screen
+    <string name="settings_notifications_title">Уведомления и звуки</string>
+    <string name="settings_notifications_section">Уведомления</string>
+    <string name="settings_notifications_publications">Публикации</string>
+    <string name="settings_notifications_reactions">Реакции</string>
+    <string name="settings_notifications_in_app">В приложении</string>
+    <string name="settings_notifications_in_app_switch">Уведомления</string>
+
 </resources>
