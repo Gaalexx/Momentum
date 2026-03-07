@@ -7,14 +7,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -25,6 +20,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.momentum.ConstColours
 import com.project.momentum.PhotoGrid
 import com.project.momentum.R
+import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.FriendsPillButton
 import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
@@ -58,12 +54,8 @@ fun GallaryScreen(
     val bg = ConstColours.BLACK
     val textColor = Color.White
 
-    var dragOffset by remember { mutableStateOf(0f) }
-    val swipeThreshold = 50f
     val context: Context = LocalContext.current
 
-    //var photos by remember { mutableStateOf<List<String>>(emptyList()) }
-    //val photos = viewModel.photos
     val posts = viewModel.posts
 
     Box(
@@ -71,8 +63,6 @@ fun GallaryScreen(
             .fillMaxSize()
             .background(bg)
             .windowInsetsPadding(WindowInsets.systemBars)
-            .pointerInput(Unit) {
-            }
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -84,6 +74,10 @@ fun GallaryScreen(
                     .padding(horizontal = 14.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                BackCircleButton(onClick = onBackClick)
+
+                Spacer(Modifier.width(12.dp))
+
                 ProfileCircleButton(onClick = onProfileClick)
 
                 Spacer(Modifier.weight(1f))

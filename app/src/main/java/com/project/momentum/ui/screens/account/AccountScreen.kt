@@ -20,29 +20,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.momentum.ConstColours
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import android.content.Context
 import androidx.compose.ui.platform.LocalContext
 import com.project.momentum.PhotoGrid
 import com.project.momentum.R
+import com.project.momentum.S3PhotoGrid
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.screens.posts.BasePostViewModel
 import com.project.momentum.ui.screens.posts.PostData
-
-
-class AccountViewModel : BasePostViewModel() {
-    override fun addPhoto(context: Context, url: String) {
-        val event = readRandomEvent(context)
-        val postData = PostData(
-            url = url,
-            name = "userName", // В аккаунте всегда userName
-            date = event.date,
-            description = event.description
-        )
-        _posts.add(0, postData)
-    }
-}
-
+import com.project.momentum.ui.viewmodel.AccountViewModel
+import androidx.compose.runtime.collectAsState
 
 @Composable
 fun AccountScreen(
@@ -52,8 +40,7 @@ fun AccountScreen(
     postsCount: Int = 0,
     onPostClick: () -> Unit = {},
     onProfileClick: () -> Unit = {},
-    onBackClick: () -> Unit,
-    viewModel: AccountViewModel
+    onBackClick: () -> Unit
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
@@ -61,16 +48,12 @@ fun AccountScreen(
     val textColor = Color.White
     val context: Context = LocalContext.current
 
-    //var photos by remember { mutableStateOf<List<String>>(emptyList()) }
-    //val photos = viewModel.photos
+    val viewModel: AccountViewModel = hiltViewModel()
+
     val posts = viewModel.posts
 
-    // Функция для добавления новой фотографии
     fun addNewPhoto() {
-        val newPhotoUrl = "https://picsum.photos/300/300?random=${System.currentTimeMillis()}"
-        // Добавляем новое фото в начало
-        //photos = listOf(newPhotoUrl) + photos
-        viewModel.addPhoto(context, newPhotoUrl)
+        viewModel.loadPosts()
     }
 
     Column(
@@ -93,12 +76,10 @@ fun AccountScreen(
 
         Spacer(Modifier.height(12.dp))
 
-        // Информация профиля
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Аватарка
             Box(
                 modifier = Modifier
                     .size(120.dp)
@@ -106,7 +87,6 @@ fun AccountScreen(
                     .background(chrome2)
                     .border(2.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
             ) {
-                // Здесь можно добавить реальное изображение профиля
                 Icon(
                     imageVector = Icons.Outlined.AccountCircle,
                     contentDescription = stringResource(R.string.account_avatar),
@@ -119,7 +99,6 @@ fun AccountScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // Имя пользователя
             Text(
                 text = userName,
                 color = textColor,
@@ -129,7 +108,6 @@ fun AccountScreen(
 
             Spacer(Modifier.height(8.dp))
 
-            // Статус
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
@@ -151,7 +129,6 @@ fun AccountScreen(
 
         Spacer(Modifier.height(32.dp))
 
-        // Раздел "Мои публикации"
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -167,13 +144,10 @@ fun AccountScreen(
                 modifier = Modifier.padding(16.dp)
             )
 
-            PhotoGrid(
-                posts = viewModel.posts,
-                onPostClick = { post ->
-                    viewModel.selectPost(post)
-                    onPostClick()
-                },
-                onAddPhotoClick = { viewModel.addRandomPhoto(context) },
+            S3PhotoGrid(
+                posts = viewModel.posts.collectAsState().value,
+                onPostClick = {},
+                onAddPhotoClick = { viewModel.loadPosts() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
@@ -191,8 +165,7 @@ private fun AccountScreenPreview() {
         AccountScreen(
             onPostClick = {},
             onProfileClick = {},
-            onBackClick = {},
-            viewModel = viewModel()
+            onBackClick = {}
         )
     }
 }

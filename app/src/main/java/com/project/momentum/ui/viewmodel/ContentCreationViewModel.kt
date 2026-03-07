@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.momentum.data.s3.PostInformation
 import com.project.momentum.data.s3.S3InteractionRepository
+import com.project.momentum.ui.screens.camera.deleteByUri
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,21 +33,28 @@ class ContentCreationViewModel @Inject constructor(
 
     fun onEvent(event: UploadEvent) {
         when (event) {
-            is UploadEvent.Send -> upload(event.postInfo)
+            is UploadEvent.Send -> {
+                if (_state.value is UploadState.Idle) {
+                    upload(event.postInfo)
+                }
+            }
+
+            else -> {}
         }
     }
 
     private fun upload(postInfo: PostInformation) {
         viewModelScope.launch {
-            // runCatching {
-            uploaderRepo.sendPhoto(postInfo)
-//            }.onSuccess {
-//                _state.value = UploadState.Success()
-//                // TODO реализовать случай успеха
-//            }/*.onFailure {
-//                _state.value = UploadState.Uploading()
-//                // TODO реализовать случай неудачи :(
-//            }*/
+            runCatching {
+                _state.value = UploadState.Uploading()
+                uploaderRepo.sendPhoto(postInfo)
+            }.onSuccess {
+                _state.value = UploadState.Success()
+                // TODO реализовать случай успеха
+            }.onFailure {
+                _state.value = UploadState.Uploading()
+                // TODO реализовать случай неудачи :(
+            }
         }
     }
 

@@ -2,6 +2,7 @@
 
 package com.project.momentum.ui.screens.camera
 
+import android.R.attr.progress
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,7 +33,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.project.momentum.R
 import com.project.momentum.data.s3.MediaType
 import com.project.momentum.data.s3.PostInformation
@@ -43,6 +50,8 @@ import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
 import com.project.momentum.ui.viewmodel.ContentCreationViewModel
 import com.project.momentum.ui.viewmodel.UploadEvent
+import com.project.momentum.ui.viewmodel.UploadState
+import kotlin.coroutines.coroutineContext
 
 
 fun deleteByUri(context: Context, uri: Uri): Boolean {
@@ -67,7 +76,21 @@ fun SendPhotoScreen(
     onGoToFriends: () -> Unit,
     uri: Uri?
 ) {
-    val vm: ContentCreationViewModel = viewModel()
+    val vm: ContentCreationViewModel = hiltViewModel()
+    val uploadState by vm.state.collectAsStateWithLifecycle()
+    var isLoading by remember { mutableStateOf(false) }
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = true
+    )
+
+    LaunchedEffect(uploadState) {
+        if (uploadState is UploadState.Success) {
+            onGoToTakePhoto()
+        }
+    }
 
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
@@ -140,6 +163,13 @@ fun SendPhotoScreen(
                             .padding(16.dp)
                             .focusRequester(captionFocusRequester)
                     )
+                    if (isLoading) {
+                        LottieAnimation(
+                            composition = composition,
+                            progress = { progress },
+                            modifier = Modifier.fillMaxSize()
+                        )
+                    }
 
 
                 }
@@ -215,7 +245,7 @@ fun SendPhotoScreen(
                                 )
                             )
                         )
-                        onGoToTakePhoto()
+                        isLoading = true
                     }
                 )
                 Spacer(Modifier.weight(1f))
