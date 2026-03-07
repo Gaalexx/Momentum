@@ -10,6 +10,7 @@ sealed class NavRoutes {
     @Serializable data object Recorder : NavRoutes()
     @Serializable data object Gallery : NavRoutes()
     @Serializable data object Friends : NavRoutes()
+    @Serializable data object Premium : NavRoutes()
 
     // Экраны с аргументами
     @Serializable data class Account(val backTo: String) : NavRoutes()
