@@ -25,7 +25,7 @@ fun SettingsMainScreen(
     onPremiumClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     onDeleteAccountClick: () -> Unit = {},
-    SettingsViewModel: SettingsMainScreenViewModel = viewModel()
+    settingsViewModel: SettingsMainScreenViewModel = viewModel()
 ) {
 
 
@@ -71,20 +71,20 @@ fun SettingsMainScreen(
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_in_app_switch),
-                checked = SettingsViewModel.inAppNotifications,
-                onCheckedChange = { SettingsViewModel.inAppNotifications = it }
+                checked = settingsViewModel.inAppNotifications,
+                onCheckedChange = { settingsViewModel.inAppNotifications = it }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_publications),
-                checked = SettingsViewModel.publicationsEnabled,
-                onCheckedChange = { SettingsViewModel.publicationsEnabled = it }
+                checked = settingsViewModel.publicationsEnabled,
+                onCheckedChange = { settingsViewModel.publicationsEnabled = it }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_reactions),
-                checked = SettingsViewModel.reactionsEnabled,
-                onCheckedChange = { SettingsViewModel.reactionsEnabled = it }
+                checked = settingsViewModel.reactionsEnabled,
+                onCheckedChange = { settingsViewModel.reactionsEnabled = it }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -98,14 +98,14 @@ fun SettingsMainScreen(
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_recommend_to_contacts),
-                checked = SettingsViewModel.recommendToContacts,
-                onCheckedChange = { SettingsViewModel.recommendToContacts = it }
+                checked = settingsViewModel.recommendToContacts,
+                onCheckedChange = { settingsViewModel.recommendToContacts = it }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_allow_add_from_anyone),
-                checked = SettingsViewModel.allowAddFromAnyone,
-                onCheckedChange = { SettingsViewModel.allowAddFromAnyone = it }
+                checked = settingsViewModel.allowAddFromAnyone,
+                onCheckedChange = { settingsViewModel.allowAddFromAnyone = it }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -119,8 +119,8 @@ fun SettingsMainScreen(
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_confirm_before_posting),
-                checked = SettingsViewModel.confirmBeforePosting,
-                onCheckedChange = { SettingsViewModel.confirmBeforePosting = it }
+                checked = settingsViewModel.confirmBeforePosting,
+                onCheckedChange = { settingsViewModel.confirmBeforePosting = it }
             )
 
         }
