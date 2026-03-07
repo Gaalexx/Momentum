@@ -1,28 +1,20 @@
 package com.project.momentum.ui.screens.settings
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.momentum.ConstColours
 import com.project.momentum.R
 import com.project.momentum.ui.assets.BackCircleButton
-import com.project.momentum.ui.assets.CircleButton
 import com.project.momentum.ui.assets.SettingsButton
 import com.project.momentum.ui.assets.SwitchRow
 import com.project.momentum.ui.theme.AppTextStyles
@@ -32,15 +24,10 @@ fun SettingsMainScreen(
     onBackClick: () -> Unit = {},
     onPremiumClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
-    onDeleteAccountClick: () -> Unit = {}
+    onDeleteAccountClick: () -> Unit = {},
+    SettingsViewModel: SettingsMainScreenViewModel = viewModel()
 ) {
 
-    var publicationsEnabled by remember { mutableStateOf(true) }
-    var reactionsEnabled by remember { mutableStateOf(true) }
-    var inAppNotifications by remember { mutableStateOf(true) }
-    var recommendToContacts by remember { mutableStateOf(true) }
-    var allowAddFromAnyone by remember { mutableStateOf(true) }
-    var confirmBeforePosting by remember { mutableStateOf(true) }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -50,7 +37,7 @@ fun SettingsMainScreen(
                 color = ConstColours.BLACK,
             )
             .windowInsetsPadding(WindowInsets.systemBars)
-            .padding(bottom = 90.dp)
+
     ) {
 
         Box(
@@ -84,20 +71,20 @@ fun SettingsMainScreen(
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_in_app_switch),
-                checked = inAppNotifications,
-                onCheckedChange = { inAppNotifications = it }
+                checked = SettingsViewModel.inAppNotifications,
+                onCheckedChange = { SettingsViewModel.inAppNotifications = it }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_publications),
-                checked = publicationsEnabled,
-                onCheckedChange = { publicationsEnabled = it }
+                checked = SettingsViewModel.publicationsEnabled,
+                onCheckedChange = { SettingsViewModel.publicationsEnabled = it }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_reactions),
-                checked = reactionsEnabled,
-                onCheckedChange = { reactionsEnabled = it }
+                checked = SettingsViewModel.reactionsEnabled,
+                onCheckedChange = { SettingsViewModel.reactionsEnabled = it }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -111,14 +98,14 @@ fun SettingsMainScreen(
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_recommend_to_contacts),
-                checked = recommendToContacts,
-                onCheckedChange = { recommendToContacts = it }
+                checked = SettingsViewModel.recommendToContacts,
+                onCheckedChange = { SettingsViewModel.recommendToContacts = it }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_allow_add_from_anyone),
-                checked = allowAddFromAnyone,
-                onCheckedChange = { allowAddFromAnyone = it }
+                checked = SettingsViewModel.allowAddFromAnyone,
+                onCheckedChange = { SettingsViewModel.allowAddFromAnyone = it }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -132,8 +119,8 @@ fun SettingsMainScreen(
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_confirm_before_posting),
-                checked = confirmBeforePosting,
-                onCheckedChange = { confirmBeforePosting = it }
+                checked = SettingsViewModel.confirmBeforePosting,
+                onCheckedChange = { SettingsViewModel.confirmBeforePosting = it }
             )
 
         }
@@ -169,6 +156,8 @@ fun SettingsMainScreen(
             textColor = ConstColours.DELETE,
             modifier = Modifier.padding(horizontal = 24.dp)
         )
+
+        Spacer(modifier = Modifier.weight(4f))
     }
 }
 

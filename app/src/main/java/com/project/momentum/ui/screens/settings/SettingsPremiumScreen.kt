@@ -2,8 +2,6 @@ package com.project.momentum.ui.screens.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -33,7 +31,6 @@ fun SettingsPremiumScreen(
     modifier: Modifier = Modifier
 ) {
     var selectedDuration by remember { mutableStateOf("Месяц") }
-    val scrollState = rememberScrollState()
 
     val subscriptionOptions = listOf(
         SubscriptionOption(
@@ -54,17 +51,17 @@ fun SettingsPremiumScreen(
     )
 
     Column(
+        verticalArrangement = Arrangement.spacedBy(24.dp),
         modifier = modifier
             .fillMaxSize()
             .background(ConstColours.BLACK)
             .windowInsetsPadding(WindowInsets.systemBars)
-            .verticalScroll(scrollState)
     ) {
         // Верхняя панель с заголовком
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 14.dp)
+                .padding(horizontal = 14.dp, vertical = 10.dp)
         ) {
             BackCircleButton(
                 onClick = onBackClick
@@ -189,7 +186,7 @@ fun SettingsPremiumScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
 
             BuyButton(

@@ -3,6 +3,7 @@ package com.project.momentum.ui.assets
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -571,7 +572,7 @@ fun PlusButton(
 @Composable
 fun ContinueButton(
     onClick: () -> Unit,
-    modifier: Modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
+    modifier: Modifier = Modifier,
     text: String = stringResource(R.string.button_continue),
     colors: ButtonColors = ButtonDefaults.buttonColors(
         containerColor = ConstColours.MAIN_BRAND_BLUE,
@@ -580,7 +581,8 @@ fun ContinueButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth()
+            .height(dimensionResource(R.dimen.button_size)),
         shape = RoundedCornerShape(50.dp),
         colors = colors
     ) {
@@ -597,7 +599,7 @@ fun ContinueButton(
 
 @Composable
 fun BuyButton(
-    modifier: Modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
     text: String = stringResource(R.string.settings_premium_buy),
     colors: ButtonColors = ButtonDefaults.buttonColors(
@@ -607,7 +609,8 @@ fun BuyButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth()
+            .height(dimensionResource(R.dimen.button_size)),
         shape = RoundedCornerShape(50.dp),
         colors = colors
     ) {
@@ -623,6 +626,47 @@ fun BuyButton(
 }
 
 @Composable
+fun StableSwitch(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+    width: Dp = 52.dp,
+    height: Dp = 32.dp,
+    thumbSize: Dp = 24.dp,
+    checkedTrackColor: Color = ConstColours.MAIN_BRAND_BLUE,
+    uncheckedTrackColor: Color = ConstColours.MAIN_BACK_GRAY,
+    thumbColor: Color = ConstColours.WHITE
+) {
+    val trackRadius = height / 2
+    val thumbRadius = thumbSize / 2
+
+    val thumbOffset by animateDpAsState(
+        targetValue = if (checked) width - thumbSize - 6.dp else 6.dp,
+        label = "thumbOffset"
+    )
+
+    Box(
+        modifier = modifier
+            .width(width)
+            .height(height)
+            .clip(RoundedCornerShape(trackRadius))
+            .background(if (checked) checkedTrackColor else uncheckedTrackColor)
+            .clickable { onCheckedChange(!checked) }
+            .padding(horizontal = 0.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        Box(
+            modifier = Modifier
+                .offset(x = thumbOffset)
+                .size(thumbSize)
+                .clip(CircleShape)
+                .background(thumbColor)
+        )
+    }
+}
+
+
+@Composable
 fun SwitchRow(
     text: String,
     checked: Boolean,
@@ -630,7 +674,8 @@ fun SwitchRow(
 ) {
     Row(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .padding(top = 6.dp, bottom = 6.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -642,16 +687,9 @@ fun SwitchRow(
                 .weight(1f)
         )
 
-        Switch(
+        StableSwitch(
             checked = checked,
-            onCheckedChange = onCheckedChange,
-            modifier = Modifier.widthIn(min = 52.dp),
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = ConstColours.WHITE,
-                checkedTrackColor = ConstColours.MAIN_BRAND_BLUE,
-                uncheckedThumbColor = ConstColours.WHITE,
-                uncheckedTrackColor = ConstColours.MAIN_BACK_GRAY
-            )
+            onCheckedChange = onCheckedChange
         )
     }
 }

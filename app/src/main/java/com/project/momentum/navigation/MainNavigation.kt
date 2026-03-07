@@ -16,7 +16,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.project.momentum.ui.screens.account.AccountScreen
 import com.project.momentum.ui.screens.account.AccountViewModel
 import com.project.momentum.ui.screens.camera.CameraLikeScreen
@@ -29,12 +28,12 @@ import com.project.momentum.ui.screens.posts.GalleryViewModel
 import com.project.momentum.ui.screens.posts.WatchPhotoScreen
 import com.project.momentum.ui.screens.recorder.RecorderScreen
 import com.project.momentum.ui.screens.settings.SettingsMainScreen
+import com.project.momentum.ui.screens.settings.SettingsPremiumScreen
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun MainScreen() {
-    val navController = rememberNavController()
     val scope = rememberCoroutineScope()
 
     // ViewModel'и — один экземпляр на всё приложение
@@ -52,7 +51,7 @@ fun MainScreen() {
     var isRecorderMode by remember { mutableStateOf(false) }
 
     // Состояние для текущей страницы пейджера
-    var currentPagerPage by remember { mutableStateOf(0) }
+    var currentPagerPage by remember { mutableIntStateOf(0) }
 
     Box(Modifier.fillMaxSize()) {
 
@@ -94,7 +93,9 @@ fun MainScreen() {
                                 currentRoute = null
                             }
                         },
-                        onPremiumClick = {},
+                        onPremiumClick = {
+                            currentRoute = NavRoutes.Premium
+                        },
                         onLogoutClick = {
                             scope.launch {
                                 isOverlayScreenVisible = false
@@ -219,7 +220,24 @@ fun MainScreen() {
                             }
                         )
                     }
-
+                    is NavRoutes.Premium -> {
+                        SettingsPremiumScreen(
+                            onBackClick = {
+                                scope.launch {
+                                    currentRoute = NavRoutes.Settings("settings")
+                                }
+                            },
+                            onBuyClick = {
+                                // Здесь логика покупки премиума
+                                // Например, показать диалог или перейти к оплате
+                                scope.launch {
+                                    // После покупки можно вернуться назад
+                                    isOverlayScreenVisible = false
+                                    currentRoute = null
+                                }
+                            }
+                        )
+                    }
                     else -> { } // Camera, Recorder, Gallery не показываем в оверлее
                 }
             }
