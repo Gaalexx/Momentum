@@ -1,8 +1,7 @@
 package com.project.momentum.data
 
 enum class RegistrationStep {
-    EMAIL,
-    PHONE,
+    LOGIN,
     PASSWORD,
     VERIFICATION,
     COMPLETED
@@ -13,7 +12,7 @@ enum class LoginType {
 }
 
 data class RegistrationState (
-    val currentStep: RegistrationStep = RegistrationStep.EMAIL,
+    val currentStep: RegistrationStep = RegistrationStep.LOGIN,
     val userData: UserData = UserData(),
     val isLoading: Boolean = false,
     val isError: Boolean = false,

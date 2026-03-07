@@ -18,7 +18,7 @@ import javax.inject.Singleton
 interface IRegistrationLoginClient {
     suspend fun sendEmailToChecker(email: CheckEmailRequestDTO): CheckResponseDTO
 
-    suspend fun sendPhoneToChecker(email: CheckPhoneNumberRequestDTO): CheckResponseDTO
+    suspend fun sendPhoneToChecker(phone: CheckPhoneNumberRequestDTO): CheckResponseDTO
 
     suspend fun sendData(userData: RegisterUserRequestDTO): LoginResponseDTO
 
