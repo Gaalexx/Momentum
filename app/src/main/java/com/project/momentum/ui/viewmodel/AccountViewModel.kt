@@ -24,7 +24,7 @@ sealed interface AccountEvent {
 }
 
 @HiltViewModel
-class AccountViewModel @Inject constructor(
+class AccountViewModel @Inject constructor( // TODO прописать состояния
     private val repository: AccountRepository
 ) : ViewModel() {
 
