@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.momentum.ConstColours
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import android.content.Context
 import androidx.compose.ui.platform.LocalContext
 import com.project.momentum.PhotoGrid
@@ -48,7 +48,7 @@ fun AccountScreen(
     val textColor = Color.White
     val context: Context = LocalContext.current
 
-    val viewModel: AccountViewModel = viewModel()
+    val viewModel: AccountViewModel = hiltViewModel()
 
     val posts = viewModel.posts
 

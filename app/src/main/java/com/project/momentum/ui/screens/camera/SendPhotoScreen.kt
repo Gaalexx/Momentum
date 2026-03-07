@@ -32,7 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.project.momentum.R
 import com.project.momentum.data.s3.MediaType
 import com.project.momentum.data.s3.PostInformation
@@ -67,7 +67,7 @@ fun SendPhotoScreen(
     onGoToFriends: () -> Unit,
     uri: Uri?
 ) {
-    val vm: ContentCreationViewModel = viewModel()
+    val vm: ContentCreationViewModel = hiltViewModel()
 
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY

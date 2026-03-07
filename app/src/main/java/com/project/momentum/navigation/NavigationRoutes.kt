@@ -1,10 +1,11 @@
 package com.project.momentum.navigation
 
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 // Все маршруты - просто сериализуемые классы
 @Serializable
-sealed class NavRoutes {
+sealed class NavRoutes : NavKey {
     // Экраны без аргументов
     @Serializable data object Camera : NavRoutes()
     @Serializable data object Recorder : NavRoutes()

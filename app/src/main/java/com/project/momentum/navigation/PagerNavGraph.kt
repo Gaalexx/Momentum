@@ -1,22 +1,21 @@
 package com.project.momentum.navigation
 
 import android.net.Uri
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.with
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.pager.VerticalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.rememberDecoratedNavEntries
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
 import com.project.momentum.ui.screens.account.AccountScreen
 import com.project.momentum.ui.screens.camera.CameraLikeScreen
 import com.project.momentum.ui.screens.camera.SendPhotoScreen
@@ -28,296 +27,246 @@ import com.project.momentum.ui.screens.posts.GalleryViewModel
 import com.project.momentum.ui.screens.posts.WatchPhotoScreen
 import com.project.momentum.ui.screens.recorder.RecorderScreen
 import com.project.momentum.ui.screens.settings.SettingsMainScreen
-import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun MainScreen() {
-    val navController = rememberNavController()
-    val scope = rememberCoroutineScope()
-
-    // ViewModel'и — один экземпляр на всё приложение
-    //val accountVm: AccountViewModel = viewModel()
     val galleryVM: GalleryViewModel = viewModel()
     val friendsVM: UserViewModel = viewModel()
 
-    // Состояние для отслеживания, показываем ли мы поверхностный экран
-    var isOverlayScreenVisible by remember { mutableStateOf(false) }
+    val backStack = rememberNavBackStack(NavRoutes.Camera)
 
-    // Состояние для текущего маршрута
-    var currentRoute by remember { mutableStateOf<NavRoutes?>(null) }
+    fun setBase(route: NavRoutes) {
+        if (backStack.isEmpty()) {
+            backStack.add(route)
+            return
+        }
+        backStack[0] = route
+    }
 
-    // Состояние для отслеживания режима камеры/рекордера
-    var isRecorderMode by remember { mutableStateOf(false) }
+    fun openOverlay(route: NavRoutes) {
+        val last = backStack.lastOrNull()
+        if (last != null && last.isOverlayRoute()) {
+            backStack[backStack.lastIndex] = route
+            return
+        }
+        backStack.add(route)
+    }
 
-    // Состояние для текущей страницы пейджера
-    var currentPagerPage by remember { mutableStateOf(0) }
-
-    Box(Modifier.fillMaxSize()) {
-
-        // Pager всегда один, не пересоздаётся
-        CameraGalleryPager(
-            galleryVM = galleryVM,
-            friendsVM = friendsVM,
-            isRecorderMode = isRecorderMode,
-            onRecorderModeChange = { isRecorderMode = it },
-            onPageChange = { currentPagerPage = it },
-            onNavigate = { route ->
-                currentRoute = route
-                isOverlayScreenVisible = true
-            }
-        )
-
-        // Навигация поверх Pager с прозрачным фоном
-        AnimatedContent(
-            targetState = isOverlayScreenVisible,
-            transitionSpec = {
-                if (targetState) {
-                    // Появление
-                    fadeIn(animationSpec = tween(200)) with fadeOut(animationSpec = tween(100))
-                } else {
-                    // Исчезновение
-                    fadeIn(animationSpec = tween(100)) with fadeOut(animationSpec = tween(200))
-                }
-            },
-            label = "overlay_navigation"
-        ) { visible ->
-            if (visible && currentRoute != null) {
-                // Показываем экран напрямую, без NavHost
-                when (val route = currentRoute) {
-                    is NavRoutes.Settings -> SettingsMainScreen(
-                        onBackClick = {
-                            scope.launch {
-                                isOverlayScreenVisible = false
-                                currentRoute = null
-                            }
-                        },
-                        onPrivacyClick = {},
-                        onNotificationsClick = {},
-                        onDataClick = {},
-                        onLanguageClick = {},
-                        onPremiumClick = {},
-                        onLogoutClick = {
-                            scope.launch {
-                                isOverlayScreenVisible = false
-                                currentRoute = null
-                            }
-                        },
-                        onDeleteAccountClick = {}
-                    )
-
-                    is NavRoutes.Account -> AccountScreen(
-                        onPostClick = {
-//                            accountVm.selectedPost?.let { post ->
-//                                currentRoute = NavRoutes.PreviewPhoto(post.url)
-//                            }
-                        },
-                        onProfileClick = {},
-                        onBackClick = {
-                            scope.launch {
-                                isOverlayScreenVisible = false
-                                currentRoute = null
-                            }
-                        },
-                        //viewModel = accountVm
-                    )
-
-                    is NavRoutes.Friends -> {
-                        val users by friendsVM.users
-                        FriendsScreen(
-                            user = users.firstOrNull() ?: User(
-                                id = "default",
-                                name = "Default User",
-                                avatarUrl = "",
-                                friends = emptyList()
-                            ),
-                            onBackClick = {
-                                scope.launch {
-                                    isOverlayScreenVisible = false
-                                    currentRoute = null
-                                }
-                            },
-                            viewModel = friendsVM
-                        )
-                    }
-
-//                    is NavRoutes.PreviewPhoto -> {
-//                        val post = accountVm.posts.find { it.url == route.url }
-//                            ?: galleryVM.posts.find { it.url == route.url }
-//
-//                        if (post != null) {
-//                            WatchPhotoScreen(
-//                                onGoToTakePhoto = {
-//                                    scope.launch {
-//                                        isOverlayScreenVisible = false
-//                                        currentRoute = null
-//                                    }
-//                                },
-//                                onGoToGallery = {
-//                                    scope.launch {
-//                                        isOverlayScreenVisible = false
-//                                        currentRoute = null
-//                                    }
-//                                },
-//                                onGoToSettings = {
-//                                    // Передаем информацию о том, откуда пришли
-//                                    val backTo = when {
-//                                        currentPagerPage == 1 -> "gallery"
-//                                        isRecorderMode -> "recorder"
-//                                        else -> "camera"
-//                                    }
-//                                    currentRoute = NavRoutes.Settings(backTo)
-//                                },
-//                                onProfileClick = {
-//                                    // Передаем информацию о том, откуда пришли
-//                                    val backTo = when {
-//                                        currentPagerPage == 1 -> "gallery"
-//                                        isRecorderMode -> "recorder"
-//                                        else -> "camera"
-//                                    }
-//                                    currentRoute = NavRoutes.Account(backTo)
-//                                },
-//                                onGoToFriends = {
-//                                    currentRoute = NavRoutes.Friends
-//                                },
-//                                url = post.url,
-//                                description = post.description,
-//                                userName = post.name,
-//                                date = post.date
-//                            )
-//                        }
-//                    }
-
-                    is NavRoutes.SendPhoto -> {
-                        val uri = Uri.parse(route.uri)
-                        SendPhotoScreen(
-                            uri = uri,
-                            onGoToTakePhoto = {
-                                scope.launch {
-                                    isOverlayScreenVisible = false
-                                    currentRoute = null
-                                }
-                            },
-                            onGoToSettings = {
-                                // Передаем информацию о том, откуда пришли
-                                val backTo = when {
-                                    currentPagerPage == 1 -> "gallery"
-                                    isRecorderMode -> "recorder"
-                                    else -> "camera"
-                                }
-                                currentRoute = NavRoutes.Settings(backTo)
-                            },
-                            onProfileClick = {
-                                // Передаем информацию о том, откуда пришли
-                                val backTo = when {
-                                    currentPagerPage == 1 -> "gallery"
-                                    isRecorderMode -> "recorder"
-                                    else -> "camera"
-                                }
-                                currentRoute = NavRoutes.Account(backTo)
-                            },
-                            onGoToFriends = {
-                                currentRoute = NavRoutes.Friends
-                            }
-                        )
-                    }
-
-                    else -> {} // Camera, Recorder, Gallery не показываем в оверлее
-                }
-            }
+    fun closeOverlay() {
+        val last = backStack.lastOrNull()
+        if (last != null && last.isOverlayRoute() && backStack.size > 1) {
+            backStack.removeAt(backStack.lastIndex)
         }
     }
-}
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun CameraGalleryPager(
-    galleryVM: GalleryViewModel,
-    friendsVM: UserViewModel,
-    isRecorderMode: Boolean,
-    onRecorderModeChange: (Boolean) -> Unit,
-    onPageChange: (Int) -> Unit,
-    onNavigate: (NavRoutes) -> Unit
-) {
-    val pagerState = rememberPagerState(pageCount = { 2 })
-    val scope = rememberCoroutineScope()
-
-    // Отслеживаем изменение страницы
-    LaunchedEffect(pagerState.currentPage) {
-        onPageChange(pagerState.currentPage)
+    fun closeGallery() {
+        val last = backStack.lastOrNull()
+        if (last is NavRoutes.Gallery && backStack.size > 1) {
+            backStack.removeAt(backStack.lastIndex)
+        } else {
+            setBase(NavRoutes.Camera)
+        }
     }
 
-    VerticalPager(
-        state = pagerState,
-        modifier = Modifier.fillMaxSize()
-    ) { page ->
-        when (page) {
-            0 -> {
-                // Страница 0 может показывать либо камеру, либо рекордер
-                if (isRecorderMode) {
-                    RecorderScreen(
-                        onCameraClick = {
-                            onRecorderModeChange(false) // Переключаем на камеру
-                        },
-                        onGoToFriends = {
-                            onNavigate(NavRoutes.Friends)
-                        },
-                        onProfileClick = {
-                            onNavigate(NavRoutes.Account("recorder"))
-                        },
-                        onGoToSettings = {
-                            onNavigate(NavRoutes.Settings("recorder"))
-                        }
-                    )
-                } else {
-                    CameraLikeScreen(
-                        onGoToPreview = { uri ->
-                            onNavigate(NavRoutes.SendPhoto(uri.toString()))
-                        },
-                        onGoToRecorder = {
-                            onRecorderModeChange(true) // Переключаем на рекордер
-                        },
-                        onProfileClick = {
-                            onNavigate(NavRoutes.Account("camera"))
-                        },
-                        onOpenGallery = {
-                            scope.launch { pagerState.animateScrollToPage(1) }
-                        },
-                        onGoToSettings = {
-                            onNavigate(NavRoutes.Settings("camera"))
-                        },
-                        onGoToFriends = {
-                            onNavigate(NavRoutes.Friends)
-                        }
-                    )
-                }
-            }
+    fun currentBackTo(): String {
+        val lastBase = backStack.lastOrNull { !it.isOverlayRoute() }
+        return when (lastBase) {
+            is NavRoutes.Gallery -> "gallery"
+            is NavRoutes.Recorder -> "recorder"
+            else -> "camera"
+        }
+    }
 
-            1 -> GallaryScreen(
+
+    val noAnimation: () -> ContentTransform = {
+        ContentTransform(EnterTransition.None, ExitTransition.None)
+    }
+
+    val saveableStateHolder = rememberSaveableStateHolder()
+    val entryDecorators = listOf(
+        rememberSaveableStateHolderNavEntryDecorator<NavKey>(saveableStateHolder),
+        rememberViewModelStoreNavEntryDecorator<NavKey>()
+    )
+
+    val navEntryProvider = entryProvider<NavKey> {
+        entry<NavRoutes.Camera> {
+            CameraLikeScreen(
+                onGoToPreview = { uri ->
+                    openOverlay(NavRoutes.SendPhoto(uri.toString()))
+                },
+                onGoToRecorder = {
+                    setBase(NavRoutes.Recorder)
+                },
+                onProfileClick = {
+                    openOverlay(NavRoutes.Account("camera"))
+                },
+                onGoToSettings = {
+                    openOverlay(NavRoutes.Settings("camera"))
+                },
+                onGoToFriends = {
+                    openOverlay(NavRoutes.Friends)
+                },
+                onOpenGallery = {}
+            )
+        }
+
+        entry<NavRoutes.Recorder> {
+            RecorderScreen(
+                onCameraClick = {
+                    setBase(NavRoutes.Camera)
+                },
+                onGoToFriends = {
+                    openOverlay(NavRoutes.Friends)
+                },
+                onProfileClick = {
+                    openOverlay(NavRoutes.Account("recorder"))
+                },
+                onGoToSettings = {
+                    openOverlay(NavRoutes.Settings("recorder"))
+                }
+            )
+        }
+
+        entry<NavRoutes.Gallery> {
+            GallaryScreen(
                 onPostClick = {
                     galleryVM.selectedPost?.let { post ->
-                        onNavigate(NavRoutes.PreviewPhoto(post.url))
+                        openOverlay(NavRoutes.PreviewPhoto(post.url))
                     }
                 },
                 onProfileClick = {
-                    onNavigate(NavRoutes.Account("gallery"))
+                    openOverlay(NavRoutes.Account("gallery"))
                 },
                 onBackClick = {
-                    scope.launch { pagerState.animateScrollToPage(0) }
+                    closeGallery()
                 },
                 onGoToSettings = {
-                    onNavigate(NavRoutes.Settings("gallery"))
+                    openOverlay(NavRoutes.Settings("gallery"))
                 },
                 onGoToFriends = {
-                    onNavigate(NavRoutes.Friends)
+                    openOverlay(NavRoutes.Friends)
                 },
                 viewModel = galleryVM
             )
         }
+
+        entry<NavRoutes.Settings> {
+            SettingsMainScreen(
+                onBackClick = {
+                    closeOverlay()
+                },
+                onPrivacyClick = {},
+                onNotificationsClick = {},
+                onDataClick = {},
+                onLanguageClick = {},
+                onPremiumClick = {},
+                onLogoutClick = {
+                    closeOverlay()
+                },
+                onDeleteAccountClick = {}
+            )
+        }
+
+        entry<NavRoutes.Account> {
+            AccountScreen(
+                onPostClick = {},
+                onProfileClick = {},
+                onBackClick = {
+                    closeOverlay()
+                }
+            )
+        }
+
+        entry<NavRoutes.Friends> {
+            val users by friendsVM.users
+            FriendsScreen(
+                user = users.firstOrNull() ?: User(
+                    id = "default",
+                    name = "Default User",
+                    avatarUrl = "",
+                    friends = emptyList()
+                ),
+                onBackClick = {
+                    closeOverlay()
+                },
+                viewModel = friendsVM
+            )
+        }
+
+        entry<NavRoutes.SendPhoto> { route ->
+            val uri = Uri.parse(route.uri)
+            SendPhotoScreen(
+                uri = uri,
+                onGoToTakePhoto = {
+                    closeOverlay()
+                },
+                onGoToSettings = {
+                    openOverlay(NavRoutes.Settings(currentBackTo()))
+                },
+                onProfileClick = {
+                    openOverlay(NavRoutes.Account(currentBackTo()))
+                },
+                onGoToFriends = {
+                    openOverlay(NavRoutes.Friends)
+                }
+            )
+        }
+
+        entry<NavRoutes.PreviewPhoto> { route ->
+            val post = galleryVM.posts.find { it.url == route.url }
+                ?: galleryVM.selectedPost
+
+            if (post != null) {
+                WatchPhotoScreen(
+                    onGoToTakePhoto = {
+                        closeOverlay()
+                    },
+                    onGoToGallery = {
+                        closeOverlay()
+                    },
+                    onGoToSettings = {
+                        openOverlay(NavRoutes.Settings(currentBackTo()))
+                    },
+                    onProfileClick = {
+                        openOverlay(NavRoutes.Account(currentBackTo()))
+                    },
+                    onGoToFriends = {
+                        openOverlay(NavRoutes.Friends)
+                    },
+                    url = post.url,
+                    description = post.description,
+                    userName = post.name,
+                    date = post.date
+                )
+            }
+        }
     }
+
+    val entries = rememberDecoratedNavEntries(
+        backStack = backStack,
+        entryDecorators = entryDecorators,
+        entryProvider = navEntryProvider
+    )
+
+    NavDisplay(
+        entries = entries,
+        transitionSpec = { noAnimation() },
+        popTransitionSpec = { noAnimation() },
+        predictivePopTransitionSpec = { _ -> noAnimation() },
+        onBack = {
+            if (backStack.size > 1) {
+                backStack.removeAt(backStack.lastIndex)
+            }
+        }
+    )
 }
 
-// Удобная extension-функция для popBackStack
-inline fun <reified T : Any> NavHostController.popBackStack(inclusive: Boolean = false) {
-    popBackStack(route = T::class, inclusive = inclusive)
+private fun NavKey.isOverlayRoute(): Boolean {
+    return when (this) {
+        is NavRoutes.Camera,
+        is NavRoutes.Recorder,
+        is NavRoutes.Gallery -> false
+
+        else -> true
+    }
 }
