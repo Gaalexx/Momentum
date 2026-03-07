@@ -8,12 +8,16 @@ enum class RegistrationStep {
     COMPLETED
 }
 
+enum class LoginType {
+    EMAIL, PHONE, VKID
+}
+
 data class RegistrationState (
     val currentStep: RegistrationStep = RegistrationStep.EMAIL,
     val userData: UserData = UserData(),
     val isLoading: Boolean = false,
     val isError: Boolean = false,
-    val isUsingEmail: Boolean = true,
+    val loginType: LoginType = LoginType.EMAIL,
     val errorMessage: String? = null,
     val isStepValid: Boolean = false,
     val canGoNext: Boolean = false,

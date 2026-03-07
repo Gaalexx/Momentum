@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.project.momentum.data.LoginType
 import com.project.momentum.data.RegistrationState
 import com.project.momentum.data.RegistrationStep
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -119,7 +120,10 @@ class RegistrationViewModel: ViewModel() {
     fun switchLoginType() {
         _state.update {
             it.copy(
-                isUsingEmail = !it.isUsingEmail
+                loginType = when (it.loginType) {
+                    LoginType.EMAIL -> LoginType.PHONE
+                    else -> LoginType.EMAIL
+                }
             )
         }
     }
@@ -138,7 +142,7 @@ class RegistrationViewModel: ViewModel() {
                     if (exists) {
                         _state.update {
                             it.copy(
-                                currentStep = RegistrationStep.PASSWORD,
+                                currentStep = RegistrationStep.VERIFICATION,
                                 isError = false,
                                 isLoading = false
                             )
@@ -158,18 +162,18 @@ class RegistrationViewModel: ViewModel() {
                 //TODO: проверка телефона на валидность
                 _state.update {
                     it.copy(
-                        currentStep = RegistrationStep.PASSWORD
-                    )
-                }
-            }
-            RegistrationStep.PASSWORD -> {
-                _state.update {
-                    it.copy(
                         currentStep = RegistrationStep.VERIFICATION
                     )
                 }
             }
             RegistrationStep.VERIFICATION -> {
+                _state.update {
+                    it.copy(
+                        currentStep = RegistrationStep.PASSWORD
+                    )
+                }
+            }
+            RegistrationStep.PASSWORD -> {
                 _state.update {
                     it.copy(
                         currentStep = RegistrationStep.COMPLETED
@@ -187,9 +191,15 @@ class RegistrationViewModel: ViewModel() {
             it.copy(
                 currentStep = when (it.currentStep) {
                     RegistrationStep.PASSWORD ->
-                        if (it.isUsingEmail) RegistrationStep.EMAIL
-                        else RegistrationStep.PHONE
-                    RegistrationStep.VERIFICATION -> RegistrationStep.PASSWORD
+                        when (it.loginType) {
+                            LoginType.EMAIL -> RegistrationStep.EMAIL
+                            else -> RegistrationStep.PHONE
+                        }
+                    RegistrationStep.VERIFICATION ->
+                        when (it.loginType) {
+                            LoginType.EMAIL -> RegistrationStep.EMAIL
+                            else -> RegistrationStep.PHONE
+                        }
                     else -> it.currentStep
                 }
             )
