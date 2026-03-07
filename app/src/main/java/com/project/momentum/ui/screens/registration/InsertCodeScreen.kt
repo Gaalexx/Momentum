@@ -10,6 +10,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.momentum.R
+import com.project.momentum.data.LoginType
 import com.project.momentum.ui.assets.TemplateAuthorizationScreen
 import com.project.momentum.ui.screens.friends.UserViewModel
 
@@ -27,8 +28,10 @@ fun InsertCodeScreen(
         value = uiState.userData.verificationCode,
         label = R.string.label_create_account,
         title =
-            if (uiState.isUsingEmail) R.string.insert_code_email
-            else R.string.insert_code_phone,
+            when (uiState.loginType) {
+                LoginType.EMAIL ->R.string.insert_code_email
+                else -> R.string.insert_code_phone
+            },
         subButtonText = R.string.button_send_code_again,
         onValueChange = { viewModel.updateUserCode(it) },
         onBackClick = {
@@ -43,8 +46,10 @@ fun InsertCodeScreen(
         modifier = modifier,
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType =
-                if (uiState.isUsingEmail) KeyboardType.Email
-                else KeyboardType.Phone,
+                when (uiState.loginType) {
+                    LoginType.EMAIL -> KeyboardType.Email
+                    else -> KeyboardType.Phone
+                },
             imeAction = ImeAction.Done
         ),
     )

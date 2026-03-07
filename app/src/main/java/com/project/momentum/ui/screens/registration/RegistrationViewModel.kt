@@ -6,29 +6,34 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.project.momentum.data.LoginType
 import com.project.momentum.data.RegistrationState
 import com.project.momentum.data.RegistrationStep
+import com.project.momentum.data.registration.RegistrationRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class RegistrationViewModel: ViewModel() {
+@HiltViewModel
+class RegistrationViewModel @Inject constructor(
+    private val repository: RegistrationRepository
+): ViewModel() {
     private var _state = MutableStateFlow(RegistrationState())
-
     val state: StateFlow<RegistrationState> = _state.asStateFlow()
-
     private val emailChecker = EmailChecker()
-
     var passwordRepetition by mutableStateOf("")
         private set
 
-
     fun validateCurrentStep() {
         val isValid = when(_state.value.currentStep) {
-            RegistrationStep.EMAIL -> isValidEmail()
-            RegistrationStep.PHONE -> isValidPhone()
+            RegistrationStep.LOGIN -> when (_state.value.loginType) {
+                LoginType.EMAIL -> isValidEmail()
+                else -> isValidPhone()
+            }
             RegistrationStep.PASSWORD -> isValidPassword() == PasswordState.VALID
             RegistrationStep.VERIFICATION -> isValidCode()
             RegistrationStep.COMPLETED -> true
@@ -38,7 +43,7 @@ class RegistrationViewModel: ViewModel() {
             it.copy(
                 isStepValid = isValid,
                 canGoNext = isValid && !it.isLoading,
-                canGoBack = it.currentStep != RegistrationStep.EMAIL
+                canGoBack = it.currentStep != RegistrationStep.LOGIN
             )
         }
     }
@@ -119,7 +124,10 @@ class RegistrationViewModel: ViewModel() {
     fun switchLoginType() {
         _state.update {
             it.copy(
-                isUsingEmail = !it.isUsingEmail
+                loginType = when (it.loginType) {
+                    LoginType.EMAIL -> LoginType.PHONE
+                    else -> LoginType.EMAIL
+                }
             )
         }
     }
@@ -128,14 +136,53 @@ class RegistrationViewModel: ViewModel() {
         if (!_state.value.isStepValid) return
 
         when (_state.value.currentStep) {
-            RegistrationStep.EMAIL -> {
+            RegistrationStep.LOGIN -> {
                 _state.update { it.copy(isLoading = true) }
 
                 viewModelScope.launch {
-                    //TODO: доработать через репозиторий
-                    val exists = emailChecker.canReceiveEmail(_state.value.userData.email)
-
+                    val exists = when (_state.value.loginType) {
+                        LoginType.EMAIL -> emailChecker.canReceiveEmail(_state.value.userData.email)
+                        else -> true //TODO: проверка на существование
+                    }
                     if (exists) {
+                        if (repository.checkUserLoginDB(_state.value)) {
+                            _state.update {
+                                it.copy(
+                                    currentStep = RegistrationStep.VERIFICATION,
+                                    isError = false,
+                                    isLoading = false
+                                )
+                            }
+                        } else {
+                            _state.update {
+                                it.copy(
+                                    isError = true,
+                                    isLoading = false,
+                                    //TODO: завести класс для ошибок enum или что-то поумнее
+                                    errorMessage = when (_state.value.loginType) {
+                                        LoginType.EMAIL -> "Аккаунт с такой почтой уже существует"
+                                        else -> "Аккаунт с таким телефоном уже существует"
+                                    }
+                                )
+                            }
+                        }
+
+                    } else {
+                        _state.update {
+                            it.copy(
+                                isError = true,
+                                isLoading = false,
+                                errorMessage = "Такого Email не существует"
+                            )
+                        }
+                    }
+                }
+            }
+            RegistrationStep.VERIFICATION -> {
+                _state.update { it.copy(isLoading = true) }
+
+                viewModelScope.launch {
+                    if (repository.checkUserLoginDB(_state.value)) {
                         _state.update {
                             it.copy(
                                 currentStep = RegistrationStep.PASSWORD,
@@ -148,32 +195,23 @@ class RegistrationViewModel: ViewModel() {
                             it.copy(
                                 isError = true,
                                 isLoading = false,
-                                errorMessage = "Email не найден"
+                                //TODO: завести класс для ошибок enum или что-то поумнее
+                                errorMessage = "Неверный код"
                             )
                         }
                     }
                 }
             }
-            RegistrationStep.PHONE -> {
-                //TODO: проверка телефона на валидность
-                _state.update {
-                    it.copy(
-                        currentStep = RegistrationStep.PASSWORD
-                    )
-                }
-            }
             RegistrationStep.PASSWORD -> {
-                _state.update {
-                    it.copy(
-                        currentStep = RegistrationStep.VERIFICATION
-                    )
-                }
-            }
-            RegistrationStep.VERIFICATION -> {
-                _state.update {
-                    it.copy(
-                        currentStep = RegistrationStep.COMPLETED
-                    )
+
+                viewModelScope.launch {
+                    //TODO: куда-то сохранить или что-то сделать
+                    val jwt = repository.sendUserData(_state.value)
+                    _state.update {
+                        it.copy(
+                            currentStep = RegistrationStep.COMPLETED
+                        )
+                    }
                 }
             }
             else -> {}
@@ -186,10 +224,8 @@ class RegistrationViewModel: ViewModel() {
         _state.update {
             it.copy(
                 currentStep = when (it.currentStep) {
-                    RegistrationStep.PASSWORD ->
-                        if (it.isUsingEmail) RegistrationStep.EMAIL
-                        else RegistrationStep.PHONE
-                    RegistrationStep.VERIFICATION -> RegistrationStep.PASSWORD
+                    RegistrationStep.PASSWORD -> RegistrationStep.LOGIN
+                    RegistrationStep.VERIFICATION -> RegistrationStep.LOGIN
                     else -> it.currentStep
                 }
             )

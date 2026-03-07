@@ -10,6 +10,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.momentum.R
+import com.project.momentum.data.LoginType
 import com.project.momentum.ui.assets.TemplateAuthorizationScreen
 import com.project.momentum.ui.screens.registration.RegistrationViewModel
 
@@ -27,11 +28,15 @@ fun PasswordRecoveryScreen(
         value = uiState.userData.verificationCode,
         label = R.string.label_password_recovery,
         title =
-            if (uiState.isUsingEmail) R.string.insert_email
-            else R.string.insert_phone_number,
+            when (uiState.loginType) {
+                LoginType.EMAIL -> R.string.insert_email
+                else -> R.string.insert_phone_number
+            },
         subButtonText =
-            if (uiState.isUsingEmail) R.string.button_use_phone_number
-            else R.string.button_use_email,
+            when (uiState.loginType) {
+                LoginType.EMAIL -> R.string.button_use_phone_number
+                else -> R.string.button_use_email
+            },
         onValueChange = { viewModel.updateUserCode(it) },
         onBackClick = {
             viewModel.previousStep()
@@ -45,8 +50,10 @@ fun PasswordRecoveryScreen(
         modifier = modifier,
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType =
-                if (uiState.isUsingEmail) KeyboardType.Email
-                else KeyboardType.Phone,
+                when (uiState.loginType) {
+                    LoginType.EMAIL -> KeyboardType.Email
+                    else -> KeyboardType.Phone
+                },
             imeAction = ImeAction.Done
         ),
     )
