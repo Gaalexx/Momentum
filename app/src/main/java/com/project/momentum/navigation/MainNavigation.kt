@@ -154,10 +154,6 @@ fun MainScreen() {
                 onBackClick = {
                     closeOverlay()
                 },
-                onPrivacyClick = {},
-                onNotificationsClick = {},
-                onDataClick = {},
-                onLanguageClick = {},
                 onPremiumClick = {},
                 onLogoutClick = {
                     closeOverlay()
