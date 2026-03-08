@@ -6,14 +6,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigationevent.NavigationEvent
 import com.project.momentum.data.LoginType
 import com.project.momentum.data.RegistrationState
 import com.project.momentum.data.RegistrationStep
+import com.project.momentum.data.registration.RegistrationNavEvent
 import com.project.momentum.data.registration.RegistrationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -24,6 +29,8 @@ class RegistrationViewModel @Inject constructor(
 ): ViewModel() {
     private var _state = MutableStateFlow(RegistrationState())
     val state: StateFlow<RegistrationState> = _state.asStateFlow()
+    private val _navigationEvents = MutableSharedFlow<RegistrationNavEvent>()
+    val navigationEvents: SharedFlow<RegistrationNavEvent> = _navigationEvents.asSharedFlow()
     private val emailChecker = EmailChecker()
     var passwordRepetition by mutableStateOf("")
         private set
@@ -153,6 +160,7 @@ class RegistrationViewModel @Inject constructor(
                                     isLoading = false
                                 )
                             }
+                            _navigationEvents.emit(RegistrationNavEvent.NavigateToNextScreen)
                         } else {
                             _state.update {
                                 it.copy(
@@ -182,7 +190,7 @@ class RegistrationViewModel @Inject constructor(
                 _state.update { it.copy(isLoading = true) }
 
                 viewModelScope.launch {
-                    if (repository.checkUserLoginDB(_state.value)) {
+                    if (repository.checkUserCode(_state.value)) {
                         _state.update {
                             it.copy(
                                 currentStep = RegistrationStep.PASSWORD,
@@ -190,6 +198,7 @@ class RegistrationViewModel @Inject constructor(
                                 isLoading = false
                             )
                         }
+                        _navigationEvents.emit(RegistrationNavEvent.NavigateToNextScreen)
                     } else {
                         _state.update {
                             it.copy(
@@ -212,6 +221,7 @@ class RegistrationViewModel @Inject constructor(
                             currentStep = RegistrationStep.COMPLETED
                         )
                     }
+                    _navigationEvents.emit(RegistrationNavEvent.NavigateToNextScreen)
                 }
             }
             else -> {}

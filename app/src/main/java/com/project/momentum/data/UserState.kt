@@ -18,7 +18,7 @@ data class RegistrationState (
     val isError: Boolean = false,
     val loginType: LoginType = LoginType.EMAIL,
     val errorMessage: String? = null,
-    val isStepValid: Boolean = false,
+    val isStepValid: Boolean = true,
     val canGoNext: Boolean = false,
     val canGoBack: Boolean = false
 )

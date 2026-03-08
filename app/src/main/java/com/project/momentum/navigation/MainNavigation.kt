@@ -25,14 +25,19 @@ import com.project.momentum.ui.screens.posts.GallaryScreen
 import com.project.momentum.ui.screens.posts.GalleryViewModel
 import com.project.momentum.ui.screens.posts.WatchPhotoScreen
 import com.project.momentum.ui.screens.recorder.RecorderScreen
+import com.project.momentum.ui.screens.registration.CreateAccountScreen
+import com.project.momentum.ui.screens.registration.CreatePasswordScreen
+import com.project.momentum.ui.screens.registration.InsertCodeScreen
+import com.project.momentum.ui.screens.registration.RegistrationViewModel
 import com.project.momentum.ui.screens.settings.SettingsMainScreen
 
 @Composable
 fun MainScreen() {
     val galleryVM: GalleryViewModel = viewModel()
     val friendsVM: UserViewModel = viewModel()
+    val registrationVM: RegistrationViewModel = viewModel()
 
-    val backStack = rememberNavBackStack(NavRoutes.Camera)
+    val backStack = rememberNavBackStack(NavRoutes.RegistrationLogin)
 
     fun setBase(route: NavRoutes) {
         if (backStack.isEmpty()) {
@@ -88,6 +93,42 @@ fun MainScreen() {
     )
 
     val navEntryProvider = entryProvider<NavKey> {
+        entry<NavRoutes.RegistrationLogin> {
+            CreateAccountScreen(
+                onBackClick = {
+                    closeOverlay()
+                },
+                onContinueClick = {
+                    openOverlay(NavRoutes.RegistrationCode)
+                }
+            )
+        }
+
+        entry<NavRoutes.RegistrationCode> {
+            InsertCodeScreen(
+                onBackClick = {
+                    closeOverlay()
+                },
+                onContinueClick = {
+                    openOverlay(NavRoutes.RegistrationPassword)
+                },
+                onSendCodeAgainClick = {},
+                viewModel = registrationVM
+            )
+        }
+
+        entry<NavRoutes.RegistrationPassword> {
+            CreatePasswordScreen(
+                onBackClick = {
+                    closeOverlay()
+                },
+                onContinueClick = {
+                    openOverlay(NavRoutes.Camera)
+                },
+                viewModel = registrationVM
+            )
+        }
+
         entry<NavRoutes.Camera> {
             CameraLikeScreen(
                 onGoToPreview = { uri ->
