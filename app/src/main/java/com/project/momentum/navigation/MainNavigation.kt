@@ -89,7 +89,7 @@ fun MainScreen() {
     val saveableStateHolder = rememberSaveableStateHolder()
     val entryDecorators = listOf(
         rememberSaveableStateHolderNavEntryDecorator<NavKey>(saveableStateHolder),
-        rememberViewModelStoreNavEntryDecorator<NavKey>()
+//        rememberViewModelStoreNavEntryDecorator<NavKey>()
     )
 
     val navEntryProvider = entryProvider<NavKey> {
