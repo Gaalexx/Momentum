@@ -27,7 +27,7 @@ fun AuthorizationAccountScreen(
     TemplateAuthorizationScreen(
         value = when (uiState.loginType) {
             LoginType.EMAIL -> uiState.userData.email
-            else -> uiState.userData.phone
+            else -> uiState.userData.phone ?: ""
         },
         label = R.string.label_authorization,
         title =

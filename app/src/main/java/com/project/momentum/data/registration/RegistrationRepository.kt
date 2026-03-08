@@ -18,7 +18,7 @@ class RegistrationRepository @Inject constructor(
     suspend fun checkUserLoginDB(user: RegistrationState): Boolean {
         val response = when (user.loginType) {
             LoginType.EMAIL -> client.sendEmailToChecker(CheckEmailRequestDTO(user.userData.email))
-            else -> client.sendPhoneToChecker(CheckPhoneNumberRequestDTO(user.userData.phone))
+            else -> client.sendPhoneToChecker(CheckPhoneNumberRequestDTO(user.userData.phone ?: ""))
         }
         return response.isSuccess
     }

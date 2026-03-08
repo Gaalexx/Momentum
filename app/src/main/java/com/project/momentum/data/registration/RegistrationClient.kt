@@ -47,7 +47,7 @@ class RegistrationClient @Inject constructor(
     }
 
     override suspend fun sendData(userData: RegisterUserRequestDTO): LoginResponseDTO {
-        val response: LoginResponseDTO = client.post("/login") {
+        val response: LoginResponseDTO = client.post("/register") {
             setBody(userData)
         }.body<LoginResponseDTO>()
 
