@@ -14,6 +14,7 @@ import com.project.momentum.data.registration.RegistrationNavEvent
 import com.project.momentum.data.registration.RegistrationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import jakarta.inject.Singleton
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -49,6 +50,7 @@ class RegistrationViewModel @Inject constructor(
         _state.update {
             it.copy(
                 isStepValid = isValid,
+                isError = !isValid,
                 canGoNext = isValid && !it.isLoading,
                 canGoBack = it.currentStep != RegistrationStep.LOGIN
             )
@@ -140,6 +142,7 @@ class RegistrationViewModel @Inject constructor(
     }
 
     fun nextStep() {
+        validateCurrentStep()
         if (!_state.value.isStepValid) return
 
         when (_state.value.currentStep) {

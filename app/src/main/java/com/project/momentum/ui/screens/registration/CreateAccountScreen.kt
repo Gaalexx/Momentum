@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,6 +23,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -29,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.momentum.ConstColours
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.R
+import com.project.momentum.data.LoginType
 import com.project.momentum.data.registration.RegistrationNavEvent
 import com.project.momentum.ui.assets.TextFieldRegistration
 import com.project.momentum.ui.assets.TopBarTemplate
@@ -121,7 +125,14 @@ fun CreateAccountScreen(
                         modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
                         placeholder = "Введеите почту",
                         isError = uiState.isError,
-
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            keyboardType =
+                                when (uiState.loginType) {
+                                    LoginType.EMAIL -> KeyboardType.Email
+                                    else -> KeyboardType.Phone
+                                },
+                            imeAction = ImeAction.Done
+                        ),
                     )
                     Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
 
@@ -134,20 +145,5 @@ fun CreateAccountScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun LoadingOverlay() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(ConstColours.BLACK.copy(alpha = 0.7f)),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator(
-            color = ConstColours.WHITE,
-            modifier = Modifier.size(50.dp)
-        )
     }
 }

@@ -7,6 +7,7 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
@@ -35,7 +36,6 @@ import com.project.momentum.ui.screens.settings.SettingsMainScreen
 fun MainScreen() {
     val galleryVM: GalleryViewModel = viewModel()
     val friendsVM: UserViewModel = viewModel()
-    val registrationVM: RegistrationViewModel = viewModel()
 
     val backStack = rememberNavBackStack(NavRoutes.RegistrationLogin)
 
@@ -111,9 +111,7 @@ fun MainScreen() {
                 },
                 onContinueClick = {
                     openOverlay(NavRoutes.RegistrationPassword)
-                },
-                onSendCodeAgainClick = {},
-                viewModel = registrationVM
+                }
             )
         }
 
@@ -124,8 +122,7 @@ fun MainScreen() {
                 },
                 onContinueClick = {
                     openOverlay(NavRoutes.Camera)
-                },
-                viewModel = registrationVM
+                }
             )
         }
 
