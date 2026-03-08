@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldColors
@@ -27,7 +28,7 @@ fun TextFieldRegistration(
     isError: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
-    TextField(
+    OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier
@@ -62,6 +63,7 @@ fun TextFieldRegistrationPreview() {
     TextFieldRegistration(
         value = "",
         onValueChange = {},
-        placeholder = "Введите текст..."
+        placeholder = "Введите текст...",
+        isError = true
     )
 }
