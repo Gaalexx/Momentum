@@ -16,9 +16,22 @@ import javax.inject.Singleton
 class RegistrationRepository @Inject constructor(
     private val client: RegistrationClient
 ) {
-    suspend fun checkUserLoginDB(user: LoginState): Boolean {
+    suspend fun checkRegistrationLoginDB(user: LoginState): Boolean {
         val response = when (user.loginType) {
-            LoginType.EMAIL -> client.sendEmailToChecker(CheckEmailRequestDTO(user.userData.email))
+            LoginType.EMAIL -> client.sendEmailToRegistrationChecker(CheckEmailRequestDTO(user.userData.email))
+            else -> client.sendPhoneToChecker(CheckPhoneNumberRequestDTO(user.userData.phone ?: ""))
+        }
+        return response.isSuccess
+    }
+
+    suspend fun sendAuthorizationCode(user: LoginState): Boolean {
+        val response = client.sendCodeAuthorization(CheckEmailRequestDTO(user.userData.email))
+        return response.isSuccess
+    }
+
+    suspend fun checkAuthorizationLoginDB(user: LoginState): Boolean {
+        val response = when (user.loginType) {
+            LoginType.EMAIL -> client.sendEmailToAuthorizationChecker(CheckEmailRequestDTO(user.userData.email))
             else -> client.sendPhoneToChecker(CheckPhoneNumberRequestDTO(user.userData.phone ?: ""))
         }
         return response.isSuccess
@@ -35,7 +48,7 @@ class RegistrationRepository @Inject constructor(
         return response.isSuccess
     }
 
-    suspend fun sendUserData(user: LoginState): String {
+    suspend fun sendUserData(user: LoginState): String? {
         val response = client.sendData(
             RegisterUserRequestDTO(
                 email = user.userData.email,
@@ -46,7 +59,7 @@ class RegistrationRepository @Inject constructor(
         return response.jwt
     }
 
-    suspend fun Login(user: LoginState): String {
+    suspend fun login(user: LoginState): String? {
         val response = client.sendLoginData(
             LoginUserRequestDTO(
                 email = user.userData.email,

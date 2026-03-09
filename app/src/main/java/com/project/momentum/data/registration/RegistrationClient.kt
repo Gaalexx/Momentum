@@ -17,7 +17,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 interface IRegistrationLoginClient {
-    suspend fun sendEmailToChecker(email: CheckEmailRequestDTO): CheckResponseDTO
+    suspend fun sendEmailToAuthorizationChecker(email: CheckEmailRequestDTO): CheckResponseDTO
+
+    suspend fun sendEmailToRegistrationChecker(email: CheckEmailRequestDTO): CheckResponseDTO
 
     suspend fun sendPhoneToChecker(phone: CheckPhoneNumberRequestDTO): CheckResponseDTO
 
@@ -26,6 +28,8 @@ interface IRegistrationLoginClient {
     suspend fun sendCodeToChecker(code: CheckCodeRequestDTO): CheckResponseDTO
 
     suspend fun sendLoginData(userData: LoginUserRequestDTO): LoginResponseDTO
+
+    suspend fun sendCodeAuthorization(email: CheckEmailRequestDTO): CheckResponseDTO
 }
 
 @Singleton
@@ -33,8 +37,16 @@ class RegistrationClient @Inject constructor(
     @Backend private val client: HttpClient
 ): IRegistrationLoginClient {
 
-    override suspend fun sendEmailToChecker(email: CheckEmailRequestDTO): CheckResponseDTO {
+    override suspend fun sendEmailToRegistrationChecker(email: CheckEmailRequestDTO): CheckResponseDTO {
         val response: CheckResponseDTO = client.post("/check-email") {
+            setBody(email)
+        }.body<CheckResponseDTO>()
+
+        return response
+    }
+
+    override suspend fun sendEmailToAuthorizationChecker(email: CheckEmailRequestDTO): CheckResponseDTO {
+        val response: CheckResponseDTO = client.post("/check-email-login") {
             setBody(email)
         }.body<CheckResponseDTO>()
 
@@ -65,6 +77,14 @@ class RegistrationClient @Inject constructor(
         return response
     }
 
+    override suspend fun sendCodeAuthorization(email: CheckEmailRequestDTO): CheckResponseDTO {
+        val response: CheckResponseDTO = client.post("/send-code") {
+            setBody(email)
+    }.body<CheckResponseDTO>()
+
+        return response
+    }
+
     override suspend fun sendLoginData(userData: LoginUserRequestDTO): LoginResponseDTO {
         val response: LoginResponseDTO = client.post("/login") {
             setBody(userData)
@@ -72,4 +92,6 @@ class RegistrationClient @Inject constructor(
 
         return response
     }
+
+
 }
