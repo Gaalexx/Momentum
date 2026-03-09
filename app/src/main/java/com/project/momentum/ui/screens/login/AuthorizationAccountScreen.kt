@@ -2,27 +2,36 @@ package com.project.momentum.ui.screens.login
 
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.project.momentum.R
 import com.project.momentum.data.LoginType
+import com.project.momentum.data.registration.NavEvent
 import com.project.momentum.ui.assets.TemplateAuthorizationScreen
-import com.project.momentum.ui.screens.registration.RegistrationViewModel
 
 @Composable
 fun AuthorizationAccountScreen(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
-//    onSwitchLoginTypeClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: RegistrationViewModel = viewModel(),
+    modifier: Modifier = Modifier
 ) {
+    val viewModel: AuthorizationViewModel = hiltViewModel()
     val uiState by viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvents.collect { event ->
+            when (event) {
+                NavEvent.NavigateToNextScreen -> onContinueClick()
+                else -> onBackClick()
+            }
+        }
+    }
 
     TemplateAuthorizationScreen(
         value = when (uiState.loginType) {
@@ -47,11 +56,9 @@ fun AuthorizationAccountScreen(
         },
         onContinueClick = {
             viewModel.nextStep()
-            onContinueClick()
         },
         onSubButtonClick = {
             viewModel.switchLoginType()
-//            onSwitchLoginTypeClick()
         },
         modifier = modifier,
         keyboardOptions = KeyboardOptions.Default.copy(
@@ -71,6 +78,5 @@ fun AuthorizationAccountScreenPreview() {
     AuthorizationAccountScreen(
         onBackClick = {},
         onContinueClick = {},
-//        onSwitchLoginTypeClick = {}
     )
 }

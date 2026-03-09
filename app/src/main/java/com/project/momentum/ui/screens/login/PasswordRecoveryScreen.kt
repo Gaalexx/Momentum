@@ -2,35 +2,45 @@ package com.project.momentum.ui.screens.login
 
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.project.momentum.R
 import com.project.momentum.data.LoginType
+import com.project.momentum.data.registration.NavEvent
 import com.project.momentum.ui.assets.TemplateAuthorizationScreen
-import com.project.momentum.ui.screens.registration.RegistrationViewModel
 
 @Composable
 fun PasswordRecoveryScreen(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
-    onSendCodeAgainClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    viewModel: RegistrationViewModel = viewModel(),
+//    onSendCodeAgainClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
+    val viewModel: AuthorizationViewModel = hiltViewModel()
     val uiState by viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvents.collect { event ->
+            when (event) {
+                NavEvent.NavigateToNextScreen -> onContinueClick()
+                else -> onBackClick()
+            }
+        }
+    }
 
     TemplateAuthorizationScreen(
         value = uiState.userData.verificationCode,
-        label = R.string.label_password_recovery,
+        label = R.string.label_authorization,
         title =
             when (uiState.loginType) {
-                LoginType.EMAIL -> R.string.insert_email
-                else -> R.string.insert_phone_number
+                LoginType.EMAIL -> R.string.insert_code_email
+                else -> R.string.insert_code_phone
             },
         subButtonText =
             when (uiState.loginType) {
@@ -43,17 +53,15 @@ fun PasswordRecoveryScreen(
             onBackClick()
         },
         onContinueClick = {
-            viewModel.nextStep() // TODO: viewModel.checkRecoveryCode()
-            onContinueClick()
+            viewModel.nextStep()
         },
-        onSubButtonClick = onSendCodeAgainClick,
+        onSubButtonClick = {
+            viewModel.switchLoginType()
+//            viewModel.onSendCodeAgainClick()
+        },
         modifier = modifier,
         keyboardOptions = KeyboardOptions.Default.copy(
-            keyboardType =
-                when (uiState.loginType) {
-                    LoginType.EMAIL -> KeyboardType.Email
-                    else -> KeyboardType.Phone
-                },
+            keyboardType = KeyboardType.Number,
             imeAction = ImeAction.Done
         ),
     )
@@ -65,6 +73,6 @@ fun PasswordRecoveryScreenPreview() {
     PasswordRecoveryScreen(
         onBackClick = {},
         onContinueClick = {},
-        onSendCodeAgainClick = {}
+//        onSendCodeAgainClick = {}
     )
 }
