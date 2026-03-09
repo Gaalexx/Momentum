@@ -5,6 +5,7 @@ import com.project.momentum.data.CheckEmailRequestDTO
 import com.project.momentum.data.CheckPhoneNumberRequestDTO
 import com.project.momentum.data.CheckResponseDTO
 import com.project.momentum.data.LoginResponseDTO
+import com.project.momentum.data.LoginUserRequestDTO
 import com.project.momentum.data.RegisterUserRequestDTO
 import com.project.momentum.data.s3.PresignedURLDTO
 import com.project.momentum.di.Backend
@@ -23,6 +24,8 @@ interface IRegistrationLoginClient {
     suspend fun sendData(userData: RegisterUserRequestDTO): LoginResponseDTO
 
     suspend fun sendCodeToChecker(code: CheckCodeRequestDTO): CheckResponseDTO
+
+    suspend fun sendLoginData(userData: LoginUserRequestDTO): LoginResponseDTO
 }
 
 @Singleton
@@ -58,6 +61,14 @@ class RegistrationClient @Inject constructor(
         val response: CheckResponseDTO = client.post("/check-code") {
             setBody(code)
         }.body<CheckResponseDTO>()
+
+        return response
+    }
+
+    override suspend fun sendLoginData(userData: LoginUserRequestDTO): LoginResponseDTO {
+        val response: LoginResponseDTO = client.post("/login") {
+            setBody(userData)
+        }.body<LoginResponseDTO>()
 
         return response
     }
