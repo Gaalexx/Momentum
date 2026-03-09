@@ -1,36 +1,20 @@
-package com.project.momentum.ui.screens.registration
+package com.project.momentum.ui.screens.login
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
-import com.project.momentum.data.LoginType
 import com.project.momentum.data.LoginStep
+import com.project.momentum.data.LoginType
 import com.project.momentum.data.registration.NavEvent
 import com.project.momentum.data.registration.RegistrationRepository
+import com.project.momentum.ui.screens.registration.LoginViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
-class RegistrationViewModel @Inject constructor(
+class AuthorizationViewModel @Inject constructor(
     private val repository: RegistrationRepository
 ): LoginViewModel() {
-    var passwordRepetition by mutableStateOf("")
-        private set
-
-    override fun isValidPassword(): PasswordState {
-        if (_state.value.userData.password != passwordRepetition) {
-            return PasswordState.NOT_MATCH
-        }
-        return super.isValidPassword()
-    }
-
-    fun updateUserPasswordRepetition(password: String) {
-        passwordRepetition = password
-    }
-
     override fun nextStep() {
         validateCurrentStep()
         if (!_state.value.isStepValid) return
@@ -45,10 +29,10 @@ class RegistrationViewModel @Inject constructor(
                         else -> true //TODO: проверка на существование
                     }
                     if (exists) {
-                        if (repository.checkRegistrationLoginDB(_state.value)) {
+                        if (repository.checkAuthorizationLoginDB(_state.value)) {
                             _state.update {
                                 it.copy(
-                                    currentStep = LoginStep.VERIFICATION,
+                                    currentStep = LoginStep.PASSWORD,
                                     isError = false,
                                     isLoading = false
                                 )
@@ -61,13 +45,12 @@ class RegistrationViewModel @Inject constructor(
                                     isLoading = false,
                                     //TODO: завести класс для ошибок enum или что-то поумнее
                                     errorMessage = when (_state.value.loginType) {
-                                        LoginType.EMAIL -> "Аккаунт с такой почтой уже существует"
-                                        else -> "Аккаунт с таким телефоном уже существует"
+                                        LoginType.EMAIL -> "Аккаунта с такой почтой не существует"
+                                        else -> "Аккаунта с таким телефоном не существует"
                                     }
                                 )
                             }
                         }
-
                     } else {
                         _state.update {
                             it.copy(
@@ -79,6 +62,31 @@ class RegistrationViewModel @Inject constructor(
                     }
                 }
             }
+            LoginStep.PASSWORD -> {
+                _state.update { it.copy(isLoading = true) }
+
+                viewModelScope.launch {
+                    val jwt = repository.login(_state.value)
+                    if (jwt != null) {
+                        //TODO: куда-то сохранить или что-то сделать
+                        _state.update {
+                            it.copy(
+                                currentStep = LoginStep.COMPLETED
+                            )
+                        }
+                        _navigationEvents.emit(NavEvent.NavigateToNextScreen)
+                    } else {
+                        _state.update {
+                            it.copy(
+                                isError = true,
+                                isLoading = false,
+                                errorMessage = "Неверный пароль"
+                            )
+                        }
+                    }
+                }
+            }
+
             LoginStep.VERIFICATION -> {
                 _state.update { it.copy(isLoading = true) }
 
@@ -86,7 +94,7 @@ class RegistrationViewModel @Inject constructor(
                     if (repository.checkUserCode(_state.value)) {
                         _state.update {
                             it.copy(
-                                currentStep = LoginStep.PASSWORD,
+                                currentStep = LoginStep.COMPLETED,
                                 isError = false,
                                 isLoading = false
                             )
@@ -104,21 +112,6 @@ class RegistrationViewModel @Inject constructor(
                     }
                 }
             }
-            LoginStep.PASSWORD -> {
-                _state.update { it.copy(isLoading = true) }
-
-                viewModelScope.launch {
-                    //TODO: куда-то сохранить или что-то сделать
-                    val jwt = repository.sendUserData(_state.value)
-                    _state.update {
-                        it.copy(
-                            currentStep = LoginStep.COMPLETED,
-                            isLoading = false
-                        )
-                    }
-                    _navigationEvents.emit(NavEvent.NavigateToNextScreen)
-                }
-            }
             else -> {}
         }
     }
@@ -130,11 +123,28 @@ class RegistrationViewModel @Inject constructor(
             it.copy(
                 currentStep = when (it.currentStep) {
                     LoginStep.PASSWORD -> LoginStep.LOGIN
-                    LoginStep.VERIFICATION -> LoginStep.LOGIN
+                    LoginStep.VERIFICATION -> LoginStep.PASSWORD_RECOVERY
+                    LoginStep.PASSWORD_RECOVERY -> LoginStep.PASSWORD
                     else -> it.currentStep
                 }
             )
         }
         validateCurrentStep()
+    }
+
+    fun onCodeAuthorization() {
+        _state.update { it.copy(isLoading = true) }
+
+        viewModelScope.launch {
+            repository.sendAuthorizationCode(_state.value)
+            _state.update {
+                it.copy(
+                    currentStep = LoginStep.VERIFICATION,
+                    isError = false,
+                    isLoading = false
+                )
+            }
+            _navigationEvents.emit(NavEvent.NavigateToNextSubScreen)
+        }
     }
 }
