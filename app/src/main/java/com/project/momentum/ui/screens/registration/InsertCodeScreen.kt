@@ -10,12 +10,10 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.momentum.R
 import com.project.momentum.data.LoginType
-import com.project.momentum.data.registration.RegistrationNavEvent
+import com.project.momentum.data.registration.NavEvent
 import com.project.momentum.ui.assets.TemplateAuthorizationScreen
-import com.project.momentum.ui.screens.friends.UserViewModel
 
 @Composable
 fun InsertCodeScreen(
@@ -29,7 +27,7 @@ fun InsertCodeScreen(
     LaunchedEffect(Unit) {
         viewModel.navigationEvents.collect { event ->
             when (event) {
-                RegistrationNavEvent.NavigateToNextScreen -> onContinueClick()
+                NavEvent.NavigateToNextScreen -> onContinueClick()
                 else -> onBackClick()
             }
         }

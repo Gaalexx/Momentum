@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -28,12 +27,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.momentum.ConstColours
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.R
 import com.project.momentum.data.LoginType
-import com.project.momentum.data.registration.RegistrationNavEvent
+import com.project.momentum.data.registration.NavEvent
 import com.project.momentum.ui.assets.TextFieldRegistration
 import com.project.momentum.ui.assets.TopBarTemplate
 
@@ -58,7 +56,7 @@ fun CreateAccountScreen(
     LaunchedEffect(Unit) {
         viewModel.navigationEvents.collect { event ->
             when (event) {
-                RegistrationNavEvent.NavigateToNextScreen -> onContinueClick()
+                NavEvent.NavigateToNextScreen -> onContinueClick()
                 else -> onBackClick()
             }
         }

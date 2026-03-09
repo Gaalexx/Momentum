@@ -22,6 +22,9 @@ import com.project.momentum.ui.screens.camera.SendPhotoScreen
 import com.project.momentum.ui.screens.friends.FriendsScreen
 import com.project.momentum.ui.screens.friends.User
 import com.project.momentum.ui.screens.friends.UserViewModel
+import com.project.momentum.ui.screens.login.AuthorizationAccountScreen
+import com.project.momentum.ui.screens.login.AuthorizationPasswordScreen
+import com.project.momentum.ui.screens.login.PasswordRecoveryScreen
 import com.project.momentum.ui.screens.posts.GallaryScreen
 import com.project.momentum.ui.screens.posts.GalleryViewModel
 import com.project.momentum.ui.screens.posts.WatchPhotoScreen
@@ -37,7 +40,7 @@ fun MainScreen() {
     val galleryVM: GalleryViewModel = viewModel()
     val friendsVM: UserViewModel = viewModel()
 
-    val backStack = rememberNavBackStack(NavRoutes.RegistrationLogin)
+    val backStack = rememberNavBackStack(NavRoutes.AuthorizationLogin)
 
     fun setBase(route: NavRoutes) {
         if (backStack.isEmpty()) {
@@ -93,6 +96,7 @@ fun MainScreen() {
     )
 
     val navEntryProvider = entryProvider<NavKey> {
+        // Экраны регистрации
         entry<NavRoutes.RegistrationLogin> {
             CreateAccountScreen(
                 onBackClick = {
@@ -126,6 +130,55 @@ fun MainScreen() {
             )
         }
 
+        // Экраны входа
+        entry<NavRoutes.AuthorizationLogin> {
+            AuthorizationAccountScreen(
+                onBackClick = {
+                    closeOverlay()
+                },
+                onContinueClick = {
+                    openOverlay(NavRoutes.AuthorizationPassword)
+                }
+            )
+        }
+
+        entry<NavRoutes.AuthorizationPassword> {
+            AuthorizationPasswordScreen(
+                onBackClick = {
+                    closeOverlay()
+                },
+                onContinueClick = {
+                    openOverlay(NavRoutes.Camera)
+                },
+                onPasswordRecoveryClick = {
+                    openOverlay(NavRoutes.AuthorizationCode)
+                }
+            )
+        }
+
+//        entry<NavRoutes.AuthorizationPasswordRecovery> {
+//            PasswordRecoveryScreen(
+//                onBackClick = {
+//                    closeOverlay()
+//                },
+//                onContinueClick = {
+//                    openOverlay(NavRoutes.AuthorizationCode)
+//                }
+//            )
+//        }
+
+        entry<NavRoutes.AuthorizationCode> {
+            PasswordRecoveryScreen(
+                onBackClick = {
+                    closeOverlay()
+                },
+                onContinueClick = {
+                    openOverlay(NavRoutes.Camera)
+                }
+            )
+        }
+
+        // Экраны создания контента
         entry<NavRoutes.Camera> {
             CameraLikeScreen(
                 onGoToPreview = { uri ->
