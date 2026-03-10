@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class RegistrationViewModel @Inject constructor(
     private val repository: RegistrationRepository
-): LoginViewModel() {
+) : LoginViewModel() {
     var passwordRepetition by mutableStateOf("")
         private set
 
@@ -79,6 +79,7 @@ class RegistrationViewModel @Inject constructor(
                     }
                 }
             }
+
             LoginStep.VERIFICATION -> {
                 _state.update { it.copy(isLoading = true) }
 
@@ -104,12 +105,13 @@ class RegistrationViewModel @Inject constructor(
                     }
                 }
             }
+
             LoginStep.PASSWORD -> {
                 _state.update { it.copy(isLoading = true) }
 
                 viewModelScope.launch {
                     //TODO: куда-то сохранить или что-то сделать
-                    val jwt = repository.sendUserData(_state.value)
+                    val refreshToken = repository.sendUserData(_state.value)
                     _state.update {
                         it.copy(
                             currentStep = LoginStep.COMPLETED,
@@ -119,6 +121,7 @@ class RegistrationViewModel @Inject constructor(
                     _navigationEvents.emit(NavEvent.NavigateToNextScreen)
                 }
             }
+
             else -> {}
         }
     }

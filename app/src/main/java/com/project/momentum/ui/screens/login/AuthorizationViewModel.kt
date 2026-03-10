@@ -14,7 +14,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthorizationViewModel @Inject constructor(
     private val repository: RegistrationRepository
-): LoginViewModel() {
+) : LoginViewModel() {
     override fun nextStep() {
         validateCurrentStep()
         if (!_state.value.isStepValid) return
@@ -62,12 +62,13 @@ class AuthorizationViewModel @Inject constructor(
                     }
                 }
             }
+
             LoginStep.PASSWORD -> {
                 _state.update { it.copy(isLoading = true) }
 
                 viewModelScope.launch {
-                    val jwt = repository.login(_state.value)
-                    if (jwt != null) {
+                    val refreshToken = repository.login(_state.value)
+                    if (refreshToken != null) {
                         //TODO: куда-то сохранить или что-то сделать
                         _state.update {
                             it.copy(
@@ -112,6 +113,7 @@ class AuthorizationViewModel @Inject constructor(
                     }
                 }
             }
+
             else -> {}
         }
     }
