@@ -62,6 +62,7 @@ dependencies {
     // Core Android
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.datastore.preferences)
 
     // Compose
     implementation(platform(libs.androidx.compose.bom))
@@ -84,6 +85,7 @@ dependencies {
     // Dependency injection
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.datastore.core)
     ksp(libs.hilt.compiler)
 
     // Tests
