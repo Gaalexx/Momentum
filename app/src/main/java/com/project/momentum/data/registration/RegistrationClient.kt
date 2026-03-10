@@ -5,6 +5,7 @@ import com.project.momentum.data.CheckEmailRequestDTO
 import com.project.momentum.data.CheckPhoneNumberRequestDTO
 import com.project.momentum.data.CheckResponseDTO
 import com.project.momentum.data.LoginResponseDTO
+import com.project.momentum.data.LoginUserRequestDTO
 import com.project.momentum.data.RegisterUserRequestDTO
 import com.project.momentum.data.s3.PresignedURLDTO
 import com.project.momentum.di.Backend
@@ -16,13 +17,19 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 interface IRegistrationLoginClient {
-    suspend fun sendEmailToChecker(email: CheckEmailRequestDTO): CheckResponseDTO
+    suspend fun sendEmailToAuthorizationChecker(email: CheckEmailRequestDTO): CheckResponseDTO
+
+    suspend fun sendEmailToRegistrationChecker(email: CheckEmailRequestDTO): CheckResponseDTO
 
     suspend fun sendPhoneToChecker(phone: CheckPhoneNumberRequestDTO): CheckResponseDTO
 
     suspend fun sendData(userData: RegisterUserRequestDTO): LoginResponseDTO
 
     suspend fun sendCodeToChecker(code: CheckCodeRequestDTO): CheckResponseDTO
+
+    suspend fun sendLoginData(userData: LoginUserRequestDTO): LoginResponseDTO
+
+    suspend fun sendCodeAuthorization(email: CheckEmailRequestDTO): CheckResponseDTO
 }
 
 @Singleton
@@ -30,8 +37,16 @@ class RegistrationClient @Inject constructor(
     @Backend private val client: HttpClient
 ): IRegistrationLoginClient {
 
-    override suspend fun sendEmailToChecker(email: CheckEmailRequestDTO): CheckResponseDTO {
+    override suspend fun sendEmailToRegistrationChecker(email: CheckEmailRequestDTO): CheckResponseDTO {
         val response: CheckResponseDTO = client.post("/check-email") {
+            setBody(email)
+        }.body<CheckResponseDTO>()
+
+        return response
+    }
+
+    override suspend fun sendEmailToAuthorizationChecker(email: CheckEmailRequestDTO): CheckResponseDTO {
+        val response: CheckResponseDTO = client.post("/check-email-login") {
             setBody(email)
         }.body<CheckResponseDTO>()
 
@@ -47,7 +62,7 @@ class RegistrationClient @Inject constructor(
     }
 
     override suspend fun sendData(userData: RegisterUserRequestDTO): LoginResponseDTO {
-        val response: LoginResponseDTO = client.post("/login") {
+        val response: LoginResponseDTO = client.post("/register") {
             setBody(userData)
         }.body<LoginResponseDTO>()
 
@@ -61,4 +76,22 @@ class RegistrationClient @Inject constructor(
 
         return response
     }
+
+    override suspend fun sendCodeAuthorization(email: CheckEmailRequestDTO): CheckResponseDTO {
+        val response: CheckResponseDTO = client.post("/send-code") {
+            setBody(email)
+    }.body<CheckResponseDTO>()
+
+        return response
+    }
+
+    override suspend fun sendLoginData(userData: LoginUserRequestDTO): LoginResponseDTO {
+        val response: LoginResponseDTO = client.post("/login") {
+            setBody(userData)
+        }.body<LoginResponseDTO>()
+
+        return response
+    }
+
+
 }

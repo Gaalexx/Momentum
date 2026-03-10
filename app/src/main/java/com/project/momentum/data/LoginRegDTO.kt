@@ -26,6 +26,8 @@ data class RegisterUserRequestDTO(
 
 @Serializable
 data class CheckCodeRequestDTO(
+    val email: String?,
+    val phone: String?,
     val code: String,
 )
 
@@ -38,5 +40,5 @@ data class LoginUserRequestDTO(
 
 @Serializable
 data class LoginResponseDTO(
-    val jwt: String,
+    val jwt: String?,
 )

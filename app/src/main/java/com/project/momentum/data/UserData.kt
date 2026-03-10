@@ -1,8 +1,8 @@
 package com.project.momentum.data
 
 data class UserData(
-    val email: String = "email",
-    val phone: String = "phone",
-    val password: String = "password",
-    val verificationCode: String = "code",
+    val email: String = "",
+    val phone: String? = null,
+    val password: String = "",
+    val verificationCode: String = "",
 )

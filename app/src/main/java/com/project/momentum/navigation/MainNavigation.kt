@@ -7,6 +7,7 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
@@ -21,10 +22,17 @@ import com.project.momentum.ui.screens.camera.SendPhotoScreen
 import com.project.momentum.ui.screens.friends.FriendsScreen
 import com.project.momentum.ui.screens.friends.User
 import com.project.momentum.ui.screens.friends.UserViewModel
+import com.project.momentum.ui.screens.login.AuthorizationAccountScreen
+import com.project.momentum.ui.screens.login.AuthorizationPasswordScreen
+import com.project.momentum.ui.screens.login.PasswordRecoveryScreen
 import com.project.momentum.ui.screens.posts.GallaryScreen
 import com.project.momentum.ui.screens.posts.GalleryViewModel
 import com.project.momentum.ui.screens.posts.WatchPhotoScreen
 import com.project.momentum.ui.screens.recorder.RecorderScreen
+import com.project.momentum.ui.screens.registration.CreateAccountScreen
+import com.project.momentum.ui.screens.registration.CreatePasswordScreen
+import com.project.momentum.ui.screens.registration.InsertCodeScreen
+import com.project.momentum.ui.screens.registration.RegistrationViewModel
 import com.project.momentum.ui.screens.settings.SettingsMainScreen
 
 @Composable
@@ -32,7 +40,7 @@ fun MainScreen() {
     val galleryVM: GalleryViewModel = viewModel()
     val friendsVM: UserViewModel = viewModel()
 
-    val backStack = rememberNavBackStack(NavRoutes.Camera)
+    val backStack = rememberNavBackStack(NavRoutes.AuthorizationLogin)
 
     fun setBase(route: NavRoutes) {
         if (backStack.isEmpty()) {
@@ -84,10 +92,93 @@ fun MainScreen() {
     val saveableStateHolder = rememberSaveableStateHolder()
     val entryDecorators = listOf(
         rememberSaveableStateHolderNavEntryDecorator<NavKey>(saveableStateHolder),
-        rememberViewModelStoreNavEntryDecorator<NavKey>()
+//        rememberViewModelStoreNavEntryDecorator<NavKey>()
     )
 
     val navEntryProvider = entryProvider<NavKey> {
+        // Экраны регистрации
+        entry<NavRoutes.RegistrationLogin> {
+            CreateAccountScreen(
+                onBackClick = {
+                    closeOverlay()
+                },
+                onContinueClick = {
+                    openOverlay(NavRoutes.RegistrationCode)
+                }
+            )
+        }
+
+        entry<NavRoutes.RegistrationCode> {
+            InsertCodeScreen(
+                onBackClick = {
+                    closeOverlay()
+                },
+                onContinueClick = {
+                    openOverlay(NavRoutes.RegistrationPassword)
+                }
+            )
+        }
+
+        entry<NavRoutes.RegistrationPassword> {
+            CreatePasswordScreen(
+                onBackClick = {
+                    closeOverlay()
+                },
+                onContinueClick = {
+                    openOverlay(NavRoutes.Camera)
+                }
+            )
+        }
+
+        // Экраны входа
+        entry<NavRoutes.AuthorizationLogin> {
+            AuthorizationAccountScreen(
+                onBackClick = {
+                    closeOverlay()
+                },
+                onContinueClick = {
+                    openOverlay(NavRoutes.AuthorizationPassword)
+                }
+            )
+        }
+
+        entry<NavRoutes.AuthorizationPassword> {
+            AuthorizationPasswordScreen(
+                onBackClick = {
+                    closeOverlay()
+                },
+                onContinueClick = {
+                    openOverlay(NavRoutes.Camera)
+                },
+                onPasswordRecoveryClick = {
+                    openOverlay(NavRoutes.AuthorizationCode)
+                }
+            )
+        }
+
+//        entry<NavRoutes.AuthorizationPasswordRecovery> {
+//            PasswordRecoveryScreen(
+//                onBackClick = {
+//                    closeOverlay()
+//                },
+//                onContinueClick = {
+//                    openOverlay(NavRoutes.AuthorizationCode)
+//                }
+//            )
+//        }
+
+        entry<NavRoutes.AuthorizationCode> {
+            PasswordRecoveryScreen(
+                onBackClick = {
+                    closeOverlay()
+                },
+                onContinueClick = {
+                    openOverlay(NavRoutes.Camera)
+                }
+            )
+        }
+
+        // Экраны создания контента
         entry<NavRoutes.Camera> {
             CameraLikeScreen(
                 onGoToPreview = { uri ->
