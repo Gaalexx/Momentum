@@ -9,11 +9,12 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
-val compileSdkApi = libs.versions.compileSdk.get().toString().toInt()
-val minSdkApi = libs.versions.minSdk.get().toString().toInt()
-val targetSdkApi = libs.versions.targetSdk.get().toString().toInt()
+val compileSdkApi = libs.versions.compileSdk.get().toInt()
+val minSdkApi = libs.versions.minSdk.get().toInt()
+val targetSdkApi = libs.versions.targetSdk.get().toInt()
 val jvmTargetVersion = libs.versions.jvmTarget.get()
 val jvmTargetEnum = JvmTarget.valueOf("JVM_$jvmTargetVersion")
+val javaVersion = JavaVersion.toVersion(jvmTargetVersion)
 
 kotlin {
     jvmToolchain(jvmTargetVersion.toInt())
@@ -46,8 +47,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.toVersion(jvmTargetVersion)
-        targetCompatibility = JavaVersion.toVersion(jvmTargetVersion)
+        sourceCompatibility = javaVersion
+        targetCompatibility = javaVersion
     }
     buildFeatures {
         compose = true
@@ -58,47 +59,38 @@ android {
 }
 
 dependencies {
+    // Core Android
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.work.runtime.ktx)
 
+    // Compose
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
+    implementation(libs.lottie.compose)
 
-    implementation(libs.androidx.navigation3.runtime)
-    implementation(libs.androidx.navigation3.ui)
-
+    // Architecture
     implementation(libs.bundles.lifecycle)
-    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    implementation(libs.bundles.navigation)
 
-    implementation(libs.kotlinx.serialization.json)
-    implementation(libs.kotlinx.coroutines.android)
-
+    // Media
     implementation(libs.bundles.camerax)
+    implementation(libs.coil.compose)
 
-    implementation(libs.bundles.coil)
-    implementation(libs.landscapist.coil)
-    implementation(libs.bundles.accompanist)
+    // Networking
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.bundles.ktor)
 
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.okhttp)
-    implementation(libs.ktor.client.android)
-    implementation(libs.ktor.client.contentnegotiation)
-    implementation(libs.ktor.serialization.kotlinx.json)
-
-
+    // Dependency injection
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.androidx.foundation)
     ksp(libs.hilt.compiler)
 
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    // Tests
+    testImplementation(libs.junit4)
     androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.bundles.androidx.test)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
-
-    implementation("com.airbnb.android:lottie-compose:6.7.1")
 }
