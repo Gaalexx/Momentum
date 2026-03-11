@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthorizationViewModel @Inject constructor(
-    private val repository: RegistrationRepository
+    private val repository: RegistrationRepository,
 ) : LoginViewModel() {
     override fun nextStep() {
         validateCurrentStep()
