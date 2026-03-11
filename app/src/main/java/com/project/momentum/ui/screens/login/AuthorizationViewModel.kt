@@ -1,5 +1,6 @@
 package com.project.momentum.ui.screens.login
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.project.momentum.data.LoginStep
 import com.project.momentum.data.LoginType
@@ -13,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AuthorizationViewModel @Inject constructor(
-    private val repository: RegistrationRepository
+    private val repository: RegistrationRepository,
 ) : LoginViewModel() {
     override fun nextStep() {
         validateCurrentStep()
@@ -69,7 +70,10 @@ class AuthorizationViewModel @Inject constructor(
                 viewModelScope.launch {
                     val refreshToken = repository.login(_state.value)
                     if (refreshToken != null) {
-                        //TODO: куда-то сохранить или что-то сделать
+                        repository.apply {
+                            saveToken(refreshToken)
+                            authorize() // TODO сохранять куда-нибудь
+                        }
                         _state.update {
                             it.copy(
                                 currentStep = LoginStep.COMPLETED
@@ -92,7 +96,12 @@ class AuthorizationViewModel @Inject constructor(
                 _state.update { it.copy(isLoading = true) }
 
                 viewModelScope.launch {
-                    if (repository.checkUserCode(_state.value)) {
+                    val token = repository.checkAuthorizationUserCode(_state.value)
+                    if (token != null) {
+                        repository.apply {
+                            saveToken(token)
+                            authorize()         // TODO сохранять куда-нибудь
+                        }
                         _state.update {
                             it.copy(
                                 currentStep = LoginStep.COMPLETED,
