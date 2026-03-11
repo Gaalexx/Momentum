@@ -40,7 +40,7 @@ fun MainScreen() {
     val galleryVM: GalleryViewModel = viewModel()
     val friendsVM: UserViewModel = viewModel()
 
-    val backStack = rememberNavBackStack(NavRoutes.Camera)
+    val backStack = rememberNavBackStack(NavRoutes.AuthorizationLogin)
 
     fun setBase(route: NavRoutes) {
         if (backStack.isEmpty()) {

@@ -6,7 +6,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AuthRepository @Inject constructor(
+class AuthRepository @Inject constructor( // TODO смерджить с RegistrationRepository
     private val authAPI: AuthAPI,
     private val authStorage: AuthStorage,
     private val keyStoreManager: KeystoreManager
