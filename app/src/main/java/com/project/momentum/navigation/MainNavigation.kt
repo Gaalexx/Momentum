@@ -49,7 +49,7 @@ fun MainScreen() {
 
     val startRoute = when (state) {
         AppStartState.Authorized -> NavRoutes.Camera
-        AppStartState.Unauthorized -> NavRoutes.AuthorizationLogin
+        AppStartState.Unauthorized -> NavRoutes.RegistrationLogin
         AppStartState.Loading -> null
     }
 
@@ -125,6 +125,9 @@ fun MainScreen() {
                     },
                     onContinueClick = {
                         openOverlay(NavRoutes.RegistrationCode)
+                    },
+                    onSubButtonClick = {
+                        openOverlay(NavRoutes.AuthorizationLogin)
                     }
                 )
             }

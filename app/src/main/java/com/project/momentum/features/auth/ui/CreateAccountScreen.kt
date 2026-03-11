@@ -1,4 +1,4 @@
-package com.project.momentum.features.auth.ui
+package com.project.momentum.ui.screens.registration
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -30,19 +31,19 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.momentum.ConstColours
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.R
-import com.project.momentum.features.auth.models.LoginType
-import com.project.momentum.features.auth.models.NavEvent
-import com.project.momentum.features.auth.viewmodel.RegistrationViewModel
+import com.project.momentum.data.LoginType
+import com.project.momentum.data.registration.NavEvent
+import com.project.momentum.ui.assets.SubButton
 import com.project.momentum.ui.assets.TextFieldRegistration
 import com.project.momentum.ui.assets.TopBarTemplate
-import com.project.momentum.ui.common.LoadingOverlay
 
 @Preview(showBackground = true)
 @Composable
 fun CreateAccountScreenPreview() {
     CreateAccountScreen(
         onBackClick = {},
-        onContinueClick = {}
+        onContinueClick = {},
+        onSubButtonClick = {}
     )
 }
 
@@ -50,6 +51,7 @@ fun CreateAccountScreenPreview() {
 fun CreateAccountScreen(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
+    onSubButtonClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: RegistrationViewModel = hiltViewModel()
@@ -117,7 +119,8 @@ fun CreateAccountScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize(),
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     TextFieldRegistration(
                         value = uiState.userData.email,
@@ -141,6 +144,11 @@ fun CreateAccountScreen(
                             viewModel.nextStep()
                         },
                         modifier = Modifier.height(dimensionResource(R.dimen.button_size))
+                    )
+
+                    SubButton(
+                        text = R.string.button_already_have_account,
+                        onClick = onSubButtonClick
                     )
                 }
             }
