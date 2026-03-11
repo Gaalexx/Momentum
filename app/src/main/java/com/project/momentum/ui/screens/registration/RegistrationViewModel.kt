@@ -84,7 +84,7 @@ class RegistrationViewModel @Inject constructor(
                 _state.update { it.copy(isLoading = true) }
 
                 viewModelScope.launch {
-                    if (repository.checkUserCode(_state.value)) {
+                    if (repository.checkRegistrationUserCode(_state.value)) {
                         _state.update {
                             it.copy(
                                 currentStep = LoginStep.PASSWORD,
@@ -110,15 +110,21 @@ class RegistrationViewModel @Inject constructor(
                 _state.update { it.copy(isLoading = true) }
 
                 viewModelScope.launch {
-                    //TODO: куда-то сохранить или что-то сделать
                     val refreshToken = repository.sendUserData(_state.value)
-                    _state.update {
-                        it.copy(
-                            currentStep = LoginStep.COMPLETED,
-                            isLoading = false
-                        )
+                    if (refreshToken != null) {
+                        repository.apply {
+                            saveToken(refreshToken)
+                            authorize() // TODO сохранять куда-нибудь
+                        }
+                        _state.update {
+                            it.copy(
+                                currentStep = LoginStep.COMPLETED,
+                                isLoading = false
+                            )
+                        }
+                        _navigationEvents.emit(NavEvent.NavigateToNextScreen)
                     }
-                    _navigationEvents.emit(NavEvent.NavigateToNextScreen)
+
                 }
             }
 

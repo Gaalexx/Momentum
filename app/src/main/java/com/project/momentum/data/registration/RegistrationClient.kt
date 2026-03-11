@@ -1,5 +1,7 @@
 package com.project.momentum.data.registration
 
+import com.project.momentum.data.CheckCodeLoginRequestDTO
+import com.project.momentum.data.CheckCodeLoginResponseDTO
 import com.project.momentum.data.CheckCodeRequestDTO
 import com.project.momentum.data.CheckEmailRequestDTO
 import com.project.momentum.data.CheckPhoneNumberRequestDTO
@@ -7,7 +9,6 @@ import com.project.momentum.data.CheckResponseDTO
 import com.project.momentum.data.LoginResponseDTO
 import com.project.momentum.data.LoginUserRequestDTO
 import com.project.momentum.data.RegisterUserRequestDTO
-import com.project.momentum.data.s3.PresignedURLDTO
 import com.project.momentum.di.Backend
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -27,6 +28,8 @@ interface IRegistrationLoginClient {
 
     suspend fun sendCodeToChecker(code: CheckCodeRequestDTO): CheckResponseDTO
 
+    suspend fun sendCodeToCheckerForAuthorization(code: CheckCodeLoginRequestDTO): CheckCodeLoginResponseDTO
+
     suspend fun sendLoginData(userData: LoginUserRequestDTO): LoginResponseDTO
 
     suspend fun sendCodeAuthorization(email: CheckEmailRequestDTO): CheckResponseDTO
@@ -35,7 +38,7 @@ interface IRegistrationLoginClient {
 @Singleton
 class RegistrationClient @Inject constructor(
     @Backend private val client: HttpClient
-): IRegistrationLoginClient {
+) : IRegistrationLoginClient {
 
     override suspend fun sendEmailToRegistrationChecker(email: CheckEmailRequestDTO): CheckResponseDTO {
         val response: CheckResponseDTO = client.post("/check-email") {
@@ -77,10 +80,18 @@ class RegistrationClient @Inject constructor(
         return response
     }
 
+    override suspend fun sendCodeToCheckerForAuthorization(code: CheckCodeLoginRequestDTO): CheckCodeLoginResponseDTO {
+        val response: CheckCodeLoginResponseDTO = client.post("/check-login-code") {
+            setBody(code)
+        }.body<CheckCodeLoginResponseDTO>()
+
+        return response
+    }
+
     override suspend fun sendCodeAuthorization(email: CheckEmailRequestDTO): CheckResponseDTO {
         val response: CheckResponseDTO = client.post("/send-code") {
             setBody(email)
-    }.body<CheckResponseDTO>()
+        }.body<CheckResponseDTO>()
 
         return response
     }
