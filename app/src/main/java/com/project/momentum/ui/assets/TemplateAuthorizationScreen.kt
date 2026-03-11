@@ -79,21 +79,10 @@ fun TemplateAuthorizationScreen(
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size))
                 )
 
-                Box(
-                    modifier = Modifier
-                        .clickable(
-                            onClick = onSubButtonClick
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(subButtonText),
-                        modifier = Modifier.padding(dimensionResource(R.dimen.medium_padding)),
-                        color = ConstColours.WHITE,
-                        textAlign = TextAlign.Center,
-                        style = AppTextStyles.SubButtonText,
-                    )
-                }
+                SubButton(
+                    text = subButtonText,
+                    onClick = onSubButtonClick
+                )
             }
         }
     }
