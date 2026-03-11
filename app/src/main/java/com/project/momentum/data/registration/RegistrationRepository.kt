@@ -9,6 +9,7 @@ import com.project.momentum.data.RegisterUserRequestDTO
 import com.project.momentum.data.LoginState
 import com.project.momentum.data.LoginUserRequestDTO
 import com.project.momentum.data.auth.AuthAPI
+import com.project.momentum.data.auth.SessionManager
 import com.project.momentum.data.auth.datastore.AuthStorageImpl
 import com.project.momentum.data.auth.keystore.KeystoreManager
 import javax.inject.Inject
@@ -20,7 +21,8 @@ class RegistrationRepository @Inject constructor(
     private val client: RegistrationClient,
     private val authAPI: AuthAPI,
     private val authStorage: AuthStorageImpl,
-    private val keyStoreManager: KeystoreManager
+    private val keyStoreManager: KeystoreManager,
+    private val sessionManager: SessionManager
 ) {
     suspend fun checkRegistrationLoginDB(user: LoginState): Boolean {
         val response = when (user.loginType) {
@@ -95,6 +97,9 @@ class RegistrationRepository @Inject constructor(
         val decrypted = keyStoreManager.decrypt(token)
         val response = authAPI.tryAuth(decrypted)
 
+        if (response.token != null) {
+            sessionManager.setToken(response.token)
+        }
         return response.token
     }
 
