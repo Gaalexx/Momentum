@@ -124,9 +124,6 @@ fun S3PhotoGrid(
         posts.forEach { post -> add(S3GridItem.Post(post)) }
     }
 
-//    val displayItems: List<S3GridItem> = posts.map { post ->
-//        S3GridItem.Post(post)
-//    }
 
 
     LazyVerticalGrid(
