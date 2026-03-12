@@ -1,4 +1,4 @@
-package com.example.momentum
+package com.project.momentum.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

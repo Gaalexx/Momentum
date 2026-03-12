@@ -18,13 +18,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.momentum.ConstColours
+import com.project.momentum.ui.theme.ConstColours
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import android.content.Context
 import androidx.compose.ui.platform.LocalContext
 import com.project.momentum.R
-import com.project.momentum.S3PhotoGrid
+import com.project.momentum.ui.assets.S3PhotoGrid
 import com.project.momentum.ui.assets.BackCircleButton
 import androidx.compose.runtime.collectAsState
 import com.project.momentum.features.account.viewmodel.AccountViewModel

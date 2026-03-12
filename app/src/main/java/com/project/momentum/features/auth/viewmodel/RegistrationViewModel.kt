@@ -1,6 +1,8 @@
 package com.project.momentum.features.auth.viewmodel
 
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.project.momentum.features.auth.models.LoginStep
 import com.project.momentum.features.auth.models.LoginType

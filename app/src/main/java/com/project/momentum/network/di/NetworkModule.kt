@@ -10,7 +10,6 @@ import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.http.ContentType
-import io.ktor.http.URLProtocol
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
@@ -32,10 +31,7 @@ object NetworkModule {
                 })
             }
             defaultRequest {
-                url {
-                    protocol = URLProtocol.Companion.HTTP
-                    host = BuildConfig.BACKEND_BUILD_URL
-                }
+                url(BuildConfig.BACKEND_BUILD_URL)
                 contentType(ContentType.Application.Json)
             }
         }

@@ -17,8 +17,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.momentum.ConstColours
-import com.project.momentum.PhotoGrid
+import com.project.momentum.ui.theme.ConstColours
+import com.project.momentum.ui.assets.PhotoGrid
 import com.project.momentum.R
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.FriendsPillButton

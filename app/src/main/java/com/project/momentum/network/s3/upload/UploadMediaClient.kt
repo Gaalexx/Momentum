@@ -24,7 +24,7 @@ class UploadMediaClient @Inject constructor(
     @Backend private val client: HttpClient,
 ) : IUploadMediaClient {
     override suspend fun sendUploadRequest(mediaInfo: UploadInfoDTO): PresignedURLDTO {
-        val response: PresignedURLDTO = client.post("/upload") {
+        val response: PresignedURLDTO = client.post("upload") {
             setBody(mediaInfo)
         }.body<PresignedURLDTO>()
 
@@ -32,7 +32,7 @@ class UploadMediaClient @Inject constructor(
     }
 
     override suspend fun sendMessageOnComplete(statusInfo: S3UpdateStatusDTO) {
-        val response = client.post("/status-upload") {
+        val response = client.post("status-upload") {
             setBody(statusInfo)
         }.body<HttpStatusCode>()
     }
