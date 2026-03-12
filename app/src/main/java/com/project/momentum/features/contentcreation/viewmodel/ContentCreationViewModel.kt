@@ -1,4 +1,4 @@
-package com.project.momentum.features.contentcreation
+package com.project.momentum.features.contentcreation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
