@@ -1,4 +1,4 @@
-package com.project.momentum.features.contentcreation
+package com.project.momentum.features.contentcreation.ui
 
 import android.content.ContentValues
 import android.content.pm.PackageManager
