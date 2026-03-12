@@ -37,15 +37,14 @@ fun AccountScreen(
     postsCount: Int = 0,
     onPostClick: () -> Unit = {},
     onProfileClick: () -> Unit = {},
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    viewModel: AccountViewModel = hiltViewModel()
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
     val iconTint = Color(0xFFEDEEF2)
     val textColor = Color.White
     val context: Context = LocalContext.current
-
-    val viewModel: AccountViewModel = hiltViewModel()
 
     val posts = viewModel.posts
 
