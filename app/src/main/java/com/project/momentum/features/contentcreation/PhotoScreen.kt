@@ -16,7 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.momentum.ConstColours
+import com.project.momentum.ui.theme.ConstColours
 import android.content.ContentValues
 import android.os.Build
 import android.provider.MediaStore

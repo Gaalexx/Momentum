@@ -41,7 +41,7 @@ class RegistrationAPI @Inject constructor(
 ) : IRegistrationLoginClient {
 
     override suspend fun sendEmailToRegistrationChecker(email: CheckEmailRequestDTO): CheckResponseDTO {
-        val response: CheckResponseDTO = client.post("/check-email") {
+        val response: CheckResponseDTO = client.post("check-email") {
             setBody(email)
         }.body<CheckResponseDTO>()
 
@@ -49,7 +49,7 @@ class RegistrationAPI @Inject constructor(
     }
 
     override suspend fun sendEmailToAuthorizationChecker(email: CheckEmailRequestDTO): CheckResponseDTO {
-        val response: CheckResponseDTO = client.post("/check-email-login") {
+        val response: CheckResponseDTO = client.post("check-email-login") {
             setBody(email)
         }.body<CheckResponseDTO>()
 
@@ -57,7 +57,7 @@ class RegistrationAPI @Inject constructor(
     }
 
     override suspend fun sendPhoneToChecker(phone: CheckPhoneNumberRequestDTO): CheckResponseDTO {
-        val response: CheckResponseDTO = client.post("/check-telephone") {
+        val response: CheckResponseDTO = client.post("check-telephone") {
             setBody(phone)
         }.body<CheckResponseDTO>()
 
@@ -65,7 +65,7 @@ class RegistrationAPI @Inject constructor(
     }
 
     override suspend fun sendData(userData: RegisterUserRequestDTO): LoginResponseDTO {
-        val response: LoginResponseDTO = client.post("/register") {
+        val response: LoginResponseDTO = client.post("register") {
             setBody(userData)
         }.body<LoginResponseDTO>()
 
@@ -73,7 +73,7 @@ class RegistrationAPI @Inject constructor(
     }
 
     override suspend fun sendCodeToChecker(code: CheckCodeRequestDTO): CheckResponseDTO {
-        val response: CheckResponseDTO = client.post("/check-code") {
+        val response: CheckResponseDTO = client.post("check-code") {
             setBody(code)
         }.body<CheckResponseDTO>()
 
@@ -81,7 +81,7 @@ class RegistrationAPI @Inject constructor(
     }
 
     override suspend fun sendCodeToCheckerForAuthorization(code: CheckCodeLoginRequestDTO): CheckCodeLoginResponseDTO {
-        val response: CheckCodeLoginResponseDTO = client.post("/check-login-code") {
+        val response: CheckCodeLoginResponseDTO = client.post("check-login-code") {
             setBody(code)
         }.body<CheckCodeLoginResponseDTO>()
 
@@ -89,7 +89,7 @@ class RegistrationAPI @Inject constructor(
     }
 
     override suspend fun sendCodeAuthorization(email: CheckEmailRequestDTO): CheckResponseDTO {
-        val response: CheckResponseDTO = client.post("/send-code") {
+        val response: CheckResponseDTO = client.post("send-code") {
             setBody(email)
         }.body<CheckResponseDTO>()
 
@@ -97,7 +97,7 @@ class RegistrationAPI @Inject constructor(
     }
 
     override suspend fun sendLoginData(userData: LoginUserRequestDTO): LoginResponseDTO {
-        val response: LoginResponseDTO = client.post("/login") {
+        val response: LoginResponseDTO = client.post("login") {
             setBody(userData)
         }.body<LoginResponseDTO>()
 

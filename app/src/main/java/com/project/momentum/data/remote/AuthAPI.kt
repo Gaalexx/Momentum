@@ -19,6 +19,6 @@ class AuthAPI @Inject constructor(
 ) : IAuthAPI {
 
     override suspend fun tryAuth(token: String): GetJWTDTO =
-        client.post("/auth") { setBody(GetJWTDTO(token)) }.body<GetJWTDTO>()
+        client.post("auth") { setBody(GetJWTDTO(token)) }.body<GetJWTDTO>()
 
 }

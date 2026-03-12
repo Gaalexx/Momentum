@@ -27,7 +27,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.momentum.ConstColours
+import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.R
 import com.project.momentum.ui.theme.AppTextStyles
 

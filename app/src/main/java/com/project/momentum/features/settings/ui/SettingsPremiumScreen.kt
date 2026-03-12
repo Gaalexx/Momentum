@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.momentum.ConstColours
+import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.R
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.BuyButton

@@ -1,7 +1,7 @@
 package com.project.momentum.ui.theme
 
 import androidx.compose.ui.graphics.Color
-import com.example.momentum.ConstColours
+import com.project.momentum.ui.theme.ConstColours
 
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)

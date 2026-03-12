@@ -13,6 +13,7 @@ import com.project.momentum.features.auth.models.dto.CheckEmailRequestDTO
 import com.project.momentum.features.auth.models.dto.CheckPhoneNumberRequestDTO
 import com.project.momentum.features.auth.models.dto.LoginUserRequestDTO
 import com.project.momentum.features.auth.models.dto.RegisterUserRequestDTO
+import java.security.GeneralSecurityException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -94,7 +95,14 @@ class RegistrationRepository @Inject constructor(
 
     suspend fun authorize(): String? {
         val token = authStorage.getEncryptedData() ?: return null
-        val decrypted = keyStoreManager.decrypt(token)
+        val decrypted = try {
+            keyStoreManager.decrypt(token)
+        } catch (e: GeneralSecurityException) {
+            // Corrupted data or invalidated keystore key -> drop saved token
+            authStorage.clear()
+            keyStoreManager.clearKey()
+            return null
+        }
         val response = authAPI.tryAuth(decrypted)
 
         if (response.token != null) {

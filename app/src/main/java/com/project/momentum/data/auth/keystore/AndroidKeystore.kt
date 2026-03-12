@@ -68,6 +68,13 @@ class KeystoreManager @Inject constructor() {
 
         return plainBytes.toString(Charsets.UTF_8)
     }
+
+    fun clearKey() {
+        val keyStore = getKeyStore()
+        if (keyStore.containsAlias(alias)) {
+            keyStore.deleteEntry(alias)
+        }
+    }
 }
 
 @Serializable

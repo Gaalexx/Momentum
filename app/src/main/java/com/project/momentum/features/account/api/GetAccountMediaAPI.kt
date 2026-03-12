@@ -18,6 +18,6 @@ class GetAccountMediaAPI @Inject constructor(
 ) : IGetAccountMediaClient {
 
     override suspend fun getAllPosts(): List<PostDTO> =
-        client.post("/get-my-media").body<List<PostDTO>>()
+        client.post("get-my-media").body<List<PostDTO>>()
 
 }

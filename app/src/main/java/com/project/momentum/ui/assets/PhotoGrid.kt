@@ -1,4 +1,4 @@
-package com.project.momentum
+package com.project.momentum.ui.assets
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,9 +16,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
-import com.example.momentum.ConstColours
+import com.project.momentum.R
+import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.network.s3.PostDTO
-import com.project.momentum.ui.assets.PlusButton
 import com.project.momentum.features.posts.PostData
 
 @Composable

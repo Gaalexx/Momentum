@@ -11,7 +11,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Constraints
-import com.example.momentum.ConstColours
+import com.project.momentum.ui.theme.ConstColours
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
