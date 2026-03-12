@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.project.momentum.features.contentcreation
+package com.project.momentum.features.contentcreation.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*

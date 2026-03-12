@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class)
 
-package com.project.momentum.features.contentcreation
+package com.project.momentum.features.contentcreation.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -40,6 +40,9 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.project.momentum.R
+import com.project.momentum.features.contentcreation.viewmodel.ContentCreationViewModel
+import com.project.momentum.features.contentcreation.viewmodel.UploadEvent
+import com.project.momentum.features.contentcreation.viewmodel.UploadState
 import com.project.momentum.network.s3.MediaType
 import com.project.momentum.network.s3.PostInformation
 import com.project.momentum.ui.assets.BigCircleSendPhotoAction
@@ -69,9 +72,10 @@ fun SendPhotoScreen(
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
-    uri: Uri?
+    uri: Uri?,
+    vm: ContentCreationViewModel = hiltViewModel()
 ) {
-    val vm: ContentCreationViewModel = hiltViewModel()
+
     val uploadState by vm.state.collectAsStateWithLifecycle()
     var isLoading by remember { mutableStateOf(false) }
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))

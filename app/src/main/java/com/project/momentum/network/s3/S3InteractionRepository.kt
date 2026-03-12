@@ -1,7 +1,7 @@
 package com.project.momentum.network.s3
 
 import android.net.Uri
-import com.project.momentum.network.s3.upload.UploadMediaClient
+import com.project.momentum.network.s3.upload.UploadMediaAPI
 import com.project.momentum.network.s3.upload.S3UploadApi
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,7 +17,7 @@ data class PostInformation(
 
 @Singleton
 class S3InteractionRepository @Inject constructor(
-    private val client: UploadMediaClient,
+    private val client: UploadMediaAPI,
     private val s3UploadAPI: S3UploadApi
 ) {
 

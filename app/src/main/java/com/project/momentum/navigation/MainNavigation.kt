@@ -18,8 +18,8 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.project.momentum.features.account.ui.AccountScreen
-import com.project.momentum.features.contentcreation.CameraLikeScreen
-import com.project.momentum.features.contentcreation.SendPhotoScreen
+import com.project.momentum.features.contentcreation.ui.CameraLikeScreen
+import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
 import com.project.momentum.features.friends.ui.FriendsScreen
 import com.project.momentum.features.friends.ui.User
 import com.project.momentum.features.friends.viewmodel.UserViewModel
@@ -29,7 +29,7 @@ import com.project.momentum.features.auth.ui.PasswordRecoveryScreen
 import com.project.momentum.features.posts.ui.GallaryScreen
 import com.project.momentum.features.posts.ui.GalleryViewModel
 import com.project.momentum.features.posts.ui.WatchPhotoScreen
-import com.project.momentum.features.contentcreation.RecorderScreen
+import com.project.momentum.features.contentcreation.ui.RecorderScreen
 import com.project.momentum.features.auth.ui.CreateAccountScreen
 import com.project.momentum.features.auth.ui.CreatePasswordScreen
 import com.project.momentum.features.auth.ui.InsertCodeScreen
