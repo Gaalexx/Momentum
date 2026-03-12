@@ -51,7 +51,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.sp
 import com.project.momentum.R
-import com.project.momentum.ui.screens.settings.SubscriptionOption
+import com.project.momentum.features.settings.ui.SubscriptionOption
 
 @Composable
 fun BackCircleButton(

@@ -10,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.NavKey
@@ -18,27 +17,26 @@ import androidx.navigation3.runtime.rememberDecoratedNavEntries
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.project.momentum.data.auth.AppStartState
-import com.project.momentum.data.auth.AppStartViewModel
-import com.project.momentum.ui.screens.account.AccountScreen
-import com.project.momentum.ui.screens.camera.CameraLikeScreen
-import com.project.momentum.ui.screens.camera.SendPhotoScreen
-import com.project.momentum.ui.screens.friends.FriendsScreen
-import com.project.momentum.ui.screens.friends.User
-import com.project.momentum.ui.screens.friends.UserViewModel
-import com.project.momentum.ui.screens.login.AuthorizationAccountScreen
-import com.project.momentum.ui.screens.login.AuthorizationPasswordScreen
-import com.project.momentum.ui.screens.login.PasswordRecoveryScreen
-import com.project.momentum.ui.screens.posts.GallaryScreen
-import com.project.momentum.ui.screens.posts.GalleryViewModel
-import com.project.momentum.ui.screens.posts.WatchPhotoScreen
-import com.project.momentum.ui.screens.recorder.RecorderScreen
-import com.project.momentum.ui.screens.registration.CreateAccountScreen
-import com.project.momentum.ui.screens.registration.CreatePasswordScreen
-import com.project.momentum.ui.screens.registration.InsertCodeScreen
-import com.project.momentum.ui.screens.registration.LoadingOverlay
-import com.project.momentum.ui.screens.registration.RegistrationViewModel
-import com.project.momentum.ui.screens.settings.SettingsMainScreen
+import com.project.momentum.features.account.ui.AccountScreen
+import com.project.momentum.features.contentcreation.CameraLikeScreen
+import com.project.momentum.features.contentcreation.SendPhotoScreen
+import com.project.momentum.features.friends.ui.FriendsScreen
+import com.project.momentum.features.friends.ui.User
+import com.project.momentum.features.friends.viewmodel.UserViewModel
+import com.project.momentum.features.auth.ui.AuthorizationAccountScreen
+import com.project.momentum.features.auth.ui.AuthorizationPasswordScreen
+import com.project.momentum.features.auth.ui.PasswordRecoveryScreen
+import com.project.momentum.features.posts.ui.GallaryScreen
+import com.project.momentum.features.posts.ui.GalleryViewModel
+import com.project.momentum.features.posts.ui.WatchPhotoScreen
+import com.project.momentum.features.contentcreation.RecorderScreen
+import com.project.momentum.features.auth.ui.CreateAccountScreen
+import com.project.momentum.features.auth.ui.CreatePasswordScreen
+import com.project.momentum.features.auth.ui.InsertCodeScreen
+import com.project.momentum.navigation.viewmodel.AppStartState
+import com.project.momentum.navigation.viewmodel.AppStartViewModel
+import com.project.momentum.ui.common.LoadingOverlay
+import com.project.momentum.features.settings.ui.SettingsMainScreen
 
 @Composable
 fun MainScreen() {
