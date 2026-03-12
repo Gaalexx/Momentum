@@ -17,9 +17,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.example.momentum.ConstColours
-import com.project.momentum.data.s3.PostDTO
+import com.project.momentum.network.s3.PostDTO
 import com.project.momentum.ui.assets.PlusButton
-import com.project.momentum.ui.screens.posts.PostData
+import com.project.momentum.features.posts.PostData
 
 @Composable
 fun PhotoGrid(

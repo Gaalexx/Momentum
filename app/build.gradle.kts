@@ -35,6 +35,12 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "BACKEND_BUILD_URL",
+            "\"193.233.20.47/api/momentum\""
+        )
     }
 
     buildTypes {
@@ -52,6 +58,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     kotlinOptions {
         freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
