@@ -848,7 +848,7 @@ private fun PreviewSettingsButton() {
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun PreviewBigCircle() {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(contentAlignment = Alignment.Center) {
         BigCircleForMainScreenAction(onClick = {}, onLongPressStart = {}, onLongPressEnd = {})
     }
 }
