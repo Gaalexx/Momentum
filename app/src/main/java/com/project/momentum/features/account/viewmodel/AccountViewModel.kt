@@ -3,6 +3,7 @@ package com.project.momentum.features.account.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.momentum.features.account.repo.AccountRepository
+import com.project.momentum.features.account.usecases.GetMediaUseCase
 import com.project.momentum.network.s3.PostDTO
 import com.project.momentum.network.s3.PostInformation
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,14 +18,15 @@ sealed interface AccountState {
     data object Done : AccountState
 }
 
-sealed interface AccountEvent {
-    data class Send(val postInfo: PostInformation) : AccountEvent
+sealed interface AccountMediaEvent {
+    data class Send(val postInfo: PostInformation) : AccountMediaEvent
     //data object Retry : UploadEvent
     //data object Reset : UploadEvent
 }
 
 @HiltViewModel
 class AccountViewModel @Inject constructor( // TODO прописать состояния
+    private val getMediaUseCase: GetMediaUseCase,
     private val repository: AccountRepository
 ) : ViewModel() {
 
