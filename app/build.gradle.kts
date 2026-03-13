@@ -1,4 +1,7 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.konan.properties.Properties
+import shadow.bundletool.com.android.ddmlib.Log
 
 plugins {
     alias(libs.plugins.android.application)
@@ -15,6 +18,9 @@ val targetSdkApi = libs.versions.targetSdk.get().toInt()
 val jvmTargetVersion = libs.versions.jvmTarget.get()
 val jvmTargetEnum = JvmTarget.valueOf("JVM_$jvmTargetVersion")
 val javaVersion = JavaVersion.toVersion(jvmTargetVersion)
+
+
+val localProperties = Properties()
 
 kotlin {
     jvmToolchain(jvmTargetVersion.toInt())
@@ -40,6 +46,15 @@ android {
             "String",
             "BACKEND_BUILD_URL",
             "\"http://193.233.20.47/api/momentum/\""
+        )
+
+        buildConfigField(
+            "String",
+            "API_KEY",
+            localProperties.getProperty("API_KEY") ?: run {
+                Log.w("Momentum", "API_KEY not found in local.properties")
+                ""
+            }
         )
     }
 
