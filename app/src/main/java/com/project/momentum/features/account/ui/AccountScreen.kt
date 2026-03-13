@@ -21,7 +21,6 @@ import com.project.momentum.ui.theme.ConstColours
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import android.content.Context
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import com.project.momentum.R
 import com.project.momentum.ui.assets.S3PhotoGrid
@@ -32,21 +31,47 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.project.momentum.features.account.viewmodel.AccountInfoEvent
+import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.account.viewmodel.AccountInfoViewModel
+import com.project.momentum.features.account.viewmodel.AccountMediaEvent
 import com.project.momentum.features.account.viewmodel.AccountViewModel
+import com.project.momentum.features.account.viewmodel.MediaState
+
+
+@Composable
+fun AccountRoot(
+    modifier: Modifier = Modifier,
+    userStatus: String = stringResource(R.string.account_online_status),
+    onPostClick: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
+    onBackClick: () -> Unit,
+    onAddPostClick: () -> Unit,
+    accountMediaViewModel: AccountViewModel = hiltViewModel(),
+    accountInfoViewModel: AccountInfoViewModel = hiltViewModel()
+){
+    val uiInfoState by accountInfoViewModel.state.collectAsStateWithLifecycle()
+    val uiMediaState by accountMediaViewModel.state.collectAsStateWithLifecycle()
+
+    AccountScreen(
+        modifier = modifier,
+        userStatus = userStatus,
+        onBackClick = onBackClick,
+        onAddPostClick = onAddPostClick,
+        uiInfoState = uiInfoState,
+        uiMediaState = uiMediaState
+    )
+}
 
 @Composable
 fun AccountScreen(
     modifier: Modifier = Modifier,
-    userName: String = stringResource(R.string.userName),
     userStatus: String = stringResource(R.string.account_online_status),
-    postsCount: Int = 0,
     onPostClick: () -> Unit = {},
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
-    accountMediaViewModel: AccountViewModel = hiltViewModel(),
-    accountInfoViewModel: AccountInfoViewModel = hiltViewModel()
+    onAddPostClick: () -> Unit,
+    uiInfoState: AccountInfoState,
+    uiMediaState: MediaState
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
@@ -54,12 +79,7 @@ fun AccountScreen(
     val textColor = Color.White
     val context: Context = LocalContext.current
 
-    val uiInfoState by accountInfoViewModel.state.collectAsStateWithLifecycle()
-    val posts = accountMediaViewModel.posts //TODO переделать state внутри AccountViewModel
 
-    fun addNewPhoto() {
-        accountMediaViewModel.loadPosts()
-    }
 
     Column(
         modifier = modifier
@@ -162,9 +182,9 @@ fun AccountScreen(
             )
 
             S3PhotoGrid(
-                posts = accountMediaViewModel.posts.collectAsState().value,
+                posts = uiMediaState.posts,
                 onPostClick = {},
-                onAddPhotoClick = { accountMediaViewModel.loadPosts() },
+                onAddPhotoClick = onAddPostClick,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
@@ -182,7 +202,10 @@ private fun AccountScreenPreview() {
         AccountScreen(
             onPostClick = {},
             onProfileClick = {},
-            onBackClick = {}
+            onBackClick = {},
+            onAddPostClick = {},
+            uiInfoState = AccountInfoState("Preview", null),
+            uiMediaState = MediaState(listOf())
         )
     }
 }
