@@ -131,10 +131,7 @@ fun WatchPhotoScreen(
     onGoToFriends: () -> Unit,
     onStartRecordVideo: () -> Unit = {},
     onStopRecordVideo: () -> Unit = {},
-    url: String?,
-    description: String,
-    userName: String,
-    date: String
+    postUrl: String
 ) {
     val bg = ConstColours.BLACK
     val iconTint = ConstColours.WHITE
@@ -177,14 +174,14 @@ fun WatchPhotoScreen(
         ) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 AsyncImage(
-                    model = url,
+                    model = postUrl,
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
 
                 CaptionBasicLabel(
-                    text = description,
+                    text = "Not implemented yet",
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .fillMaxWidth()
@@ -198,12 +195,12 @@ fun WatchPhotoScreen(
 
         Text(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = date,
+            text = "Not implemented yet",
             color = ConstColours.WHITE,
             style = AppTextStyles.SupportingText
         )
 
-        ProfileLabel(name = userName, imageUrl = stringResource(R.string.cats_url))
+        ProfileLabel(name = "Not implemented yet", imageUrl = stringResource(R.string.cats_url))
 
         ReactToPhoto(onReact = {})
 
@@ -282,10 +279,7 @@ private fun WatchPhotoScreenPreview() {
             onGoToSettings = {},
             onProfileClick = {},
             onGoToFriends = {},
-            url = null,
-            description = "null",
-            userName = "null",
-            date = "null"
+            postUrl = stringResource(R.string.cats_url)
         )
     }
 }

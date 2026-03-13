@@ -42,13 +42,13 @@ import com.project.momentum.features.account.viewmodel.MediaState
 fun AccountRoot(
     modifier: Modifier = Modifier,
     userStatus: String = stringResource(R.string.account_online_status),
-    onPostClick: () -> Unit = {},
+    onPostClick: (String) -> Unit,
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
     onAddPostClick: () -> Unit,
     accountMediaViewModel: AccountViewModel = hiltViewModel(),
     accountInfoViewModel: AccountInfoViewModel = hiltViewModel()
-){
+) {
     val uiInfoState by accountInfoViewModel.state.collectAsStateWithLifecycle()
     val uiMediaState by accountMediaViewModel.state.collectAsStateWithLifecycle()
 
@@ -57,6 +57,7 @@ fun AccountRoot(
         userStatus = userStatus,
         onBackClick = onBackClick,
         onAddPostClick = onAddPostClick,
+        onPostClick = onPostClick,
         uiInfoState = uiInfoState,
         uiMediaState = uiMediaState
     )
@@ -66,7 +67,7 @@ fun AccountRoot(
 fun AccountScreen(
     modifier: Modifier = Modifier,
     userStatus: String = stringResource(R.string.account_online_status),
-    onPostClick: () -> Unit = {},
+    onPostClick: (String) -> Unit,
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
     onAddPostClick: () -> Unit,
@@ -183,7 +184,7 @@ fun AccountScreen(
 
             S3PhotoGrid(
                 posts = uiMediaState.posts,
-                onPostClick = {},
+                onPostClick = onPostClick,
                 onAddPhotoClick = onAddPostClick,
                 modifier = Modifier
                     .fillMaxWidth()
