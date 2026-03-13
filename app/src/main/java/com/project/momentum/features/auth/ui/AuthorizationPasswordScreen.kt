@@ -53,6 +53,7 @@ fun AuthorizationPasswordScreen(
             viewModel.onCodeAuthorization()
         },
         modifier = modifier,
+        isError = uiState.isError,
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Password,
             imeAction = ImeAction.Done

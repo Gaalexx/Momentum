@@ -62,6 +62,7 @@ fun AuthorizationAccountScreen(
             viewModel.switchLoginType()
         },
         modifier = modifier,
+        isError = uiState.isError,
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType =
                 when (uiState.loginType) {
