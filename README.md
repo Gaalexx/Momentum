@@ -4,19 +4,31 @@
 ## Архитектура и ключевые решения
 
 ### Подход
-- UI: Jetpack Compose, single-activity
-- Архитектура: MVI
+- Single-activity приложение на Jetpack Compose
+- Архитектура: feature-first + state во `ViewModel`
 
 ### Слои и ответственность
-- `ui/` — экраны, компоненты, тема. Не содержит работы с сетью/базой.
-- `viewmodel/` — состояние экрана, обработка событий, вызов use-cases/repositories.
-- `domain/` — бизнес-логика (use cases), модели домена.
-- `data/` — репозитории, маппинг моделей, источники данных.
-- `network/` — Ktor client, API, сериализация.
-- `di/` — Hilt-модули и биндинги.
+- `MainActivity.kt`, `MomentumApp.kt` — точка входа, запуск Compose и Hilt.
+- `navigation/` — маршруты, корневая навигация, выбор стартового экрана по состоянию сессии.
+- `features/*/ui/` — экраны фич и пользовательские сценарии.
+- `features/*/viewmodel/` — состояние экрана и обработка действий пользователя.
+- `features/*/models/` — DTO, UI-state и локальные модели.
+- `features/*/usecases/` — бизнес-сценарии там, где логика вынесена из `ViewModel`.
+- `features/*/repo/`, `features/*/api/` — доступ к backend и подготовка данных внутри конкретной фичи.
+- `data/` — общая auth/session-логика, регистрация, логин, восстановление сессии.
+- `data/auth/*` — безопасное хранение токена через `DataStore` и `Android Keystore`.
+- `network/` — `Ktor`-клиенты, S3 upload, сетевые модели.
+- `di/` — Hilt-модули и сборка зависимостей.
+- `ui/*` — общие UI-компоненты и тема.
+- `assets/`, `res/` — ресурсы приложения и локальные mock-данные.
+
+Примечание:
+- Архитектура проекта pragmatic, а не строго `Clean Architecture`.
+- `account` уже использует цепочку `ui -> viewmodel -> usecase -> repo/api`.
+- `friends` и часть `posts` пока работают через `assets/*.json` и mock-данные.
 
 ### Навигация
-- Navigation Compose, один `NavHost` как корень.
+- `androidx.navigation3`, один корневой `NavDisplay`.
 - Навигационные маршруты описаны в `navigation/`.
 - Аргументы передаются через типизированные routes.
 
