@@ -17,6 +17,7 @@ import androidx.navigation3.runtime.rememberDecoratedNavEntries
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.project.momentum.features.account.ui.AccountRoot
 import com.project.momentum.features.account.ui.AccountScreen
 import com.project.momentum.features.contentcreation.ui.CameraLikeScreen
 import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
@@ -245,7 +246,7 @@ fun MainScreen() {
                 GallaryScreen(
                     onPostClick = {
                         galleryVM.selectedPost?.let { post ->
-                            openOverlay(NavRoutes.PreviewPhoto(post.url))
+                            openOverlay(NavRoutes.PreviewPhoto(post.presignedURL))
                         }
                     },
                     onProfileClick = {
@@ -278,12 +279,13 @@ fun MainScreen() {
             }
 
             entry<NavRoutes.Account> {
-                AccountScreen(
+                AccountRoot(
                     onPostClick = {},
                     onProfileClick = {},
                     onBackClick = {
                         closeOverlay()
-                    }
+                    },
+                    onAddPostClick = { openOverlay(NavRoutes.Camera) }
                 )
             }
 
@@ -323,7 +325,7 @@ fun MainScreen() {
             }
 
             entry<NavRoutes.PreviewPhoto> { route ->
-                val post = galleryVM.posts.find { it.url == route.url }
+                val post = galleryVM.posts.find { it.presignedURL == route.url }
                     ?: galleryVM.selectedPost
 
                 if (post != null) {
@@ -343,10 +345,10 @@ fun MainScreen() {
                         onGoToFriends = {
                             openOverlay(NavRoutes.Friends)
                         },
-                        url = post.url,
-                        description = post.description,
-                        userName = post.name,
-                        date = post.date
+                        url = post.presignedURL,
+                        description = post.title,
+                        userName = "TODO",      // TODO подумать как это сделать по умному
+                        date = post.createdAt ?: "TODO"
                     )
                 }
             }
