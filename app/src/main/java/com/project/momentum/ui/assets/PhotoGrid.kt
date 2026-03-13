@@ -113,7 +113,7 @@ sealed class GridItem {
 @Composable
 fun S3PhotoGrid(
     posts: List<PostData>,
-    onPostClick: (PostData) -> Unit = {},
+    onPostClick: (String) -> Unit = {},
     onAddPhotoClick: () -> Unit,
     modifier: Modifier = Modifier,
     showPlusButton: Boolean = true,
@@ -160,7 +160,7 @@ fun S3PhotoGrid(
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .fillMaxSize()
-                                .clickable { onPostClick(post) },
+                                .clickable { onPostClick(post.presignedURL) },
                             loading = {
                                 Box(
                                     modifier = Modifier.fillMaxSize(),
