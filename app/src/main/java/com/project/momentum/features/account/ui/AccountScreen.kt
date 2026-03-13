@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -22,11 +21,19 @@ import com.project.momentum.ui.theme.ConstColours
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import android.content.Context
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import com.project.momentum.R
 import com.project.momentum.ui.assets.S3PhotoGrid
 import com.project.momentum.ui.assets.BackCircleButton
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.ContentScale
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import com.project.momentum.features.account.viewmodel.AccountInfoEvent
+import com.project.momentum.features.account.viewmodel.AccountInfoViewModel
 import com.project.momentum.features.account.viewmodel.AccountViewModel
 
 @Composable
@@ -38,7 +45,8 @@ fun AccountScreen(
     onPostClick: () -> Unit = {},
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
-    viewModel: AccountViewModel = hiltViewModel()
+    accountMediaViewModel: AccountViewModel = hiltViewModel(),
+    accountInfoViewModel: AccountInfoViewModel = hiltViewModel()
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
@@ -46,10 +54,11 @@ fun AccountScreen(
     val textColor = Color.White
     val context: Context = LocalContext.current
 
-    val posts = viewModel.posts
+    val uiInfoState by accountInfoViewModel.state.collectAsStateWithLifecycle()
+    val posts = accountMediaViewModel.posts //TODO переделать state внутри AccountViewModel
 
     fun addNewPhoto() {
-        viewModel.loadPosts()
+        accountMediaViewModel.loadPosts()
     }
 
     Column(
@@ -83,20 +92,32 @@ fun AccountScreen(
                     .background(chrome2)
                     .border(2.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.AccountCircle,
-                    contentDescription = stringResource(R.string.account_avatar),
-                    tint = iconTint.copy(alpha = 0.7f),
-                    modifier = Modifier
-                        .size(80.dp)
-                        .align(Alignment.Center)
-                )
+                if (uiInfoState.profilePhotoURL == null) {
+                    Icon(
+                        imageVector = Icons.Outlined.AccountCircle,
+                        contentDescription = stringResource(R.string.account_avatar),
+                        tint = iconTint.copy(alpha = 0.7f),
+                        modifier = Modifier
+                            .size(80.dp)
+                            .align(Alignment.Center)
+                    )
+                } else {
+                    AsyncImage(
+                        model = uiInfoState.profilePhotoURL,
+                        contentDescription = stringResource(R.string.account_avatar),
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(2.dp)
+                            .clip(CircleShape)
+                    )
+                }
             }
 
             Spacer(Modifier.height(16.dp))
 
             Text(
-                text = userName,
+                text = uiInfoState.name,
                 color = textColor,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold
@@ -141,9 +162,9 @@ fun AccountScreen(
             )
 
             S3PhotoGrid(
-                posts = viewModel.posts.collectAsState().value,
+                posts = accountMediaViewModel.posts.collectAsState().value,
                 onPostClick = {},
-                onAddPhotoClick = { viewModel.loadPosts() },
+                onAddPhotoClick = { accountMediaViewModel.loadPosts() },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
