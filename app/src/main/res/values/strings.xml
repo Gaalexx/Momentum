@@ -83,6 +83,9 @@
     <string name="button_authorization_by_email">Введите почту</string>
     <string name="button_password_recovery">Восстановить пароль</string>
 
+    // Settings
+    <string name="label_delete_account">Удаление аккаунта</string>
+    <string name="button_delete_account">Удалить аккаунт</string>
 
     // Settings Privacy Screen
     <string name="settings_privacy_title">Конфиденциальность</string>

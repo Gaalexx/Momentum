@@ -5,6 +5,7 @@ import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -33,6 +34,9 @@ import com.project.momentum.ui.screens.registration.CreateAccountScreen
 import com.project.momentum.ui.screens.registration.CreatePasswordScreen
 import com.project.momentum.ui.screens.registration.InsertCodeScreen
 import com.project.momentum.ui.screens.registration.RegistrationViewModel
+import com.project.momentum.ui.screens.settings.DeleteAccountCheckCodeScreen
+import com.project.momentum.ui.screens.settings.DeleteAccountCheckPasswordScreen
+import com.project.momentum.ui.screens.settings.DeleteAccountConfirmationScreen
 import com.project.momentum.ui.screens.settings.SettingsMainScreen
 
 @Composable
@@ -249,7 +253,41 @@ fun MainScreen() {
                 onLogoutClick = {
                     closeOverlay()
                 },
-                onDeleteAccountClick = {}
+                onDeleteAccountClick = {
+                    openOverlay(NavRoutes.DeleteAccountCheckPassword)
+                }
+            )
+        }
+
+        entry<NavRoutes.DeleteAccountCheckPassword> {
+            DeleteAccountCheckPasswordScreen(
+                onBackClick = {
+                    closeOverlay()
+                },
+                onContinueClick = {
+                    openOverlay(NavRoutes.DeleteAccountCheckCode)
+                }
+            )
+        }
+
+        entry<NavRoutes.DeleteAccountCheckCode> {
+            DeleteAccountCheckCodeScreen(
+                onBackClick = {
+                    closeOverlay()
+                },
+                onContinueClick = {
+                    openOverlay(NavRoutes.DeleteAccountConfirmation)
+                }
+            )
+        }
+        entry<NavRoutes.DeleteAccountConfirmation> {
+            DeleteAccountConfirmationScreen(
+                onBackClick = {
+                    closeOverlay()
+                },
+                onContinueClick = {
+                    //openOverlay(NavRoutes.Camera)
+                }
             )
         }
 

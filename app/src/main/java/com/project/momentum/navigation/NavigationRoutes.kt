@@ -12,6 +12,9 @@ sealed class NavRoutes : NavKey {
     @Serializable data object Gallery : NavRoutes()
     @Serializable data object Friends : NavRoutes()
     @Serializable data object Premium : NavRoutes()
+    @Serializable data object DeleteAccountCheckPassword : NavRoutes()
+    @Serializable data object DeleteAccountCheckCode : NavRoutes()
+    @Serializable data object DeleteAccountConfirmation : NavRoutes()
 
     //Экраны регистрации
     @Serializable data object RegistrationLogin : NavRoutes()
