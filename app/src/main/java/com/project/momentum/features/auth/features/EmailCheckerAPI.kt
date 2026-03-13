@@ -17,13 +17,11 @@ class EmailCheckerAPI @Inject constructor(
     @EmailChecker private val client: HttpClient
 ) {
     suspend fun checkEmail(email: String): EmailResponse {
-        val response: EmailResponse = client.get("check") {
+        val response = client.get("validate") {
             url {
-                parameters.append("access_key", BuildConfig.API_KEY)
                 parameters.append("email", email)
             }
-        }.body<EmailResponse>()
-
-        return response
+        }
+        return response.body<EmailResponse>()
     }
 }
