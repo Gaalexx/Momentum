@@ -831,6 +831,20 @@ fun SubscriptionOptionCardPreview() {
 
 @Preview
 @Composable
+fun SubscriptionOptionCardPreview() {
+    SubscriptionOptionCard(
+        option = SubscriptionOption(
+            title = "Год",
+            price = "1200",
+            month_cost = "100",
+        ),
+        isSelected = false,
+        onSelect = {}
+    )
+}
+
+@Preview
+@Composable
 fun BuyButtonPreview() {
     BuyButton(
         modifier = Modifier,
