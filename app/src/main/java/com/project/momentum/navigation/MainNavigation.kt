@@ -4,6 +4,10 @@ import android.net.Uri
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,6 +21,7 @@ import androidx.navigation3.runtime.rememberDecoratedNavEntries
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.project.momentum.features.account.ui.AccountRoot
 import com.project.momentum.features.account.ui.AccountScreen
 import com.project.momentum.features.contentcreation.ui.CameraLikeScreen
 import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
@@ -72,11 +77,11 @@ fun MainScreen() {
         }
 
         fun openOverlay(route: NavRoutes) {
-            val last = backStack.lastOrNull()
-            if (last != null && last.isOverlayRoute()) {
-                backStack[backStack.lastIndex] = route
-                return
-            }
+//            val last = backStack.lastOrNull()
+//            if (last != null && last.isOverlayRoute()) {
+//                backStack[backStack.lastIndex] = route
+//                return
+//            }
             backStack.add(route)
         }
 
@@ -245,7 +250,7 @@ fun MainScreen() {
                 GallaryScreen(
                     onPostClick = {
                         galleryVM.selectedPost?.let { post ->
-                            openOverlay(NavRoutes.PreviewPhoto(post.url))
+                            openOverlay(NavRoutes.PreviewPhoto(post.presignedURL))
                         }
                     },
                     onProfileClick = {
@@ -277,13 +282,23 @@ fun MainScreen() {
                 )
             }
 
-            entry<NavRoutes.Account> {
-                AccountScreen(
-                    onPostClick = {},
+            entry<NavRoutes.Account>(
+                metadata = NavDisplay.transitionSpec {
+                    slideInHorizontally(
+                        initialOffsetX = { -it },
+                        animationSpec = tween(500)
+                    ) togetherWith ExitTransition.KeepUntilTransitionsFinished
+                }
+            ) {
+                AccountRoot(
+                    onPostClick = { postUrl ->
+                        openOverlay(NavRoutes.PreviewPhoto(postUrl = postUrl))
+                    },
                     onProfileClick = {},
                     onBackClick = {
                         closeOverlay()
-                    }
+                    },
+                    onAddPostClick = { openOverlay(NavRoutes.Camera) }
                 )
             }
 
@@ -323,32 +338,26 @@ fun MainScreen() {
             }
 
             entry<NavRoutes.PreviewPhoto> { route ->
-                val post = galleryVM.posts.find { it.url == route.url }
-                    ?: galleryVM.selectedPost
 
-                if (post != null) {
-                    WatchPhotoScreen(
-                        onGoToTakePhoto = {
-                            closeOverlay()
-                        },
-                        onGoToGallery = {
-                            closeOverlay()
-                        },
-                        onGoToSettings = {
-                            openOverlay(NavRoutes.Settings(currentBackTo()))
-                        },
-                        onProfileClick = {
-                            openOverlay(NavRoutes.Account(currentBackTo()))
-                        },
-                        onGoToFriends = {
-                            openOverlay(NavRoutes.Friends)
-                        },
-                        url = post.url,
-                        description = post.description,
-                        userName = post.name,
-                        date = post.date
-                    )
-                }
+                WatchPhotoScreen(
+                    onGoToTakePhoto = {
+                        closeOverlay()
+                    },
+                    onGoToGallery = {
+                        closeOverlay()
+                    },
+                    onGoToSettings = {
+                        openOverlay(NavRoutes.Settings(currentBackTo()))
+                    },
+                    onProfileClick = {
+                        openOverlay(NavRoutes.Account(currentBackTo()))
+                    },
+                    onGoToFriends = {
+                        openOverlay(NavRoutes.Friends)
+                    },
+                    postUrl = route.postUrl
+                )
+
             }
         }
 

@@ -20,23 +20,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.ui.assets.PhotoGrid
 import com.project.momentum.R
+import com.project.momentum.features.account.models.PostData
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.FriendsPillButton
 import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
 import com.project.momentum.features.posts.BasePostViewModel
-import com.project.momentum.features.posts.PostData
 
 
 class GalleryViewModel : BasePostViewModel() {
     override fun addPhoto(context: Context, url: String) {
         val event = readRandomEvent(context)
-        val postData = PostData(
-            url = url,
-            name = event.name, // В галерее имя из JSON
-            date = event.date,
-            description = event.description
-        )
+        val postData = PostData(url, event.name, event.date, event.description)
         _posts.add(0, postData)
     }
 }
@@ -106,7 +101,7 @@ fun GallaryScreen(
                 onPostClick =
                     { post ->
                         viewModel.selectPost(post)
-                        onPostClick(post.url)
+                        onPostClick(post.presignedURL)
                     },
                 onAddPhotoClick = { viewModel.addRandomPhoto(context) },
                 modifier = Modifier
