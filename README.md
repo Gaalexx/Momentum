@@ -22,11 +22,6 @@
 - `ui/*` — общие UI-компоненты и тема.
 - `assets/`, `res/` — ресурсы приложения и локальные mock-данные.
 
-Примечание:
-- Архитектура проекта pragmatic, а не строго `Clean Architecture`.
-- `account` уже использует цепочку `ui -> viewmodel -> usecase -> repo/api`.
-- `friends` и часть `posts` пока работают через `assets/*.json` и mock-данные.
-
 ### Навигация
 - `androidx.navigation3`, один корневой `NavDisplay`.
 - Навигационные маршруты описаны в `navigation/`.
