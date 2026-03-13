@@ -53,7 +53,7 @@ android {
         buildConfigField(
             "String",
             "EMAIL_CHECKER",
-            "\"http://apilayer.net/api/\""
+            "\"https://rapid-email-verifier.fly.dev/api/\""
         )
 
         buildConfigField(
