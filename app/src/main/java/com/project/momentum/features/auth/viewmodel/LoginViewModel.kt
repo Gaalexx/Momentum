@@ -14,13 +14,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import javax.inject.Singleton
 
 open class LoginViewModel : ViewModel() {
     protected var _state = MutableStateFlow(LoginState())
     val state: StateFlow<LoginState> = _state.asStateFlow()
     protected val _navigationEvents = MutableSharedFlow<NavEvent>()
     val navigationEvents: SharedFlow<NavEvent> = _navigationEvents.asSharedFlow()
-    protected val emailChecker = EmailChecker()
 
     fun validateCurrentStep() {
         val isValid = when (_state.value.currentStep) {

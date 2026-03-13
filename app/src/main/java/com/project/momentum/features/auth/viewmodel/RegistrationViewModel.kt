@@ -8,6 +8,7 @@ import com.project.momentum.features.auth.models.LoginStep
 import com.project.momentum.features.auth.models.LoginType
 import com.project.momentum.features.auth.models.NavEvent
 import com.project.momentum.data.RegistrationRepository
+import com.project.momentum.features.auth.features.EmailChecker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.update
@@ -15,7 +16,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class RegistrationViewModel @Inject constructor(
-    private val repository: RegistrationRepository
+    private val repository: RegistrationRepository,
+    private val emailChecker: EmailChecker
 ) : LoginViewModel() {
     var passwordRepetition by mutableStateOf("")
         private set
@@ -41,7 +43,7 @@ class RegistrationViewModel @Inject constructor(
 
                 viewModelScope.launch {
                     val exists = when (_state.value.loginType) {
-                        LoginType.EMAIL -> emailChecker.canReceiveEmail(_state.value.userData.email)
+                        LoginType.EMAIL -> emailChecker.checkEmail(_state.value.userData.email)
                         else -> true //TODO: проверка на существование
                     }
                     if (exists) {

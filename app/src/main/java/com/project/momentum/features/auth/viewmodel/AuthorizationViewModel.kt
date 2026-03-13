@@ -23,39 +23,25 @@ class AuthorizationViewModel @Inject constructor(
                 _state.update { it.copy(isLoading = true) }
 
                 viewModelScope.launch {
-                    val exists = when (_state.value.loginType) {
-                        LoginType.EMAIL -> emailChecker.canReceiveEmail(_state.value.userData.email)
-                        else -> true //TODO: проверка на существование
-                    }
-                    if (exists) {
-                        if (repository.checkAuthorizationLoginDB(_state.value)) {
-                            _state.update {
-                                it.copy(
-                                    currentStep = LoginStep.PASSWORD,
-                                    isError = false,
-                                    isLoading = false
-                                )
-                            }
-                            _navigationEvents.emit(NavEvent.NavigateToNextScreen)
-                        } else {
-                            _state.update {
-                                it.copy(
-                                    isError = true,
-                                    isLoading = false,
-                                    //TODO: завести класс для ошибок enum или что-то поумнее
-                                    errorMessage = when (_state.value.loginType) {
-                                        LoginType.EMAIL -> "Аккаунта с такой почтой не существует"
-                                        else -> "Аккаунта с таким телефоном не существует"
-                                    }
-                                )
-                            }
+                    if (repository.checkAuthorizationLoginDB(_state.value)) {
+                        _state.update {
+                            it.copy(
+                                currentStep = LoginStep.PASSWORD,
+                                isError = false,
+                                isLoading = false
+                            )
                         }
+                        _navigationEvents.emit(NavEvent.NavigateToNextScreen)
                     } else {
                         _state.update {
                             it.copy(
                                 isError = true,
                                 isLoading = false,
-                                errorMessage = "Такого Email не существует"
+                                //TODO: завести класс для ошибок enum или что-то поумнее
+                                errorMessage = when (_state.value.loginType) {
+                                    LoginType.EMAIL -> "Аккаунта с такой почтой не существует"
+                                    else -> "Аккаунта с таким телефоном не существует"
+                                }
                             )
                         }
                     }
