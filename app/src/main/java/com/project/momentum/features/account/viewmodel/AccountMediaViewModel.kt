@@ -20,7 +20,7 @@ sealed interface AccountMediaEvent {
 }
 
 @HiltViewModel
-class AccountViewModel @Inject constructor(
+class AccountMediaViewModel @Inject constructor(
     private val getMediaUseCase: GetMediaUseCase
 ) : ViewModel() {
 

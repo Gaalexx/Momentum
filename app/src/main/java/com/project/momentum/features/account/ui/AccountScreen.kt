@@ -25,7 +25,6 @@ import androidx.compose.ui.platform.LocalContext
 import com.project.momentum.R
 import com.project.momentum.ui.assets.S3PhotoGrid
 import com.project.momentum.ui.assets.BackCircleButton
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
@@ -33,8 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.account.viewmodel.AccountInfoViewModel
-import com.project.momentum.features.account.viewmodel.AccountMediaEvent
-import com.project.momentum.features.account.viewmodel.AccountViewModel
+import com.project.momentum.features.account.viewmodel.AccountMediaViewModel
 import com.project.momentum.features.account.viewmodel.MediaState
 
 
@@ -46,7 +44,7 @@ fun AccountRoot(
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
     onAddPostClick: () -> Unit,
-    accountMediaViewModel: AccountViewModel = hiltViewModel(),
+    accountMediaViewModel: AccountMediaViewModel = hiltViewModel(),
     accountInfoViewModel: AccountInfoViewModel = hiltViewModel()
 ) {
     val uiInfoState by accountInfoViewModel.state.collectAsStateWithLifecycle()
