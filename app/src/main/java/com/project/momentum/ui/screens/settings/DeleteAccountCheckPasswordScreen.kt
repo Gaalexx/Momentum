@@ -6,8 +6,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.project.momentum.data.registration.NavEvent
-import com.project.momentum.ui.screens.login.DeleteAccountViewModel
-import com.project.momentum.ui.screens.registration.TemplateDeleteAccountCheckPassword
+import com.project.momentum.ui.screens.settings.DeleteAccountViewModel
+import com.project.momentum.ui.screens.settings.TemplateDeleteAccountCheckPassword
 
 @Composable
 fun DeleteAccountCheckPasswordScreen(

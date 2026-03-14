@@ -12,6 +12,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
@@ -787,6 +788,31 @@ fun SubscriptionOptionCard(
         }
     }
 }
+
+@Composable
+fun ButtonForDelete(
+    onClick: () -> Unit,
+    text: String,
+    color: Color
+){
+    Button(
+        onClick = onClick,
+        modifier = Modifier,
+        shape = RoundedCornerShape(999.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = ConstColours.WHITE,
+            contentColor = ConstColours.WHITE
+        ),
+        contentPadding = PaddingValues(horizontal = 22.dp, vertical = 0.dp)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleMedium,
+            color = color
+        )
+    }
+}
+
 
 @Preview
 @Composable

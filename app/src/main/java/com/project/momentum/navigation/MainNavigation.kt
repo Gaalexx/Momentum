@@ -282,11 +282,11 @@ fun MainScreen() {
         }
         entry<NavRoutes.DeleteAccountConfirmation> {
             DeleteAccountConfirmationScreen(
-                onBackClick = {
+                onCancel = {
                     closeOverlay()
                 },
-                onContinueClick = {
-                    //openOverlay(NavRoutes.Camera)
+                onConfirm = {
+                    openOverlay(NavRoutes.RegistrationLogin)
                 }
             )
         }

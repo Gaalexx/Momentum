@@ -86,6 +86,9 @@
     // Settings
     <string name="label_delete_account">Удаление аккаунта</string>
     <string name="button_delete_account">Удалить аккаунт</string>
+    <string name="label_delete_account_confirmation">Вы действительно хотите удалить аккаунт?</string>
+    <string name="button_delete_account_yes">Да</string>
+    <string name="button_delete_account_no">Нет</string>
 
     // Settings Privacy Screen
     <string name="settings_privacy_title">Конфиденциальность</string>

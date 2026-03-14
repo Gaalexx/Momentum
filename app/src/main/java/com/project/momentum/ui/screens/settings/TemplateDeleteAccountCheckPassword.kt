@@ -1,4 +1,4 @@
-package com.project.momentum.ui.screens.registration
+package com.project.momentum.ui.screens.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

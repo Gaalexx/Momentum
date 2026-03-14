@@ -1,4 +1,4 @@
-package com.project.momentum.ui.screens.login
+package com.project.momentum.ui.screens.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
