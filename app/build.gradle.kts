@@ -1,4 +1,8 @@
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.konan.properties.Properties
+import shadow.bundletool.com.android.ddmlib.Log
+import java.io.FileInputStream
 
 plugins {
     alias(libs.plugins.android.application)
@@ -15,6 +19,10 @@ val targetSdkApi = libs.versions.targetSdk.get().toInt()
 val jvmTargetVersion = libs.versions.jvmTarget.get()
 val jvmTargetEnum = JvmTarget.valueOf("JVM_$jvmTargetVersion")
 val javaVersion = JavaVersion.toVersion(jvmTargetVersion)
+
+
+val localProperties = Properties()
+localProperties.load(FileInputStream(rootProject.file("local.properties")))
 
 kotlin {
     jvmToolchain(jvmTargetVersion.toInt())
@@ -40,6 +48,21 @@ android {
             "String",
             "BACKEND_BUILD_URL",
             "\"http://193.233.20.47/api/momentum/\""
+        )
+
+        buildConfigField(
+            "String",
+            "EMAIL_CHECKER",
+            "\"https://rapid-email-verifier.fly.dev/api/\""
+        )
+
+        buildConfigField(
+            "String",
+            "API_KEY",
+            localProperties.getProperty("API_KEY") ?: run {
+                Log.w("Momentum", "API_KEY not found in local.properties")
+                "\"\""
+            }
         )
     }
 
@@ -88,6 +111,8 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.bundles.ktor)
+    implementation(libs.ktor.client.logging)
+    implementation(libs.ktor.client.android.v341)
 
     // Dependency injection
     implementation(libs.hilt.android)

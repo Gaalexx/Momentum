@@ -35,6 +35,7 @@ fun TemplateAuthorizationScreen(
     onContinueClick: () -> Unit,
     onSubButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
+    isError: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
     val bg = ConstColours.BLACK
@@ -69,7 +70,7 @@ fun TemplateAuthorizationScreen(
                 TextFieldRegistration(
                     value = value,
                     onValueChange = onValueChange,
-
+                    isError = isError,
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
                     keyboardOptions = keyboardOptions,
                 )

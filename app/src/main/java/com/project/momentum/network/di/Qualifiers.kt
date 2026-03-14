@@ -9,3 +9,7 @@ annotation class Backend
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class S3
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class EmailChecker
