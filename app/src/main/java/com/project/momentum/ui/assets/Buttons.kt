@@ -37,7 +37,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.ui.theme.AppTextStyles
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.MutableState
@@ -52,6 +51,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.sp
 import com.project.momentum.R
 import com.project.momentum.features.settings.ui.SubscriptionOption
+import com.project.momentum.ui.theme.ConstColours
 
 @Composable
 fun BackCircleButton(
@@ -888,7 +888,7 @@ private fun PreviewSettingsButton() {
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun PreviewBigCircle() {
-    Box(contentAlignment = Alignment.Center) {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         BigCircleForMainScreenAction(onClick = {}, onLongPressStart = {}, onLongPressEnd = {})
     }
 }
