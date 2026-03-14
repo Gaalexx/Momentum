@@ -17,9 +17,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil.compose.SubcomposeAsyncImage
 import com.project.momentum.R
+import com.project.momentum.features.account.models.PostData
 import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.network.s3.PostDTO
-import com.project.momentum.features.posts.PostData
 
 @Composable
 fun PhotoGrid(
@@ -46,7 +46,7 @@ fun PhotoGrid(
             items = displayItems,
             key = { item ->
                 when (item) {
-                    is GridItem.Post -> item.post.url
+                    is GridItem.Post -> item.post.presignedURL
                     GridItem.PlusButton -> "PLUS"
                 }
             }
@@ -61,10 +61,10 @@ fun PhotoGrid(
                     is GridItem.Post -> {
                         val post = item.post
                         SubcomposeAsyncImage(
-                            model = post.url,
+                            model = post.presignedURL,
                             contentDescription = stringResource(
                                 R.string.photo_grid_photo,
-                                post.name
+                                post.title
                             ),
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
@@ -112,9 +112,9 @@ sealed class GridItem {
 
 @Composable
 fun S3PhotoGrid(
-    posts: List<PostDTO>,
-    onPostClick: (PostDTO) -> Unit = {},
-    onAddPhotoClick: () -> Unit = {},
+    posts: List<PostData>,
+    onPostClick: (String) -> Unit = {},
+    onAddPhotoClick: () -> Unit,
     modifier: Modifier = Modifier,
     showPlusButton: Boolean = true,
     columns: Int = 3
@@ -160,7 +160,7 @@ fun S3PhotoGrid(
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .fillMaxSize()
-                                .clickable { onPostClick(post) },
+                                .clickable { onPostClick(post.presignedURL) },
                             loading = {
                                 Box(
                                     modifier = Modifier.fillMaxSize(),
@@ -196,6 +196,6 @@ fun S3PhotoGrid(
 }
 
 sealed class S3GridItem {
-    data class Post(val post: PostDTO) : S3GridItem()
+    data class Post(val post: PostData) : S3GridItem()
     data object PlusButton : S3GridItem()
 }
