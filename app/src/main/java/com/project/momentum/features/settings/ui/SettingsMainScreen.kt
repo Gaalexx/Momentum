@@ -12,13 +12,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.R
+import com.project.momentum.features.settings.viewmodel.SettingsMainScreenViewModel
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.SettingsButton
 import com.project.momentum.ui.assets.SwitchRow
-import com.project.momentum.features.settings.viewmodel.SettingsMainScreenViewModel
 import com.project.momentum.ui.theme.AppTextStyles
+import com.project.momentum.ui.theme.ConstColours
 
 @Composable
 fun SettingsMainScreen(

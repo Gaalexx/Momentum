@@ -12,6 +12,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
@@ -36,7 +37,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.ui.theme.AppTextStyles
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.MutableState
@@ -51,6 +51,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.sp
 import com.project.momentum.R
 import com.project.momentum.features.settings.ui.SubscriptionOption
+import com.project.momentum.ui.theme.ConstColours
 
 @Composable
 fun BackCircleButton(
@@ -697,7 +698,7 @@ fun SwitchRow(
 @Composable
 fun PremiumFeatureItem(
     text: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector
+    icon: ImageVector
 ) {
     Row(
         modifier = Modifier
@@ -788,6 +789,45 @@ fun SubscriptionOptionCard(
     }
 }
 
+@Composable
+fun ButtonForDelete(
+    onClick: () -> Unit,
+    text: String,
+    color: Color
+){
+    Button(
+        onClick = onClick,
+        modifier = Modifier,
+        shape = RoundedCornerShape(999.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = ConstColours.WHITE,
+            contentColor = ConstColours.WHITE
+        ),
+        contentPadding = PaddingValues(horizontal = 22.dp, vertical = 0.dp)
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.titleMedium,
+            color = color
+        )
+    }
+}
+
+
+@Preview
+@Composable
+fun SubscriptionOptionCardPreview() {
+    SubscriptionOptionCard(
+        option = SubscriptionOption(
+            title = "Год",
+            price = "1200",
+            month_cost = "100",
+        ),
+        isSelected = false,
+        onSelect = {}
+    )
+}
+
 @Preview
 @Composable
 fun BuyButtonPreview() {
@@ -848,7 +888,7 @@ private fun PreviewSettingsButton() {
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun PreviewBigCircle() {
-    Box(contentAlignment = Alignment.Center) {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         BigCircleForMainScreenAction(onClick = {}, onLongPressStart = {}, onLongPressEnd = {})
     }
 }
