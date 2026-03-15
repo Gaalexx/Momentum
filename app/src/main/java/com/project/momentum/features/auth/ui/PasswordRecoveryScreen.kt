@@ -61,6 +61,7 @@ fun PasswordRecoveryScreen(
 //            viewModel.onSendCodeAgainClick()
         },
         modifier = modifier,
+        isError = uiState.isError,
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Number,
             imeAction = ImeAction.Done

@@ -11,20 +11,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
-import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.R
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.BuyButton
 import com.project.momentum.ui.assets.PremiumFeatureItem
 import com.project.momentum.ui.assets.SubscriptionOptionCard
 import com.project.momentum.ui.theme.AppTextStyles
+import com.project.momentum.ui.theme.ConstColours
 
 data class SubscriptionOption(
     val title: String,
     val price: String,
     val month_cost: String,
 )
-
 @Composable
 fun SettingsPremiumScreen(
     onBackClick: () -> Unit,
