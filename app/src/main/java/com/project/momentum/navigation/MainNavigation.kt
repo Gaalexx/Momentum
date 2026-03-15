@@ -46,11 +46,8 @@ fun MainScreen() {
         backStack[0] = route
     }
 
-    fun openOverlay(route: NavRoutes) {
-        val last = backStack.lastOrNull()
-        if (last != null && last.isOverlayRoute()) {
-            backStack[backStack.lastIndex] = route
-            return
+        fun openOverlay(route: NavRoutes) {
+            backStack.add(route)
         }
         backStack.add(route)
     }
