@@ -299,7 +299,7 @@ fun MainScreen() {
                     onPostClick = { postUrl ->
                         openOverlay(NavRoutes.PreviewPhoto(postUrl = postUrl))
                     },
-                    onProfileClick = {},
+                    onEditClick = {},
                     onBackClick = {
                         closeOverlay()
                     },

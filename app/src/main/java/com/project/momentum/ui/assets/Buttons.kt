@@ -5,11 +5,13 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
@@ -595,10 +597,45 @@ fun ContinueButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
             .height(dimensionResource(R.dimen.button_size)),
         shape = RoundedCornerShape(50.dp),
         colors = colors
+    ) {
+        Text(
+            text = text,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = AppTextStyles.ButtonText.copy(
+                textAlign = TextAlign.Center,
+                color = colors.contentColor
+            )
+        )
+    }
+}
+
+@Composable
+fun CancelButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    text: String = stringResource(R.string.button_cancel),
+    colors: ButtonColors = ButtonDefaults.buttonColors(
+        containerColor = ConstColours.TRANSPARENT_WHITE_ALPHA0,
+        contentColor = ConstColours.MAIN_BRAND_BLUE,
+    )
+) {
+    OutlinedButton (
+        onClick = onClick,
+        modifier = modifier
+            .fillMaxWidth()
+            .height(dimensionResource(R.dimen.button_size)),
+        shape = RoundedCornerShape(50.dp),
+        colors = colors,
+        border = BorderStroke (
+            width = dimensionResource(R.dimen.thickness_divider),
+            color = colors.contentColor
+        )
     ) {
         Text(
             text = text,
@@ -624,7 +661,8 @@ fun BuyButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
             .height(dimensionResource(R.dimen.button_size)),
         shape = RoundedCornerShape(50.dp),
         colors = colors
@@ -855,9 +893,16 @@ fun BuyButtonPreview() {
 @Preview(showBackground = true)
 @Composable
 fun ContinueButtonPreview() {
-    ContinueButton(
-        {}
-    )
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        ContinueButton(
+            {}
+        )
+        CancelButton(
+            {}
+        )
+    }
 }
 
 

@@ -49,7 +49,7 @@ fun AccountRoot(
     modifier: Modifier = Modifier,
     userStatus: String = stringResource(R.string.account_online_status),
     onPostClick: (String) -> Unit,
-    onProfileClick: () -> Unit = {},
+    onEditClick: () -> Unit = {},
     onBackClick: () -> Unit,
     onAddPostClick: () -> Unit,
     accountMediaViewModel: AccountMediaViewModel = hiltViewModel(),
@@ -64,6 +64,7 @@ fun AccountRoot(
         onBackClick = onBackClick,
         onAddPostClick = onAddPostClick,
         onPostClick = onPostClick,
+        onEditClick = onEditClick,
         uiInfoState = uiInfoState,
         uiMediaState = uiMediaState
     )
@@ -74,7 +75,7 @@ fun AccountScreen(
     modifier: Modifier = Modifier,
     userStatus: String = stringResource(R.string.account_online_status),
     onPostClick: (String) -> Unit,
-    onProfileClick: () -> Unit = {},
+    onEditClick: () -> Unit,
     onBackClick: () -> Unit,
     onAddPostClick: () -> Unit,
     uiInfoState: AccountInfoState,
@@ -106,7 +107,7 @@ fun AccountScreen(
             )
             Spacer(Modifier.weight(1f))
             EditCircleButton(
-                onClick = {},
+                onClick = onEditClick,
             )
         }
 
@@ -220,7 +221,7 @@ private fun AccountScreenPreview() {
     MaterialTheme {
         AccountScreen(
             onPostClick = {},
-            onProfileClick = {},
+            onEditClick = {},
             onBackClick = {},
             onAddPostClick = {},
             uiInfoState = AccountInfoState("Preview", null),

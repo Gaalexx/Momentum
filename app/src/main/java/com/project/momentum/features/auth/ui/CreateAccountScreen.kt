@@ -1,7 +1,6 @@
 package com.project.momentum.features.auth.ui
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,22 +21,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.project.momentum.ui.theme.ConstColours
-import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.R
-import com.project.momentum.features.auth.models.LoginType
 import com.project.momentum.features.auth.models.NavEvent
 import com.project.momentum.features.auth.viewmodel.RegistrationViewModel
-import com.project.momentum.ui.assets.SubButton
 import com.project.momentum.ui.assets.TemplateAuthorizationScreen
-import com.project.momentum.ui.assets.TextFieldRegistration
-import com.project.momentum.ui.assets.TopBarTemplate
 import com.project.momentum.ui.common.LoadingOverlay
 
 @Preview(showBackground = true)
