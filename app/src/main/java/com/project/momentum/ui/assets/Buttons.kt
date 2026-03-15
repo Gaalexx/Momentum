@@ -262,7 +262,8 @@ fun FriendsPillButton(
         Spacer(Modifier.width(10.dp))
         Text(
             text = text,
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
+            color = ConstColours.WHITE
         )
     }
 }
