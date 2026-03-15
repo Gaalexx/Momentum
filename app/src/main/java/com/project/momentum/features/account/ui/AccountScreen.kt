@@ -98,7 +98,7 @@ fun AccountScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 10.dp),
+                .padding(dimensionResource(R.dimen.medium_padding)),
             verticalAlignment = Alignment.CenterVertically
         ) {
             BackCircleButton(

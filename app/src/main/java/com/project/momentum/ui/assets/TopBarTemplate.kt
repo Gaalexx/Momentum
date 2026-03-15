@@ -4,8 +4,11 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +35,8 @@ fun TopBarTemplate(
     Scaffold(
         modifier = modifier
             .background(bg)
-            .padding(16.dp),
+            .padding(16.dp)
+            .windowInsetsPadding(WindowInsets.systemBars),
         backgroundColor = bg,
         topBar = {
             Box(
