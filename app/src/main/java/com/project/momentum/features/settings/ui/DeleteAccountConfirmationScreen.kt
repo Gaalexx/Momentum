@@ -5,7 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.project.momentum.data.registration.NavEvent
+import com.project.momentum.features.auth.models.NavEvent
 import com.project.momentum.features.settings.template.TemplateDeleteAccountConfirmation
 import com.project.momentum.features.settings.viewmodel.DeleteAccountViewModel
 

@@ -17,11 +17,13 @@ class DeleteAccountRepository @Inject constructor(
             LoginUserRequestDTO(
                 email = user.userData.email,
                 phone = user.userData.phone,
-                password = user.userData.password
+                password = user.userData.password,
+                deviceInfo = "Android"              // TODO поменять DTO
             )
         )
         return response.jwt
     }
+
     suspend fun sendAuthorizationCode(user: DeleteAccountState): Boolean {
         val response = client.sendCodeAuthorization(CheckEmailRequestDTO(user.userData.email))
         return response.isSuccess
