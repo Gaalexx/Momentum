@@ -4,6 +4,10 @@ import android.net.Uri
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,6 +21,7 @@ import androidx.navigation3.runtime.rememberDecoratedNavEntries
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.project.momentum.features.account.ui.AccountRoot
 import com.project.momentum.features.account.ui.AccountScreen
 import com.project.momentum.features.contentcreation.ui.CameraLikeScreen
 import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
@@ -33,10 +38,13 @@ import com.project.momentum.features.contentcreation.ui.RecorderScreen
 import com.project.momentum.features.auth.ui.CreateAccountScreen
 import com.project.momentum.features.auth.ui.CreatePasswordScreen
 import com.project.momentum.features.auth.ui.InsertCodeScreen
+import com.project.momentum.features.settings.ui.DeleteAccountCheckCodeScreen
 import com.project.momentum.navigation.viewmodel.AppStartState
 import com.project.momentum.navigation.viewmodel.AppStartViewModel
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.features.settings.ui.SettingsMainScreen
+import com.project.momentum.ui.screens.settings.DeleteAccountCheckPasswordScreen
+import com.project.momentum.ui.screens.settings.DeleteAccountConfirmationScreen
 
 @Composable
 fun MainScreen() {
@@ -72,11 +80,11 @@ fun MainScreen() {
         }
 
         fun openOverlay(route: NavRoutes) {
-            val last = backStack.lastOrNull()
-            if (last != null && last.isOverlayRoute()) {
-                backStack[backStack.lastIndex] = route
-                return
-            }
+//            val last = backStack.lastOrNull()
+//            if (last != null && last.isOverlayRoute()) {
+//                backStack[backStack.lastIndex] = route
+//                return
+//            }
             backStack.add(route)
         }
 
@@ -273,17 +281,29 @@ fun MainScreen() {
                     onLogoutClick = {
                         closeOverlay()
                     },
-                    onDeleteAccountClick = {}
+                    onDeleteAccountClick = {
+                        openOverlay(NavRoutes.DeleteAccountCheckPassword)
+                    }
                 )
             }
 
-            entry<NavRoutes.Account> {
-                AccountScreen(
-                    onPostClick = {},
+            entry<NavRoutes.Account>(
+                metadata = NavDisplay.transitionSpec {
+                    slideInHorizontally(
+                        initialOffsetX = { -it },
+                        animationSpec = tween(500)
+                    ) togetherWith ExitTransition.KeepUntilTransitionsFinished
+                }
+            ) {
+                AccountRoot(
+                    onPostClick = { postUrl ->
+                        openOverlay(NavRoutes.PreviewPhoto(postUrl = postUrl))
+                    },
                     onProfileClick = {},
                     onBackClick = {
                         closeOverlay()
-                    }
+                    },
+                    onAddPostClick = { openOverlay(NavRoutes.Camera) }
                 )
             }
 
@@ -323,32 +343,58 @@ fun MainScreen() {
             }
 
             entry<NavRoutes.PreviewPhoto> { route ->
-                val post = galleryVM.posts.find { it.url == route.url }
-                    ?: galleryVM.selectedPost
 
-                if (post != null) {
-                    WatchPhotoScreen(
-                        onGoToTakePhoto = {
-                            closeOverlay()
-                        },
-                        onGoToGallery = {
-                            closeOverlay()
-                        },
-                        onGoToSettings = {
-                            openOverlay(NavRoutes.Settings(currentBackTo()))
-                        },
-                        onProfileClick = {
-                            openOverlay(NavRoutes.Account(currentBackTo()))
-                        },
-                        onGoToFriends = {
-                            openOverlay(NavRoutes.Friends)
-                        },
-                        url = post.url,
-                        description = post.description,
-                        userName = post.name,
-                        date = post.date
-                    )
-                }
+                WatchPhotoScreen(
+                    onGoToTakePhoto = {
+                        closeOverlay()
+                    },
+                    onGoToGallery = {
+                        closeOverlay()
+                    },
+                    onGoToSettings = {
+                        openOverlay(NavRoutes.Settings(currentBackTo()))
+                    },
+                    onProfileClick = {
+                        openOverlay(NavRoutes.Account(currentBackTo()))
+                    },
+                    onGoToFriends = {
+                        openOverlay(NavRoutes.Friends)
+                    },
+                    postUrl = route.postUrl
+                )
+
+            }
+
+            entry<NavRoutes.DeleteAccountCheckPassword> {
+                DeleteAccountCheckPasswordScreen(
+                    onBackClick = {
+                        closeOverlay()
+                    },
+                    onContinueClick = {
+                        openOverlay(NavRoutes.DeleteAccountCheckCode)
+                    }
+                )
+            }
+
+            entry<NavRoutes.DeleteAccountCheckCode> {
+                DeleteAccountCheckCodeScreen(
+                    onBackClick = {
+                        closeOverlay()
+                    },
+                    onContinueClick = {
+                        openOverlay(NavRoutes.DeleteAccountConfirmation)
+                    }
+                )
+            }
+            entry<NavRoutes.DeleteAccountConfirmation> {
+                DeleteAccountConfirmationScreen(
+                    onCancel = {
+                        closeOverlay()
+                    },
+                    onConfirm = {
+                        openOverlay(NavRoutes.RegistrationLogin)
+                    }
+                )
             }
         }
 
