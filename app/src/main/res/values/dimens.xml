@@ -3,6 +3,7 @@
     <dimen name="button_size">56.dp</dimen>
     <dimen name="medium_padding">16.dp</dimen>
     <dimen name="small_padding">8.dp</dimen>
+    <dimen name="extra_small_padding">4.dp</dimen>
     <dimen name="sub_button_size">48.dp</dimen>
     <dimen name="delete_account_stroke">24.dp</dimen>
     <dimen name="delete_account_padding_width">280.dp</dimen>

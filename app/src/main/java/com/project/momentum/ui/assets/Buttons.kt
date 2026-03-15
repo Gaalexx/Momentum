@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Settings
@@ -63,27 +64,18 @@ fun BackCircleButton(
     shadowElevation: Dp = 6.dp,
     enabled: Boolean = true,
 ) {
-    Surface(
-        modifier = modifier.size(size),
-        shape = CircleShape,
-        color = backgroundColor,
-        contentColor = iconColor,
-        tonalElevation = 0.dp,
-        shadowElevation = shadowElevation
-    ) {
-        IconButton(
-            onClick = onClick,
-            enabled = enabled,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
-                contentDescription = "Back",
-                tint = iconColor,
-                modifier = Modifier.size(size * 0.55f)
-            )
-        }
-    }
+    CircleButton(
+        onClick = onClick,
+        icon = Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
+        contentDescription = "Back",
+        size = size,
+        iconSize = size * 0.55f,
+        backgroundColor = backgroundColor,
+        iconColor = iconColor,
+        shadowElevation = shadowElevation,
+        enabled = enabled,
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -96,27 +88,41 @@ fun ProfileCircleButton(
     shadowElevation: Dp = 6.dp,
     enabled: Boolean = true,
 ) {
-    Surface(
-        modifier = modifier.size(size),
-        shape = CircleShape,
-        color = backgroundColor,
-        contentColor = iconColor,
-        tonalElevation = 0.dp,
-        shadowElevation = shadowElevation
-    ) {
-        IconButton(
-            onClick = onClick,
-            enabled = enabled,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.AccountCircle,
-                contentDescription = "Profile",
-                tint = iconColor,
-                modifier = Modifier.size(size * 0.62f)
-            )
-        }
-    }
+    CircleButton(
+        onClick = onClick,
+        icon = Icons.Outlined.AccountCircle,
+        contentDescription = "Profile",
+        size = size,
+        backgroundColor = backgroundColor,
+        iconColor = iconColor,
+        shadowElevation = shadowElevation,
+        enabled = enabled,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun EditCircleButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    size: Dp = 50.dp,
+    backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
+    iconColor: Color = ConstColours.WHITE,
+    shadowElevation: Dp = 6.dp,
+    enabled: Boolean = true,
+) {
+    CircleButton(
+        onClick = onClick,
+        icon = Icons.Outlined.Edit,
+        contentDescription = "Edit profile",
+        size = size,
+        iconSize = size * 0.5f,
+        backgroundColor = backgroundColor,
+        iconColor = iconColor,
+        shadowElevation = shadowElevation,
+        enabled = enabled,
+        modifier = modifier
+    )
 }
 
 @Composable
@@ -132,36 +138,27 @@ fun SettingsCircleButton(
 ) {
     val icon = if (filledIcon) Icons.Filled.Settings else Icons.Outlined.Settings
 
-    Surface(
-        modifier = modifier.size(size),
-        shape = CircleShape,
-        color = backgroundColor,
-        contentColor = iconColor,
-        tonalElevation = 0.dp,
-        shadowElevation = shadowElevation
-    ) {
-        IconButton(
-            onClick = onClick,
-            enabled = enabled,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = "Settings",
-                tint = iconColor,
-                modifier = Modifier.size(size * 0.62f)
-            )
-        }
-    }
+    CircleButton(
+        onClick = onClick,
+        icon = icon,
+        contentDescription = "Settings",
+        size = size,
+        backgroundColor = backgroundColor,
+        iconColor = iconColor,
+        shadowElevation = shadowElevation,
+        enabled = enabled,
+        modifier = modifier
+    )
 }
 
 @Composable
 fun CircleButton(
     onClick: () -> Unit,
     icon: ImageVector,
-    contentDescription: String? = null,
     modifier: Modifier = Modifier,
+    contentDescription: String? = null,
     size: Dp = 50.dp,
+    iconSize: Dp = size * 0.62f,
     backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
     iconColor: Color = ConstColours.WHITE,
     shadowElevation: Dp = 6.dp,
@@ -184,7 +181,7 @@ fun CircleButton(
                 imageVector = icon,
                 contentDescription = contentDescription,
                 tint = iconColor,
-                modifier = Modifier.size(size * 0.62f)
+                modifier = Modifier.size(iconSize)
             )
         }
     }
@@ -518,23 +515,38 @@ fun BigCircleMicroButton(
 
 
 @Composable
-fun EditButton(onEditProfile: () -> Unit) {
+fun EditButton(
+    onEditProfile: () -> Unit,
+    modifier: Modifier = Modifier,
+    colors: ButtonColors = ButtonDefaults.buttonColors(
+        containerColor = ConstColours.MAIN_BRAND_BLUE,
+        contentColor = ConstColours.WHITE
+    )
+) {
     Button(
         onClick = onEditProfile,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = ConstColours.MAIN_BRAND_BLUE,
-            contentColor = Color.White
-        ),
-        shape = RoundedCornerShape(20.dp),
-        modifier = Modifier.width(200.dp)
+        colors = colors,
+        shape = RoundedCornerShape(50.dp),
+        modifier = modifier.heightIn(min = 32.dp),
+        contentPadding = PaddingValues(
+            horizontal = dimensionResource(R.dimen.small_padding) ,
+            vertical = 0.dp
+        )
     ) {
         Icon(
             imageVector = Icons.Filled.Edit,
-            contentDescription = "Редактировать",
-            modifier = Modifier.size(18.dp)
+            contentDescription = null,
+            modifier = Modifier.size(18.dp),
+            tint = colors.contentColor
         )
-        Spacer(Modifier.width(8.dp))
-        Text("Редактировать")
+        Spacer(Modifier.width(dimensionResource(R.dimen.extra_small_padding)))
+        Text(
+            text = stringResource(R.string.button_edit),
+            style = AppTextStyles.SubButtonText.copy(
+                textAlign = TextAlign.Center,
+                color = colors.contentColor
+            )
+        )
     }
 }
 
@@ -593,7 +605,8 @@ fun ContinueButton(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             style = AppTextStyles.ButtonText.copy(
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = colors.contentColor
             )
         )
     }
@@ -621,7 +634,8 @@ fun BuyButton(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             style = AppTextStyles.ButtonText.copy(
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = colors.contentColor
             )
         )
     }
@@ -838,7 +852,7 @@ fun BuyButtonPreview() {
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun ContinueButtonPreview() {
     ContinueButton(
@@ -860,6 +874,7 @@ private fun PreviewCircleButtons() {
         BackCircleButton(onClick = {})
         ProfileCircleButton(onClick = {})
         SettingsCircleButton(onClick = {})
+        EditCircleButton({})
     }
 }
 
