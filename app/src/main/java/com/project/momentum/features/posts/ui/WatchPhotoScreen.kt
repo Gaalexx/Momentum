@@ -1,6 +1,7 @@
 package com.project.momentum.features.posts.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -52,9 +53,11 @@ import com.project.momentum.ui.assets.FriendsPillButton
 import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.project.momentum.R
 import com.project.momentum.ui.assets.CaptionBasicLabel
+import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.ui.theme.AppTextStyles
 
 
@@ -64,31 +67,50 @@ fun ProfileLabel(
     name: String,
     imageUrl: String
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .padding(top = 7.dp)
-            .fillMaxWidth()
-            .size(70.dp)
-    ) {
-        AsyncImage(
-            model = imageUrl,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(67.dp)
-                .clip(CircleShape)
-        )
 
-        Spacer(Modifier.width(13.dp))
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(0.95f)
+            .height(70.dp)
+            .clip(RoundedCornerShape(60.dp))
+            .background(ConstColours.MAIN_BACK_GRAY)
+            .padding(start = 5.dp)
+    ){
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .padding(start = 7.dp)
+                .fillMaxWidth()
+                .size(70.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(65.dp)
+                    .clip(CircleShape)
+                    .border(2.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
+            ) {
+                AsyncImage(
+                    model = imageUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .fillMaxSize()
+                )
+            }
 
-        Text(
-            text = name,
-            color = Color.White,
-            overflow = TextOverflow.Ellipsis,
-            style = AppTextStyles.MainText
-        )
+
+            Spacer(Modifier.width(13.dp))
+
+            Text(
+                text = name,
+                color = Color.White,
+                overflow = TextOverflow.Ellipsis,
+                style = AppTextStyles.MainText
+            )
+        }
     }
+
 }
 
 @Composable
@@ -167,9 +189,9 @@ fun WatchPhotoScreen(
 
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.98f)
-                .aspectRatio(1.10f)
-                .clip(RoundedCornerShape(28.dp))
+                .fillMaxWidth(0.95f)
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(60.dp))
                 .background(ConstColours.MAIN_BACK_GRAY)
         ) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -181,7 +203,7 @@ fun WatchPhotoScreen(
                 )
 
                 CaptionBasicLabel(
-                    text = "Not implemented yet",
+                    text = "Description is not implemented yet",
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .fillMaxWidth()
@@ -195,76 +217,102 @@ fun WatchPhotoScreen(
 
         Text(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = "Not implemented yet",
+            text = "Date is not implemented yet",
             color = ConstColours.WHITE,
             style = AppTextStyles.SupportingText
         )
+        Spacer(Modifier.height(5.dp))
 
-        ProfileLabel(name = "Not implemented yet", imageUrl = stringResource(R.string.cats_url))
+        ProfileLabel(
+            name = "Name is not implemented yet",
+            imageUrl = stringResource(R.string.cats_url)
+        )
 
-        ReactToPhoto(onReact = {})
+        //ReactToPhoto(onReact = {})
 
-        Spacer(modifier = Modifier.weight(1f))
+        //Spacer(modifier = Modifier.weight(1f))
 
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 40.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .fillMaxSize()
         ) {
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 28.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(bottom = 40.dp)
+                    .align(Alignment.CenterStart),
+//                horizontalAlignment = Alignment.CenterHorizontally,
+//                verticalArrangement = Alignment.CenterVertically
             ) {
-                IconButton(
-                    onClick = onGoToGallery,
-                    modifier = Modifier.size(50.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 28.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        Icons.Default.Photo,
-                        modifier = Modifier.size(40.dp),
-                        contentDescription = stringResource(R.string.icon_flash),
-                        tint = iconTint
+                    IconButton(
+                        onClick = onGoToGallery,
+                        modifier = Modifier.size(50.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Photo,
+                            modifier = Modifier.size(40.dp),
+                            contentDescription = stringResource(R.string.icon_flash),
+                            tint = iconTint
+                        )
+                    }
+
+
+//                BigCircleForMainScreenAction(
+//                    onClick = onGoToTakePhoto,
+//                    onLongPressStart = onStartRecordVideo,
+//                    onLongPressEnd = onStopRecordVideo
+//                )
+
+                    Spacer(Modifier.weight(1f))
+                    ContinueButton({},
+                        modifier = Modifier
+                            .width(200.dp)
+                            .height(75.dp),
+                        "Ответить",
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = ConstColours.MAIN_BRAND_BLUE,
+                            contentColor = ConstColours.WHITE
+                        )
                     )
+                    Spacer(Modifier.weight(1f))
+
+                    IconButton(
+                        onClick = {
+                            captionFocusRequester.requestFocus()
+                            keyboardController?.show()
+                        },
+                        modifier = Modifier.size(50.dp)
+                    ) {
+                        Icon(
+                            Icons.Outlined.MoreHoriz,
+                            modifier = Modifier.size(40.dp),
+                            contentDescription = stringResource(R.string.icon_flip_camera),
+                            tint = iconTint
+                        )
+                    }
                 }
 
-                Spacer(Modifier.weight(1f))
 
-                BigCircleForMainScreenAction(
-                    onClick = onGoToTakePhoto,
-                    onLongPressStart = onStartRecordVideo,
-                    onLongPressEnd = onStopRecordVideo
-                )
-
-                Spacer(Modifier.weight(1f))
-
-                IconButton(
-                    onClick = {
-                        captionFocusRequester.requestFocus()
-                        keyboardController?.show()
-                    },
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Icon(
-                        Icons.Outlined.MoreHoriz,
-                        modifier = Modifier.size(40.dp),
-                        contentDescription = stringResource(R.string.icon_flip_camera),
-                        tint = iconTint
-                    )
-                }
             }
+            Spacer(Modifier.height(15.dp))
+
+            Icon(
+                imageVector = Icons.Outlined.KeyboardArrowDown,
+                contentDescription = stringResource(R.string.icon_more),
+                tint = iconTint.copy(alpha = 0.9f),
+                modifier = Modifier
+                    .size(34.dp)
+                    .align(Alignment.BottomCenter)
+            )
         }
 
-        Spacer(Modifier.height(15.dp))
 
-        Icon(
-            imageVector = Icons.Outlined.KeyboardArrowDown,
-            contentDescription = stringResource(R.string.icon_more),
-            tint = iconTint.copy(alpha = 0.9f),
-            modifier = Modifier.size(34.dp)
-        )
     }
 }
 

@@ -188,17 +188,6 @@ fun MainScreen() {
                 )
             }
 
-//        entry<NavRoutes.AuthorizationPasswordRecovery> {
-//            PasswordRecoveryScreen(
-//                onBackClick = {
-//                    closeOverlay()
-//                },
-//                onContinueClick = {
-//                    openOverlay(NavRoutes.AuthorizationCode)
-//                }
-//            )
-//        }
-
             entry<NavRoutes.AuthorizationCode> {
                 PasswordRecoveryScreen(
                     onBackClick = {
