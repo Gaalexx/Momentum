@@ -151,8 +151,6 @@ fun WatchPhotoScreen(
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
-    onStartRecordVideo: () -> Unit = {},
-    onStopRecordVideo: () -> Unit = {},
     postUrl: String
 ) {
     val bg = ConstColours.BLACK
@@ -270,7 +268,7 @@ fun WatchPhotoScreen(
 //                )
 
                     Spacer(Modifier.weight(1f))
-                    ContinueButton({},
+                    ContinueButton(onClick = onGoToTakePhoto,
                         modifier = Modifier
                             .width(200.dp)
                             .height(75.dp),

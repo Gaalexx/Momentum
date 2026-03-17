@@ -335,7 +335,7 @@ fun MainScreen() {
 
                 WatchPhotoScreen(
                     onGoToTakePhoto = {
-                        closeOverlay()
+                        openOverlay(NavRoutes.Camera)
                     },
                     onGoToGallery = {
                         closeOverlay()
