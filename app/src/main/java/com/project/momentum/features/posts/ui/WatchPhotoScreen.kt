@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Photo
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material3.*
@@ -56,6 +57,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.project.momentum.R
+import com.project.momentum.features.account.models.PostData
 import com.project.momentum.ui.assets.CaptionBasicLabel
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.ui.theme.AppTextStyles
@@ -65,7 +67,7 @@ import com.project.momentum.ui.theme.AppTextStyles
 fun ProfileLabel(
     modifier: Modifier = Modifier,
     name: String,
-    imageUrl: String
+    imageUrl: String?
 ) {
 
     Box(
@@ -75,7 +77,7 @@ fun ProfileLabel(
             .clip(RoundedCornerShape(60.dp))
             .background(ConstColours.MAIN_BACK_GRAY)
             .padding(start = 5.dp)
-    ){
+    ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
@@ -87,16 +89,29 @@ fun ProfileLabel(
                 modifier = Modifier
                     .size(65.dp)
                     .clip(CircleShape)
-                    .border(2.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
+                    .border(1.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
             ) {
-                AsyncImage(
-                    model = imageUrl,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .fillMaxSize()
-                )
+                if (imageUrl == null) {
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .fillMaxSize()
+                    )
+                } else {
+                    val iconTint = Color(0xFFEDEEF2) // TODO ВЫНЕСТИ В ЦВЕТА КОГДА БУДЕТ НЕ В ПАДЛУ
+                    Icon(
+                        imageVector = Icons.Outlined.AccountCircle,
+                        contentDescription = stringResource(R.string.account_avatar),
+                        tint = iconTint.copy(alpha = 0.7f),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.Center)
+                    )
+                }
+
             }
 
 
@@ -151,7 +166,8 @@ fun WatchPhotoScreen(
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
-    postUrl: String
+    post: PostData
+    //postUrl: String
 ) {
     val bg = ConstColours.BLACK
     val iconTint = ConstColours.WHITE
@@ -194,20 +210,23 @@ fun WatchPhotoScreen(
         ) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 AsyncImage(
-                    model = postUrl,
+                    model = post.presignedURL,
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
 
-                CaptionBasicLabel(
-                    text = "Description is not implemented yet",
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .focusRequester(captionFocusRequester)
-                )
+                if (post.title != null && post.title != "") {
+                    CaptionBasicLabel(
+                        text = post.title,
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .focusRequester(captionFocusRequester)
+                    )
+                }
+
             }
         }
 
@@ -215,20 +234,18 @@ fun WatchPhotoScreen(
 
         Text(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = "Date is not implemented yet",
+            text = post.createdAt ?: "",
             color = ConstColours.WHITE,
             style = AppTextStyles.SupportingText
         )
+
         Spacer(Modifier.height(5.dp))
 
         ProfileLabel(
-            name = "Name is not implemented yet",
+            name = post.userId,
             imageUrl = stringResource(R.string.cats_url)
         )
 
-        //ReactToPhoto(onReact = {})
-
-        //Spacer(modifier = Modifier.weight(1f))
 
         Box(
             modifier = Modifier
@@ -238,9 +255,7 @@ fun WatchPhotoScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 40.dp)
-                    .align(Alignment.CenterStart),
-//                horizontalAlignment = Alignment.CenterHorizontally,
-//                verticalArrangement = Alignment.CenterVertically
+                    .align(Alignment.CenterStart)
             ) {
                 Row(
                     modifier = Modifier
@@ -260,15 +275,9 @@ fun WatchPhotoScreen(
                         )
                     }
 
-
-//                BigCircleForMainScreenAction(
-//                    onClick = onGoToTakePhoto,
-//                    onLongPressStart = onStartRecordVideo,
-//                    onLongPressEnd = onStopRecordVideo
-//                )
-
                     Spacer(Modifier.weight(1f))
-                    ContinueButton(onClick = onGoToTakePhoto,
+                    ContinueButton(
+                        onClick = onGoToTakePhoto,
                         modifier = Modifier
                             .width(200.dp)
                             .height(75.dp),
@@ -325,7 +334,7 @@ private fun WatchPhotoScreenPreview() {
             onGoToSettings = {},
             onProfileClick = {},
             onGoToFriends = {},
-            postUrl = stringResource(R.string.cats_url)
+            post = PostData("1", "1", "Description", "a", "10.12.2026")
         )
     }
 }

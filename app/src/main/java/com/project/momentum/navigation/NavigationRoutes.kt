@@ -1,6 +1,7 @@
 package com.project.momentum.navigation
 
 import androidx.navigation3.runtime.NavKey
+import com.project.momentum.features.account.models.PostData
 import kotlinx.serialization.Serializable
 
 // Все маршруты - просто сериализуемые классы
@@ -25,8 +26,10 @@ sealed class NavRoutes : NavKey {
 
     @Serializable
     data object DeleteAccountCheckPassword : NavRoutes()
+
     @Serializable
     data object DeleteAccountCheckCode : NavRoutes()
+
     @Serializable
     data object DeleteAccountConfirmation : NavRoutes()
 
@@ -60,8 +63,11 @@ sealed class NavRoutes : NavKey {
     @Serializable
     data class Settings(val backTo: String) : NavRoutes()
 
+    //
+//    @Serializable
+//    data class PreviewPhoto(val postUrl: String) : NavRoutes()
     @Serializable
-    data class PreviewPhoto(val postUrl: String) : NavRoutes()
+    data class PreviewPhoto(val post: PostData) : NavRoutes()
 
     @Serializable
     data class SendPhoto(val uri: String) : NavRoutes()

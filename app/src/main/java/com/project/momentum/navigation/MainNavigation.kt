@@ -242,7 +242,7 @@ fun MainScreen() {
                 GallaryScreen(
                     onPostClick = {
                         galleryVM.selectedPost?.let { post ->
-                            openOverlay(NavRoutes.PreviewPhoto(post.presignedURL))
+                            openOverlay(NavRoutes.PreviewPhoto(post))
                         }
                     },
                     onProfileClick = {
@@ -285,8 +285,8 @@ fun MainScreen() {
                 }
             ) {
                 AccountRoot(
-                    onPostClick = { postUrl ->
-                        openOverlay(NavRoutes.PreviewPhoto(postUrl = postUrl))
+                    onPostClick = { post ->
+                        openOverlay(NavRoutes.PreviewPhoto(post = post))
                     },
                     onProfileClick = {},
                     onBackClick = {
@@ -349,7 +349,7 @@ fun MainScreen() {
                     onGoToFriends = {
                         openOverlay(NavRoutes.Friends)
                     },
-                    postUrl = route.postUrl
+                    post = route.post
                 )
 
             }
