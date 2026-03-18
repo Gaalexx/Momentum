@@ -647,6 +647,7 @@ fun CameraLikeScreen(
         Spacer(Modifier.height(15.dp))
 
 
+
         Icon(
             imageVector = Icons.Outlined.KeyboardArrowUp,
             contentDescription = "Swipe up",
