@@ -346,12 +346,6 @@ fun CameraLikeScreen(
     var recordingStarted by remember { mutableStateOf(false) }
     var stopRequested by remember { mutableStateOf(false) }
 
-    // swipe state
-    var dragOffset by remember { mutableStateOf(0f) }
-    val swipeThreshold = 80f
-
-    val swipeEnabled = recording == null
-
     val progress = remember { Animatable(0f) }
     val progressPath = remember { PathMeasure() }
     val scope = rememberCoroutineScope()
@@ -431,20 +425,7 @@ fun CameraLikeScreen(
         modifier = modifier
             .fillMaxSize()
             .background(backGround)
-            .windowInsetsPadding(WindowInsets.systemBars)
-            .pointerInput(swipeEnabled) {
-                if (!swipeEnabled) return@pointerInput
-                detectVerticalDragGestures(
-                    onVerticalDrag = { _, dragAmount ->
-                        dragOffset += dragAmount
-                    },
-                    onDragEnd = {
-                        if (dragOffset < -swipeThreshold) onOpenGallery()
-                        dragOffset = 0f
-                    },
-                    onDragCancel = { dragOffset = 0f }
-                )
-            },
+            .windowInsetsPadding(WindowInsets.systemBars),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -665,15 +646,13 @@ fun CameraLikeScreen(
 
         Spacer(Modifier.height(15.dp))
 
-        val progress = ((-dragOffset) / swipeThreshold).coerceIn(0f, 1f)
 
         Icon(
             imageVector = Icons.Outlined.KeyboardArrowUp,
             contentDescription = "Swipe up",
-            tint = iconTint.copy(alpha = 0.6f + 0.4f * progress),
+            tint = iconTint.copy(alpha = 0.6f),
             modifier = Modifier
-                .size((34 + 8 * progress).dp)
-                .offset(y = (-10 * progress).dp)
+                .size(34.dp)
         )
     }
 }
