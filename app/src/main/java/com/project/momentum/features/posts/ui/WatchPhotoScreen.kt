@@ -55,6 +55,7 @@ import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.project.momentum.R
 import com.project.momentum.features.account.models.PostData
@@ -73,7 +74,7 @@ fun ProfileLabel(
     Box(
         modifier = Modifier
             .fillMaxWidth(0.95f)
-            .height(70.dp)
+            .height(100.dp)
             .clip(RoundedCornerShape(60.dp))
             .background(ConstColours.MAIN_BACK_GRAY)
             .padding(start = 5.dp)
@@ -84,6 +85,7 @@ fun ProfileLabel(
                 .padding(start = 7.dp)
                 .fillMaxWidth()
                 .size(70.dp)
+                .align(Alignment.Center)
         ) {
             Box(
                 modifier = Modifier
@@ -114,8 +116,8 @@ fun ProfileLabel(
 
             }
 
-
             Spacer(Modifier.width(13.dp))
+
 
             Text(
                 text = name,
@@ -123,6 +125,8 @@ fun ProfileLabel(
                 overflow = TextOverflow.Ellipsis,
                 style = AppTextStyles.MainText
             )
+
+
         }
     }
 
@@ -230,16 +234,16 @@ fun WatchPhotoScreen(
             }
         }
 
-        Spacer(Modifier.height(5.dp))
+        Spacer(Modifier.height(15.dp))
 
         Text(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = post.createdAt ?: "",
+            text = post.getDate() ?: "",
             color = ConstColours.WHITE,
             style = AppTextStyles.SupportingText
         )
 
-        Spacer(Modifier.height(5.dp))
+        Spacer(Modifier.height(75.dp))
 
         ProfileLabel(
             name = post.userId,
@@ -255,7 +259,7 @@ fun WatchPhotoScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 40.dp)
-                    .align(Alignment.CenterStart)
+                    .align(Alignment.BottomCenter)
             ) {
                 Row(
                     modifier = Modifier
@@ -276,6 +280,7 @@ fun WatchPhotoScreen(
                     }
 
                     Spacer(Modifier.weight(1f))
+
                     ContinueButton(
                         onClick = onGoToTakePhoto,
                         modifier = Modifier
@@ -334,7 +339,7 @@ private fun WatchPhotoScreenPreview() {
             onGoToSettings = {},
             onProfileClick = {},
             onGoToFriends = {},
-            post = PostData("1", "1", "Description", "a", "10.12.2026")
+            post = PostData("1", "PreviewName", "Description", "a", "2026-03-12T14:38:50.690942Z")
         )
     }
 }
