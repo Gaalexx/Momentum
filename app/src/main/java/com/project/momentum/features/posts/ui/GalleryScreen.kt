@@ -101,7 +101,7 @@ fun GallaryScreen(
                 onPostClick =
                     { post ->
                         viewModel.selectPost(post)
-                        onPostClick(post.presignedURL)
+                        onPostClick(post.presignedURL ?: "")
                     },
                 onAddPhotoClick = { viewModel.addRandomPhoto(context) },
                 modifier = Modifier

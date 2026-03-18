@@ -594,7 +594,8 @@ fun ContinueButton(
             overflow = TextOverflow.Ellipsis,
             style = AppTextStyles.ButtonText.copy(
                 textAlign = TextAlign.Center
-            )
+            ),
+            color = colors.contentColor
         )
     }
 }

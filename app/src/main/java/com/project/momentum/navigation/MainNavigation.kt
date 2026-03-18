@@ -188,17 +188,6 @@ fun MainScreen() {
                 )
             }
 
-//        entry<NavRoutes.AuthorizationPasswordRecovery> {
-//            PasswordRecoveryScreen(
-//                onBackClick = {
-//                    closeOverlay()
-//                },
-//                onContinueClick = {
-//                    openOverlay(NavRoutes.AuthorizationCode)
-//                }
-//            )
-//        }
-
             entry<NavRoutes.AuthorizationCode> {
                 PasswordRecoveryScreen(
                     onBackClick = {
@@ -253,7 +242,7 @@ fun MainScreen() {
                 GallaryScreen(
                     onPostClick = {
                         galleryVM.selectedPost?.let { post ->
-                            openOverlay(NavRoutes.PreviewPhoto(post.presignedURL))
+                            openOverlay(NavRoutes.PreviewPhoto(post))
                         }
                     },
                     onProfileClick = {
@@ -296,8 +285,8 @@ fun MainScreen() {
                 }
             ) {
                 AccountRoot(
-                    onPostClick = { postUrl ->
-                        openOverlay(NavRoutes.PreviewPhoto(postUrl = postUrl))
+                    onPostClick = { post ->
+                        openOverlay(NavRoutes.PreviewPhoto(post = post))
                     },
                     onProfileClick = {},
                     onBackClick = {
@@ -346,7 +335,7 @@ fun MainScreen() {
 
                 WatchPhotoScreen(
                     onGoToTakePhoto = {
-                        closeOverlay()
+                        openOverlay(NavRoutes.Camera)
                     },
                     onGoToGallery = {
                         closeOverlay()
@@ -360,7 +349,7 @@ fun MainScreen() {
                     onGoToFriends = {
                         openOverlay(NavRoutes.Friends)
                     },
-                    postUrl = route.postUrl
+                    post = route.post
                 )
 
             }

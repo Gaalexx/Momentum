@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.project.momentum.features.account.models.PostData
 import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.account.viewmodel.AccountInfoViewModel
 import com.project.momentum.features.account.viewmodel.AccountMediaViewModel
@@ -40,7 +41,7 @@ import com.project.momentum.features.account.viewmodel.MediaState
 fun AccountRoot(
     modifier: Modifier = Modifier,
     userStatus: String = stringResource(R.string.account_online_status),
-    onPostClick: (String) -> Unit,
+    onPostClick: (PostData) -> Unit,
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
     onAddPostClick: () -> Unit,
@@ -65,7 +66,7 @@ fun AccountRoot(
 fun AccountScreen(
     modifier: Modifier = Modifier,
     userStatus: String = stringResource(R.string.account_online_status),
-    onPostClick: (String) -> Unit,
+    onPostClick: (PostData) -> Unit,
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
     onAddPostClick: () -> Unit,
