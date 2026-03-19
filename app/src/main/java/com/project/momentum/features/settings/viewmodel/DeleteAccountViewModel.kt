@@ -139,7 +139,7 @@ class DeleteAccountViewModel @Inject constructor(
         _state.update { it.copy(isLoading = true, showConfirmationDialog = false) }
 
         viewModelScope.launch {
-            val success = repository.deleteAccount(_state.value) // твой метод удаления
+            val success = repository.deleteAccount(_state.value)
 
             if (success) {
                 _state.update {

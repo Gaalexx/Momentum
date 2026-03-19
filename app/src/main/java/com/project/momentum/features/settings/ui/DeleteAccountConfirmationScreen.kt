@@ -1,4 +1,4 @@
-package com.project.momentum.ui.screens.settings
+package com.project.momentum.features.settings.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

@@ -6,7 +6,6 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,7 +21,6 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.project.momentum.features.account.ui.AccountRoot
-import com.project.momentum.features.account.ui.AccountScreen
 import com.project.momentum.features.contentcreation.ui.CameraLikeScreen
 import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
 import com.project.momentum.features.friends.ui.FriendsScreen
@@ -44,7 +42,7 @@ import com.project.momentum.navigation.viewmodel.AppStartViewModel
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.features.settings.ui.SettingsMainScreen
 import com.project.momentum.ui.screens.settings.DeleteAccountCheckPasswordScreen
-import com.project.momentum.ui.screens.settings.DeleteAccountConfirmationScreen
+import com.project.momentum.features.settings.ui.DeleteAccountConfirmationScreen
 
 @Composable
 fun MainScreen() {
@@ -277,7 +275,9 @@ fun MainScreen() {
                     onBackClick = {
                         closeOverlay()
                     },
-                    onPremiumClick = {},
+                    onPremiumClick = {
+                        openOverlay(NavRoutes.Premium)
+                    },
                     onLogoutClick = {
                         closeOverlay()
                     },
