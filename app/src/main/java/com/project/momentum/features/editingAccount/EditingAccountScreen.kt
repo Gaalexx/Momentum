@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
@@ -20,9 +21,11 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
@@ -31,9 +34,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.project.momentum.R
-import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.ui.assets.CancelButton
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.ui.assets.TextFieldRegistration
@@ -41,9 +44,34 @@ import com.project.momentum.ui.assets.TopBarTemplate
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
 
+
+@Composable
+fun EditingAccountRoot(
+    onBackClick: () -> Unit,
+    onContinueClick: () ->Unit,
+    modifier: Modifier = Modifier
+) {
+    val viewModel: EditAccountViewModel = hiltViewModel()
+    val uiState = viewModel.state.collectAsState()
+
+
+    EditingAccountScreen(
+        uiInfoState = uiState.value,
+        onLoginChange = { viewModel.updateLogin(it) },
+        onEmailChange = { viewModel.updateEmail(it) },
+        onPhoneChange = { viewModel.updatePhone(it) },
+        onBackClick = onBackClick,
+        onContinueClick = onContinueClick,
+        modifier = modifier
+    )
+}
+
 @Composable
 fun EditingAccountScreen(
-    uiInfoState: AccountInfoState,
+    uiInfoState: EditAccountState,
+    onLoginChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPhoneChange: (String) -> Unit,
     onBackClick: () -> Unit,
     onContinueClick: () ->Unit,
     modifier: Modifier = Modifier
@@ -54,6 +82,30 @@ fun EditingAccountScreen(
             text = it,
             style = AppTextStyles.SubHeadlines,
             color = ConstColours.MAIN_BRAND_BLUE,
+        )
+    }
+    @Composable
+    fun EditTextField(
+        value: String,
+        onValueChange: (String) -> Unit,
+        placeholder: String? = null,
+        keyboardOptions: KeyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Text,
+            imeAction = ImeAction.Next
+        )
+    ) {
+        TextFieldRegistration(
+            value = value,
+            onValueChange = onValueChange,
+            modifier = Modifier
+                .height(48.dp)
+                .shadow(
+                    elevation = 8.dp,
+                    shape = RoundedCornerShape(36.dp),
+                    spotColor = ConstColours.MAIN_BRAND_BLUE
+                ),
+            placeholder = placeholder,
+            keyboardOptions = keyboardOptions,
         )
     }
 
@@ -81,15 +133,15 @@ fun EditingAccountScreen(
                         .background(ConstColours.MAIN_BACK_GRAY)
                         .border(2.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
                 ) {
-                    if (uiInfoState.profilePhotoURL == null) {
-//                    Image(
-//                        painter = painterResource(R.drawable.profile_image_small),
-//                        contentDescription = null,
-//                        modifier = Modifier
-//                            .height(80.dp)
-//                            .aspectRatio(1f)
-//                            .align(Alignment.Center),
-//                    )
+                    if (uiInfoState.fields.profilePhotoURL == null) {
+//                        Image(
+//                            painter = painterResource(R.drawable.profile_image_small),
+//                            contentDescription = null,
+//                            modifier = Modifier
+//                                .height(80.dp)
+//                                .aspectRatio(1f)
+//                                .align(Alignment.Center),
+//                        )
                         Icon(
                             imageVector = Icons.Outlined.AccountCircle,
                             contentDescription = stringResource(R.string.account_avatar),
@@ -100,7 +152,7 @@ fun EditingAccountScreen(
                         )
                     } else {
                         AsyncImage(
-                            model = uiInfoState.profilePhotoURL,
+                            model = uiInfoState.fields.profilePhotoURL,
                             contentDescription = stringResource(R.string.account_avatar),
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
@@ -125,30 +177,23 @@ fun EditingAccountScreen(
                     .padding(dimensionResource(R.dimen.medium_padding))
             ) {
                 subHeadLine("Логин")
-                TextFieldRegistration(
-                    value = "",
-                    onValueChange = {},
-                    modifier = Modifier.height(48.dp),
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Text,
-                        imeAction = ImeAction.Next
-                    )
+                EditTextField(
+                    value = uiInfoState.fields.login ?: "",
+                    onValueChange = onLoginChange,
                 )
                 subHeadLine("Почта")
-                TextFieldRegistration(
-                    value = "",
-                    onValueChange = {},
-                    modifier = Modifier.height(48.dp),
+                EditTextField(
+                    value = uiInfoState.fields.email ?: "",
+                    onValueChange = onEmailChange,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Email,
                         imeAction = ImeAction.Next
                     )
                 )
                 subHeadLine("Телефон")
-                TextFieldRegistration(
-                    value = "",
-                    onValueChange = {},
-                    modifier = Modifier.height(48.dp),
+                EditTextField(
+                    value = uiInfoState.fields.phone ?: "",
+                    onValueChange = onPhoneChange,
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Phone,
                         imeAction = ImeAction.Done
@@ -183,7 +228,10 @@ fun EditingAccountScreen(
 @Composable
 fun EditingAccountScreenPreview() {
     EditingAccountScreen(
-        uiInfoState = AccountInfoState("Preview", null),
+        uiInfoState = EditAccountState.Content(EditAccountFields()),
+        onLoginChange = {},
+        onEmailChange = {},
+        onPhoneChange = {},
         onBackClick = {},
         onContinueClick = {}
     )

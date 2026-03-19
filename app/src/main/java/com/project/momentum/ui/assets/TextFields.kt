@@ -47,12 +47,12 @@ fun TextFieldRegistration(
         isError = isError,
         keyboardOptions = keyboardOptions,
         maxLines = 1,
-        shape = RoundedCornerShape(50.dp),
+        shape = RoundedCornerShape(36.dp),
         colors = TextFieldDefaults.textFieldColors(
             disabledTextColor = ConstColours.WHITE,
             focusedLabelColor = ConstColours.WHITE,
             unfocusedLabelColor = ConstColours.WHITE,
-            backgroundColor = ConstColours.WHITE
+            backgroundColor = ConstColours.WHITE.copy(alpha = 0.9f),
         )
     )
 }
@@ -64,6 +64,6 @@ fun TextFieldRegistrationPreview() {
         value = "",
         onValueChange = {},
         placeholder = "Введите текст...",
-        isError = true
+        isError = false
     )
 }
