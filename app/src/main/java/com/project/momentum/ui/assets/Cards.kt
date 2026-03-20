@@ -47,8 +47,8 @@ fun FriendRequestCard(
         modifier = Modifier
             .width(widthDp)
             .height(heightDp)
+            .clip(RoundedCornerShape(10.dp))
             .background(ConstColours.MAIN_BACK_GRAY)
-            .clip(RoundedCornerShape(20.dp))
     ) {
         Row(
             modifier = Modifier
@@ -87,7 +87,7 @@ fun FriendRequestCard(
 
             Column(
                 modifier = Modifier.fillMaxSize()
-            ){
+            ) {
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
@@ -103,7 +103,7 @@ fun FriendRequestCard(
 
                 Row(
                     modifier = Modifier.fillMaxSize()
-                ){
+                ) {
                     Box(
                         contentAlignment = Alignment.Center,
                         modifier = Modifier
@@ -112,19 +112,22 @@ fun FriendRequestCard(
                     ) {
                         Button(
                             onClick = {},
-                            modifier = Modifier.fillMaxWidth(0.9f).fillMaxHeight(0.85f),
+                            modifier = Modifier
+                                .fillMaxWidth(0.9f)
+                                .fillMaxHeight(0.85f),
                             colors = ButtonColors(
                                 containerColor = ConstColours.MAIN_BRAND_BLUE,
                                 contentColor = ConstColours.WHITE,
                                 disabledContentColor = ConstColours.MAIN_BRAND_BLUE_ALPHA40,
-                                disabledContainerColor = ConstColours.WHITE)
-                            ){
-                                Icon(
-                                    imageVector = Icons.Filled.Check,
-                                    contentDescription = null,
-                                    tint = ConstColours.WHITE
-                                )
-                            }
+                                disabledContainerColor = ConstColours.WHITE
+                            )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Check,
+                                contentDescription = null,
+                                tint = ConstColours.WHITE
+                            )
+                        }
                     }
 
                     Box(
@@ -134,13 +137,16 @@ fun FriendRequestCard(
                     ) {
                         Button(
                             onClick = {},
-                            modifier = Modifier.fillMaxWidth(0.9f).fillMaxHeight(0.85f),
+                            modifier = Modifier
+                                .fillMaxWidth(0.9f)
+                                .fillMaxHeight(0.85f),
                             colors = ButtonColors(
                                 containerColor = ConstColours.RED,
                                 contentColor = ConstColours.WHITE,
                                 disabledContentColor = ConstColours.MAIN_BRAND_BLUE_ALPHA40,
-                                disabledContainerColor = ConstColours.WHITE)
-                        ){
+                                disabledContainerColor = ConstColours.WHITE
+                            )
+                        ) {
                             Icon(
                                 imageVector = Icons.Filled.Close,
                                 contentDescription = null,

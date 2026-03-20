@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.Mic
+import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -79,6 +80,39 @@ fun BackCircleButton(
             Icon(
                 imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
                 contentDescription = "Back",
+                tint = iconColor,
+                modifier = Modifier.size(size * 0.55f)
+            )
+        }
+    }
+}
+
+@Composable
+fun AddFriendCircleButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    size: Dp = 50.dp,
+    backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
+    iconColor: Color = ConstColours.WHITE,
+    shadowElevation: Dp = 6.dp,
+    enabled: Boolean = true,
+) {
+    Surface(
+        modifier = modifier.size(size),
+        shape = CircleShape,
+        color = backgroundColor,
+        contentColor = iconColor,
+        tonalElevation = 0.dp,
+        shadowElevation = shadowElevation
+    ) {
+        IconButton(
+            onClick = onClick,
+            enabled = enabled,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.PersonAdd,
+                contentDescription = "Add friend",
                 tint = iconColor,
                 modifier = Modifier.size(size * 0.55f)
             )
@@ -861,6 +895,7 @@ private fun PreviewCircleButtons() {
         BackCircleButton(onClick = {})
         ProfileCircleButton(onClick = {})
         SettingsCircleButton(onClick = {})
+        AddFriendCircleButton(onClick = {})
     }
 }
 

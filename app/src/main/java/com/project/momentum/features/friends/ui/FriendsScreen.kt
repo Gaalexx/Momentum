@@ -43,11 +43,14 @@ import android.content.res.Configuration
 
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.momentum.R
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.FriendSearchField
 import com.project.momentum.features.friends.viewmodel.UserViewModel
+import com.project.momentum.ui.assets.AddFriendCircleButton
+import com.project.momentum.ui.assets.AddFriendPage
 
 
 data class Friend(
@@ -81,6 +84,8 @@ fun FriendsScreen(
     val userFriends by viewModel.userFriends
     val isLoading by viewModel.isLoading
 
+    var showPage by remember { mutableStateOf(false) }
+    var addFriendQuery by remember { mutableStateOf("") }
     var searchQuery by remember { mutableStateOf("") }
 
     val filteredFriends = remember(userFriends, searchQuery) {
@@ -122,6 +127,11 @@ fun FriendsScreen(
                 BackCircleButton(
                     onClick = onBackClick
                 )
+                Spacer(modifier = Modifier.weight(1f))
+                AddFriendCircleButton(
+                    onClick = { showPage = true }
+                )
+
             }
 
             Text(
@@ -272,6 +282,17 @@ fun FriendsScreen(
                     }
                 }
             }
+        }
+    }
+
+    if (showPage) {
+        Dialog(
+            onDismissRequest = { showPage = false }
+        ) {
+            AddFriendPage(
+                value = addFriendQuery,
+                onValueChange = { addFriendQuery = it }
+            )
         }
     }
 }

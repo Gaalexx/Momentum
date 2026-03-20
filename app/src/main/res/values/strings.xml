@@ -39,7 +39,8 @@
 
     <string name="label_write_message">Написать сообщение...</string>
     <string name="label_write_comment">Введите комментарий...</string>
-    <string name="find_or_add_friend">Найти или добавить друга</string>
+    <string name="find_or_add_friend">Найти друга</string>
+    <string name="friend_search">Поиск друга</string>
 
     <string name="cats_url">"https://cataas.com/cat"</string>
 
