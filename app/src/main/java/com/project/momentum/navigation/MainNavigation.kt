@@ -313,8 +313,8 @@ fun MainScreen() {
             }
             entry<NavRoutes.EditAccount> {
                 EditingAccountRoot(
-                    onBackClick = {},
-                    onContinueClick = {}
+                    onBackClick = { closeOverlay() },
+                    onContinueClick = { closeOverlay() }
                 )
             }
 

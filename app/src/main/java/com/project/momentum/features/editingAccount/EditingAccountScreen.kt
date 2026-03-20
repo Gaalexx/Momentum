@@ -21,6 +21,7 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.project.momentum.R
+import com.project.momentum.features.auth.models.NavEvent
 import com.project.momentum.ui.assets.CancelButton
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.ui.assets.TextFieldRegistration
@@ -54,6 +56,14 @@ fun EditingAccountRoot(
     val viewModel: EditAccountViewModel = hiltViewModel()
     val uiState = viewModel.state.collectAsState()
 
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvents.collect { event ->
+            when (event) {
+                NavEvent.NavigateToNextScreen -> onContinueClick()
+                else -> onBackClick()
+            }
+        }
+    }
 
     EditingAccountScreen(
         uiInfoState = uiState.value,
@@ -61,7 +71,7 @@ fun EditingAccountRoot(
         onEmailChange = { viewModel.updateEmail(it) },
         onPhoneChange = { viewModel.updatePhone(it) },
         onBackClick = onBackClick,
-        onContinueClick = onContinueClick,
+        onContinueClick = { viewModel.next() },
         modifier = modifier
     )
 }
@@ -178,7 +188,7 @@ fun EditingAccountScreen(
             ) {
                 subHeadLine("Логин")
                 EditTextField(
-                    value = uiInfoState.fields.login ?: "",
+                    value = uiInfoState.fields.username ?: "",
                     onValueChange = onLoginChange,
                 )
                 subHeadLine("Почта")
