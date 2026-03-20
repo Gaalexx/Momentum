@@ -3,6 +3,7 @@ package com.project.momentum.data
 import com.project.momentum.data.remote.AuthAPI
 import com.project.momentum.data.auth.SessionManager
 import com.project.momentum.data.auth.datastore.AuthStorageImpl
+import com.project.momentum.data.auth.deviceinfo.DeviceInfo
 import com.project.momentum.data.auth.keystore.KeystoreManager
 import com.project.momentum.data.remote.RegistrationAPI
 import com.project.momentum.features.auth.models.LoginState
@@ -23,7 +24,8 @@ class RegistrationRepository @Inject constructor(
     private val authAPI: AuthAPI,
     private val authStorage: AuthStorageImpl,
     private val keyStoreManager: KeystoreManager,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val deviceInfo: DeviceInfo
 ) {
     suspend fun checkRegistrationLoginDB(user: LoginState): Boolean {
         val response = when (user.loginType) {
@@ -63,7 +65,7 @@ class RegistrationRepository @Inject constructor(
                 email = user.userData.email,
                 phone = user.userData.phone,
                 code = user.userData.verificationCode,
-                deviceInfo = "Android" // TODO получать данные об устройстве по-другому
+                deviceInfo = deviceInfo.getPhoneInfo()
             )
         )
         return response.token
@@ -75,7 +77,7 @@ class RegistrationRepository @Inject constructor(
                 email = user.userData.email,
                 phone = user.userData.phone,
                 password = user.userData.password,
-                deviceInfo = "Android" // TODO получать данные об устройстве по-другому
+                deviceInfo = deviceInfo.getPhoneInfo()
             )
         )
         return response.jwt
@@ -87,7 +89,7 @@ class RegistrationRepository @Inject constructor(
                 email = user.userData.email,
                 phone = user.userData.phone,
                 password = user.userData.password,
-                deviceInfo = "Android" // TODO получать данные об устройстве по-другому
+                deviceInfo = deviceInfo.getPhoneInfo()
             )
         )
         return response.jwt
@@ -98,7 +100,6 @@ class RegistrationRepository @Inject constructor(
         val decrypted = try {
             keyStoreManager.decrypt(token)
         } catch (e: GeneralSecurityException) {
-            // Corrupted data or invalidated keystore key -> drop saved token
             authStorage.clear()
             keyStoreManager.clearKey()
             return null
