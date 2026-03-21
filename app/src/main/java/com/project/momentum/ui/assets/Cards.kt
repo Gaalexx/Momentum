@@ -169,6 +169,6 @@ fun FriendRequestCard(
 @Composable
 private fun PreviewCard() {
     Box(contentAlignment = Alignment.Center) {
-        FriendRequestCard(userName = "Preview name", userAvatarUrl = null, 200.dp, 75.dp)
+        FriendRequestCard(userName = "Preview name", userAvatarUrl = null, 300.dp, 100.dp)
     }
 }
