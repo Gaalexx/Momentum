@@ -12,13 +12,22 @@ class FriendsRepository @Inject constructor(
     private val friendsInfoAPI: FriendsInfoAPI
 ) {
 
+    sealed interface RequestBy {
+        val identifier: String
+
+        data class ByEmail(override val identifier: String) : RequestBy
+        data class ByNumber(override val identifier: String) : RequestBy
+        data class ByLogin(override val identifier: String) : RequestBy
+    }
+
     suspend fun getAllFriends(): List<UserNew> {
         val friendsDTO = friendsInfoAPI.getFriends()
 
         return friendsDTO.friends.map { friend ->
             UserNew(
                 id = friend.userId,
-                name = friend.username ?: "No name"
+                name = friend.username ?: "No name",
+                avatarUrl = null
             )
         }
     }
@@ -62,6 +71,20 @@ class FriendsRepository @Inject constructor(
             println("Error while deleting friend request")
         }
         return false
+    }
+
+    suspend fun createFriendRequest(    // TODO допилить обратную связь, если пользователя не существует или другие ошибки
+        requestBy: RequestBy
+    ) {
+        when (requestBy) {
+            is RequestBy.ByEmail -> {
+                // TODO сделать проверку что такой пользователь вообще есть
+                friendsInfoAPI.createRequestWithEmail(requestBy.identifier)
+            }
+
+            is RequestBy.ByLogin -> println("Not implemented")
+            is RequestBy.ByNumber -> println("Not implemented")
+        }
     }
 
 }

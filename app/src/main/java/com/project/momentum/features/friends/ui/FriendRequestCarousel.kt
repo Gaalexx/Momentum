@@ -19,7 +19,7 @@ import com.project.momentum.ui.assets.FriendRequestCard
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FriendRequestCarousel(
-    users: List<User>
+    users: List<UserNew>
 ) {
     val items = remember { users }
     val carouselState = rememberCarouselState { items.count() }

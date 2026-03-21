@@ -40,12 +40,20 @@ import coil.compose.AsyncImage
 import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.ui.theme.AppTextStyles
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material3.Icon
 
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.momentum.R
+import com.project.momentum.features.friends.viewmodel.FriendsViewModel
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.FriendSearchField
 import com.project.momentum.features.friends.viewmodel.UserViewModel
@@ -62,7 +70,7 @@ data class FriendRequest(
     val id: String,
     val userId: String,
     val userName: String,
-    val avatarUrl: String?,
+    val avatarUrl: String? = null,
 )
 
 data class UserNew(
@@ -85,19 +93,15 @@ data class User(
 @Composable
 fun FriendsScreen(
     modifier: Modifier = Modifier,
-    user: User,
     onBackClick: () -> Unit,
-    viewModel: UserViewModel = viewModel()
+    viewModel: FriendsViewModel = hiltViewModel()
 ) {
     val bg = ConstColours.BLACK
     val textColor = ConstColours.WHITE
 
-    LaunchedEffect(user.id) {
-        viewModel.loadFriendsForUser(user)
-    }
-
-    val userFriends by viewModel.userFriends
-    val isLoading by viewModel.isLoading
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val userFriends = uiState.friends
+    val isLoading = uiState.isLoading
 
     var showPage by remember { mutableStateOf(false) }
     var addFriendQuery by remember { mutableStateOf("") }
@@ -348,24 +352,42 @@ fun FriendsScreen(
 
 @Composable
 fun FriendButton(
-    imageUrl: String,
+    imageUrl: String?,
     modifier: Modifier = Modifier
 ) {
+
     Box(
         modifier = modifier
+            .aspectRatio(1.0f)
             .clip(CircleShape)
+            .border(2.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
     ) {
-        AsyncImage(
-            model = imageUrl,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-        )
+        if (imageUrl == null) {
+            Icon(
+                imageVector = Icons.Outlined.AccountCircle,
+                contentDescription = stringResource(R.string.account_avatar),
+                tint = ConstColours.ACCOUNT_LOGO_TINT,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .align(Alignment.Center)
+            )
+        } else {
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = stringResource(R.string.account_avatar),
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(2.dp)
+                    .clip(CircleShape)
+            )
+        }
     }
 }
 
 
 @Composable
-fun FriendItem(friend: User) {
+fun FriendItem(friend: UserNew) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -439,24 +461,22 @@ fun FriendItemPreview() {
                 .padding(16.dp)
         ) {
             FriendItem(
-                friend = User(
+                friend = UserNew(
                     id = "preview1",
                     name = "Тестовый Друг",
-                    avatarUrl = "",
-                    isOnline = true,
-                    friends = emptyList()
+                    avatarUrl = null,
+                    isOnline = true
                 )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
             FriendItem(
-                friend = User(
+                friend = UserNew(
                     id = "preview2",
                     name = "Друг со статусом",
-                    avatarUrl = "",
-                    description = "С описанием",
-                    friends = emptyList()
+                    avatarUrl = null,
+                    description = "С описанием"
                 )
             )
         }

@@ -1,5 +1,6 @@
 package com.project.momentum.features.friends.viewmodel
 
+import android.R
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,12 +27,14 @@ import javax.inject.Inject
 
 data class FriendsScreenState(
     val friends: List<UserNew>,
-    val friendRequests: List<FriendRequest>
+    val friendRequests: List<FriendRequest>,
+    val isLoading: Boolean
 )
 
 sealed interface FriendsScreenEvent {
     data class AcceptRequest(val request: FriendRequest) : FriendsScreenEvent
     data class RejectRequest(val request: FriendRequest) : FriendsScreenEvent
+    data class CreateEmailRequest(val email: String) : FriendsScreenEvent
     data object GetFriends : FriendsScreenEvent
     data object GetRequests : FriendsScreenEvent
 }
@@ -42,7 +45,7 @@ class FriendsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _state =
-        MutableStateFlow<FriendsScreenState>(FriendsScreenState(listOf(), listOf()))
+        MutableStateFlow<FriendsScreenState>(FriendsScreenState(listOf(), listOf(), false))
     val state = _state.asStateFlow()
 
     init {
@@ -56,6 +59,7 @@ class FriendsViewModel @Inject constructor(
             is FriendsScreenEvent.RejectRequest -> rejectRequest(event)
             is FriendsScreenEvent.GetFriends -> getFriends()
             is FriendsScreenEvent.GetRequests -> getRequests()
+            is FriendsScreenEvent.CreateEmailRequest -> println()
         }
     }
 
@@ -75,12 +79,12 @@ class FriendsViewModel @Inject constructor(
         }
     }
 
-    private fun rejectRequest(accept: FriendsScreenEvent.RejectRequest) {
+    private fun rejectRequest(reject: FriendsScreenEvent.RejectRequest) {
         viewModelScope.launch {
-            repo.acceptFriendRequest(accept.request.id)
+            repo.rejectFriendRequest(reject.request.id)
 
             _state.value = _state.value.copy(
-                friendRequests = _state.value.friendRequests.filterNot { it.id == accept.request.id }
+                friendRequests = _state.value.friendRequests.filterNot { it.id == reject.request.id }
             )
         }
     }
@@ -88,7 +92,11 @@ class FriendsViewModel @Inject constructor(
     private fun getFriends() {
         viewModelScope.launch {
             _state.value = _state.value.copy(
-                friends = repo.getAllFriends()
+                isLoading = true
+            )
+            _state.value = _state.value.copy(
+                friends = repo.getAllFriends(),
+                isLoading = false
             )
         }
     }
@@ -101,6 +109,11 @@ class FriendsViewModel @Inject constructor(
         }
     }
 
+    private fun createFriendRequestWithEmail(request: FriendsScreenEvent.CreateEmailRequest) {
+        viewModelScope.launch {
+            repo.createFriendRequest(FriendsRepository.RequestBy.ByEmail(request.email))
+        }
+    }
 
 }
 

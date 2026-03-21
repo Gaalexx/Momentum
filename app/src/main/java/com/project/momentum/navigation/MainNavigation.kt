@@ -69,7 +69,6 @@ fun MainScreen() {
         val backStack: NavBackStack<NavKey> = rememberNavBackStack(startRoute)
 
         val galleryVM: GalleryViewModel = viewModel()
-        val friendsVM: UserViewModel = viewModel()
 
         fun setBase(route: NavRoutes) {
             if (backStack.isEmpty()) {
@@ -80,11 +79,6 @@ fun MainScreen() {
         }
 
         fun openOverlay(route: NavRoutes) {
-//            val last = backStack.lastOrNull()
-//            if (last != null && last.isOverlayRoute()) {
-//                backStack[backStack.lastIndex] = route
-//                return
-//            }
             backStack.add(route)
         }
 
@@ -297,18 +291,10 @@ fun MainScreen() {
             }
 
             entry<NavRoutes.Friends> {
-                val users by friendsVM.users
                 FriendsScreen(
-                    user = users.firstOrNull() ?: User(
-                        id = "default",
-                        name = "Default User",
-                        avatarUrl = "",
-                        friends = emptyList()
-                    ),
                     onBackClick = {
                         closeOverlay()
-                    },
-                    viewModel = friendsVM
+                    }
                 )
             }
 
