@@ -134,4 +134,10 @@
     <string name="settings_notifications_in_app">В приложении</string>
     <string name="settings_notifications_in_app_switch">Уведомления</string>
 
+    // Words
+    <string name="email">Почта</string>
+    <string name="telephone_number">Номер</string>
+    <string name="login">Логин</string>
+
+
 </resources>

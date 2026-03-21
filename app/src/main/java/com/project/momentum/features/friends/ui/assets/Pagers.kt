@@ -28,15 +28,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.project.momentum.R
 import com.project.momentum.features.friends.viewmodel.FriendsScreenEvent
+import com.project.momentum.features.friends.viewmodel.SelectedIndex
 import com.project.momentum.ui.assets.TextFieldRegistration
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
 
 
 @Composable
-fun SingleChoiceSegmentedButton(modifier: Modifier = Modifier) {
-    var selectedIndex by remember { mutableIntStateOf(0) }
-    val options = listOf("Почта", "Номер", "Логин")
+fun SingleChoiceSegmentedButton(
+    modifier: Modifier = Modifier,
+    selectedIndex: SelectedIndex = SelectedIndex.EMAIL,
+    onEvent: (FriendsScreenEvent) -> Unit
+) {
+    val options = listOf(
+        stringResource(R.string.email),
+        stringResource(R.string.telephone_number),
+        stringResource(R.string.login)
+    )
 
     SingleChoiceSegmentedButtonRow(
         modifier = modifier
@@ -55,8 +63,8 @@ fun SingleChoiceSegmentedButton(modifier: Modifier = Modifier) {
                     activeBorderColor = ConstColours.WHITE,
                     inactiveBorderColor = ConstColours.WHITE
                 ),
-                onClick = { selectedIndex = index },
-                selected = index == selectedIndex,
+                onClick = { onEvent(FriendsScreenEvent.ChangeSelectedIndex(SelectedIndex.fromIndex(index))) },
+                selected = index == selectedIndex.index,
                 label = {
                     Text(
                         label,
@@ -71,6 +79,7 @@ fun SingleChoiceSegmentedButton(modifier: Modifier = Modifier) {
 @Composable
 fun AddFriendPage(
     value: String,
+    selectedIndex: SelectedIndex,
     onEvent: (FriendsScreenEvent) -> Unit = {},
     placeholder: String = "",
     onValueChange: (String) -> Unit,
@@ -127,7 +136,11 @@ fun AddFriendPage(
                     .weight(1f),
                 contentAlignment = Alignment.Center
             ) {
-                SingleChoiceSegmentedButton(modifier = Modifier.fillMaxWidth(0.8f))
+                SingleChoiceSegmentedButton(
+                    modifier = Modifier.fillMaxWidth(0.8f),
+                    selectedIndex,
+                    onEvent
+                )
             }
             Spacer(
                 modifier = Modifier.weight(1f)
@@ -141,9 +154,14 @@ fun AddFriendPage(
             ) {
                 Button(
                     onClick = {
-                        onEvent(FriendsScreenEvent.CreateEmailRequest(value))
+                        when(selectedIndex){
+                            SelectedIndex.EMAIL -> onEvent(FriendsScreenEvent.CreateEmailRequest(value))
+                            SelectedIndex.LOGIN -> println("Not implemented yet")
+                            SelectedIndex.TELEPHONE -> println("Not implemented yet")
+                        }
                         onEvent(FriendsScreenEvent.ShowPageEvent(false))
-                              },
+                        onEvent(FriendsScreenEvent.AddFriendQueryChange(""))
+                    },
                     modifier = Modifier
                         .fillMaxWidth(0.8f)
                         .fillMaxHeight(0.8f),
@@ -175,6 +193,11 @@ private fun PreviewPager() {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        AddFriendPage("Что это", onEvent = {}, "Введите имя", {})
+        AddFriendPage(
+            "Что это",
+            onEvent = {},
+            selectedIndex = SelectedIndex.LOGIN,
+            placeholder = "Введите имя",
+            onValueChange = {})
     }
 }

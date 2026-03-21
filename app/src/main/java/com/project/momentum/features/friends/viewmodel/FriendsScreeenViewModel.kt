@@ -13,14 +13,26 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 
+enum class SelectedIndex(val index: Int){
+    EMAIL(0),
+    TELEPHONE(1),
+    LOGIN(2);
+
+    companion object {
+        fun fromIndex(index: Int): SelectedIndex =
+            entries.firstOrNull { it.index == index } ?: EMAIL
+    }
+
+}
+
 data class FriendsScreenState(
     val friends: List<User>,
     val friendRequests: List<FriendRequest>,
     val isLoading: Boolean = false,
     val showPage: Boolean = false,
     val addFriendQuery: String = "",
-    val searchQuery: String = ""
-
+    val searchQuery: String = "",
+    val selectedIndex: SelectedIndex = SelectedIndex.EMAIL
 )
 
 sealed interface FriendsScreenEvent {
@@ -35,6 +47,7 @@ sealed interface FriendsScreenEvent {
     data class SearchQueryChange(val newValue: String) : FriendsScreenEvent
 
     data class AddFriendQueryChange(val newValue: String) : FriendsScreenEvent
+    data class ChangeSelectedIndex(val newIndex: SelectedIndex) : FriendsScreenEvent
 }
 
 @HiltViewModel
@@ -69,7 +82,12 @@ class FriendsViewModel @Inject constructor(
             is FriendsScreenEvent.ShowPageEvent -> onShowPageChange(event)
             is FriendsScreenEvent.AddFriendQueryChange -> onAddFriendQueryChange(event)
             is FriendsScreenEvent.SearchQueryChange -> onSearchQueryChange(event)
+            is FriendsScreenEvent.ChangeSelectedIndex -> onChangeSelectedIndex(event)
         }
+    }
+
+    private fun onChangeSelectedIndex(value: FriendsScreenEvent.ChangeSelectedIndex){
+        _state.update { it.copy(selectedIndex = value.newIndex) }
     }
 
     private fun onShowPageChange(value: FriendsScreenEvent.ShowPageEvent) {

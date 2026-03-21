@@ -113,6 +113,7 @@ fun FriendsScreen(
     val showPage = uiState.showPage
     val addFriendQuery = uiState.addFriendQuery
     val searchQuery = uiState.searchQuery
+    val selectedIndex = uiState.selectedIndex
 
     val filteredFriends = remember(userFriends, searchQuery) {
         if (searchQuery.isEmpty()) {
@@ -353,6 +354,7 @@ fun FriendsScreen(
         ) {
             AddFriendPage(
                 value = addFriendQuery,
+                selectedIndex = selectedIndex,
                 onEvent = onEvent,
                 onValueChange = { onEvent(FriendsScreenEvent.AddFriendQueryChange(it)) }
             )
