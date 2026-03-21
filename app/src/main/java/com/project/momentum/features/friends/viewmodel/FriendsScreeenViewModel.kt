@@ -49,8 +49,7 @@ class FriendsViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     init {
-        getFriends()
-        getRequests()
+        loadInitialData()
     }
 
     fun onEvent(event: FriendsScreenEvent) {
@@ -62,6 +61,22 @@ class FriendsViewModel @Inject constructor(
             is FriendsScreenEvent.CreateEmailRequest -> println()
         }
     }
+
+    private fun loadInitialData() {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(
+                isLoading = true
+            )
+            val friends = repo.getAllFriends()
+            val requests = repo.getAllRequests()
+            _state.value = _state.value.copy(
+                friendRequests = requests,
+                friends = friends,
+                isLoading = false
+            )
+        }
+    }
+
 
     private fun acceptRequest(accept: FriendsScreenEvent.AcceptRequest) {
         viewModelScope.launch {

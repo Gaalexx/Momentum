@@ -14,12 +14,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.project.momentum.features.friends.viewmodel.FriendsScreenEvent
 import com.project.momentum.ui.assets.FriendRequestCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FriendRequestCarousel(
-    users: List<UserNew>
+    users: List<FriendRequest>,
+    onEvent: (FriendsScreenEvent) -> Unit
 ) {
     val items = remember { users }
     val carouselState = rememberCarouselState { items.count() }
@@ -36,8 +38,8 @@ fun FriendRequestCarousel(
     ) { i ->
         val item = items[i]
         FriendRequestCard(
-            item.name,
-            item.avatarUrl
+            item,
+            onEvent
         )
     }
 }

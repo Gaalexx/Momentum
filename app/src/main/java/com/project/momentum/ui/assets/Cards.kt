@@ -33,13 +33,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.project.momentum.R
+import com.project.momentum.features.friends.ui.FriendRequest
+import com.project.momentum.features.friends.viewmodel.FriendsScreenEvent
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
 
 @Composable
 fun FriendRequestCard(
-    userName: String,
-    userAvatarUrl: String?,
+    request: FriendRequest,
+    onEvent: (FriendsScreenEvent) -> Unit = {},
     widthDp: Dp = 250.dp,
     heightDp: Dp = 100.dp
 ) {
@@ -63,7 +65,7 @@ fun FriendRequestCard(
                     .border(2.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
                     .align(Alignment.CenterVertically)
             ) {
-                if (userAvatarUrl == null) {
+                if (request.avatarUrl == null) {
                     Icon(
                         imageVector = Icons.Outlined.AccountCircle,
                         contentDescription = stringResource(R.string.account_avatar),
@@ -74,7 +76,7 @@ fun FriendRequestCard(
                     )
                 } else {
                     AsyncImage(
-                        model = userAvatarUrl,
+                        model = request.avatarUrl ,
                         contentDescription = stringResource(R.string.account_avatar),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -95,7 +97,7 @@ fun FriendRequestCard(
                         .fillMaxWidth()
                 ) {
                     Text(
-                        text = userName,
+                        text = request.userName,
                         color = ConstColours.WHITE,
                         style = AppTextStyles.SupportingText
                     )
@@ -111,7 +113,7 @@ fun FriendRequestCard(
                             .fillMaxHeight()
                     ) {
                         Button(
-                            onClick = {},
+                            onClick = {onEvent(FriendsScreenEvent.AcceptRequest(request))},
                             modifier = Modifier
                                 .fillMaxWidth(0.9f)
                                 .fillMaxHeight(0.85f),
@@ -136,7 +138,7 @@ fun FriendRequestCard(
                             .fillMaxSize()
                     ) {
                         Button(
-                            onClick = {},
+                            onClick = { onEvent(FriendsScreenEvent.RejectRequest(request)) },
                             modifier = Modifier
                                 .fillMaxWidth(0.9f)
                                 .fillMaxHeight(0.85f),
@@ -169,6 +171,6 @@ fun FriendRequestCard(
 @Composable
 private fun PreviewCard() {
     Box(contentAlignment = Alignment.Center) {
-        FriendRequestCard(userName = "Preview name", userAvatarUrl = null, 300.dp, 100.dp)
+        FriendRequestCard(FriendRequest("123", "123", "Preview name"), widthDp = 300.dp, heightDp = 100.dp)
     }
 }

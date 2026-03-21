@@ -199,7 +199,7 @@ fun FriendsScreen(
             }
         } else {
 
-            if (!filteredFriends.isEmpty()) {
+            if (uiState.friendRequests.isNotEmpty()) {
 
 
                 Row(
@@ -228,7 +228,10 @@ fun FriendsScreen(
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                FriendRequestCarousel(filteredFriends)
+                FriendRequestCarousel(
+                    uiState.friendRequests,
+                    viewModel::onEvent
+                )
             }
 
             Row(
