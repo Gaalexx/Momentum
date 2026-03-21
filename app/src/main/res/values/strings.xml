@@ -57,6 +57,7 @@
     <string name="recorder_video_saved">Видео сохранено</string>
     <string name="friends_screen_headliner">Друзья</string>
     <string name="friends_screen_sub_headliner">Мои друзья</string>
+    <string name="friend_requests">Заявки в друзья</string>
     <string name="friends_screen_search_loading">Загрузка друзей…</string>
     <string name="friends_screen_search_nothing">Друзья не найдены</string>
     <string name="friends_screen_search_support_mess">Попробуйте изменить запрос</string>

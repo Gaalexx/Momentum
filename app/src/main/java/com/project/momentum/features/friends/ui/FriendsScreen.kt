@@ -61,7 +61,7 @@ data class Friend(
 data class User(
     val id: String,
     val name: String,
-    val avatarUrl: String,
+    val avatarUrl: String? = null,
     val isOnline: Boolean = false,
     val description: String? = null,
     val friends: List<Friend>
@@ -179,6 +179,39 @@ fun FriendsScreen(
                 }
             }
         } else {
+
+            if (!filteredFriends.isEmpty()) {
+
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = if (isPortrait) 28.dp else 32.dp,
+                            vertical = 8.dp
+                        ),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.friend_requests),
+                        color = textColor,
+                        style = AppTextStyles.Headlines,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = userFriends.size.toString(),
+                        color = ConstColours.MAIN_BRAND_BLUE,
+                        style = AppTextStyles.Headlines,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                FriendRequestCarousel(filteredFriends)
+            }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -328,7 +361,7 @@ fun FriendItem(friend: User) {
             modifier = Modifier.padding(end = 12.dp)
         ) {
             FriendButton(
-                imageUrl = friend.avatarUrl,
+                imageUrl = friend.avatarUrl ?: "",
                 modifier = Modifier
                     .width(67.dp)
                     .height(67.dp)
