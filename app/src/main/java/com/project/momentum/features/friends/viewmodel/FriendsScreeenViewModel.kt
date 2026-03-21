@@ -8,10 +8,102 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.Dispatchers
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.State
+import androidx.compose.runtime.remember
+import androidx.lifecycle.ViewModel
+import com.project.momentum.features.friends.repo.FriendsRepository
 import com.project.momentum.features.friends.ui.Friend
+import com.project.momentum.features.friends.ui.FriendRequest
 import com.project.momentum.features.friends.ui.User
+import com.project.momentum.features.friends.ui.UserNew
+import dagger.hilt.android.lifecycle.HiltViewModel
+import io.ktor.client.request.request
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import org.json.JSONArray
 import org.json.JSONObject
+import javax.inject.Inject
+
+
+data class FriendsScreenState(
+    val friends: List<UserNew>,
+    val friendRequests: List<FriendRequest>
+)
+
+sealed interface FriendsScreenEvent {
+    data class AcceptRequest(val request: FriendRequest) : FriendsScreenEvent
+    data class RejectRequest(val request: FriendRequest) : FriendsScreenEvent
+    data object GetFriends : FriendsScreenEvent
+    data object GetRequests : FriendsScreenEvent
+}
+
+@HiltViewModel
+class FriendsViewModel @Inject constructor(
+    private val repo: FriendsRepository
+) : ViewModel() {
+
+    private val _state =
+        MutableStateFlow<FriendsScreenState>(FriendsScreenState(listOf(), listOf()))
+    val state = _state.asStateFlow()
+
+    init {
+        getFriends()
+        getRequests()
+    }
+
+    fun onEvent(event: FriendsScreenEvent) {
+        when (event) {
+            is FriendsScreenEvent.AcceptRequest -> acceptRequest(event)
+            is FriendsScreenEvent.RejectRequest -> rejectRequest(event)
+            is FriendsScreenEvent.GetFriends -> getFriends()
+            is FriendsScreenEvent.GetRequests -> getRequests()
+        }
+    }
+
+    private fun acceptRequest(accept: FriendsScreenEvent.AcceptRequest) {
+        viewModelScope.launch {
+            repo.acceptFriendRequest(accept.request.id)
+
+            _state.value = _state.value.copy(
+                friends = _state.value.friends.plus(
+                    UserNew(
+                        accept.request.userId,
+                        accept.request.userName
+                    )
+                ),
+                friendRequests = _state.value.friendRequests.filterNot { it.id == accept.request.id }
+            )
+        }
+    }
+
+    private fun rejectRequest(accept: FriendsScreenEvent.RejectRequest) {
+        viewModelScope.launch {
+            repo.acceptFriendRequest(accept.request.id)
+
+            _state.value = _state.value.copy(
+                friendRequests = _state.value.friendRequests.filterNot { it.id == accept.request.id }
+            )
+        }
+    }
+
+    private fun getFriends() {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(
+                friends = repo.getAllFriends()
+            )
+        }
+    }
+
+    private fun getRequests() {
+        viewModelScope.launch {
+            _state.value = _state.value.copy(
+                friendRequests = repo.getAllRequests()
+            )
+        }
+    }
+
+
+}
+
 
 class UserViewModel(application: Application) : AndroidViewModel(application) {
     private val context = application.applicationContext
@@ -49,8 +141,7 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             val friendsIds = user.friends.map { it.id }
             val filteredFriends = _users.value.filter { it.id in friendsIds }
-            if (filteredFriends.isNotEmpty())
-            {
+            if (filteredFriends.isNotEmpty()) {
                 _userFriends.value = filteredFriends
             } else {
                 _userFriends.value = createMockFriends(user)

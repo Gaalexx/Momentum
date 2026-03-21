@@ -58,6 +58,21 @@ data class Friend(
     val name: String,
 )
 
+data class FriendRequest(
+    val id: String,
+    val userId: String,
+    val userName: String,
+    val avatarUrl: String?,
+)
+
+data class UserNew(
+    val id: String,
+    val name: String,
+    val avatarUrl: String? = null,
+    val isOnline: Boolean = false,
+    val description: String? = null
+)
+
 data class User(
     val id: String,
     val name: String,
