@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +29,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -41,7 +38,6 @@ import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.ui.theme.AppTextStyles
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.Icon
@@ -51,12 +47,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.momentum.R
+import com.project.momentum.features.friends.viewmodel.FriendsScreenEvent
 import com.project.momentum.features.friends.viewmodel.FriendsViewModel
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.FriendSearchField
-import com.project.momentum.features.friends.viewmodel.UserViewModel
 import com.project.momentum.ui.assets.AddFriendCircleButton
 import com.project.momentum.ui.assets.AddFriendPage
 
@@ -102,10 +97,9 @@ fun FriendsScreen(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val userFriends = uiState.friends
     val isLoading = uiState.isLoading
-
-    var showPage by remember { mutableStateOf(false) }
-    var addFriendQuery by remember { mutableStateOf("") }
-    var searchQuery by remember { mutableStateOf("") }
+    val showPage = uiState.showPage
+    val addFriendQuery = uiState.addFriendQuery
+    val searchQuery = uiState.searchQuery
 
     val filteredFriends = remember(userFriends, searchQuery) {
         if (searchQuery.isEmpty()) {
@@ -148,7 +142,7 @@ fun FriendsScreen(
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 AddFriendCircleButton(
-                    onClick = { showPage = true }
+                    onClick = { viewModel.onEvent(FriendsScreenEvent.ShowPageEvent(true)) }
                 )
 
             }
@@ -168,7 +162,7 @@ fun FriendsScreen(
 
         FriendSearchField(
             query = searchQuery,
-            onQueryChange = { searchQuery = it },
+            onQueryChange = { viewModel.onEvent(FriendsScreenEvent.SearchQueryChange(it)) },
             modifier = Modifier.padding(horizontal = 16.dp),
             onSearch = { /* Можно добавить логику поиска */ }
         )
@@ -219,7 +213,7 @@ fun FriendsScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = userFriends.size.toString(),
+                        text = uiState.friendRequests.size.toString(),
                         color = ConstColours.MAIN_BRAND_BLUE,
                         style = AppTextStyles.Headlines,
                         fontWeight = FontWeight.Bold
@@ -342,11 +336,12 @@ fun FriendsScreen(
 
     if (showPage) {
         Dialog(
-            onDismissRequest = { showPage = false }
+            onDismissRequest = { viewModel.onEvent(FriendsScreenEvent.ShowPageEvent(false)) }
         ) {
             AddFriendPage(
                 value = addFriendQuery,
-                onValueChange = { addFriendQuery = it }
+                onEvent = viewModel::onEvent,
+                onValueChange = { viewModel.onEvent(FriendsScreenEvent.AddFriendQueryChange(it))}
             )
         }
     }
@@ -365,7 +360,7 @@ fun FriendButton(
             .clip(CircleShape)
             .border(2.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
     ) {
-        if (imageUrl == null) {
+        if (imageUrl.isNullOrBlank()) {
             Icon(
                 imageVector = Icons.Outlined.AccountCircle,
                 contentDescription = stringResource(R.string.account_avatar),
@@ -401,7 +396,7 @@ fun FriendItem(friend: UserNew) {
             modifier = Modifier.padding(end = 12.dp)
         ) {
             FriendButton(
-                imageUrl = friend.avatarUrl ?: "",
+                imageUrl = friend.avatarUrl,
                 modifier = Modifier
                     .width(67.dp)
                     .height(67.dp)

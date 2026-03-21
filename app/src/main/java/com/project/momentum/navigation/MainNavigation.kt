@@ -27,7 +27,6 @@ import com.project.momentum.features.contentcreation.ui.CameraLikeScreen
 import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
 import com.project.momentum.features.friends.ui.FriendsScreen
 import com.project.momentum.features.friends.ui.User
-import com.project.momentum.features.friends.viewmodel.UserViewModel
 import com.project.momentum.features.auth.ui.AuthorizationAccountScreen
 import com.project.momentum.features.auth.ui.AuthorizationPasswordScreen
 import com.project.momentum.features.auth.ui.PasswordRecoveryScreen

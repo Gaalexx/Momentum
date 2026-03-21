@@ -9,13 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.Icon
 import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonColors
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
@@ -31,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.project.momentum.R
+import com.project.momentum.features.friends.viewmodel.FriendsScreenEvent
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
 
@@ -73,6 +70,7 @@ fun SingleChoiceSegmentedButton(modifier: Modifier = Modifier) {
 @Composable
 fun AddFriendPage(
     value: String,
+    onEvent: (FriendsScreenEvent) -> Unit = {},
     placeholder: String = "",
     onValueChange: (String) -> Unit,
     isError: Boolean = false,
@@ -141,7 +139,10 @@ fun AddFriendPage(
                     .weight(1f)
             ) {
                 Button(
-                    onClick = {},
+                    onClick = {
+                        onEvent(FriendsScreenEvent.CreateEmailRequest(value))
+                        onEvent(FriendsScreenEvent.ShowPageEvent(false))
+                              },
                     modifier = Modifier
                         .fillMaxWidth(0.8f)
                         .fillMaxHeight(0.8f),
@@ -173,6 +174,6 @@ private fun PreviewPager() {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        AddFriendPage("Что это", "Введите имя", {})
+        AddFriendPage("Что это", onEvent = {}, "Введите имя", {})
     }
 }

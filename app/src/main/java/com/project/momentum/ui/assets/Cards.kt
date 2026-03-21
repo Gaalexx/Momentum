@@ -49,13 +49,13 @@ fun FriendRequestCard(
         modifier = Modifier
             .width(widthDp)
             .height(heightDp)
-            .clip(RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(15.dp))
             .background(ConstColours.MAIN_BACK_GRAY)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(start = 3.dp)
+                .padding(start = 5.dp)
         ) {
             Box(
                 modifier = Modifier
@@ -65,7 +65,7 @@ fun FriendRequestCard(
                     .border(2.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
                     .align(Alignment.CenterVertically)
             ) {
-                if (request.avatarUrl == null) {
+                if (request.avatarUrl.isNullOrBlank()) {
                     Icon(
                         imageVector = Icons.Outlined.AccountCircle,
                         contentDescription = stringResource(R.string.account_avatar),
@@ -76,7 +76,7 @@ fun FriendRequestCard(
                     )
                 } else {
                     AsyncImage(
-                        model = request.avatarUrl ,
+                        model = request.avatarUrl,
                         contentDescription = stringResource(R.string.account_avatar),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
@@ -113,7 +113,7 @@ fun FriendRequestCard(
                             .fillMaxHeight()
                     ) {
                         Button(
-                            onClick = {onEvent(FriendsScreenEvent.AcceptRequest(request))},
+                            onClick = { onEvent(FriendsScreenEvent.AcceptRequest(request)) },
                             modifier = Modifier
                                 .fillMaxWidth(0.9f)
                                 .fillMaxHeight(0.85f),
@@ -171,6 +171,10 @@ fun FriendRequestCard(
 @Composable
 private fun PreviewCard() {
     Box(contentAlignment = Alignment.Center) {
-        FriendRequestCard(FriendRequest("123", "123", "Preview name"), widthDp = 300.dp, heightDp = 100.dp)
+        FriendRequestCard(
+            FriendRequest("123", "123", "Preview name"),
+            widthDp = 300.dp,
+            heightDp = 100.dp
+        )
     }
 }
