@@ -1,4 +1,4 @@
-package com.project.momentum.ui.assets
+package com.project.momentum.features.friends.ui.assets
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

@@ -3,7 +3,7 @@ package com.project.momentum.features.friends.repo
 import com.project.momentum.features.friends.api.FriendsInfoAPI
 import com.project.momentum.features.friends.models.FriendRequestActionDTO
 import com.project.momentum.features.friends.ui.FriendRequest
-import com.project.momentum.features.friends.ui.UserNew
+import com.project.momentum.features.friends.ui.User
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -20,11 +20,11 @@ class FriendsRepository @Inject constructor(
         data class ByLogin(override val identifier: String) : RequestBy
     }
 
-    suspend fun getAllFriends(): List<UserNew> {
+    suspend fun getAllFriends(): List<User> {
         val friendsDTO = friendsInfoAPI.getFriends()
 
         return friendsDTO.friends.map { friend ->
-            UserNew(
+            User(
                 id = friend.userId,
                 name = friend.username ?: "No name",
                 avatarUrl = null

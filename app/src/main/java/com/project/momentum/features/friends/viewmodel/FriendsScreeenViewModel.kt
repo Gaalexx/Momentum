@@ -1,38 +1,25 @@
 package com.project.momentum.features.friends.viewmodel
 
-import android.R
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.Dispatchers
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.State
-import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import com.project.momentum.features.friends.repo.FriendsRepository
-import com.project.momentum.features.friends.ui.Friend
 import com.project.momentum.features.friends.ui.FriendRequest
 import com.project.momentum.features.friends.ui.User
-import com.project.momentum.features.friends.ui.UserNew
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.ktor.client.request.request
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import org.json.JSONArray
-import org.json.JSONObject
 import javax.inject.Inject
 
 
 data class FriendsScreenState(
-    val friends: List<UserNew>,
+    val friends: List<User>,
     val friendRequests: List<FriendRequest>,
-    val isLoading: Boolean,
-    val showPage: Boolean,
-    val addFriendQuery: String,
-    val searchQuery: String
+    val isLoading: Boolean = false,
+    val showPage: Boolean = false,
+    val addFriendQuery: String = "",
+    val searchQuery: String = ""
 
 )
 
@@ -56,7 +43,16 @@ class FriendsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _state =
-        MutableStateFlow<FriendsScreenState>(FriendsScreenState(listOf(), listOf(), false, false, "", ""))
+        MutableStateFlow<FriendsScreenState>(
+            FriendsScreenState(
+                listOf(),
+                listOf(),
+                false,
+                false,
+                "",
+                ""
+            )
+        )
     val state = _state.asStateFlow()
 
     init {
@@ -111,7 +107,7 @@ class FriendsViewModel @Inject constructor(
 
             _state.value = _state.value.copy(
                 friends = _state.value.friends.plus(
-                    UserNew(
+                    User(
                         accept.request.userId,
                         accept.request.userName
                     )

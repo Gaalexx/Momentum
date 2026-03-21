@@ -1,4 +1,4 @@
-package com.project.momentum.ui.assets
+package com.project.momentum.features.friends.ui.assets
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.project.momentum.R
 import com.project.momentum.features.friends.viewmodel.FriendsScreenEvent
+import com.project.momentum.ui.assets.TextFieldRegistration
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
 
@@ -97,7 +98,7 @@ fun AddFriendPage(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = stringResource(com.project.momentum.R.string.friend_search),
+                    text = stringResource(R.string.friend_search),
                     color = ConstColours.WHITE,
                     style = AppTextStyles.Headlines
                 )

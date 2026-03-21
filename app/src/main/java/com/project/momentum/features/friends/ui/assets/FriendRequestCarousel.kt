@@ -1,21 +1,18 @@
-package com.project.momentum.features.friends.ui
+package com.project.momentum.features.friends.ui.assets
 
-import androidx.compose.foundation.gestures.FlingBehavior
-import androidx.compose.foundation.gestures.TargetedFlingBehavior
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.carousel.CarouselDefaults
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.project.momentum.features.friends.ui.FriendRequest
 import com.project.momentum.features.friends.viewmodel.FriendsScreenEvent
-import com.project.momentum.ui.assets.FriendRequestCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

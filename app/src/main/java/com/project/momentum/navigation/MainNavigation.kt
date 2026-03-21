@@ -26,7 +26,6 @@ import com.project.momentum.features.account.ui.AccountScreen
 import com.project.momentum.features.contentcreation.ui.CameraLikeScreen
 import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
 import com.project.momentum.features.friends.ui.FriendsScreen
-import com.project.momentum.features.friends.ui.User
 import com.project.momentum.features.auth.ui.AuthorizationAccountScreen
 import com.project.momentum.features.auth.ui.AuthorizationPasswordScreen
 import com.project.momentum.features.auth.ui.PasswordRecoveryScreen
@@ -37,6 +36,7 @@ import com.project.momentum.features.contentcreation.ui.RecorderScreen
 import com.project.momentum.features.auth.ui.CreateAccountScreen
 import com.project.momentum.features.auth.ui.CreatePasswordScreen
 import com.project.momentum.features.auth.ui.InsertCodeScreen
+import com.project.momentum.features.friends.ui.FriendsScreenRoute
 import com.project.momentum.features.settings.ui.DeleteAccountCheckCodeScreen
 import com.project.momentum.navigation.viewmodel.AppStartState
 import com.project.momentum.navigation.viewmodel.AppStartViewModel
@@ -290,7 +290,7 @@ fun MainScreen() {
             }
 
             entry<NavRoutes.Friends> {
-                FriendsScreen(
+                FriendsScreenRoute(
                     onBackClick = {
                         closeOverlay()
                     }

@@ -53,7 +53,9 @@ import com.project.momentum.features.friends.viewmodel.FriendsViewModel
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.FriendSearchField
 import com.project.momentum.ui.assets.AddFriendCircleButton
-import com.project.momentum.ui.assets.AddFriendPage
+import com.project.momentum.features.friends.ui.assets.AddFriendPage
+import com.project.momentum.features.friends.ui.assets.FriendRequestCarousel
+import com.project.momentum.features.friends.viewmodel.FriendsScreenState
 
 
 data class Friend(
@@ -68,7 +70,7 @@ data class FriendRequest(
     val avatarUrl: String? = null,
 )
 
-data class UserNew(
+data class User(
     val id: String,
     val name: String,
     val avatarUrl: String? = null,
@@ -76,25 +78,36 @@ data class UserNew(
     val description: String? = null
 )
 
-data class User(
-    val id: String,
-    val name: String,
-    val avatarUrl: String? = null,
-    val isOnline: Boolean = false,
-    val description: String? = null,
-    val friends: List<Friend>
-)
+
+@Composable
+fun FriendsScreenRoute(
+    onBackClick: () -> Unit,
+    viewModel: FriendsViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val addFriend: () -> Unit = { viewModel.onEvent(FriendsScreenEvent.ShowPageEvent(true)) }
+    val onEvent = viewModel::onEvent
+
+    FriendsScreen(
+        onBackClick,
+        uiState,
+        addFriend,
+        onEvent
+    )
+
+}
 
 @Composable
 fun FriendsScreen(
-    modifier: Modifier = Modifier,
     onBackClick: () -> Unit,
-    viewModel: FriendsViewModel = hiltViewModel()
+    uiState: FriendsScreenState,
+    addFriend: () -> Unit,
+    onEvent: (FriendsScreenEvent) -> Unit
 ) {
     val bg = ConstColours.BLACK
     val textColor = ConstColours.WHITE
 
-    val uiState by viewModel.state.collectAsStateWithLifecycle()
+
     val userFriends = uiState.friends
     val isLoading = uiState.isLoading
     val showPage = uiState.showPage
@@ -116,7 +129,7 @@ fun FriendsScreen(
     val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(bg)
             .windowInsetsPadding(WindowInsets.systemBars)
@@ -142,7 +155,7 @@ fun FriendsScreen(
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 AddFriendCircleButton(
-                    onClick = { viewModel.onEvent(FriendsScreenEvent.ShowPageEvent(true)) }
+                    onClick = { addFriend() }
                 )
 
             }
@@ -162,7 +175,7 @@ fun FriendsScreen(
 
         FriendSearchField(
             query = searchQuery,
-            onQueryChange = { viewModel.onEvent(FriendsScreenEvent.SearchQueryChange(it)) },
+            onQueryChange = { onEvent(FriendsScreenEvent.SearchQueryChange(it)) },
             modifier = Modifier.padding(horizontal = 16.dp),
             onSearch = { /* Можно добавить логику поиска */ }
         )
@@ -224,7 +237,7 @@ fun FriendsScreen(
 
                 FriendRequestCarousel(
                     uiState.friendRequests,
-                    viewModel::onEvent
+                    onEvent
                 )
             }
 
@@ -336,12 +349,12 @@ fun FriendsScreen(
 
     if (showPage) {
         Dialog(
-            onDismissRequest = { viewModel.onEvent(FriendsScreenEvent.ShowPageEvent(false)) }
+            onDismissRequest = { onEvent(FriendsScreenEvent.ShowPageEvent(false)) }
         ) {
             AddFriendPage(
                 value = addFriendQuery,
-                onEvent = viewModel::onEvent,
-                onValueChange = { viewModel.onEvent(FriendsScreenEvent.AddFriendQueryChange(it))}
+                onEvent = onEvent,
+                onValueChange = { onEvent(FriendsScreenEvent.AddFriendQueryChange(it)) }
             )
         }
     }
@@ -385,7 +398,7 @@ fun FriendButton(
 
 
 @Composable
-fun FriendItem(friend: UserNew) {
+fun FriendItem(friend: User) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -443,6 +456,27 @@ fun FriendItem(friend: UserNew) {
     }
 }
 
+@Preview(
+    name = "Friend Item",
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF
+)
+@Composable
+fun FriendsScreenPreview() {
+    FriendsScreen(
+        {},
+        FriendsScreenState(
+            friends = listOf(User("123", "User 1"), User("321", "User 2")),
+            friendRequests = listOf(
+                FriendRequest("312", "132", "User 3"),
+                FriendRequest("313", "134", "User 4"),
+                FriendRequest("22", "2322", "User 5")
+            )
+        ),
+        {}, {}
+    )
+}
+
 
 @Preview(
     name = "Friend Item",
@@ -459,7 +493,7 @@ fun FriendItemPreview() {
                 .padding(16.dp)
         ) {
             FriendItem(
-                friend = UserNew(
+                friend = User(
                     id = "preview1",
                     name = "Тестовый Друг",
                     avatarUrl = null,
@@ -470,7 +504,7 @@ fun FriendItemPreview() {
             Spacer(modifier = Modifier.height(16.dp))
 
             FriendItem(
-                friend = UserNew(
+                friend = User(
                     id = "preview2",
                     name = "Друг со статусом",
                     avatarUrl = null,
