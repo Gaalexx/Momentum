@@ -2,8 +2,6 @@ package com.project.momentum.features.settings.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.project.momentum.features.auth.models.NavEvent
 import com.project.momentum.features.settings.template.TemplateDeleteAccountConfirmation
@@ -12,10 +10,9 @@ import com.project.momentum.features.settings.viewmodel.DeleteAccountViewModel
 @Composable
 fun DeleteAccountConfirmationScreen(
     onConfirm: () -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    viewModel: DeleteAccountViewModel = hiltViewModel()
 ) {
-    val viewModel: DeleteAccountViewModel = hiltViewModel()
-    val uiState by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.navigationEvents.collect { event ->
@@ -27,7 +24,6 @@ fun DeleteAccountConfirmationScreen(
     }
 
     TemplateDeleteAccountConfirmation(
-        onConfirm = viewModel::onConfirmDelete,
-        onCancel = viewModel::onCancelDelete
+        onEvent = viewModel::onEvent
     )
 }

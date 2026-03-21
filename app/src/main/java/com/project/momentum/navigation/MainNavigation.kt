@@ -41,8 +41,9 @@ import com.project.momentum.navigation.viewmodel.AppStartState
 import com.project.momentum.navigation.viewmodel.AppStartViewModel
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.features.settings.ui.SettingsMainScreen
-import com.project.momentum.ui.screens.settings.DeleteAccountCheckPasswordScreen
+import com.project.momentum.features.settings.ui.DeleteAccountCheckPasswordScreen
 import com.project.momentum.features.settings.ui.DeleteAccountConfirmationScreen
+import com.project.momentum.features.settings.ui.SettingsPremiumScreen
 
 @Composable
 fun MainScreen() {
@@ -393,6 +394,17 @@ fun MainScreen() {
                     },
                     onConfirm = {
                         openOverlay(NavRoutes.RegistrationLogin)
+                    }
+                )
+            }
+
+            entry<NavRoutes.Premium> {
+                SettingsPremiumScreen(
+                    onBackClick = {
+                        closeOverlay()
+                    },
+                    onBuyClick = {
+
                     }
                 )
             }

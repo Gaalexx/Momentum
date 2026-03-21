@@ -1,13 +1,15 @@
 package com.project.momentum.features.settings.repo
 
+import com.project.momentum.features.settings.api.GetSettingsInfoAPI
 import com.project.momentum.features.settings.api.SettingsMainAPI
-import com.project.momentum.features.settings.models.dto.SwitchStateDTO
+import com.project.momentum.features.settings.models.dto.SettingsStateDTO
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class SettingsMainRepository @Inject constructor(
-    private val client: SettingsMainAPI
+    private val client: SettingsMainAPI,
+    private val settingsInfoAPI: GetSettingsInfoAPI
 ) {
     suspend fun changeInAppNotifications() : Boolean{
         val response = client.changeInAppNotifications()
@@ -39,52 +41,9 @@ class SettingsMainRepository @Inject constructor(
         return response.isSuccess
     }
 
-
-
-
-    suspend fun getInAppNotifications() : Boolean?{
+    suspend fun getSettingsInfo() : SettingsStateDTO?{
         return try {
-            client.getInAppNotifications().switchState
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    suspend fun getPublicationsEnabled() : Boolean?{
-        return try {
-            client.getPublicationsEnabled().switchState
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    suspend fun getReactionsEnabled() : Boolean?{
-        return try {
-            client.getReactionsEnabled().switchState
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    suspend fun getRecommendToContacts() : Boolean?{
-        return try {
-            client.getRecommendToContacts().switchState
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    suspend fun getAllowAddFromAnyone() : Boolean? {
-        return try {
-            client.getAllowAddFromAnyone().switchState
-        } catch (e: Exception) {
-            null
-        }
-    }
-
-    suspend fun getConfirmBeforePosting() : Boolean?{
-        return try {
-            client.getConfirmBeforePosting().switchState
+            settingsInfoAPI.getSettingsInfo()
         } catch (e: Exception) {
             null
         }

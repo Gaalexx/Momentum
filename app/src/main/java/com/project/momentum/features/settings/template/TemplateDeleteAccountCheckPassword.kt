@@ -1,7 +1,6 @@
 package com.project.momentum.features.settings.template
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.R
 import com.project.momentum.features.settings.models.DeleteAccountState
+import com.project.momentum.features.settings.viewmodel.DeleteEvent
 import com.project.momentum.ui.assets.TextFieldRegistration
 import com.project.momentum.ui.assets.TopBarTemplate
 import com.project.momentum.ui.theme.AppTextStyles
@@ -36,8 +36,7 @@ import com.project.momentum.ui.theme.ConstColours
 fun DeleteAccountCheckPasswordScreenPreview() {
     TemplateDeleteAccountCheckPassword(
         onBackClick = {},
-        onContinueClick = {},
-        onPasswordChange = {},
+        onEvent = {},
         state = DeleteAccountState(),
     )
 }
@@ -45,14 +44,15 @@ fun DeleteAccountCheckPasswordScreenPreview() {
 @Composable
 fun TemplateDeleteAccountCheckPassword(
     onBackClick: () -> Unit,
-    onContinueClick: () -> Unit,
-    onPasswordChange: (String) -> Unit,
+    onEvent: (DeleteEvent)-> Unit,
     state: DeleteAccountState,
     modifier: Modifier = Modifier
 ) {
     TopBarTemplate(
         label = R.string.label_delete_account,
-        onBackClick = onBackClick,
+        onBackClick = {
+            onEvent(DeleteEvent.previousStep)
+            onBackClick() },
         modifier = modifier
     ) { paddingValues ->
         Box(
@@ -64,9 +64,9 @@ fun TemplateDeleteAccountCheckPassword(
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Spacer(Modifier.height(dimensionResource(R.dimen.delete_account_padding_height)))
                 Text(
                     text = stringResource(R.string.insert_password),
                     color = ConstColours.WHITE,
@@ -79,7 +79,7 @@ fun TemplateDeleteAccountCheckPassword(
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
                 TextFieldRegistration(
                     value = state.userData.password,
-                    onValueChange = onPasswordChange,
+                    onValueChange = {onEvent(DeleteEvent.updateUserPassword(it))},
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Password,
@@ -89,7 +89,7 @@ fun TemplateDeleteAccountCheckPassword(
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
                 TextFieldRegistration(
                     value = state.userData.password,
-                    onValueChange = onPasswordChange,
+                    onValueChange = {onEvent(DeleteEvent.updateUserPassword(it))},
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Password,
@@ -98,7 +98,7 @@ fun TemplateDeleteAccountCheckPassword(
                 )
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
                 ContinueButton(
-                    onClick = onContinueClick,
+                    onClick = {onEvent(DeleteEvent.nextStep)},
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size))
                 )
             }

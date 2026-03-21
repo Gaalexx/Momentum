@@ -6,4 +6,5 @@
     <dimen name="sub_button_size">48.dp</dimen>
     <dimen name="delete_account_stroke">24.dp</dimen>
     <dimen name="delete_account_padding_width">280.dp</dimen>
+    <dimen name="delete_account_padding_height">180.dp</dimen>
 </resources>

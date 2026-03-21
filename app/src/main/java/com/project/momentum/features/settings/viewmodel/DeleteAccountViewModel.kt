@@ -17,6 +17,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+sealed interface DeleteEvent {
+    data object nextStep : DeleteEvent
+    data object previousStep : DeleteEvent
+    data object onConfirmDelete : DeleteEvent
+    data object onCancelDelete : DeleteEvent
+    data class updateUserPassword(val password: String) : DeleteEvent
+}
+
 @HiltViewModel
 class DeleteAccountViewModel @Inject constructor(
     private val repository: DeleteAccountRepository
@@ -26,13 +34,17 @@ class DeleteAccountViewModel @Inject constructor(
     private val _navigationEvents = MutableSharedFlow<NavEvent>()
     val navigationEvents: SharedFlow<NavEvent> = _navigationEvents.asSharedFlow()
 
-
-
-    fun isValidCode(): Boolean {
-        return true
+    fun onEvent(event: DeleteEvent) {
+        when (event) {
+            is DeleteEvent.nextStep -> nextStep()
+            is DeleteEvent.previousStep -> previousStep()
+            is DeleteEvent.onConfirmDelete -> onConfirmDelete()
+            is DeleteEvent.onCancelDelete -> onCancelDelete()
+            is DeleteEvent.updateUserPassword -> {updateUserPassword(event.password)}
+        }
     }
 
-    fun nextStep() {
+    private fun nextStep() {
         if (!_state.value.isStepValid) return
 
         when (_state.value.currentStep) {
@@ -106,7 +118,7 @@ class DeleteAccountViewModel @Inject constructor(
         }
     }
 
-    fun previousStep() {
+    private fun previousStep() {
         if (!_state.value.canGoBack) return
 
         _state.update {
@@ -118,24 +130,8 @@ class DeleteAccountViewModel @Inject constructor(
             )
         }
     }
-
-    fun onCodeAuthorization() {
-        _state.update { it.copy(isLoading = true) }
-
-        viewModelScope.launch {
-            repository.sendAuthorizationCode(_state.value)
-            _state.update {
-                it.copy(
-                    currentStep = DeleteAccountStep.VERIFICATION,
-                    isError = false,
-                    isLoading = false
-                )
-            }
-            _navigationEvents.emit(NavEvent.NavigateToNextSubScreen)
-        }
-    }
-
-    fun onConfirmDelete() {
+    
+    private fun onConfirmDelete() {
         _state.update { it.copy(isLoading = true, showConfirmationDialog = false) }
 
         viewModelScope.launch {
@@ -162,16 +158,15 @@ class DeleteAccountViewModel @Inject constructor(
         }
     }
 
-    fun onCancelDelete() {
+    private fun onCancelDelete() {
         _state.update { it.copy(showConfirmationDialog = false) }
     }
 
-    fun updateUserPassword(password: String) {
+    private fun updateUserPassword(password: String) {
         _state.update { currentState ->
             currentState.copy (
                 userData = currentState.userData.copy(password = password)
             )
         }
     }
-
 }

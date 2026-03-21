@@ -3,6 +3,7 @@ package com.project.momentum.features.settings.template
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -11,10 +12,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.momentum.R
-import com.project.momentum.features.settings.models.SettingsState
-import com.project.momentum.features.settings.viewmodel.SettingsMainScreenViewModel
+import com.project.momentum.features.settings.viewmodel.SettingsEvent
+import com.project.momentum.features.settings.viewmodel.SettingsState
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.SettingsButton
 import com.project.momentum.ui.assets.SwitchRow
@@ -27,12 +27,7 @@ fun SettingsMainScreenPreview() {
     MaterialTheme {
         TemplateSettingsMain(
             onBackClick = {},
-            onInAppNotifications = {},
-            onPublicationsEnabled = {},
-            onReactionsEnabled = {},
-            onRecommendToContacts = {},
-            onAllowAddFromAnyone = {},
-            onConfirmBeforePosting = {},
+            onEvent = {},
             state = SettingsState(),
             onPremiumClick = {},
             onLogoutClick = {},
@@ -44,12 +39,7 @@ fun SettingsMainScreenPreview() {
 @Composable
 fun TemplateSettingsMain(
     onBackClick: () -> Unit = {},
-    onInAppNotifications: () -> Unit = {},
-    onPublicationsEnabled: () -> Unit = {},
-    onReactionsEnabled: () -> Unit = {},
-    onRecommendToContacts: () -> Unit = {},
-    onAllowAddFromAnyone: () -> Unit = {},
-    onConfirmBeforePosting: () -> Unit = {},
+    onEvent: (SettingsEvent)-> Unit,
     state: SettingsState,
     onPremiumClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
@@ -99,20 +89,20 @@ fun TemplateSettingsMain(
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_in_app_switch),
-                enabled = state.inAppNotifications,
-                onEnabledChange = { onInAppNotifications() }
+                enabled = state.settingsState.inAppNotifications,
+                onEnabledChange = { onEvent(SettingsEvent.onInAppNotifications) }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_publications),
-                enabled = state.publicationsEnabled,
-                onEnabledChange = { onPublicationsEnabled() }
+                enabled = state.settingsState.publicationsEnabled,
+                onEnabledChange = { onEvent(SettingsEvent.onPublicationsEnabled) }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_reactions),
-                enabled = state.reactionsEnabled,
-                onEnabledChange = { onReactionsEnabled() }
+                enabled = state.settingsState.reactionsEnabled,
+                onEnabledChange = { onEvent(SettingsEvent.onReactionsEnabled) }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -126,14 +116,14 @@ fun TemplateSettingsMain(
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_recommend_to_contacts),
-                enabled = state.recommendToContacts,
-                onEnabledChange = { onRecommendToContacts() }
+                enabled = state.settingsState.recommendToContacts,
+                onEnabledChange = { onEvent(SettingsEvent.onRecommendToContacts) }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_allow_add_from_anyone),
-                enabled = state.allowAddFromAnyone,
-                onEnabledChange = { onAllowAddFromAnyone() }
+                enabled = state.settingsState.allowAddFromAnyone,
+                onEnabledChange = { onEvent(SettingsEvent.onAllowAddFromAnyone) }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -147,44 +137,42 @@ fun TemplateSettingsMain(
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_confirm_before_posting),
-                enabled = state.confirmBeforePosting,
-                onEnabledChange = { onConfirmBeforePosting() }
+                enabled = state.settingsState.confirmBeforePosting,
+                onEnabledChange = { onEvent(SettingsEvent.onConfirmBeforePosting) }
             )
 
+            Spacer(modifier = Modifier.weight(1f))
+
+
+
+            SettingsButton(
+                onClick = onPremiumClick,
+                icon = Icons.Default.Star,
+                text = stringResource(R.string.settings_section_premium),
+                textColor = ConstColours.GOLD,
+                modifier = Modifier
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            SettingsButton(
+                onClick = onLogoutClick,
+                icon = Icons.AutoMirrored.Filled.Logout,
+                text = stringResource(R.string.settings_section_quit),
+                modifier = Modifier
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            SettingsButton(
+                onClick = onDeleteAccountClick,
+                icon = Icons.Default.Delete,
+                text = stringResource(R.string.settings_section_delete),
+                textColor = ConstColours.DELETE,
+                modifier = Modifier
+            )
+
+            Spacer(modifier = Modifier.weight(1.5f))
         }
-
-
-        Spacer(modifier = Modifier.weight(1f))
-
-
-
-        SettingsButton(
-            onClick = onPremiumClick,
-            icon = Icons.Default.Star,
-            text = stringResource(R.string.settings_section_premium),
-            textColor = ConstColours.GOLD,
-            modifier = Modifier.padding(horizontal = 24.dp)
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        SettingsButton(
-            onClick = onLogoutClick,
-            icon = Icons.Default.Logout,
-            text = stringResource(R.string.settings_section_quit),
-            modifier = Modifier.padding(horizontal = 24.dp)
-        )
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        SettingsButton(
-            onClick = onDeleteAccountClick,
-            icon = Icons.Default.Delete,
-            text = stringResource(R.string.settings_section_delete),
-            textColor = ConstColours.DELETE,
-            modifier = Modifier.padding(horizontal = 24.dp)
-        )
-
-        Spacer(modifier = Modifier.weight(4f))
     }
 }

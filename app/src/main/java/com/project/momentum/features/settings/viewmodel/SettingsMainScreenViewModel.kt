@@ -2,8 +2,9 @@ package com.project.momentum.features.settings.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.project.momentum.features.settings.models.SettingsState
-import com.project.momentum.features.settings.models.dto.SwitchStateDTO
+import com.project.momentum.features.account.viewmodel.AccountInfoEvent
+import com.project.momentum.features.account.viewmodel.AccountInfoState
+import com.project.momentum.features.settings.models.dto.SettingsStateDTO
 import com.project.momentum.features.settings.repo.SettingsMainRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,34 +14,47 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class SettingsState (
+    val settingsState: SettingsStateDTO = SettingsStateDTO(),
+    val isLoading: Boolean = false,
+    val isError: Boolean = false,
+    val errorMessage: String? = null
+)
+
+sealed interface SettingsEvent {
+    data object onInAppNotifications : SettingsEvent
+    data object onPublicationsEnabled : SettingsEvent
+    data object onReactionsEnabled : SettingsEvent
+    data object onRecommendToContacts : SettingsEvent
+    data object onAllowAddFromAnyone : SettingsEvent
+    data object onConfirmBeforePosting : SettingsEvent
+    data object getAccountInfo : SettingsEvent
+}
+
 @HiltViewModel
 class SettingsMainScreenViewModel @Inject constructor(
     private val repository: SettingsMainRepository
 ) : ViewModel() {
     private var _state = MutableStateFlow(SettingsState())
     val state: StateFlow<SettingsState> = _state.asStateFlow()
-    /*private val _navigationEvents = MutableSharedFlow<Boolean>()
-    val navigationEvents: SharedFlow<Boolean> = _navigationEvents.asSharedFlow()
 
-    private val _publicationsEnabled = MutableSharedFlow<Boolean>()
-    var publicationsEnabled: SharedFlow<Boolean> = _publicationsEnabled.asSharedFlow()
+    init{
+        getSettingsInfo()
+    }
 
-    private val _reactionsEnabled = MutableSharedFlow<Boolean>()
-    var reactionsEnabled: SharedFlow<Boolean> = _reactionsEnabled.asSharedFlow()
+    fun onEvent(event: SettingsEvent) {
+        when (event) {
+            is SettingsEvent.onInAppNotifications -> onInAppNotifications()
+            is SettingsEvent.onPublicationsEnabled -> onPublicationsEnabled()
+            is SettingsEvent.onReactionsEnabled -> onReactionsEnabled()
+            is SettingsEvent.onRecommendToContacts -> onRecommendToContacts()
+            is SettingsEvent.onAllowAddFromAnyone -> onAllowAddFromAnyone()
+            is SettingsEvent.onConfirmBeforePosting -> onConfirmBeforePosting()
+            is SettingsEvent.getAccountInfo -> getSettingsInfo()
+        }
+    }
 
-    private val _inAppNotifications = MutableSharedFlow<Boolean>()
-    var inAppNotifications: SharedFlow<Boolean> = _inAppNotifications.asSharedFlow()
-
-    private val _recommendToContacts = MutableSharedFlow<Boolean>()
-    var recommendToContacts: SharedFlow<Boolean> = _recommendToContacts.asSharedFlow()
-
-    private val _allowAddFromAnyone = MutableSharedFlow<Boolean>()
-    var allowAddFromAnyone: SharedFlow<Boolean> = _allowAddFromAnyone.asSharedFlow()
-
-    private val _confirmBeforePosting = MutableSharedFlow<Boolean>()
-    var confirmBeforePosting: SharedFlow<Boolean> = _confirmBeforePosting.asSharedFlow()*/
-
-    fun onInAppNotifications() {
+    private fun onInAppNotifications() {
         _state.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
@@ -49,7 +63,7 @@ class SettingsMainScreenViewModel @Inject constructor(
         }
     }
 
-    fun onPublicationsEnabled() {
+    private fun onPublicationsEnabled() {
         _state.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
@@ -58,7 +72,7 @@ class SettingsMainScreenViewModel @Inject constructor(
         }
     }
 
-    fun onReactionsEnabled() {
+    private fun onReactionsEnabled() {
         _state.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
@@ -67,7 +81,7 @@ class SettingsMainScreenViewModel @Inject constructor(
         }
     }
 
-    fun onRecommendToContacts() {
+    private fun onRecommendToContacts() {
         _state.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
@@ -76,7 +90,7 @@ class SettingsMainScreenViewModel @Inject constructor(
         }
     }
 
-    fun onAllowAddFromAnyone() {
+    private fun onAllowAddFromAnyone() {
         _state.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
@@ -85,7 +99,7 @@ class SettingsMainScreenViewModel @Inject constructor(
         }
     }
 
-    fun onConfirmBeforePosting() {
+    private fun onConfirmBeforePosting() {
         _state.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
@@ -94,16 +108,14 @@ class SettingsMainScreenViewModel @Inject constructor(
         }
     }
 
-    fun getInAppNotifications() {
-        _state.update { it.copy(isLoading = true) }
-
+    private fun getSettingsInfo() {
         viewModelScope.launch {
-            val response = repository.getInAppNotifications()
-            if (response != null){
+            val info = repository.getSettingsInfo()
+            if (info != null){
                 _state.update {
                     it.copy(
                         isLoading = false,
-                        inAppNotifications = response,
+                        settingsState = info
                     )
                 }
             }
@@ -113,102 +125,7 @@ class SettingsMainScreenViewModel @Inject constructor(
         }
     }
 
-    fun getPublicationsEnabled() {
-        _state.update { it.copy(isLoading = true) }
-
-        viewModelScope.launch {
-            val response = repository.getPublicationsEnabled()
-            if (response != null){
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        publicationsEnabled = response,
-                    )
-                }
-            }
-            else {
-                getErrorHandler()
-            }
-        }
-    }
-
-    fun getReactionsEnabled() {
-        _state.update { it.copy(isLoading = true) }
-
-        viewModelScope.launch {
-            val response = repository.getReactionsEnabled()
-            if (response != null){
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        reactionsEnabled = response,
-                    )
-                }
-            }
-            else {
-                getErrorHandler()
-            }
-        }
-    }
-
-    fun getRecommendToContacts() {
-        _state.update { it.copy(isLoading = true) }
-
-        viewModelScope.launch {
-            val response = repository.getRecommendToContacts()
-            if (response != null){
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        recommendToContacts = response,
-                    )
-                }
-            }
-            else {
-                getErrorHandler()
-            }
-        }
-    }
-
-    fun getAllowAddFromAnyone() {
-        _state.update { it.copy(isLoading = true) }
-
-        viewModelScope.launch {
-            val response = repository.getAllowAddFromAnyone()
-            if (response != null){
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        allowAddFromAnyone = response,
-                    )
-                }
-            }
-            else {
-                getErrorHandler()
-            }
-        }
-    }
-
-    fun getConfirmBeforePosting() {
-        _state.update { it.copy(isLoading = true) }
-
-        viewModelScope.launch {
-            val response = repository.getConfirmBeforePosting()
-            if (response != null){
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        confirmBeforePosting = response,
-                    )
-                }
-            }
-            else {
-                getErrorHandler()
-            }
-        }
-    }
-
-    fun onErrorHandler(response: Boolean){
+    private fun onErrorHandler(response: Boolean){
         if (response){
             _state.update {
                 it.copy(
@@ -227,7 +144,7 @@ class SettingsMainScreenViewModel @Inject constructor(
         }
     }
 
-    fun getErrorHandler(){
+    private fun getErrorHandler(){
         _state.update {
             it.copy(
                 isError = true,
