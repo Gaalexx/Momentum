@@ -41,6 +41,7 @@
     <string name="label_write_comment">Введите комментарий...</string>
     <string name="find_or_add_friend">Найти друга</string>
     <string name="friend_search">Добавить друга</string>
+    <string name="send_request">Отправить запрос</string>
 
     <string name="cats_url">"https://cataas.com/cat"</string>
 
