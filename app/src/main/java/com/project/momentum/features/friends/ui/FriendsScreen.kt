@@ -38,6 +38,7 @@ import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.ui.theme.AppTextStyles
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.Icon
@@ -406,6 +407,9 @@ fun FriendItem(friend: User) {
         modifier = Modifier
             .padding(vertical = 6.dp, horizontal = 10.dp)
             .fillMaxWidth()
+            .clip(RoundedCornerShape(15.dp))
+            .background(ConstColours.MAIN_BACK_GRAY)
+
     ) {
         Box(
             modifier = Modifier.padding(end = 12.dp)
