@@ -7,18 +7,18 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.header
 import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import javax.inject.Inject
 import javax.inject.Singleton
 
 interface ISettingsMainAPI {
-    suspend fun changeInAppNotifications(): CheckResponseDTO
-    suspend fun changePublicationsEnabled(): CheckResponseDTO
-    suspend fun changeReactionsEnabled(): CheckResponseDTO
-    suspend fun changeRecommendToContacts(): CheckResponseDTO
-    suspend fun changeAllowAddFromAnyone(): CheckResponseDTO
-    suspend fun changeConfirmBeforePosting(): CheckResponseDTO
+    suspend fun changeInAppNotifications(newValue: Boolean): CheckResponseDTO
+    suspend fun changePublicationsEnabled(newValue: Boolean): CheckResponseDTO
+    suspend fun changeReactionsEnabled(newValue: Boolean): CheckResponseDTO
+    suspend fun changeRecommendToContacts(newValue: Boolean): CheckResponseDTO
+    suspend fun changeAllowAddFromAnyone(newValue: Boolean): CheckResponseDTO
 }
 
 @Singleton
@@ -26,9 +26,10 @@ class SettingsMainAPI @Inject constructor(
     @Backend private val client: HttpClient,
     private val sessionManager: SessionManager
 ): ISettingsMainAPI{
-    override suspend fun changeInAppNotifications() : CheckResponseDTO{
+    override suspend fun changeInAppNotifications(newValue: Boolean) : CheckResponseDTO{
         val response = client.post("change-in-app-notifications") {
             header(HttpHeaders.Authorization, "Bearer ${sessionManager.getToken()}")
+            setBody(newValue)
         }
         if (response.status == HttpStatusCode.OK) {
             return response.body<CheckResponseDTO>()
@@ -36,9 +37,10 @@ class SettingsMainAPI @Inject constructor(
             throw Exception() // TODO прописать свои Exception
         }
     }
-    override suspend fun changePublicationsEnabled() : CheckResponseDTO{
+    override suspend fun changePublicationsEnabled(newValue: Boolean) : CheckResponseDTO{
         val response = client.post("change-publications-enabled") {
             header(HttpHeaders.Authorization, "Bearer ${sessionManager.getToken()}")
+            setBody(newValue)
         }
         if (response.status == HttpStatusCode.OK) {
             return response.body<CheckResponseDTO>()
@@ -46,9 +48,10 @@ class SettingsMainAPI @Inject constructor(
             throw Exception() // TODO прописать свои Exception
         }
     }
-    override suspend fun changeReactionsEnabled() : CheckResponseDTO{
+    override suspend fun changeReactionsEnabled(newValue: Boolean) : CheckResponseDTO{
         val response = client.post("change-reactions-enabled") {
             header(HttpHeaders.Authorization, "Bearer ${sessionManager.getToken()}")
+            setBody(newValue)
         }
         if (response.status == HttpStatusCode.OK) {
             return response.body<CheckResponseDTO>()
@@ -56,9 +59,10 @@ class SettingsMainAPI @Inject constructor(
             throw Exception() // TODO прописать свои Exception
         }
     }
-    override suspend fun changeRecommendToContacts() : CheckResponseDTO{
+    override suspend fun changeRecommendToContacts(newValue: Boolean) : CheckResponseDTO{
         val response = client.post("change-recommend-to-contacts") {
             header(HttpHeaders.Authorization, "Bearer ${sessionManager.getToken()}")
+            setBody(newValue)
         }
         if (response.status == HttpStatusCode.OK) {
             return response.body<CheckResponseDTO>()
@@ -66,19 +70,10 @@ class SettingsMainAPI @Inject constructor(
             throw Exception() // TODO прописать свои Exception
         }
     }
-    override suspend fun changeAllowAddFromAnyone() : CheckResponseDTO{
+    override suspend fun changeAllowAddFromAnyone(newValue: Boolean) : CheckResponseDTO{
         val response = client.post("change-allow-add-from-anyone") {
             header(HttpHeaders.Authorization, "Bearer ${sessionManager.getToken()}")
-        }
-        if (response.status == HttpStatusCode.OK) {
-            return response.body<CheckResponseDTO>()
-        } else {
-            throw Exception() // TODO прописать свои Exception
-        }
-    }
-    override suspend fun changeConfirmBeforePosting() : CheckResponseDTO{
-        val response = client.post("change-confirm-before-posting") {
-            header(HttpHeaders.Authorization, "Bearer ${sessionManager.getToken()}")
+            setBody(newValue)
         }
         if (response.status == HttpStatusCode.OK) {
             return response.body<CheckResponseDTO>()

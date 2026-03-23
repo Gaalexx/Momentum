@@ -1,7 +1,5 @@
 package com.project.momentum.features.settings.models
 
-import com.project.momentum.features.auth.models.UserData
-
 enum class DeleteAccountStep {
     PASSWORD,
     VERIFICATION,
@@ -9,6 +7,15 @@ enum class DeleteAccountStep {
     DELETE_ACCOUNT,
     COMPLETED
 }
+
+data class UserData(
+    val passwordFstTextField: String = "",
+    val passwordScdTextField: String = "",
+    val email: String = "",
+    val phone: String? = null,
+    val password: String = "",
+    val verificationCode: String = "",
+)
 
 data class DeleteAccountState (
     val currentStep: DeleteAccountStep = DeleteAccountStep.PASSWORD,

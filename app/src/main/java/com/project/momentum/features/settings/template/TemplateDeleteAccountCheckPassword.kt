@@ -78,8 +78,8 @@ fun TemplateDeleteAccountCheckPassword(
                 )
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
                 TextFieldRegistration(
-                    value = state.userData.password,
-                    onValueChange = {onEvent(DeleteEvent.updateUserPassword(it))},
+                    value = state.userData.passwordFstTextField,
+                    onValueChange = {onEvent(DeleteEvent.updatePasswordFstTextField(it))},
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Password,
@@ -88,8 +88,8 @@ fun TemplateDeleteAccountCheckPassword(
                 )
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
                 TextFieldRegistration(
-                    value = state.userData.password,
-                    onValueChange = {onEvent(DeleteEvent.updateUserPassword(it))},
+                    value = state.userData.passwordScdTextField,
+                    onValueChange = {onEvent(DeleteEvent.updatePasswordScdTextField(it))},
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Password,

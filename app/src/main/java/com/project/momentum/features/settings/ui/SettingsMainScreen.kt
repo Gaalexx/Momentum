@@ -16,11 +16,13 @@ fun SettingsMainScreen(
     viewModel: SettingsMainScreenViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val stateLocalSetting by viewModel.confirmBeforePostFlow.collectAsStateWithLifecycle()
 
     TemplateSettingsMain(
         onBackClick = onBackClick,
         onEvent = viewModel::onEvent,
         state = uiState,
+        stateLocalSetting = stateLocalSetting,
         onPremiumClick = onPremiumClick,
         onLogoutClick = onLogoutClick,
         onDeleteAccountClick = onDeleteAccountClick

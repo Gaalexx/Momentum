@@ -20,6 +20,7 @@ import com.project.momentum.ui.assets.SettingsButton
 import com.project.momentum.ui.assets.SwitchRow
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
+import kotlinx.coroutines.flow.StateFlow
 
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
@@ -29,6 +30,7 @@ fun SettingsMainScreenPreview() {
             onBackClick = {},
             onEvent = {},
             state = SettingsState(),
+            stateLocalSetting = true,
             onPremiumClick = {},
             onLogoutClick = {},
             onDeleteAccountClick = {}
@@ -41,6 +43,7 @@ fun TemplateSettingsMain(
     onBackClick: () -> Unit = {},
     onEvent: (SettingsEvent)-> Unit,
     state: SettingsState,
+    stateLocalSetting: Boolean,
     onPremiumClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     onDeleteAccountClick: () -> Unit = {},
@@ -89,19 +92,19 @@ fun TemplateSettingsMain(
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_in_app_switch),
-                enabled = state.settingsState.inAppNotifications,
+                enabled = state.serverSettingsState.inAppNotifications,
                 onEnabledChange = { onEvent(SettingsEvent.onInAppNotifications) }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_publications),
-                enabled = state.settingsState.publicationsEnabled,
+                enabled = state.serverSettingsState.publicationsEnabled,
                 onEnabledChange = { onEvent(SettingsEvent.onPublicationsEnabled) }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_reactions),
-                enabled = state.settingsState.reactionsEnabled,
+                enabled = state.serverSettingsState.reactionsEnabled,
                 onEnabledChange = { onEvent(SettingsEvent.onReactionsEnabled) }
             )
 
@@ -116,13 +119,13 @@ fun TemplateSettingsMain(
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_recommend_to_contacts),
-                enabled = state.settingsState.recommendToContacts,
+                enabled = state.serverSettingsState.recommendToContacts,
                 onEnabledChange = { onEvent(SettingsEvent.onRecommendToContacts) }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_allow_add_from_anyone),
-                enabled = state.settingsState.allowAddFromAnyone,
+                enabled = state.serverSettingsState.allowAddFromAnyone,
                 onEnabledChange = { onEvent(SettingsEvent.onAllowAddFromAnyone) }
             )
 
@@ -137,7 +140,7 @@ fun TemplateSettingsMain(
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_confirm_before_posting),
-                enabled = state.settingsState.confirmBeforePosting,
+                enabled = stateLocalSetting,
                 onEnabledChange = { onEvent(SettingsEvent.onConfirmBeforePosting) }
             )
 

@@ -78,7 +78,7 @@ fun TemplateDeleteAccountCheckCode(
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
                 TextFieldRegistration(
                     value = state.userData.password,
-                    onValueChange = {onEvent(DeleteEvent.updateUserPassword(it))},
+                    onValueChange = {onEvent(DeleteEvent.updateUserCode(it))},
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Password,

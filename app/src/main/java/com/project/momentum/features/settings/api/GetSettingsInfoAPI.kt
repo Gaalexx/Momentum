@@ -1,7 +1,7 @@
 package com.project.momentum.features.settings.api
 
 import com.project.momentum.data.auth.SessionManager
-import com.project.momentum.features.settings.models.dto.SettingsStateDTO
+import com.project.momentum.features.settings.models.dto.ServerSettingsStateDTO
 import com.project.momentum.network.di.Backend
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -18,12 +18,12 @@ class GetSettingsInfoAPI @Inject constructor(
     private val sessionManager: SessionManager
 ){
 
-    suspend fun getSettingsInfo() : SettingsStateDTO {
+    suspend fun getServerSettingsInfo() : ServerSettingsStateDTO {
         val response = client.post("get-settings-info") {
             header(HttpHeaders.Authorization, "Bearer ${sessionManager.getToken()}")
         }
         if (response.status == HttpStatusCode.OK) {
-            return response.body<SettingsStateDTO>()
+            return response.body<ServerSettingsStateDTO>()
         } else {
             throw Exception() // TODO прописать свои Exception
         }
