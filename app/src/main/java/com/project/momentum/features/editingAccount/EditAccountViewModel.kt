@@ -45,6 +45,10 @@ data class EditAccountErrorFields (
 sealed class EditAccountState {
     abstract val fields: EditAccountFields
 
+    fun getErrorForUsername(): ErrorType? = (this as? Error)?.errorFields?.usernameError
+    fun getErrorForEmail(): ErrorType? = (this as? Error)?.errorFields?.emailError
+    fun getErrorForPhone(): ErrorType? = (this as? Error)?.errorFields?.phoneError
+
     data class Loading(
         override val fields: EditAccountFields = EditAccountFields()
     ) : EditAccountState()
@@ -64,7 +68,9 @@ class EditAccountViewModel @Inject constructor(
     private val emailChecker: EmailChecker,
     private val repo: AccountRepository
 ) : ViewModel() {
-    private var _state = MutableStateFlow<EditAccountState>(EditAccountState.Loading())
+    private var _state = MutableStateFlow<EditAccountState>(EditAccountState.Content(
+        fields = EditAccountFields()
+    ))
     val state: StateFlow<EditAccountState> = _state.asStateFlow()
 
     private val _navigationEvents = MutableSharedFlow<NavEvent>()
@@ -105,8 +111,10 @@ class EditAccountViewModel @Inject constructor(
 
         setLoading()
         try {
-            if (!fields.email.isNullOrBlank() && emailChecker.checkEmail(fields.email))
+            if (!fields.email.isNullOrBlank() && emailChecker.checkEmail(fields.email)) {
                 setError(emailError = ErrorType.NOT_EXIST)
+                return
+            }
 
             val errors = repo.checkUserInfoDB(fields)
             setError(
@@ -129,6 +137,7 @@ class EditAccountViewModel @Inject constructor(
     }
 
     fun isValidPhone(phone: String): Boolean {
+        //TODO: проверка на валидность номера
         return Patterns.PHONE.matcher(phone).matches()
     }
 
@@ -166,9 +175,9 @@ class EditAccountViewModel @Inject constructor(
             EditAccountState.Error(
                 fields = state.fields,
                 errorFields = EditAccountErrorFields(
-                    usernameError = usernameError ?: currentErrors?.usernameError,
-                    emailError = emailError ?: currentErrors?.emailError,
-                    phoneError = phoneError ?: currentErrors?.phoneError
+                    usernameError = currentErrors?.usernameError ?: usernameError,
+                    emailError = currentErrors?.emailError ?: emailError,
+                    phoneError = currentErrors?.phoneError ?: phoneError
                 )
             )
         }
