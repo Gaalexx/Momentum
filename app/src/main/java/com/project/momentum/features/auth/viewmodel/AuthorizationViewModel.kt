@@ -131,7 +131,9 @@ class AuthorizationViewModel @Inject constructor(
         _state.update { it.copy(isLoading = true) }
 
         viewModelScope.launch {
-            repository.sendAuthorizationCode(_state.value)
+            while (true) {
+                if (repository.sendCode(_state.value)) break
+            }
             _state.update {
                 it.copy(
                     currentStep = LoginStep.VERIFICATION,

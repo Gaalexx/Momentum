@@ -35,8 +35,8 @@ class RegistrationRepository @Inject constructor(
         return response.isSuccess
     }
 
-    suspend fun sendAuthorizationCode(user: LoginState): Boolean {
-        val response = client.sendCodeAuthorization(CheckEmailRequestDTO(user.userData.email))
+    suspend fun sendCode(user: LoginState): Boolean {
+        val response = client.sendCode(CheckEmailRequestDTO(user.userData.email))
         return response.isSuccess
     }
 

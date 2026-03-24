@@ -55,8 +55,7 @@ fun InsertCodeScreen(
                 viewModel.nextStep()
             },
             onSubButtonClick = {
-                //TODO: ресерч как отправлять код
-//            viewModel.onSendCodeAgainClick
+                viewModel.sendCodeAgain()
             },
             modifier = modifier,
             isError = uiState.isError,
