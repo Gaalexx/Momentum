@@ -6,7 +6,8 @@ import kotlinx.serialization.Serializable
 
 // Все маршруты - просто сериализуемые классы
 @Serializable
-sealed class NavRoutes : NavKey {
+sealed class
+NavRoutes : NavKey {
     // Экраны без аргументов
     @Serializable
     data object Camera : NavRoutes()
@@ -55,6 +56,9 @@ sealed class NavRoutes : NavKey {
 
     @Serializable
     data object AuthorizationPasswordRecovery : NavRoutes()
+
+    @Serializable
+    data object EditAccount : NavRoutes()
 
     // Экраны с аргументами
     @Serializable
