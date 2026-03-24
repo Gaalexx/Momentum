@@ -645,6 +645,9 @@ fun CancelButton(
                 textAlign = TextAlign.Center,
                 color = colors.contentColor
             )
+                textAlign = TextAlign.Center
+            ),
+            color = colors.contentColor
         )
     }
 }
