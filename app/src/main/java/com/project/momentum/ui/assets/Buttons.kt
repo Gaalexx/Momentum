@@ -644,9 +644,8 @@ fun CancelButton(
             style = AppTextStyles.ButtonText.copy(
                 textAlign = TextAlign.Center,
                 color = colors.contentColor
-            )
-                textAlign = TextAlign.Center
             ),
+            textAlign = TextAlign.Center,
             color = colors.contentColor
         )
     }
