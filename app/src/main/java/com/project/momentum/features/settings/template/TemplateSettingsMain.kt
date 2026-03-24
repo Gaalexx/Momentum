@@ -18,6 +18,7 @@ import com.project.momentum.features.settings.viewmodel.SettingsState
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.SettingsButton
 import com.project.momentum.ui.assets.SwitchRow
+import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
 import kotlinx.coroutines.flow.StateFlow
@@ -30,7 +31,7 @@ fun SettingsMainScreenPreview() {
             onBackClick = {},
             onEvent = {},
             state = SettingsState(),
-            stateLocalSetting = true,
+            //stateLocalSetting = true,
             onPremiumClick = {},
             onLogoutClick = {},
             onDeleteAccountClick = {}
@@ -42,13 +43,16 @@ fun SettingsMainScreenPreview() {
 fun TemplateSettingsMain(
     onBackClick: () -> Unit = {},
     onEvent: (SettingsEvent)-> Unit,
-    state: SettingsState,
-    stateLocalSetting: Boolean,
+    state: SettingsState?,
+    //stateLocalSetting: Boolean,
     onPremiumClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     onDeleteAccountClick: () -> Unit = {},
 ) {
-
+    if (state == null) {
+        LoadingOverlay()
+        return
+    }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(24.dp),
@@ -140,7 +144,7 @@ fun TemplateSettingsMain(
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_confirm_before_posting),
-                enabled = stateLocalSetting,
+                enabled = state.localSettingsState.confirmBeforePosting,
                 onEnabledChange = { onEvent(SettingsEvent.onConfirmBeforePosting) }
             )
 
