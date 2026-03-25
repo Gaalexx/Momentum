@@ -35,7 +35,7 @@ fun TopBarTemplate(
     Scaffold(
         modifier = modifier
             .background(bg)
-            .padding(16.dp)
+            .padding(horizontal = 14.dp, vertical = 10.dp)
             .windowInsetsPadding(WindowInsets.systemBars),
         backgroundColor = bg,
         topBar = {

@@ -11,7 +11,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
@@ -25,6 +24,7 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Group
 import androidx.compose.material.icons.outlined.Mic
+import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -45,7 +45,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
-
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -55,6 +54,7 @@ import androidx.compose.ui.unit.sp
 import com.project.momentum.R
 import com.project.momentum.features.settings.ui.SubscriptionOption
 import com.project.momentum.ui.theme.ConstColours
+
 
 @Composable
 fun BackCircleButton(
@@ -78,6 +78,39 @@ fun BackCircleButton(
         enabled = enabled,
         modifier = modifier
     )
+}
+
+@Composable
+fun AddFriendCircleButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    size: Dp = 50.dp,
+    backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
+    iconColor: Color = ConstColours.WHITE,
+    shadowElevation: Dp = 6.dp,
+    enabled: Boolean = true,
+) {
+    Surface(
+        modifier = modifier.size(size),
+        shape = CircleShape,
+        color = backgroundColor,
+        contentColor = iconColor,
+        tonalElevation = 0.dp,
+        shadowElevation = shadowElevation
+    ) {
+        IconButton(
+            onClick = onClick,
+            enabled = enabled,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.PersonAdd,
+                contentDescription = "Add friend",
+                tint = iconColor,
+                modifier = Modifier.size(size * 0.55f)
+            )
+        }
+    }
 }
 
 @Composable
@@ -286,11 +319,11 @@ fun BigCircleForMainScreenAction(
     val progress = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
 
-    fun startPulsations(){
+    fun startPulsations() {
         scope.launch {
             progress.snapTo(0f)
             progressStarted.value = true
-            while(pressed){
+            while (pressed) {
                 progress.animateTo(
                     targetValue = 1f,
                     animationSpec = tween(
@@ -305,7 +338,7 @@ fun BigCircleForMainScreenAction(
                         easing = LinearEasing
                     )
                 )
-                if(!(progressStarted.value && pressed)){
+                if (!(progressStarted.value && pressed)) {
                     break
                 }
             }
@@ -428,7 +461,7 @@ fun BigCircleMicroButton(
         scope.launch {
             progress.snapTo(0f)
             progressStarted.value = true
-            while(pressed) {
+            while (pressed) {
                 progress.animateTo(
                     targetValue = 1f,
                     animationSpec = tween(
@@ -443,7 +476,7 @@ fun BigCircleMicroButton(
                         easing = LinearEasing
                     )
                 )
-                if(!(progressStarted.value && pressed)) {
+                if (!(progressStarted.value && pressed)) {
                     break
                 }
             }
@@ -531,7 +564,7 @@ fun EditButton(
         shape = RoundedCornerShape(50.dp),
         modifier = modifier.heightIn(min = 32.dp),
         contentPadding = PaddingValues(
-            horizontal = dimensionResource(R.dimen.small_padding) ,
+            horizontal = dimensionResource(R.dimen.small_padding),
             vertical = 0.dp
         )
     ) {
@@ -625,14 +658,14 @@ fun CancelButton(
         contentColor = ConstColours.MAIN_BRAND_BLUE,
     )
 ) {
-    OutlinedButton (
+    OutlinedButton(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
             .height(dimensionResource(R.dimen.button_size)),
         shape = RoundedCornerShape(50.dp),
         colors = colors,
-        border = BorderStroke (
+        border = BorderStroke(
             width = dimensionResource(R.dimen.thickness_divider),
             color = colors.contentColor
         )
@@ -683,21 +716,21 @@ fun BuyButton(
 
 @Composable
 fun StableSwitch(
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
+    enabled: Boolean,
+    onEnabledChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     width: Dp = 52.dp,
     height: Dp = 32.dp,
     thumbSize: Dp = 24.dp,
-    checkedTrackColor: Color = ConstColours.MAIN_BRAND_BLUE,
-    uncheckedTrackColor: Color = ConstColours.MAIN_BACK_GRAY,
+    enabledTrackColor: Color = ConstColours.MAIN_BRAND_BLUE,
+    disabledTrackColor: Color = ConstColours.MAIN_BACK_GRAY,
     thumbColor: Color = ConstColours.WHITE
 ) {
     val trackRadius = height / 2
     val thumbRadius = thumbSize / 2
 
     val thumbOffset by animateDpAsState(
-        targetValue = if (checked) width - thumbSize - 6.dp else 6.dp,
+        targetValue = if (enabled) width - thumbSize - 6.dp else 6.dp,
         label = "thumbOffset"
     )
 
@@ -706,8 +739,8 @@ fun StableSwitch(
             .width(width)
             .height(height)
             .clip(RoundedCornerShape(trackRadius))
-            .background(if (checked) checkedTrackColor else uncheckedTrackColor)
-            .clickable { onCheckedChange(!checked) }
+            .background(if (enabled) enabledTrackColor else disabledTrackColor)
+            .clickable { onEnabledChange(!enabled) }
             .padding(horizontal = 0.dp),
         contentAlignment = Alignment.CenterStart
     ) {
@@ -725,8 +758,8 @@ fun StableSwitch(
 @Composable
 fun SwitchRow(
     text: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    enabled: Boolean,
+    onEnabledChange: (Boolean) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -744,8 +777,8 @@ fun SwitchRow(
         )
 
         StableSwitch(
-            checked = checked,
-            onCheckedChange = onCheckedChange
+            enabled = enabled,
+            onEnabledChange = onEnabledChange
         )
     }
 }
@@ -849,7 +882,7 @@ fun ButtonForDelete(
     onClick: () -> Unit,
     text: String,
     color: Color
-){
+) {
     Button(
         onClick = onClick,
         modifier = Modifier,
@@ -921,6 +954,7 @@ private fun PreviewCircleButtons() {
         BackCircleButton(onClick = {})
         ProfileCircleButton(onClick = {})
         SettingsCircleButton(onClick = {})
+        AddFriendCircleButton(onClick = {})
         EditCircleButton({})
     }
 }

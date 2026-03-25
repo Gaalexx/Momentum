@@ -19,4 +19,5 @@ object ConstColours {
     val SUPPORTING_SUB_TEXT = Color(0xFF666666)
     val GOLD = Color(0xFFFFAE00)
     val GOLD_ALPHA30 = Color(0x4CFFAE00)
+    val ACCOUNT_LOGO_TINT = Color(0xFFEDEEF2).copy(alpha = 0.7f)
 }

@@ -41,6 +41,8 @@ junit4 = "4.13.2"
 datastoreCore = "1.2.0"
 transportRuntime = "4.1.0"
 runtime = "1.10.5"
+datastorePreferencesCore = "1.2.1"
+uiText = "1.10.5"
 
 [libraries]
 # Core Android
@@ -105,6 +107,8 @@ junit4 = { module = "junit:junit", version.ref = "junit4" }
 androidx-datastore-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "datastoreCore" }
 transport-runtime = { group = "com.google.android.datatransport", name = "transport-runtime", version.ref = "transportRuntime" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "runtime" }
+androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastorePreferencesCore" }
+androidx-ui-text = { group = "androidx.compose.ui", name = "ui-text", version.ref = "uiText" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

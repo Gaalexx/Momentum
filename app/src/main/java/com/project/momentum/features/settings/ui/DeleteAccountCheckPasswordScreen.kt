@@ -1,10 +1,10 @@
-package com.project.momentum.ui.screens.settings
+package com.project.momentum.features.settings.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.project.momentum.features.auth.models.NavEvent
 import com.project.momentum.features.settings.template.TemplateDeleteAccountCheckPassword
 import com.project.momentum.features.settings.viewmodel.DeleteAccountViewModel
@@ -12,10 +12,10 @@ import com.project.momentum.features.settings.viewmodel.DeleteAccountViewModel
 @Composable
 fun DeleteAccountCheckPasswordScreen(
     onBackClick: () -> Unit,
-    onContinueClick: () -> Unit
+    onContinueClick: () -> Unit,
+    viewModel: DeleteAccountViewModel = hiltViewModel()
 ) {
-    val viewModel: DeleteAccountViewModel = hiltViewModel()
-    val uiState by viewModel.state.collectAsState()
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         viewModel.navigationEvents.collect { event ->
@@ -28,8 +28,7 @@ fun DeleteAccountCheckPasswordScreen(
 
     TemplateDeleteAccountCheckPassword(
         state = uiState,
-        onPasswordChange = viewModel::updateUserPassword,
         onBackClick = onBackClick,
-        onContinueClick = viewModel::nextStep
+        onEvent = viewModel::onEvent,
     )
 }
