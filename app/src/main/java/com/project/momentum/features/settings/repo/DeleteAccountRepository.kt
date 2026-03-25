@@ -4,13 +4,13 @@ import com.project.momentum.features.auth.models.dto.CheckCodeRequestDTO
 import com.project.momentum.features.auth.models.dto.CheckEmailRequestDTO
 import com.project.momentum.features.auth.models.dto.LoginUserRequestDTO
 import com.project.momentum.features.settings.models.DeleteAccountState
-import com.project.momentum.features.settings.api.DeleteAccountClient
+import com.project.momentum.features.settings.api.DeleteAccountAPI
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class DeleteAccountRepository @Inject constructor(
-    private val client: DeleteAccountClient
+    private val client: DeleteAccountAPI
 ) {
     suspend fun login(user: DeleteAccountState): String? {
         val response = client.sendLoginData(

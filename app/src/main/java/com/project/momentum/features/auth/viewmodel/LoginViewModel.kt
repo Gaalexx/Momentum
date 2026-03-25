@@ -54,8 +54,7 @@ open class LoginViewModel : ViewModel() {
     }
 
     fun isValidPhone(): Boolean {
-        //TODO
-        return true
+        return Patterns.PHONE.matcher(_state.value.userData.phone ?: "").matches()
     }
 
     enum class PasswordState {

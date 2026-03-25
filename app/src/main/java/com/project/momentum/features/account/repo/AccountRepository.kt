@@ -3,8 +3,12 @@ package com.project.momentum.features.account.repo
 import com.project.momentum.features.account.api.GetAccountInfoAPI
 import com.project.momentum.features.account.api.GetAccountMediaAPI
 import com.project.momentum.features.account.models.AccountInformationDTO
+import com.project.momentum.features.account.models.CheckUserInfoIsFreeRequestDTO
+import com.project.momentum.features.account.models.EditAccountDTO
 import com.project.momentum.features.account.models.PostData
-import com.project.momentum.network.s3.PostDTO
+import com.project.momentum.features.editingAccount.EditAccountErrorFields
+import com.project.momentum.features.editingAccount.EditAccountFields
+import com.project.momentum.features.editingAccount.ErrorType
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,4 +34,36 @@ class AccountRepository @Inject constructor(
         }
     }
 
+    suspend fun checkUserInfoDB(user: EditAccountFields): EditAccountErrorFields {
+        val response = accountInfoAPI.checkUserInfoIsFree(
+            CheckUserInfoIsFreeRequestDTO(
+                username = user.username,
+                email = user.email,
+                phone = user.phone
+            )
+        )
+        return EditAccountErrorFields(
+            usernameError =
+                if (response.isUsernameFree ?: true) null
+                else ErrorType.ALREADY_EXIST,
+            emailError =
+                if (response.isEmailFree ?: true) null
+                else ErrorType.ALREADY_EXIST,
+            phoneError =
+                if (response.isPhoneFree ?: true) null
+                else ErrorType.ALREADY_EXIST
+        )
+    }
+
+    suspend fun updateUserInfo(userInfo: EditAccountFields): EditAccountDTO {
+        val response = accountInfoAPI.sendNewUserInfo(
+            EditAccountDTO(
+                username = userInfo.username,
+                email = userInfo.email,
+                phone = userInfo.phone,
+                profilePhotoURL = userInfo.profilePhotoURL
+            )
+        )
+        return response
+    }
 }
