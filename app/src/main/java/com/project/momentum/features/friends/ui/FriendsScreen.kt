@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,7 +29,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -40,14 +37,26 @@ import coil.compose.AsyncImage
 import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.ui.theme.AppTextStyles
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material3.Icon
 
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.project.momentum.R
+import com.project.momentum.features.friends.viewmodel.FriendsScreenEvent
+import com.project.momentum.features.friends.viewmodel.FriendsViewModel
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.FriendSearchField
-import com.project.momentum.features.friends.viewmodel.UserViewModel
+import com.project.momentum.ui.assets.AddFriendCircleButton
+import com.project.momentum.features.friends.ui.assets.AddFriendPage
+import com.project.momentum.features.friends.ui.assets.FriendRequestCarousel
+import com.project.momentum.features.friends.viewmodel.FriendsScreenState
 
 
 data class Friend(
@@ -55,33 +64,57 @@ data class Friend(
     val name: String,
 )
 
+data class FriendRequest(
+    val id: String,
+    val userId: String,
+    val userName: String,
+    val avatarUrl: String? = null,
+)
+
 data class User(
     val id: String,
     val name: String,
-    val avatarUrl: String,
+    val avatarUrl: String? = null,
     val isOnline: Boolean = false,
-    val description: String? = null,
-    val friends: List<Friend>
+    val description: String? = null
 )
+
+
+@Composable
+fun FriendsScreenRoute(
+    onBackClick: () -> Unit,
+    viewModel: FriendsViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val addFriend: () -> Unit = { viewModel.onEvent(FriendsScreenEvent.ShowPageEvent(true)) }
+    val onEvent = viewModel::onEvent
+
+    FriendsScreen(
+        onBackClick,
+        uiState,
+        addFriend,
+        onEvent
+    )
+
+}
 
 @Composable
 fun FriendsScreen(
-    modifier: Modifier = Modifier,
-    user: User,
     onBackClick: () -> Unit,
-    viewModel: UserViewModel = viewModel()
+    uiState: FriendsScreenState,
+    addFriend: () -> Unit,
+    onEvent: (FriendsScreenEvent) -> Unit
 ) {
     val bg = ConstColours.BLACK
     val textColor = ConstColours.WHITE
 
-    LaunchedEffect(user.id) {
-        viewModel.loadFriendsForUser(user)
-    }
 
-    val userFriends by viewModel.userFriends
-    val isLoading by viewModel.isLoading
-
-    var searchQuery by remember { mutableStateOf("") }
+    val userFriends = uiState.friends
+    val isLoading = uiState.isLoading
+    val showPage = uiState.showPage
+    val addFriendQuery = uiState.addFriendQuery
+    val searchQuery = uiState.searchQuery
+    val selectedIndex = uiState.selectedIndex
 
     val filteredFriends = remember(userFriends, searchQuery) {
         if (searchQuery.isEmpty()) {
@@ -98,7 +131,7 @@ fun FriendsScreen(
     val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(bg)
             .windowInsetsPadding(WindowInsets.systemBars)
@@ -122,6 +155,11 @@ fun FriendsScreen(
                 BackCircleButton(
                     onClick = onBackClick
                 )
+                Spacer(modifier = Modifier.weight(1f))
+                AddFriendCircleButton(
+                    onClick = { addFriend() }
+                )
+
             }
 
             Text(
@@ -139,7 +177,7 @@ fun FriendsScreen(
 
         FriendSearchField(
             query = searchQuery,
-            onQueryChange = { searchQuery = it },
+            onQueryChange = { onEvent(FriendsScreenEvent.SearchQueryChange(it)) },
             modifier = Modifier.padding(horizontal = 16.dp),
             onSearch = { /* Можно добавить логику поиска */ }
         )
@@ -169,6 +207,42 @@ fun FriendsScreen(
                 }
             }
         } else {
+
+            if (uiState.friendRequests.isNotEmpty()) {
+
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = if (isPortrait) 28.dp else 32.dp,
+                            vertical = 8.dp
+                        ),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.friend_requests),
+                        color = textColor,
+                        style = AppTextStyles.Headlines,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = uiState.friendRequests.size.toString(),
+                        color = ConstColours.MAIN_BRAND_BLUE,
+                        style = AppTextStyles.Headlines,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                FriendRequestCarousel(
+                    uiState.friendRequests,
+                    onEvent
+                )
+            }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -274,23 +348,54 @@ fun FriendsScreen(
             }
         }
     }
+
+    if (showPage) {
+        Dialog(
+            onDismissRequest = { onEvent(FriendsScreenEvent.ShowPageEvent(false)) }
+        ) {
+            AddFriendPage(
+                value = addFriendQuery,
+                selectedIndex = selectedIndex,
+                onEvent = onEvent,
+                onValueChange = { onEvent(FriendsScreenEvent.AddFriendQueryChange(it)) }
+            )
+        }
+    }
 }
 
 
 @Composable
 fun FriendButton(
-    imageUrl: String,
+    imageUrl: String?,
     modifier: Modifier = Modifier
 ) {
+
     Box(
         modifier = modifier
+            .aspectRatio(1.0f)
             .clip(CircleShape)
+            .border(2.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
     ) {
-        AsyncImage(
-            model = imageUrl,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-        )
+        if (imageUrl.isNullOrBlank()) {
+            Icon(
+                imageVector = Icons.Outlined.AccountCircle,
+                contentDescription = stringResource(R.string.account_avatar),
+                tint = ConstColours.ACCOUNT_LOGO_TINT,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .align(Alignment.Center)
+            )
+        } else {
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = stringResource(R.string.account_avatar),
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(2.dp)
+                    .clip(CircleShape)
+            )
+        }
     }
 }
 
@@ -300,8 +405,11 @@ fun FriendItem(friend: User) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .padding(vertical = 6.dp, horizontal = 10.dp)
+            .padding(vertical = 3.dp, horizontal = 10.dp)
             .fillMaxWidth()
+            .clip(RoundedCornerShape(15.dp))
+            .background(ConstColours.MAIN_BACK_GRAY)
+
     ) {
         Box(
             modifier = Modifier.padding(end = 12.dp)
@@ -311,6 +419,7 @@ fun FriendItem(friend: User) {
                 modifier = Modifier
                     .width(67.dp)
                     .height(67.dp)
+                    .padding(3.dp)
             )
 
             if (friend.isOnline) {
@@ -354,6 +463,27 @@ fun FriendItem(friend: User) {
     }
 }
 
+@Preview(
+    name = "Friend Item",
+    showBackground = true,
+    backgroundColor = 0xFFFFFFFF
+)
+@Composable
+fun FriendsScreenPreview() {
+    FriendsScreen(
+        {},
+        FriendsScreenState(
+            friends = listOf(User("123", "User 1"), User("321", "User 2")),
+            friendRequests = listOf(
+                FriendRequest("312", "132", "User 3"),
+                FriendRequest("313", "134", "User 4"),
+                FriendRequest("22", "2322", "User 5")
+            )
+        ),
+        {}, {}
+    )
+}
+
 
 @Preview(
     name = "Friend Item",
@@ -373,9 +503,8 @@ fun FriendItemPreview() {
                 friend = User(
                     id = "preview1",
                     name = "Тестовый Друг",
-                    avatarUrl = "",
-                    isOnline = true,
-                    friends = emptyList()
+                    avatarUrl = null,
+                    isOnline = true
                 )
             )
 
@@ -385,9 +514,8 @@ fun FriendItemPreview() {
                 friend = User(
                     id = "preview2",
                     name = "Друг со статусом",
-                    avatarUrl = "",
-                    description = "С описанием",
-                    friends = emptyList()
+                    avatarUrl = null,
+                    description = "С описанием"
                 )
             )
         }

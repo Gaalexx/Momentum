@@ -40,7 +40,9 @@
 
     <string name="label_write_message">Написать сообщение...</string>
     <string name="label_write_comment">Введите комментарий...</string>
-    <string name="find_or_add_friend">Найти или добавить друга</string>
+    <string name="find_or_add_friend">Найти друга</string>
+    <string name="friend_search">Добавить друга</string>
+    <string name="send_request">Отправить запрос</string>
 
     <string name="cats_url">"https://cataas.com/cat"</string>
 
@@ -56,6 +58,7 @@
     <string name="recorder_video_saved">Видео сохранено</string>
     <string name="friends_screen_headliner">Друзья</string>
     <string name="friends_screen_sub_headliner">Мои друзья</string>
+    <string name="friend_requests">Заявки в друзья</string>
     <string name="friends_screen_search_loading">Загрузка друзей…</string>
     <string name="friends_screen_search_nothing">Друзья не найдены</string>
     <string name="friends_screen_search_support_mess">Попробуйте изменить запрос</string>
@@ -132,5 +135,11 @@
     <string name="settings_notifications_in_app">В приложении</string>
     <string name="settings_notifications_in_app_switch">Уведомления</string>
     <string name="label_editing">Редактирование профиля</string>
+
+    // Words
+    <string name="email">Почта</string>
+    <string name="telephone_number">Номер</string>
+    <string name="login">Логин</string>
+
 
 </resources>

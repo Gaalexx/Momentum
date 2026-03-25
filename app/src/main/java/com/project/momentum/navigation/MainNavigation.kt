@@ -26,8 +26,6 @@ import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.contentcreation.ui.CameraLikeScreen
 import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
 import com.project.momentum.features.friends.ui.FriendsScreen
-import com.project.momentum.features.friends.ui.User
-import com.project.momentum.features.friends.viewmodel.UserViewModel
 import com.project.momentum.features.auth.ui.AuthorizationAccountScreen
 import com.project.momentum.features.auth.ui.AuthorizationPasswordScreen
 import com.project.momentum.features.auth.ui.PasswordRecoveryScreen
@@ -38,6 +36,7 @@ import com.project.momentum.features.contentcreation.ui.RecorderScreen
 import com.project.momentum.features.auth.ui.CreateAccountScreen
 import com.project.momentum.features.auth.ui.CreatePasswordScreen
 import com.project.momentum.features.auth.ui.InsertCodeScreen
+import com.project.momentum.features.friends.ui.FriendsScreenRoute
 import com.project.momentum.features.editingAccount.EditingAccountRoot
 import com.project.momentum.features.editingAccount.EditingAccountScreen
 import com.project.momentum.features.settings.ui.DeleteAccountCheckCodeScreen
@@ -72,7 +71,6 @@ fun MainScreen() {
         val backStack: NavBackStack<NavKey> = rememberNavBackStack(startRoute)
 
         val galleryVM: GalleryViewModel = viewModel()
-        val friendsVM: UserViewModel = viewModel()
 
         fun setBase(route: NavRoutes) {
             if (backStack.isEmpty()) {
@@ -83,11 +81,6 @@ fun MainScreen() {
         }
 
         fun openOverlay(route: NavRoutes) {
-//            val last = backStack.lastOrNull()
-//            if (last != null && last.isOverlayRoute()) {
-//                backStack[backStack.lastIndex] = route
-//                return
-//            }
             backStack.add(route)
         }
 
@@ -310,18 +303,10 @@ fun MainScreen() {
             }
 
             entry<NavRoutes.Friends> {
-                val users by friendsVM.users
-                FriendsScreen(
-                    user = users.firstOrNull() ?: User(
-                        id = "default",
-                        name = "Default User",
-                        avatarUrl = "",
-                        friends = emptyList()
-                    ),
+                FriendsScreenRoute(
                     onBackClick = {
                         closeOverlay()
-                    },
-                    viewModel = friendsVM
+                    }
                 )
             }
 

@@ -16,6 +16,8 @@ class SessionManager @Inject constructor() {
 
     fun getToken(): String? = _jwt.value
 
+    fun getHeader(): String = "Bearer ${this.getToken()}"
+
     fun clear() {
         _jwt.value = null
     }
