@@ -32,7 +32,7 @@ interface IRegistrationLoginClient {
 
     suspend fun sendLoginData(userData: LoginUserRequestDTO): LoginResponseDTO
 
-    suspend fun sendCodeAuthorization(email: CheckEmailRequestDTO): CheckResponseDTO
+    suspend fun sendCode(email: CheckEmailRequestDTO): CheckResponseDTO
 }
 
 @Singleton
@@ -88,7 +88,7 @@ class RegistrationAPI @Inject constructor(
         return response
     }
 
-    override suspend fun sendCodeAuthorization(email: CheckEmailRequestDTO): CheckResponseDTO {
+    override suspend fun sendCode(email: CheckEmailRequestDTO): CheckResponseDTO {
         val response: CheckResponseDTO = client.post("send-code") {
             setBody(email)
         }.body<CheckResponseDTO>()

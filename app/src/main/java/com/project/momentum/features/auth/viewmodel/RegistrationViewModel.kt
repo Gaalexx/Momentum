@@ -148,4 +148,12 @@ class RegistrationViewModel @Inject constructor(
         }
         validateCurrentStep()
     }
+
+    fun sendCodeAgain() {
+        viewModelScope.launch {
+            while (true) {
+                if (repository.sendCode(_state.value)) break
+            }
+        }
+    }
 }

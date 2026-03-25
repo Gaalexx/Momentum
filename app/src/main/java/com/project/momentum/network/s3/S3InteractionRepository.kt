@@ -1,6 +1,8 @@
 package com.project.momentum.network.s3
 
 import android.net.Uri
+import android.util.Log
+import com.project.momentum.features.editingAccount.AvatarInfo
 import com.project.momentum.network.s3.upload.UploadMediaAPI
 import com.project.momentum.network.s3.upload.S3UploadApi
 import javax.inject.Inject
@@ -50,4 +52,41 @@ class S3InteractionRepository @Inject constructor(
             )
     }
 
+    suspend fun sendAvatar(avatarInfo: AvatarInfo) {
+        val presignedURLDTO: PresignedURLDTO = client
+            .sendAvatarUploadRequest (
+                UploadAvatarInfoDTO(
+                    avatarInfo.mimeType,
+                    avatarInfo.size
+                )
+            )
+        try {
+            s3UploadAPI.sendFileToS3(
+                presignedURLDTO.urlToLoad,
+                avatarInfo.uri,
+                avatarInfo.mimeType,
+                avatarInfo.size
+            )
+
+            val body =
+                client.sendAvatarUploadingStatus(    // TODO в зависимости от того какой ответ, то и будем отображать на экране
+                    S3UpdateStatusDTO(
+                        UploadingStatus.READY,
+                        presignedURLDTO.mediaId,
+                        //title
+                    )
+                )
+        } catch (e: Exception) {
+            //TODO: сообщить юзеру об ошибке
+            val body =
+                client.sendAvatarUploadingStatus(    // TODO в зависимости от того какой ответ, то и будем отображать на экране
+                    S3UpdateStatusDTO(
+                        UploadingStatus.FAILED,
+                        presignedURLDTO.mediaId,
+                        //title
+                    )
+                )
+            Log.e("Momentum", e.message.toString())
+        }
+    }
 }
