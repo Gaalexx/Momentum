@@ -25,6 +25,12 @@ data class UploadInfoDTO(
 )
 
 @Serializable
+data class UploadAvatarInfoDTO(
+    val mimeType: String,
+    val size: Long,
+)
+
+@Serializable
 data class S3UpdateStatusDTO(
     val status: UploadingStatus,
     val mediaId: String,

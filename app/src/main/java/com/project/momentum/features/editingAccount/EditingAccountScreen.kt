@@ -1,7 +1,11 @@
 package com.project.momentum.features.editingAccount
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -58,6 +63,18 @@ fun EditingAccountRoot(
     val viewModel: EditAccountViewModel = hiltViewModel()
     val uiState = viewModel.state.collectAsState()
 
+    val context = LocalContext.current
+
+    val mediaLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri == null) {
+            //TODO: сообщить что обмена выбора мб
+            return@rememberLauncherForActivityResult
+        }
+        viewModel.selectPhoto(context, uri)
+    }
+
     LaunchedEffect(Unit) {
         viewModel.navigationEvents.collect { event ->
             when (event) {
@@ -72,6 +89,13 @@ fun EditingAccountRoot(
         onLoginChange = { viewModel.updateLogin(it) },
         onEmailChange = { viewModel.updateEmail(it) },
         onPhoneChange = { viewModel.updatePhone(it) },
+        onProfileClick = {
+            mediaLauncher.launch(
+                PickVisualMediaRequest(
+                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                )
+            )
+        },
         onBackClick = onBackClick,
         onContinueClick = { viewModel.next() },
         modifier = modifier
@@ -84,6 +108,7 @@ fun EditingAccountScreen(
     onLoginChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPhoneChange: (String) -> Unit,
+    onProfileClick: () -> Unit,
     onBackClick: () -> Unit,
     onContinueClick: () ->Unit,
     modifier: Modifier = Modifier
@@ -152,6 +177,7 @@ fun EditingAccountScreen(
                             .clip(CircleShape)
                             .background(ConstColours.MAIN_BACK_GRAY)
                             .border(2.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
+                            .clickable(onClick = onProfileClick)
                     ) {
                         if (uiInfoState.fields.profilePhotoURL == null) {
     //                        Image(
@@ -252,6 +278,7 @@ fun EditingAccountScreenPreview() {
         onLoginChange = {},
         onEmailChange = {},
         onPhoneChange = {},
+        onProfileClick = {},
         onBackClick = {},
         onContinueClick = {}
     )

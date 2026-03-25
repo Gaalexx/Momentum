@@ -1,8 +1,13 @@
 package com.project.momentum.features.editingAccount
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import android.util.Patterns
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -10,6 +15,8 @@ import com.project.momentum.features.account.repo.AccountRepository
 import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.auth.features.EmailChecker
 import com.project.momentum.features.auth.models.NavEvent
+import com.project.momentum.network.s3.MediaType
+import com.project.momentum.network.s3.S3InteractionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -63,10 +70,17 @@ sealed class EditAccountState {
     ) : EditAccountState()
 }
 
+data class AvatarInfo(
+    val uri: Uri,
+    val mimeType: String,
+    val size: Long,
+)
+
 @HiltViewModel
 class EditAccountViewModel @Inject constructor(
     private val emailChecker: EmailChecker,
-    private val repo: AccountRepository
+    private val repo: AccountRepository,
+    private val uploaderRepo: S3InteractionRepository
 ) : ViewModel() {
     private var _state = MutableStateFlow<EditAccountState>(EditAccountState.Content(
         fields = EditAccountFields()
@@ -90,6 +104,22 @@ class EditAccountViewModel @Inject constructor(
                     Log.e("Momentum", e.message.toString())
                 }
             }
+        }
+    }
+
+    fun selectPhoto(context: Context, uri: Uri) {
+        viewModelScope.launch {
+            val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
+            val size = context.contentResolver.openFileDescriptor(uri, "r")
+                ?.use { pfd -> pfd.statSize }?.takeIf { it >= 0 } ?: 0L
+
+            uploaderRepo.sendAvatar(
+                AvatarInfo(
+                    uri = uri,
+                    mimeType = mimeType,
+                    size = size
+                )
+            )
         }
     }
 
