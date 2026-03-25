@@ -120,6 +120,7 @@ dependencies {
     implementation(libs.androidx.datastore.core)
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.datastore.preferences.core)
+    implementation(libs.androidx.ui.text)
     ksp(libs.hilt.compiler)
 
     // Tests

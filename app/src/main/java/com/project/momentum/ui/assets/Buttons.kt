@@ -11,7 +11,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
@@ -45,7 +44,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
-
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -55,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import com.project.momentum.R
 import com.project.momentum.features.settings.ui.SubscriptionOption
 import com.project.momentum.ui.theme.ConstColours
+
 
 @Composable
 fun BackCircleButton(
@@ -286,11 +285,11 @@ fun BigCircleForMainScreenAction(
     val progress = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
 
-    fun startPulsations(){
+    fun startPulsations() {
         scope.launch {
             progress.snapTo(0f)
             progressStarted.value = true
-            while(pressed){
+            while (pressed) {
                 progress.animateTo(
                     targetValue = 1f,
                     animationSpec = tween(
@@ -305,7 +304,7 @@ fun BigCircleForMainScreenAction(
                         easing = LinearEasing
                     )
                 )
-                if(!(progressStarted.value && pressed)){
+                if (!(progressStarted.value && pressed)) {
                     break
                 }
             }
@@ -428,7 +427,7 @@ fun BigCircleMicroButton(
         scope.launch {
             progress.snapTo(0f)
             progressStarted.value = true
-            while(pressed) {
+            while (pressed) {
                 progress.animateTo(
                     targetValue = 1f,
                     animationSpec = tween(
@@ -443,7 +442,7 @@ fun BigCircleMicroButton(
                         easing = LinearEasing
                     )
                 )
-                if(!(progressStarted.value && pressed)) {
+                if (!(progressStarted.value && pressed)) {
                     break
                 }
             }
@@ -531,7 +530,7 @@ fun EditButton(
         shape = RoundedCornerShape(50.dp),
         modifier = modifier.heightIn(min = 32.dp),
         contentPadding = PaddingValues(
-            horizontal = dimensionResource(R.dimen.small_padding) ,
+            horizontal = dimensionResource(R.dimen.small_padding),
             vertical = 0.dp
         )
     ) {
@@ -625,14 +624,14 @@ fun CancelButton(
         contentColor = ConstColours.MAIN_BRAND_BLUE,
     )
 ) {
-    OutlinedButton (
+    OutlinedButton(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
             .height(dimensionResource(R.dimen.button_size)),
         shape = RoundedCornerShape(50.dp),
         colors = colors,
-        border = BorderStroke (
+        border = BorderStroke(
             width = dimensionResource(R.dimen.thickness_divider),
             color = colors.contentColor
         )
@@ -644,9 +643,8 @@ fun CancelButton(
             style = AppTextStyles.ButtonText.copy(
                 textAlign = TextAlign.Center,
                 color = colors.contentColor
-            )
-                textAlign = TextAlign.Center
             ),
+            textAlign = TextAlign.Center,
             color = colors.contentColor
         )
     }
@@ -850,7 +848,7 @@ fun ButtonForDelete(
     onClick: () -> Unit,
     text: String,
     color: Color
-){
+) {
     Button(
         onClick = onClick,
         modifier = Modifier,
