@@ -2,6 +2,7 @@ package com.project.momentum.features.auth.models.dto
 
 import kotlinx.serialization.Serializable
 
+// Request DTO
 @Serializable
 data class CheckEmailRequestDTO(
     val email: String,
@@ -10,11 +11,6 @@ data class CheckEmailRequestDTO(
 @Serializable
 data class CheckPhoneNumberRequestDTO(
     val phone: String,
-)
-
-@Serializable
-data class CheckResponseDTO(
-    val isSuccess: Boolean,
 )
 
 @Serializable
@@ -55,11 +51,17 @@ data class CheckCodeLoginResponseDTO(
 )
 
 @Serializable
-data class LoginResponseDTO(
-    val jwt: String?,
+data class GetJWTDTO(
+    val token: String?,
+)
+
+// Response DTO
+@Serializable
+data class CheckResponseDTO(
+    val isSuccess: Boolean,
 )
 
 @Serializable
-data class GetJWTDTO(
-    val token: String?,
+data class LoginResponseDTO(
+    val jwt: String?,
 )

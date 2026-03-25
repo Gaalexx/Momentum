@@ -7,10 +7,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +38,7 @@ fun TemplateAuthorizationScreen(
     onContinueClick: () -> Unit,
     onSubButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
+    placeholder: String? = null,
     isError: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
@@ -49,7 +53,6 @@ fun TemplateAuthorizationScreen(
             modifier = Modifier
                 .background(bg)
                 .padding(paddingValues)
-//                .windowIn  setsPadding(WindowInsets.systemBars) ,
         ) {
             Column(
                 modifier = Modifier
@@ -70,8 +73,9 @@ fun TemplateAuthorizationScreen(
                 TextFieldRegistration(
                     value = value,
                     onValueChange = onValueChange,
-                    isError = isError,
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
+                    placeholder = placeholder,
+                    isError = isError,
                     keyboardOptions = keyboardOptions,
                 )
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))

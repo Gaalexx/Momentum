@@ -21,6 +21,7 @@ import com.project.momentum.ui.theme.ConstColours
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import android.content.Context
+import androidx.compose.foundation.Image
 import androidx.compose.ui.platform.LocalContext
 import com.project.momentum.R
 import com.project.momentum.ui.assets.S3PhotoGrid
@@ -28,19 +29,28 @@ import com.project.momentum.ui.assets.BackCircleButton
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.project.momentum.features.account.models.PostData
 import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.account.viewmodel.AccountInfoViewModel
 import com.project.momentum.features.account.viewmodel.AccountMediaViewModel
 import com.project.momentum.features.account.viewmodel.MediaState
+import com.project.momentum.ui.assets.ButtonForDelete
+import com.project.momentum.ui.assets.EditButton
+import com.project.momentum.ui.assets.EditCircleButton
+import com.project.momentum.ui.theme.AppTextStyles
 
 
 @Composable
 fun AccountRoot(
     modifier: Modifier = Modifier,
     userStatus: String = stringResource(R.string.account_online_status),
-    onPostClick: (String) -> Unit,
+    onEditClick: () -> Unit = {},
+    onPostClick: (PostData) -> Unit,
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
     onAddPostClick: () -> Unit,
@@ -56,6 +66,7 @@ fun AccountRoot(
         onBackClick = onBackClick,
         onAddPostClick = onAddPostClick,
         onPostClick = onPostClick,
+        onEditClick = onEditClick,
         uiInfoState = uiInfoState,
         uiMediaState = uiMediaState
     )
@@ -65,7 +76,8 @@ fun AccountRoot(
 fun AccountScreen(
     modifier: Modifier = Modifier,
     userStatus: String = stringResource(R.string.account_online_status),
-    onPostClick: (String) -> Unit,
+    onEditClick: () -> Unit,
+    onPostClick: (PostData) -> Unit,
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
     onAddPostClick: () -> Unit,
@@ -74,8 +86,8 @@ fun AccountScreen(
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
-    val iconTint = Color(0xFFEDEEF2)
-    val textColor = Color.White
+    val iconTint = Color(0xFFEDEEF2) // TODO: fa fa fa what a faaa
+    val textColor = ConstColours.WHITE
     val context: Context = LocalContext.current
 
 
@@ -90,11 +102,15 @@ fun AccountScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 10.dp),
+                .padding(dimensionResource(R.dimen.medium_padding)),
             verticalAlignment = Alignment.CenterVertically
         ) {
             BackCircleButton(
                 onClick = onBackClick
+            )
+            Spacer(Modifier.weight(1f))
+            EditCircleButton(
+                onClick = onEditClick,
             )
         }
 
@@ -112,6 +128,14 @@ fun AccountScreen(
                     .border(2.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
             ) {
                 if (uiInfoState.profilePhotoURL == null) {
+//                    Image(
+//                        painter = painterResource(R.drawable.profile_image_small),
+//                        contentDescription = null,
+//                        modifier = Modifier
+//                            .height(80.dp)
+//                            .aspectRatio(1f)
+//                            .align(Alignment.Center),
+//                    )
                     Icon(
                         imageVector = Icons.Outlined.AccountCircle,
                         contentDescription = stringResource(R.string.account_avatar),
@@ -132,17 +156,17 @@ fun AccountScreen(
                     )
                 }
             }
-
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(dimensionResource(R.dimen.medium_padding)))
 
             Text(
                 text = uiInfoState.name,
-                color = textColor,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Bold
+                style = AppTextStyles.MainText.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = textColor
+                ),
             )
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(dimensionResource(R.dimen.extra_small_padding)))
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -154,10 +178,10 @@ fun AccountScreen(
                         .clip(CircleShape)
                         .background(Color.Green)
                 )
-                Spacer(Modifier.width(8.dp))
+                Spacer(Modifier.width(dimensionResource(R.dimen.small_padding)))
                 Text(
                     text = userStatus,
-                    color = Color(0xFFA0A0A0),
+                    color = Color(0xFFA0A0A0), // TODO: fa fa fa what a faaa
                     fontSize = 16.sp
                 )
             }
@@ -200,7 +224,7 @@ private fun AccountScreenPreview() {
     MaterialTheme {
         AccountScreen(
             onPostClick = {},
-            onProfileClick = {},
+            onEditClick = {},
             onBackClick = {},
             onAddPostClick = {},
             uiInfoState = AccountInfoState("Preview", null),

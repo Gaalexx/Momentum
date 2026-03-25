@@ -21,6 +21,8 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.project.momentum.features.account.ui.AccountRoot
+import com.project.momentum.features.account.ui.AccountScreen
+import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.contentcreation.ui.CameraLikeScreen
 import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
 import com.project.momentum.features.friends.ui.FriendsScreen
@@ -36,6 +38,8 @@ import com.project.momentum.features.contentcreation.ui.RecorderScreen
 import com.project.momentum.features.auth.ui.CreateAccountScreen
 import com.project.momentum.features.auth.ui.CreatePasswordScreen
 import com.project.momentum.features.auth.ui.InsertCodeScreen
+import com.project.momentum.features.editingAccount.EditingAccountRoot
+import com.project.momentum.features.editingAccount.EditingAccountScreen
 import com.project.momentum.features.settings.ui.DeleteAccountCheckCodeScreen
 import com.project.momentum.navigation.viewmodel.AppStartState
 import com.project.momentum.navigation.viewmodel.AppStartViewModel
@@ -187,17 +191,6 @@ fun MainScreen() {
                 )
             }
 
-//        entry<NavRoutes.AuthorizationPasswordRecovery> {
-//            PasswordRecoveryScreen(
-//                onBackClick = {
-//                    closeOverlay()
-//                },
-//                onContinueClick = {
-//                    openOverlay(NavRoutes.AuthorizationCode)
-//                }
-//            )
-//        }
-
             entry<NavRoutes.AuthorizationCode> {
                 PasswordRecoveryScreen(
                     onBackClick = {
@@ -252,7 +245,7 @@ fun MainScreen() {
                 GallaryScreen(
                     onPostClick = {
                         galleryVM.selectedPost?.let { post ->
-                            openOverlay(NavRoutes.PreviewPhoto(post.presignedURL))
+                            openOverlay(NavRoutes.PreviewPhoto(post))
                         }
                     },
                     onProfileClick = {
@@ -297,14 +290,22 @@ fun MainScreen() {
                 }
             ) {
                 AccountRoot(
-                    onPostClick = { postUrl ->
-                        openOverlay(NavRoutes.PreviewPhoto(postUrl = postUrl))
+                    onPostClick = { post ->
+                        openOverlay(NavRoutes.PreviewPhoto(post = post))
                     },
-                    onProfileClick = {},
+                    onEditClick = {
+                        openOverlay(NavRoutes.EditAccount)
+                    },
                     onBackClick = {
                         closeOverlay()
                     },
                     onAddPostClick = { openOverlay(NavRoutes.Camera) }
+                )
+            }
+            entry<NavRoutes.EditAccount> {
+                EditingAccountRoot(
+                    onBackClick = { closeOverlay() },
+                    onContinueClick = { closeOverlay() }
                 )
             }
 
@@ -347,7 +348,7 @@ fun MainScreen() {
 
                 WatchPhotoScreen(
                     onGoToTakePhoto = {
-                        closeOverlay()
+                        openOverlay(NavRoutes.Camera)
                     },
                     onGoToGallery = {
                         closeOverlay()
@@ -361,7 +362,7 @@ fun MainScreen() {
                     onGoToFriends = {
                         openOverlay(NavRoutes.Friends)
                     },
-                    postUrl = route.postUrl
+                    post = route.post
                 )
 
             }

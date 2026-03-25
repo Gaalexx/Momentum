@@ -1,6 +1,7 @@
 package com.project.momentum.features.posts.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Photo
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material3.*
@@ -52,9 +54,13 @@ import com.project.momentum.ui.assets.FriendsPillButton
 import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.project.momentum.R
+import com.project.momentum.features.account.models.PostData
 import com.project.momentum.ui.assets.CaptionBasicLabel
+import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.ui.theme.AppTextStyles
 
 
@@ -62,33 +68,68 @@ import com.project.momentum.ui.theme.AppTextStyles
 fun ProfileLabel(
     modifier: Modifier = Modifier,
     name: String,
-    imageUrl: String
+    imageUrl: String?
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .padding(top = 7.dp)
-            .fillMaxWidth()
-            .size(70.dp)
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth(0.95f)
+            .height(100.dp)
+            .clip(RoundedCornerShape(60.dp))
+            .background(ConstColours.MAIN_BACK_GRAY)
+            .padding(start = 5.dp)
     ) {
-        AsyncImage(
-            model = imageUrl,
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(67.dp)
-                .clip(CircleShape)
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .padding(start = 7.dp)
+                .fillMaxWidth()
+                .size(70.dp)
+                .align(Alignment.Center)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(65.dp)
+                    .clip(CircleShape)
+                    .border(1.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
+            ) {
+                if (imageUrl == null) {
+                    AsyncImage(
+                        model = imageUrl,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .fillMaxSize()
+                    )
+                } else {
+                    val iconTint = Color(0xFFEDEEF2) // TODO ВЫНЕСТИ В ЦВЕТА КОГДА БУДЕТ НЕ В ПАДЛУ
+                    Icon(
+                        imageVector = Icons.Outlined.AccountCircle,
+                        contentDescription = stringResource(R.string.account_avatar),
+                        tint = iconTint.copy(alpha = 0.7f),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.Center)
+                    )
+                }
 
-        Spacer(Modifier.width(13.dp))
+            }
 
-        Text(
-            text = name,
-            color = Color.White,
-            overflow = TextOverflow.Ellipsis,
-            style = AppTextStyles.MainText
-        )
+            Spacer(Modifier.width(13.dp))
+
+
+            Text(
+                text = name,
+                color = Color.White,
+                overflow = TextOverflow.Ellipsis,
+                style = AppTextStyles.MainText
+            )
+
+
+        }
     }
+
 }
 
 @Composable
@@ -129,9 +170,8 @@ fun WatchPhotoScreen(
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
-    onStartRecordVideo: () -> Unit = {},
-    onStopRecordVideo: () -> Unit = {},
-    postUrl: String
+    post: PostData
+    //postUrl: String
 ) {
     val bg = ConstColours.BLACK
     val iconTint = ConstColours.WHITE
@@ -167,104 +207,124 @@ fun WatchPhotoScreen(
 
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.98f)
-                .aspectRatio(1.10f)
-                .clip(RoundedCornerShape(28.dp))
+                .fillMaxWidth(0.95f)
+                .aspectRatio(1f)
+                .clip(RoundedCornerShape(60.dp))
                 .background(ConstColours.MAIN_BACK_GRAY)
         ) {
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 AsyncImage(
-                    model = postUrl,
+                    model = post.presignedURL,
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
 
-                CaptionBasicLabel(
-                    text = "Not implemented yet",
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .focusRequester(captionFocusRequester)
-                )
-            }
-        }
-
-        Spacer(Modifier.height(5.dp))
-
-        Text(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = "Not implemented yet",
-            color = ConstColours.WHITE,
-            style = AppTextStyles.SupportingText
-        )
-
-        ProfileLabel(name = "Not implemented yet", imageUrl = stringResource(R.string.cats_url))
-
-        ReactToPhoto(onReact = {})
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 40.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 28.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = onGoToGallery,
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Icon(
-                        Icons.Default.Photo,
-                        modifier = Modifier.size(40.dp),
-                        contentDescription = stringResource(R.string.icon_flash),
-                        tint = iconTint
+                if (post.title != null && post.title != "") {
+                    CaptionBasicLabel(
+                        text = post.title,
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                            .focusRequester(captionFocusRequester)
                     )
                 }
 
-                Spacer(Modifier.weight(1f))
-
-                BigCircleForMainScreenAction(
-                    onClick = onGoToTakePhoto,
-                    onLongPressStart = onStartRecordVideo,
-                    onLongPressEnd = onStopRecordVideo
-                )
-
-                Spacer(Modifier.weight(1f))
-
-                IconButton(
-                    onClick = {
-                        captionFocusRequester.requestFocus()
-                        keyboardController?.show()
-                    },
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Icon(
-                        Icons.Outlined.MoreHoriz,
-                        modifier = Modifier.size(40.dp),
-                        contentDescription = stringResource(R.string.icon_flip_camera),
-                        tint = iconTint
-                    )
-                }
             }
         }
 
         Spacer(Modifier.height(15.dp))
 
-        Icon(
-            imageVector = Icons.Outlined.KeyboardArrowDown,
-            contentDescription = stringResource(R.string.icon_more),
-            tint = iconTint.copy(alpha = 0.9f),
-            modifier = Modifier.size(34.dp)
+        Text(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            text = post.getDate() ?: "",
+            color = ConstColours.WHITE,
+            style = AppTextStyles.SupportingText
         )
+
+        Spacer(Modifier.height(75.dp))
+
+        ProfileLabel(
+            name = post.userId,
+            imageUrl = stringResource(R.string.cats_url)
+        )
+
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 40.dp)
+                    .align(Alignment.BottomCenter)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 28.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = onGoToGallery,
+                        modifier = Modifier.size(50.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Photo,
+                            modifier = Modifier.size(40.dp),
+                            contentDescription = stringResource(R.string.icon_flash),
+                            tint = iconTint
+                        )
+                    }
+
+                    Spacer(Modifier.weight(1f))
+
+                    ContinueButton(
+                        onClick = onGoToTakePhoto,
+                        modifier = Modifier
+                            .width(200.dp)
+                            .height(75.dp),
+                        "Ответить",
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = ConstColours.MAIN_BRAND_BLUE,
+                            contentColor = ConstColours.WHITE
+                        )
+                    )
+                    Spacer(Modifier.weight(1f))
+
+                    IconButton(
+                        onClick = {
+                            captionFocusRequester.requestFocus()
+                            keyboardController?.show()
+                        },
+                        modifier = Modifier.size(50.dp)
+                    ) {
+                        Icon(
+                            Icons.Outlined.MoreHoriz,
+                            modifier = Modifier.size(40.dp),
+                            contentDescription = stringResource(R.string.icon_flip_camera),
+                            tint = iconTint
+                        )
+                    }
+                }
+
+
+            }
+            Spacer(Modifier.height(15.dp))
+
+            Icon(
+                imageVector = Icons.Outlined.KeyboardArrowDown,
+                contentDescription = stringResource(R.string.icon_more),
+                tint = iconTint.copy(alpha = 0.9f),
+                modifier = Modifier
+                    .size(34.dp)
+                    .align(Alignment.BottomCenter)
+            )
+        }
+
+
     }
 }
 
@@ -279,7 +339,7 @@ private fun WatchPhotoScreenPreview() {
             onGoToSettings = {},
             onProfileClick = {},
             onGoToFriends = {},
-            postUrl = stringResource(R.string.cats_url)
+            post = PostData("1", "PreviewName", "Description", "a", "2026-03-12T14:38:50.690942Z")
         )
     }
 }
