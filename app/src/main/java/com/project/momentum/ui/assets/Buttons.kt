@@ -684,21 +684,21 @@ fun BuyButton(
 
 @Composable
 fun StableSwitch(
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
+    enabled: Boolean,
+    onEnabledChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     width: Dp = 52.dp,
     height: Dp = 32.dp,
     thumbSize: Dp = 24.dp,
-    checkedTrackColor: Color = ConstColours.MAIN_BRAND_BLUE,
-    uncheckedTrackColor: Color = ConstColours.MAIN_BACK_GRAY,
+    enabledTrackColor: Color = ConstColours.MAIN_BRAND_BLUE,
+    disabledTrackColor: Color = ConstColours.MAIN_BACK_GRAY,
     thumbColor: Color = ConstColours.WHITE
 ) {
     val trackRadius = height / 2
     val thumbRadius = thumbSize / 2
 
     val thumbOffset by animateDpAsState(
-        targetValue = if (checked) width - thumbSize - 6.dp else 6.dp,
+        targetValue = if (enabled) width - thumbSize - 6.dp else 6.dp,
         label = "thumbOffset"
     )
 
@@ -707,8 +707,8 @@ fun StableSwitch(
             .width(width)
             .height(height)
             .clip(RoundedCornerShape(trackRadius))
-            .background(if (checked) checkedTrackColor else uncheckedTrackColor)
-            .clickable { onCheckedChange(!checked) }
+            .background(if (enabled) enabledTrackColor else disabledTrackColor)
+            .clickable { onEnabledChange(!enabled) }
             .padding(horizontal = 0.dp),
         contentAlignment = Alignment.CenterStart
     ) {
@@ -726,8 +726,8 @@ fun StableSwitch(
 @Composable
 fun SwitchRow(
     text: String,
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    enabled: Boolean,
+    onEnabledChange: (Boolean) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -745,8 +745,8 @@ fun SwitchRow(
         )
 
         StableSwitch(
-            checked = checked,
-            onCheckedChange = onCheckedChange
+            enabled = enabled,
+            onEnabledChange = onEnabledChange
         )
     }
 }

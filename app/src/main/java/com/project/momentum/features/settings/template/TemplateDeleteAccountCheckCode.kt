@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.R
 import com.project.momentum.features.settings.models.DeleteAccountState
+import com.project.momentum.features.settings.viewmodel.DeleteEvent
 import com.project.momentum.ui.assets.TextFieldRegistration
 import com.project.momentum.ui.assets.TopBarTemplate
 import com.project.momentum.ui.theme.AppTextStyles
@@ -34,8 +35,7 @@ import com.project.momentum.ui.theme.ConstColours
 fun DeleteAccountCheckCodeScreenPreview() {
     TemplateDeleteAccountCheckCode(
         onBackClick = {},
-        onDeleteClick = {},
-        onPasswordChange = {},
+        onEvent = {},
         state = DeleteAccountState(),
     )
 }
@@ -43,14 +43,15 @@ fun DeleteAccountCheckCodeScreenPreview() {
 @Composable
 fun TemplateDeleteAccountCheckCode(
     onBackClick: () -> Unit,
-    onDeleteClick: () -> Unit,
-    onPasswordChange: (String) -> Unit,
+    onEvent: (DeleteEvent)-> Unit,
     state: DeleteAccountState,
     modifier: Modifier = Modifier
 ) {
     TopBarTemplate(
         label = R.string.label_delete_account,
-        onBackClick = onBackClick,
+        onBackClick = {
+            onEvent(DeleteEvent.previousStep)
+            onBackClick() },
         modifier = modifier
     ) { paddingValues ->
         Box(
@@ -77,7 +78,7 @@ fun TemplateDeleteAccountCheckCode(
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
                 TextFieldRegistration(
                     value = state.userData.password,
-                    onValueChange = onPasswordChange,
+                    onValueChange = {onEvent(DeleteEvent.updateUserCode(it))},
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
                     keyboardOptions = KeyboardOptions.Default.copy(
                         keyboardType = KeyboardType.Password,
@@ -86,7 +87,7 @@ fun TemplateDeleteAccountCheckCode(
                 )
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
                 ContinueButton(
-                    onClick = onDeleteClick,
+                    onClick = {onEvent(DeleteEvent.nextStep)},
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
                     text = stringResource(R.string.button_delete_account),
                     colors = ButtonDefaults.buttonColors(

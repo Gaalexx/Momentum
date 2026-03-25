@@ -14,7 +14,7 @@ import io.ktor.client.request.setBody
 import javax.inject.Inject
 import javax.inject.Singleton
 
-interface IDeleteAccountClient {
+interface IDeleteAccountAPI {
     suspend fun sendLoginData(userData: LoginUserRequestDTO): LoginResponseDTO
     suspend fun sendCodeToChecker(code: CheckCodeRequestDTO): CheckResponseDTO
 
@@ -24,10 +24,10 @@ interface IDeleteAccountClient {
 }
 
 @Singleton
-class DeleteAccountClient @Inject constructor(
+class DeleteAccountAPI @Inject constructor(
     @Backend private val client: HttpClient,
     private val regAPI: RegistrationAPI
-): IDeleteAccountClient{
+): IDeleteAccountAPI{
     override suspend fun sendLoginData(userData: LoginUserRequestDTO): LoginResponseDTO = regAPI.sendLoginData(userData)
 
     override suspend fun sendCodeToChecker(code: CheckCodeRequestDTO): CheckResponseDTO {

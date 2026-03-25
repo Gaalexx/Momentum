@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.project.momentum.R
+import com.project.momentum.features.settings.viewmodel.DeleteEvent
 import com.project.momentum.ui.assets.ButtonForDelete
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
@@ -28,15 +29,13 @@ import com.project.momentum.ui.theme.ConstColours
 @Composable
 fun DeleteAccountConfirmationScreenPreview() {
     TemplateDeleteAccountConfirmation(
-        onConfirm = {},
-        onCancel = {}
+        onEvent = {}
     )
 }
 
 @Composable
 fun TemplateDeleteAccountConfirmation(
-    onConfirm: () -> Unit,
-    onCancel: () -> Unit
+    onEvent: (DeleteEvent)-> Unit
 ) {
     Box(
         modifier = Modifier
@@ -65,13 +64,13 @@ fun TemplateDeleteAccountConfirmation(
             ){
                 Spacer(modifier = Modifier.weight(1f))
                 ButtonForDelete(
-                    onClick = onConfirm,
+                    onClick = {onEvent(DeleteEvent.onConfirmDelete)},
                     text = stringResource(R.string.button_delete_account_yes),
                     color =  ConstColours.ERROR_RED,
                 )
                 Spacer(modifier = Modifier.weight(2f))
                 ButtonForDelete(
-                    onClick = onCancel,
+                    onClick = {onEvent(DeleteEvent.onCancelDelete)},
                     text = stringResource(R.string.button_delete_account_no),
                     color =  ConstColours.BLACK,
                 )

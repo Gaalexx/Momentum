@@ -1,15 +1,22 @@
 package com.project.momentum.data.auth.datastore
 
 
+import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.preferencesDataStore
 import com.project.momentum.data.auth.keystore.EncryptedData
+import com.project.momentum.di.AuthPrefs
 import kotlinx.coroutines.flow.first
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
+
+val Context.localSettingsDataStore by preferencesDataStore(
+    name = "local_settings"
+)
 
 
 interface AuthStorage {
@@ -21,7 +28,7 @@ interface AuthStorage {
 
 @Singleton
 class AuthStorageImpl @Inject constructor(
-    private val dataStore: DataStore<Preferences>
+    @AuthPrefs private val dataStore: DataStore<Preferences>
 ) : AuthStorage {
 
     private companion object {

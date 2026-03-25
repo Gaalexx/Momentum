@@ -119,6 +119,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.datastore.core)
     implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.datastore.preferences.core)
     ksp(libs.hilt.compiler)
 
     // Tests
