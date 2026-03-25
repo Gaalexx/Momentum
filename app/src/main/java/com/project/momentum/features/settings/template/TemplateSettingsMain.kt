@@ -21,7 +21,6 @@ import com.project.momentum.ui.assets.SwitchRow
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
-import kotlinx.coroutines.flow.StateFlow
 
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
@@ -31,7 +30,6 @@ fun SettingsMainScreenPreview() {
             onBackClick = {},
             onEvent = {},
             state = SettingsState(),
-            //stateLocalSetting = true,
             onPremiumClick = {},
             onLogoutClick = {},
             onDeleteAccountClick = {}
@@ -44,12 +42,11 @@ fun TemplateSettingsMain(
     onBackClick: () -> Unit = {},
     onEvent: (SettingsEvent)-> Unit,
     state: SettingsState?,
-    //stateLocalSetting: Boolean,
     onPremiumClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     onDeleteAccountClick: () -> Unit = {},
 ) {
-    if (state == null) {
+    if (state == null || state.isLoading) {
         LoadingOverlay()
         return
     }

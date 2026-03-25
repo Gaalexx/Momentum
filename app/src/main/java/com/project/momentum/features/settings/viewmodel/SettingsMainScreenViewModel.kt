@@ -9,11 +9,8 @@ import com.project.momentum.features.settings.repo.ServerSettingsRepository
 import com.project.momentum.features.settings.repo.SettingsLocalRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,8 +30,6 @@ sealed interface SettingsEvent {
     data object onRecommendToContacts : SettingsEvent
     data object onAllowAddFromAnyone : SettingsEvent
     data object onConfirmBeforePosting : SettingsEvent
-    data object getAccountInfo : SettingsEvent
-    //data object getLocalSettingsInfo : SettingsEvent
 }
 
 @HiltViewModel
@@ -48,18 +43,8 @@ class SettingsMainScreenViewModel @Inject constructor(
     val state = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            val initialLocal = appSettings.confirmBeforePost.first()
-
-            _state.value = SettingsState(
-                localSettingsState = LocalSettingsStateDTO(
-                    confirmBeforePosting = initialLocal
-                )
-            )
-
-            observeLocalSettings()
-            getServerSettingsInfo()
-        }
+        getLocalSettingsInfo()
+        getServerSettingsInfo()
     }
 
 
@@ -71,22 +56,38 @@ class SettingsMainScreenViewModel @Inject constructor(
             is SettingsEvent.onRecommendToContacts -> onRecommendToContacts()
             is SettingsEvent.onAllowAddFromAnyone -> onAllowAddFromAnyone()
             is SettingsEvent.onConfirmBeforePosting -> onConfirmBeforePosting()
-            is SettingsEvent.getAccountInfo -> getServerSettingsInfo()
-            //is SettingsEvent.getLocalSettingsInfo -> getLocalSettingsInfo()
         }
     }
 
-    private fun observeLocalSettings() {
+    private fun getLocalSettingsInfo() {
+        _state.update { it?.copy(isLoading = true) }
+
         viewModelScope.launch {
-            appSettings.confirmBeforePost.collect { value ->
-                _state.update {
-                    it?.copy(
-                        localSettingsState = it.localSettingsState.copy(
-                            confirmBeforePosting = value
+            val initialLocal = appSettings.confirmBeforePost.first()
+
+            _state.value = SettingsState(
+                isLoading = false,
+                localSettingsState = LocalSettingsStateDTO(
+                    confirmBeforePosting = initialLocal
+                )
+            )
+        }
+    }
+    private fun onConfirmBeforePosting() {
+        viewModelScope.launch {
+            val current = appSettings.confirmBeforePost.value
+            localRep.setConfirmBeforePost(!current)
+                .onSuccess { newValue ->
+                    _state.update {
+                        it?.copy(
+                            localSettingsState = it.localSettingsState.copy(
+                                confirmBeforePosting = newValue
+                            )
                         )
-                    )
+                    }
                 }
-            }
+                .onFailure { onErrorHandler() }
+
         }
     }
 
@@ -190,27 +191,6 @@ class SettingsMainScreenViewModel @Inject constructor(
         }
     }
 
-    private fun onConfirmBeforePosting() {
-        _state.update { it?.copy(isLoading = true) }
-
-        viewModelScope.launch {
-            val current = appSettings.confirmBeforePost.value
-            localRep.setConfirmBeforePost(!current)
-                .onSuccess { newValue ->
-                    _state.update {
-                        it?.copy(
-                            isLoading = false,
-//                            localSettingsState = it.localSettingsState.copy(
-//                                confirmBeforePosting = newValue
-//                            )
-                        )
-                    }
-                }
-                .onFailure { onErrorHandler() }
-
-        }
-    }
-
     private fun getServerSettingsInfo() {
         _state.update { it?.copy(isLoading = true) }
         viewModelScope.launch {
@@ -228,23 +208,6 @@ class SettingsMainScreenViewModel @Inject constructor(
                 }
         }
     }
-
-    /*private fun getLocalSettingsInfo() {
-        //_state.update { it.copy(isLoading = true) }
-        viewModelScope.launch {
-            confirmBeforePostFlow.collect { value ->
-                _state.update {
-                    it.copy(
-                        //isLoading = false,
-                        localSettingsState = it.localSettingsState.copy(
-                            confirmBeforePosting = value
-                        )
-                    )
-                }
-            }
-        }
-    }*/
-
 
     private fun onErrorHandler(){
         _state.update {

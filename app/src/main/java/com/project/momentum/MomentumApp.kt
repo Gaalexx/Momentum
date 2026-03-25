@@ -12,8 +12,6 @@ class MomentumApp : Application(){
 
     override fun onCreate() {
         super.onCreate()
-
-        // ВАЖНО: это заставляет Hilt создать Singleton прямо сейчас
         appSettingsHolder.toString()
     }
 }

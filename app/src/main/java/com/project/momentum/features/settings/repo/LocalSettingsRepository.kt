@@ -5,12 +5,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import com.project.momentum.di.LocalPrefs
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -28,6 +22,4 @@ class SettingsLocalRepository @Inject constructor(
             dataStore.edit { it[Keys.CONFIRM_BEFORE_POST] = newValue }
             newValue
         }
-
-
 }
