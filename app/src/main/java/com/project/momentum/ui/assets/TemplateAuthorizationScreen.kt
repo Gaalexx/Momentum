@@ -73,7 +73,7 @@ fun TemplateAuthorizationScreen(
                 TextFieldRegistration(
                     value = value,
                     onValueChange = onValueChange,
-                    modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
+//                    modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
                     placeholder = placeholder,
                     isError = isError,
                     keyboardOptions = keyboardOptions,
