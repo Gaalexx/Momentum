@@ -405,7 +405,7 @@ fun FriendItem(friend: User) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .padding(vertical = 6.dp, horizontal = 10.dp)
+            .padding(vertical = 3.dp, horizontal = 10.dp)
             .fillMaxWidth()
             .clip(RoundedCornerShape(15.dp))
             .background(ConstColours.MAIN_BACK_GRAY)
@@ -419,6 +419,7 @@ fun FriendItem(friend: User) {
                 modifier = Modifier
                     .width(67.dp)
                     .height(67.dp)
+                    .padding(3.dp)
             )
 
             if (friend.isOnline) {
