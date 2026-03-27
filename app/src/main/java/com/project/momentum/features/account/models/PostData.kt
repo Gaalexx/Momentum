@@ -16,10 +16,15 @@ data class PostData(
     val createdAt: String? = null
 ) {
     fun getDate(): String {
-        val instant = Instant.parse(createdAt)
+        val instant = createdAtInstantOrNull() ?: return ""
 
         return instant
             .atZone(ZoneId.systemDefault())
             .format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"))
     }
+
+    fun createdAtInstantOrNull(): Instant? =
+        createdAt?.let { value ->
+            runCatching { Instant.parse(value) }.getOrNull()
+        }
 }
