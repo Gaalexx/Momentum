@@ -320,7 +320,7 @@ fun CameraLikeScreen(
     onGoToPreview: (Uri) -> Unit,
     onGoToRecorder: () -> Unit,
     onProfileClick: () -> Unit,
-    onOpenGallery: () -> Unit,
+    onGoToGallery: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
     maxRecordMs: Int = 10_000
@@ -647,14 +647,17 @@ fun CameraLikeScreen(
         Spacer(Modifier.height(15.dp))
 
 
-
-        Icon(
-            imageVector = Icons.Outlined.KeyboardArrowUp,
-            contentDescription = "Swipe up",
-            tint = iconTint.copy(alpha = 0.6f),
-            modifier = Modifier
-                .size(34.dp)
-        )
+        IconButton(
+            onClick = onGoToGallery
+        ){
+            Icon(
+                imageVector = Icons.Outlined.KeyboardArrowUp,
+                contentDescription = "Swipe up",
+                tint = iconTint.copy(alpha = 0.6f),
+                modifier = Modifier
+                    .size(34.dp)
+            )
+        }
     }
 }
 
@@ -667,7 +670,7 @@ private fun CameraLikeScreenPreview() {
             onGoToPreview = {},
             onGoToRecorder = {},
             onProfileClick = {},
-            onOpenGallery = {},
+            onGoToGallery = {},
             onGoToSettings = {},
             onGoToFriends = {}
         )

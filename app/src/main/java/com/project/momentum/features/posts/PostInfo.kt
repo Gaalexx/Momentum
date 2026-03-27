@@ -10,24 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import com.project.momentum.features.account.models.PostData
 
-//data class PostData(
-//    val url: String,
-//    val name: String,
-//    val date: String,
-//    val description: String
-//) {
-//    override fun equals(other: Any?): Boolean {
-//        if (this === other) return true
-//        if (javaClass != other?.javaClass) return false
-//        other as PostData
-//        return url == other.url
-//    }
-//
-//    override fun hashCode(): Int {
-//        return url.hashCode()
-//    }
-//}
-
 
 @Serializable
 data class PostItem(

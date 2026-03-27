@@ -26,12 +26,13 @@ import com.project.momentum.ui.assets.FriendsPillButton
 import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
 import com.project.momentum.features.posts.BasePostViewModel
+import com.project.momentum.ui.assets.S3PhotoGrid
 
 
 class GalleryViewModel : BasePostViewModel() {
     override fun addPhoto(context: Context, url: String) {
         val event = readRandomEvent(context)
-        val postData = PostData(url, event.name, event.date, event.description)
+        val postData = PostData(url, event.name, "sdf", event.date, event.description)
         _posts.add(0, postData)
     }
 }
@@ -96,7 +97,7 @@ fun GallaryScreen(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
-            PhotoGrid(
+            S3PhotoGrid(
                 posts = viewModel.posts,
                 onPostClick =
                     { post ->
@@ -107,7 +108,7 @@ fun GallaryScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                showPlusButton = true,
+                showPlusButton = false,
                 columns = 3
             )
         }

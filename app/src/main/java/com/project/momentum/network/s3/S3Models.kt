@@ -47,9 +47,11 @@ data class PresignedURLDTO(
 data class PostDTO(
     val id: String,
     val userId: String,
+    val userName: String,
     val title: String,
     val inUse: Boolean,
     val presignedURL: String,
+    val avatarPresignedURL: String? = null,
     val createdAt: String? = null
 )
 

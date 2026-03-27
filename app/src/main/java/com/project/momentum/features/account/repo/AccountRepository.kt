@@ -21,7 +21,17 @@ class AccountRepository @Inject constructor(
         val listOfDTOs = mediaAPI.getAllPosts()
         val posts: MutableList<PostData> = mutableListOf()
         listOfDTOs.forEach { post ->
-            posts.add(PostData(post.id, post.userId, post.title, post.presignedURL, post.createdAt))
+            posts.add(
+                PostData(
+                    post.id,
+                    post.userId,
+                    post.userName,
+                    post.title,
+                    post.presignedURL,
+                    post.avatarPresignedURL,
+                    post.createdAt
+                )
+            )
         }
         return posts
     }

@@ -9,8 +9,10 @@ import java.time.format.DateTimeFormatter
 data class PostData(
     val id: String,
     val userId: String,
+    val userName: String,
     val title: String,
     val presignedURL: String,
+    val avatarPresignedURL: String? = null,
     val createdAt: String? = null
 ) {
     fun getDate(): String {

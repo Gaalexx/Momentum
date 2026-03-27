@@ -238,6 +238,7 @@ fun RecorderScreen(
     onGoToFriends: () -> Unit,              // Для перехода к друзьям
     onProfileClick: () -> Unit,              // Для перехода в профиль
     onGoToSettings: () -> Unit,              // Для перехода в настройки
+    onGoToGallery: () -> Unit,               // Для перехода в галерею
     modifier: Modifier = Modifier
 ) {
     val bg = ConstColours.BLACK
@@ -369,7 +370,8 @@ fun RecorderScreen(
 
         // Нижняя секция с микрофоном и состояниями
         SecondaryImagesSection(
-            mainState = mainState
+            mainState = mainState,
+            onGoToGallery = onGoToGallery
         )
     }
 }
@@ -389,7 +391,8 @@ class MainState {
 
 @Composable
 fun SecondaryImagesSection(
-    mainState: MainState
+    mainState: MainState,
+    onGoToGallery: () -> Unit
 ) {
     var isImage1Tinted by remember { mutableStateOf(false) }
     var isImage2Visible by remember { mutableStateOf(true) }
@@ -620,7 +623,7 @@ fun SecondaryImagesSection(
 
             if (isImage2Visible && mainState.currentState != "STATE_2") {
                 IconButton(
-                    onClick = { },
+                    onClick = onGoToGallery,
                     modifier = Modifier
                         .size(50.dp)
                         .offset(y = 35.dp)
@@ -629,7 +632,7 @@ fun SecondaryImagesSection(
                     Icon(
                         imageVector = Icons.Outlined.KeyboardArrowUp,
                         contentDescription = stringResource(R.string.recorder_more_content_description),
-                        tint = Color(0xFFEDEEF2).copy(alpha = 0.65f),
+                        tint = Color(0xFFEDEEF2).copy(alpha = 0.6f),
                         modifier = Modifier.size(34.dp)
                     )
                 }
@@ -654,5 +657,5 @@ private fun formatElapsedTime(milliseconds: Long): String {
 @Preview()
 @Composable
 fun preview() {
-    RecorderScreen({}, {}, {}, {})
+    RecorderScreen({}, {}, {}, {}, {})
 }
