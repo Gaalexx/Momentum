@@ -16,6 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.ui.assets.PhotoGrid
@@ -26,13 +28,22 @@ import com.project.momentum.ui.assets.FriendsPillButton
 import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
 import com.project.momentum.features.posts.BasePostViewModel
+import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.ui.assets.S3PhotoGrid
+import java.time.Instant
 
 
 class GalleryViewModel : BasePostViewModel() {
     override fun addPhoto(context: Context, url: String) {
         val event = readRandomEvent(context)
-        val postData = PostData(url, event.name, "sdf", event.date, event.description)
+        val postData = PostData(
+            id = url,
+            userId = "preview-user",
+            userName = event.name,
+            title = event.description,
+            presignedURL = url,
+            createdAt = Instant.now().toString()
+        )
         _posts.add(0, postData)
     }
 }
@@ -41,20 +52,22 @@ class GalleryViewModel : BasePostViewModel() {
 @Composable
 fun GallaryScreen(
     modifier: Modifier = Modifier,
-    onPostClick: (String) -> Unit = {},
+    onPostClick: (PostData) -> Unit,
     onAddPhoto: () -> Unit = {},
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
-    viewModel: GalleryViewModel
+    viewModel: PostsViewModel = hiltViewModel()
 ) {
     val bg = ConstColours.BLACK
     val textColor = Color.White
 
     val context: Context = LocalContext.current
 
-    val posts = viewModel.posts
+    val state = viewModel.state.collectAsStateWithLifecycle()
+    val posts = state.value.posts
+
 
     Box(
         modifier = modifier
@@ -98,13 +111,9 @@ fun GallaryScreen(
             )
 
             S3PhotoGrid(
-                posts = viewModel.posts,
-                onPostClick =
-                    { post ->
-                        viewModel.selectPost(post)
-                        onPostClick(post.presignedURL ?: "")
-                    },
-                onAddPhotoClick = { viewModel.addRandomPhoto(context) },
+                posts = posts,
+                onPostClick = onPostClick,
+                onAddPhotoClick = {  },
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),

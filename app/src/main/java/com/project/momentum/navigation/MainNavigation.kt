@@ -241,10 +241,8 @@ fun MainScreen() {
 
             entry<NavRoutes.Gallery> {
                 GallaryScreen(
-                    onPostClick = {
-                        galleryVM.selectedPost?.let { post ->
-                            openOverlay(NavRoutes.PreviewPhoto(post))
-                        }
+                    onPostClick = { post ->
+                        openOverlay(NavRoutes.PreviewPhoto(post = post))
                     },
                     onProfileClick = {
                         openOverlay(NavRoutes.Account("gallery"))
@@ -258,7 +256,6 @@ fun MainScreen() {
                     onGoToFriends = {
                         openOverlay(NavRoutes.Friends)
                     },
-                    viewModel = galleryVM
                 )
             }
 

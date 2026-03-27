@@ -93,7 +93,7 @@ fun ProfileLabel(
                     .clip(CircleShape)
                     .border(1.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
             ) {
-                if (imageUrl == null) {
+                if (!imageUrl.isNullOrBlank()) {
                     AsyncImage(
                         model = imageUrl,
                         contentDescription = null,
@@ -247,7 +247,7 @@ fun WatchPhotoScreen(
 
         ProfileLabel(
             name = post.userName,
-            imageUrl = stringResource(R.string.cats_url)
+            imageUrl = post.avatarPresignedURL
         )
 
 
@@ -339,7 +339,14 @@ private fun WatchPhotoScreenPreview() {
             onGoToSettings = {},
             onProfileClick = {},
             onGoToFriends = {},
-            post = PostData("1", "PreviewName", "Description", "a", "2026-03-12T14:38:50.690942Z")
+            post = PostData(
+                id = "1",
+                userId = "preview-user",
+                userName = "PreviewName",
+                title = "Description",
+                presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+                createdAt = "2026-03-12T14:38:50.690942Z"
+            )
         )
     }
 }

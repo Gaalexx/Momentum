@@ -1,10 +1,8 @@
 package com.project.momentum.features.posts.repo
 
 import com.project.momentum.features.account.models.PostData
-import com.project.momentum.features.friends.api.FriendsInfoAPI
 import com.project.momentum.features.posts.api.PostsAPI
 import java.time.Instant
-import java.time.ZoneId
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,33 +19,31 @@ class PostsRepo @Inject constructor(
         myPostsDTO.forEach { it ->
             result.add(
                 PostData(
-                    it.id,
-                    it.userId,
-                    it.userName,
-                    it.title,
-                    it.presignedURL,
-                    it.createdAt
+                    id = it.id,
+                    userId = it.userId,
+                    userName = it.userName,
+                    title = it.title,
+                    presignedURL = it.presignedURL,
+                    avatarPresignedURL = it.avatarPresignedURL,
+                    createdAt = it.createdAt
                 )
             )
         }
         myFriendsPostsDTO.forEach { it ->
             result.add(
                 PostData(
-                    it.id,
-                    it.userId,
-                    it.userName,
-                    it.title,
-                    it.presignedURL,
-                    it.createdAt
+                    id = it.id,
+                    userId = it.userId,
+                    userName = it.userName,
+                    title = it.title,
+                    presignedURL = it.presignedURL,
+                    avatarPresignedURL = it.avatarPresignedURL,
+                    createdAt = it.createdAt
                 )
             )
         }
 
-        result.sortWith(Comparator { data, data1 ->
-            val time = Instant.parse(data.createdAt).atZone(ZoneId.systemDefault())
-            val time1 = Instant.parse(data1.createdAt).atZone(ZoneId.systemDefault())
-            return@Comparator time1.compareTo(time)
-        })
+        result.sortByDescending { it.createdAtInstantOrNull() ?: Instant.MIN }
 
         return result
     }

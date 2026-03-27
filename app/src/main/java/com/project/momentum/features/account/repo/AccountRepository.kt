@@ -23,13 +23,13 @@ class AccountRepository @Inject constructor(
         listOfDTOs.forEach { post ->
             posts.add(
                 PostData(
-                    post.id,
-                    post.userId,
-                    post.userName,
-                    post.title,
-                    post.presignedURL,
-                    post.avatarPresignedURL,
-                    post.createdAt
+                    id = post.id,
+                    userId = post.userId,
+                    userName = post.userName,
+                    title = post.title,
+                    presignedURL = post.presignedURL,
+                    avatarPresignedURL = post.avatarPresignedURL,
+                    createdAt = post.createdAt
                 )
             )
         }
