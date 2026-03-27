@@ -1,7 +1,7 @@
 package com.project.momentum.features.friends.repo
 
+import com.example.Models.FriendRequestActionDTO
 import com.project.momentum.features.friends.api.FriendsInfoAPI
-import com.project.momentum.features.friends.models.FriendRequestActionDTO
 import com.project.momentum.features.friends.ui.FriendRequest
 import com.project.momentum.features.friends.ui.User
 import javax.inject.Inject
@@ -26,8 +26,8 @@ class FriendsRepository @Inject constructor(
         return friendsDTO.friends.map { friend ->
             User(
                 id = friend.userId,
-                name = friend.username ?: "No name",
-                avatarUrl = null
+                name = friend.username,
+                avatarUrl = friend.userAvatarUrl
             )
         }
     }
@@ -39,8 +39,8 @@ class FriendsRepository @Inject constructor(
             FriendRequest(
                 request.id,
                 request.fromUserId,
-                request.fromUserId, //TODO заменить под имя
-                "" // TODO показывать с аватаркой
+                request.fromUserUsername,
+                request.fromUserAvatarUrl
             )
         }
     }

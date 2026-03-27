@@ -213,7 +213,9 @@ fun MainScreen() {
                     onGoToFriends = {
                         openOverlay(NavRoutes.Friends)
                     },
-                    onOpenGallery = {}
+                    onGoToGallery = {
+                        openOverlay(NavRoutes.Gallery)
+                    }
                 )
             }
 
@@ -230,6 +232,9 @@ fun MainScreen() {
                     },
                     onGoToSettings = {
                         openOverlay(NavRoutes.Settings("recorder"))
+                    },
+                    onGoToGallery = {
+                        openOverlay(NavRoutes.Gallery)
                     }
                 )
             }

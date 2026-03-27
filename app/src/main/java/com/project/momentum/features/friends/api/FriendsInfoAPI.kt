@@ -1,10 +1,10 @@
 package com.project.momentum.features.friends.api
 
+import com.example.Models.FriendRequestActionDTO
+import com.example.Models.FriendRequestCreateByEmailDTO
+import com.example.Models.FriendRequestWithUserDetailsDTO
+import com.example.Models.FriendshipListDTO
 import com.project.momentum.data.auth.SessionManager
-import com.project.momentum.features.friends.models.FriendRequestActionDTO
-import com.project.momentum.features.friends.models.FriendRequestCreateByEmailDTO
-import com.project.momentum.features.friends.models.FriendRequestWithUserDetailsDTO
-import com.project.momentum.features.friends.models.FriendshipListDTO
 import com.project.momentum.network.di.Backend
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body

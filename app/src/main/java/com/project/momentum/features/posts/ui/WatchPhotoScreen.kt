@@ -246,7 +246,7 @@ fun WatchPhotoScreen(
         Spacer(Modifier.height(75.dp))
 
         ProfileLabel(
-            name = post.userId,
+            name = post.userName,
             imageUrl = stringResource(R.string.cats_url)
         )
 
