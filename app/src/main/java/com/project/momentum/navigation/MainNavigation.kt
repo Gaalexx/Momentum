@@ -39,6 +39,7 @@ import com.project.momentum.features.auth.ui.InsertCodeScreen
 import com.project.momentum.features.friends.ui.FriendsScreenRoute
 import com.project.momentum.features.editingAccount.EditingAccountRoot
 import com.project.momentum.features.editingAccount.EditingAccountScreen
+import com.project.momentum.features.posts.ui.WatchPhotoScreenRoute
 import com.project.momentum.features.settings.ui.DeleteAccountCheckCodeScreen
 import com.project.momentum.navigation.viewmodel.AppStartState
 import com.project.momentum.navigation.viewmodel.AppStartViewModel
@@ -333,7 +334,7 @@ fun MainScreen() {
 
             entry<NavRoutes.PreviewPhoto> { route ->
 
-                WatchPhotoScreen(
+                WatchPhotoScreenRoute(
                     onGoToTakePhoto = {
                         openOverlay(NavRoutes.Camera)
                     },
@@ -349,7 +350,7 @@ fun MainScreen() {
                     onGoToFriends = {
                         openOverlay(NavRoutes.Friends)
                     },
-                    post = route.post
+                    postIndex = route.post
                 )
 
             }

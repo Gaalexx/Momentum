@@ -52,7 +52,7 @@ class GalleryViewModel : BasePostViewModel() {
 @Composable
 fun GallaryScreen(
     modifier: Modifier = Modifier,
-    onPostClick: (PostData) -> Unit,
+    onPostClick: (Int) -> Unit,
     onAddPhoto: () -> Unit = {},
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
