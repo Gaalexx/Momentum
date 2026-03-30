@@ -6,6 +6,7 @@ import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +29,7 @@ import com.project.momentum.ui.assets.FriendsPillButton
 import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
 import com.project.momentum.features.posts.BasePostViewModel
+import com.project.momentum.features.posts.viewmodel.GalleryEvent
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.ui.assets.S3PhotoGrid
 import java.time.Instant
@@ -67,6 +69,7 @@ fun GallaryScreen(
 
     val state = viewModel.state.collectAsStateWithLifecycle()
     val posts = state.value.posts
+    val isLoading = state.value.isRefreshing
 
 
     Box(
@@ -110,16 +113,24 @@ fun GallaryScreen(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
             )
 
-            S3PhotoGrid(
-                posts = posts,
-                onPostClick = onPostClick,
-                onAddPhotoClick = {  },
+            PullToRefreshBox(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                showPlusButton = false,
-                columns = 3
-            )
+                isRefreshing = isLoading,
+                onRefresh = { viewModel.onEvent(GalleryEvent.OnRefreshPosts) }
+            ) {
+                S3PhotoGrid(
+                    posts = posts,
+                    onPostClick = onPostClick,
+                    onAddPhotoClick = { },
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    showPlusButton = false,
+                    columns = 3
+                )
+            }
+
         }
     }
 }
