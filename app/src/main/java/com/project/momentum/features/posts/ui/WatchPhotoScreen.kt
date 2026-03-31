@@ -208,12 +208,14 @@ fun WatchPhotoScreen(
     val bg = ConstColours.BLACK
     val iconTint = ConstColours.WHITE
 
-    val context = LocalContext.current
-    var caption by rememberSaveable { mutableStateOf("") }
     val captionFocusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
     val pagerState = rememberPagerState(initialPage = postIndex, pageCount = { posts.size })
-    var curIndex by remember { mutableIntStateOf(postIndex) }
+
+    val currentPost by remember(posts, pagerState) {
+        derivedStateOf { posts.getOrNull(pagerState.currentPage) }
+    }
+    //var curIndex by remember { mutableIntStateOf(postIndex) }
 
     Column(
         modifier = Modifier
@@ -246,7 +248,7 @@ fun WatchPhotoScreen(
                 .fillMaxWidth()
                 .aspectRatio(1f)
         ) { pageIndex ->
-            curIndex = pageIndex
+            //curIndex = pageIndex
             Box(
                 modifier = Modifier
                     .fillMaxWidth(0.95f)
@@ -277,21 +279,24 @@ fun WatchPhotoScreen(
             }
         }
 
+        currentPost?.let{
+            post ->
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = post.getDate() ?: "",
+                color = ConstColours.WHITE,
+                style = AppTextStyles.SupportingText
+            )
 
-        Text(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = posts[curIndex].getDate() ?: "",
-            color = ConstColours.WHITE,
-            style = AppTextStyles.SupportingText
-        )
 
+            Spacer(Modifier.height(75.dp))
 
-        Spacer(Modifier.height(75.dp))
+            ProfileLabel(
+                name = post.userName,
+                imageUrl = post.avatarPresignedURL
+            )
+        }
 
-        ProfileLabel(
-            name = posts[curIndex].userName,
-            imageUrl = posts[curIndex].avatarPresignedURL
-        )
 
 
         Box(
