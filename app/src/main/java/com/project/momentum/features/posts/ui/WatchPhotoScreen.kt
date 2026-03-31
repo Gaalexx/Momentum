@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,6 +17,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.pager.VerticalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -57,8 +60,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.project.momentum.R
 import com.project.momentum.features.account.models.PostData
+import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.ui.assets.CaptionBasicLabel
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.ui.theme.AppTextStyles
@@ -161,28 +167,58 @@ fun ReactToPhoto(
     }
 }
 
+
 @Composable
-fun WatchPhotoScreen(
-    previewPainter: Painter? = null,
-    modifier: Modifier = Modifier,
+fun WatchPhotoScreenRoute(
     onGoToTakePhoto: () -> Unit,
     onGoToGallery: () -> Unit,
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
-    post: PostData
-    //postUrl: String
+    postIndex: Int,
+    postsViewModel: PostsViewModel = hiltViewModel()
+) {
+
+    val uiState = postsViewModel.state.collectAsStateWithLifecycle()
+    val posts = uiState.value.posts
+
+    WatchPhotoScreen(
+        onGoToTakePhoto = onGoToTakePhoto,
+        onGoToGallery = onGoToGallery,
+        onProfileClick = onProfileClick,
+        onGoToSettings = onGoToSettings,
+        onGoToFriends = onGoToFriends,
+        postIndex = postIndex,
+        posts = posts
+    )
+
+
+}
+
+@Composable
+fun WatchPhotoScreen(
+    onGoToTakePhoto: () -> Unit,
+    onGoToGallery: () -> Unit,
+    onProfileClick: () -> Unit,
+    onGoToSettings: () -> Unit,
+    onGoToFriends: () -> Unit,
+    postIndex: Int,
+    posts: List<PostData>
 ) {
     val bg = ConstColours.BLACK
     val iconTint = ConstColours.WHITE
 
-    val context = LocalContext.current
-    var caption by rememberSaveable { mutableStateOf("") }
     val captionFocusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
+    val pagerState = rememberPagerState(initialPage = postIndex, pageCount = { posts.size })
+
+    val currentPost by remember(posts, pagerState) {
+        derivedStateOf { posts.getOrNull(pagerState.currentPage) }
+    }
+    //var curIndex by remember { mutableIntStateOf(postIndex) }
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .background(bg)
             .windowInsetsPadding(WindowInsets.systemBars),
@@ -205,50 +241,62 @@ fun WatchPhotoScreen(
 
         Spacer(Modifier.height(12.dp))
 
-        Box(
+
+        VerticalPager(
+            state = pagerState,
             modifier = Modifier
-                .fillMaxWidth(0.95f)
+                .fillMaxWidth()
                 .aspectRatio(1f)
-                .clip(RoundedCornerShape(60.dp))
-                .background(ConstColours.MAIN_BACK_GRAY)
-        ) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                AsyncImage(
-                    model = post.presignedURL,
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-
-                if (post.title != null && post.title != "") {
-                    CaptionBasicLabel(
-                        text = post.title,
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .focusRequester(captionFocusRequester)
+        ) { pageIndex ->
+            //curIndex = pageIndex
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.95f)
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(60.dp))
+                    .background(ConstColours.MAIN_BACK_GRAY)
+            ) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    AsyncImage(
+                        model = posts[pageIndex].presignedURL,
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
                     )
-                }
 
+                    if (posts[pageIndex].title.isNotBlank()) {
+                        CaptionBasicLabel(
+                            text = posts[pageIndex].title,
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .focusRequester(captionFocusRequester)
+                        )
+                    }
+
+                }
             }
         }
 
-        Spacer(Modifier.height(15.dp))
+        currentPost?.let{
+            post ->
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = post.getDate() ?: "",
+                color = ConstColours.WHITE,
+                style = AppTextStyles.SupportingText
+            )
 
-        Text(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            text = post.getDate() ?: "",
-            color = ConstColours.WHITE,
-            style = AppTextStyles.SupportingText
-        )
 
-        Spacer(Modifier.height(75.dp))
+            Spacer(Modifier.height(75.dp))
 
-        ProfileLabel(
-            name = post.userName,
-            imageUrl = post.avatarPresignedURL
-        )
+            ProfileLabel(
+                name = post.userName,
+                imageUrl = post.avatarPresignedURL
+            )
+        }
+
 
 
         Box(
@@ -333,19 +381,29 @@ fun WatchPhotoScreen(
 private fun WatchPhotoScreenPreview() {
     MaterialTheme {
         WatchPhotoScreen(
-            previewPainter = null,
             onGoToTakePhoto = {},
             onGoToGallery = {},
             onGoToSettings = {},
             onProfileClick = {},
             onGoToFriends = {},
-            post = PostData(
-                id = "1",
-                userId = "preview-user",
-                userName = "PreviewName",
-                title = "Description",
-                presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-                createdAt = "2026-03-12T14:38:50.690942Z"
+            postIndex = 0,
+            posts = listOf(
+                PostData(
+                    id = "1",
+                    userId = "preview-user",
+                    userName = "PreviewName",
+                    title = "Description",
+                    presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+                    createdAt = "2026-03-12T14:38:50.690942Z"
+                ),
+                PostData(
+                    id = "1",
+                    userId = "preview-user",
+                    userName = "PreviewName2",
+                    title = "Description2",
+                    presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+                    createdAt = "2026-03-12T14:38:50.690942Z"
+                )
             )
         )
     }

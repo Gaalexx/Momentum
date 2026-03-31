@@ -6,10 +6,10 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -21,24 +21,19 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.project.momentum.features.account.ui.AccountRoot
-import com.project.momentum.features.account.ui.AccountScreen
-import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.contentcreation.ui.CameraLikeScreen
 import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
-import com.project.momentum.features.friends.ui.FriendsScreen
 import com.project.momentum.features.auth.ui.AuthorizationAccountScreen
 import com.project.momentum.features.auth.ui.AuthorizationPasswordScreen
 import com.project.momentum.features.auth.ui.PasswordRecoveryScreen
-import com.project.momentum.features.posts.ui.GallaryScreen
-import com.project.momentum.features.posts.ui.GalleryViewModel
-import com.project.momentum.features.posts.ui.WatchPhotoScreen
+import com.project.momentum.features.posts.ui.GalleryScreen
 import com.project.momentum.features.contentcreation.ui.RecorderScreen
 import com.project.momentum.features.auth.ui.CreateAccountScreen
 import com.project.momentum.features.auth.ui.CreatePasswordScreen
 import com.project.momentum.features.auth.ui.InsertCodeScreen
 import com.project.momentum.features.friends.ui.FriendsScreenRoute
 import com.project.momentum.features.editingAccount.EditingAccountRoot
-import com.project.momentum.features.editingAccount.EditingAccountScreen
+import com.project.momentum.features.posts.ui.WatchPhotoScreenRoute
 import com.project.momentum.features.settings.ui.DeleteAccountCheckCodeScreen
 import com.project.momentum.navigation.viewmodel.AppStartState
 import com.project.momentum.navigation.viewmodel.AppStartViewModel
@@ -69,8 +64,6 @@ fun MainScreen() {
         LoadingOverlay()
     } else {
         val backStack: NavBackStack<NavKey> = rememberNavBackStack(startRoute)
-
-        val galleryVM: GalleryViewModel = viewModel()
 
         fun setBase(route: NavRoutes) {
             if (backStack.isEmpty()) {
@@ -239,8 +232,15 @@ fun MainScreen() {
                 )
             }
 
-            entry<NavRoutes.Gallery> {
-                GallaryScreen(
+            entry<NavRoutes.Gallery>(
+                metadata = NavDisplay.transitionSpec {
+                    slideInVertically(
+                        initialOffsetY = { it },
+                        animationSpec = tween(1000)
+                    ) togetherWith ExitTransition.KeepUntilTransitionsFinished
+                }
+            ) {
+                GalleryScreen(
                     onPostClick = { post ->
                         openOverlay(NavRoutes.PreviewPhoto(post = post))
                     },
@@ -333,7 +333,7 @@ fun MainScreen() {
 
             entry<NavRoutes.PreviewPhoto> { route ->
 
-                WatchPhotoScreen(
+                WatchPhotoScreenRoute(
                     onGoToTakePhoto = {
                         openOverlay(NavRoutes.Camera)
                     },
@@ -349,7 +349,7 @@ fun MainScreen() {
                     onGoToFriends = {
                         openOverlay(NavRoutes.Friends)
                     },
-                    post = route.post
+                    postIndex = route.post
                 )
 
             }

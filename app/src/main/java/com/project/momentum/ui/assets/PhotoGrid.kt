@@ -113,7 +113,7 @@ sealed class GridItem {
 @Composable
 fun S3PhotoGrid(
     posts: List<PostData>,
-    onPostClick: (PostData) -> Unit = {},
+    onPostClick: (Int) -> Unit = { },
     onAddPhotoClick: () -> Unit,
     modifier: Modifier = Modifier,
     showPlusButton: Boolean = true,
@@ -160,7 +160,11 @@ fun S3PhotoGrid(
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
                                 .fillMaxSize()
-                                .clickable { onPostClick(post) },
+                                .clickable {
+                                    onPostClick(
+                                        displayItems.indexOf(item)
+                                    )
+                                }, // TODO переделать под O(1) (просто поменять на indexedItems)
                             loading = {
                                 Box(
                                     modifier = Modifier.fillMaxSize(),

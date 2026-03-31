@@ -13,18 +13,21 @@ import javax.inject.Inject
 import kotlin.collections.listOf
 
 data class PostsState(
-    val posts: List<PostData>
+    val posts: List<PostData>,
+    val isRefreshing: Boolean
 )
 
 sealed interface GalleryEvent {
     data object OnLoadPosts : GalleryEvent
+    data object OnRefreshPosts : GalleryEvent
+    data class OnLocalLoadPosts(val posts: List<PostData>) : GalleryEvent
 }
 
 @HiltViewModel
 class PostsViewModel @Inject constructor(
     private val repo: PostsRepo
 ) : ViewModel() {
-    private val _state = MutableStateFlow<PostsState>(PostsState(listOf()))
+    private val _state = MutableStateFlow<PostsState>(PostsState(listOf(), false))
     val state = _state.asStateFlow()
 
     init {
@@ -34,15 +37,41 @@ class PostsViewModel @Inject constructor(
     fun onEvent(event: GalleryEvent) {
         when (event) {
             is GalleryEvent.OnLoadPosts -> loadAllPosts()
+            is GalleryEvent.OnRefreshPosts -> refreshPosts()
+            is GalleryEvent.OnLocalLoadPosts -> loadLocalPosts(event)
             else -> println()
+        }
+    }
+
+    private suspend fun postsUpdate() {
+        val posts = repo.getAllPosts()
+        _state.update {
+            it.copy(posts = posts)
+        }
+    }
+
+    private fun loadLocalPosts(event: GalleryEvent.OnLocalLoadPosts){
+        viewModelScope.launch {
+            _state.update {
+                it.copy(posts = event.posts)
+            }
         }
     }
 
     private fun loadAllPosts() {
         viewModelScope.launch {
-            val posts = repo.getAllPosts()
+            postsUpdate()
+        }
+    }
+
+    private fun refreshPosts() {
+        viewModelScope.launch {
             _state.update {
-                it.copy(posts = posts)
+                it.copy(isRefreshing = true)
+            }
+            postsUpdate()
+            _state.update {
+                it.copy(isRefreshing = false)
             }
         }
     }

@@ -54,7 +54,7 @@ import com.project.momentum.features.friends.viewmodel.FriendsViewModel
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.FriendSearchField
 import com.project.momentum.ui.assets.AddFriendCircleButton
-import com.project.momentum.features.friends.ui.assets.AddFriendPage
+import com.project.momentum.features.friends.ui.assets.AddFriendDialog
 import com.project.momentum.features.friends.ui.assets.FriendRequestCarousel
 import com.project.momentum.features.friends.viewmodel.FriendsScreenState
 
@@ -88,12 +88,16 @@ fun FriendsScreenRoute(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val addFriend: () -> Unit = { viewModel.onEvent(FriendsScreenEvent.ShowPageEvent(true)) }
     val onEvent = viewModel::onEvent
+    val errorState = uiState.errorState
+    val errorTextId = uiState.errorText
 
     FriendsScreen(
         onBackClick,
         uiState,
         addFriend,
-        onEvent
+        onEvent,
+        errorState,
+        errorTextId
     )
 
 }
@@ -103,7 +107,9 @@ fun FriendsScreen(
     onBackClick: () -> Unit,
     uiState: FriendsScreenState,
     addFriend: () -> Unit,
-    onEvent: (FriendsScreenEvent) -> Unit
+    onEvent: (FriendsScreenEvent) -> Unit,
+    errorState: Boolean = false,
+    errorTextId: Int?
 ) {
     val bg = ConstColours.BLACK
     val textColor = ConstColours.WHITE
@@ -353,11 +359,13 @@ fun FriendsScreen(
         Dialog(
             onDismissRequest = { onEvent(FriendsScreenEvent.ShowPageEvent(false)) }
         ) {
-            AddFriendPage(
+            AddFriendDialog(
                 value = addFriendQuery,
                 selectedIndex = selectedIndex,
                 onEvent = onEvent,
-                onValueChange = { onEvent(FriendsScreenEvent.AddFriendQueryChange(it)) }
+                onValueChange = { onEvent(FriendsScreenEvent.AddFriendQueryChange(it)) },
+                isError = errorState,
+                errorText = if(errorTextId != null && errorState) stringResource(errorTextId) else ""
             )
         }
     }
@@ -480,7 +488,8 @@ fun FriendsScreenPreview() {
                 FriendRequest("22", "2322", "User 5")
             )
         ),
-        {}, {}
+        {}, {},
+        errorState = false, errorTextId = null
     )
 }
 

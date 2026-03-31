@@ -50,7 +50,7 @@ fun AccountRoot(
     modifier: Modifier = Modifier,
     userStatus: String = stringResource(R.string.account_online_status),
     onEditClick: () -> Unit = {},
-    onPostClick: (PostData) -> Unit,
+    onPostClick: (Int) -> Unit,
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
     onAddPostClick: () -> Unit,
@@ -77,7 +77,7 @@ fun AccountScreen(
     modifier: Modifier = Modifier,
     userStatus: String = stringResource(R.string.account_online_status),
     onEditClick: () -> Unit,
-    onPostClick: (PostData) -> Unit,
+    onPostClick: (Int) -> Unit,
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
     onAddPostClick: () -> Unit,
@@ -206,7 +206,7 @@ fun AccountScreen(
 
             S3PhotoGrid(
                 posts = uiMediaState.posts,
-                onPostClick = onPostClick,
+                onPostClick = {},//onPostClick,
                 onAddPhotoClick = onAddPostClick,
                 modifier = Modifier
                     .fillMaxWidth()

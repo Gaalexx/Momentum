@@ -1,6 +1,7 @@
 package com.project.momentum.features.friends.repo
 
 import com.example.Models.FriendRequestActionDTO
+import com.project.momentum.data.usersinfo.UsersInfoAPI
 import com.project.momentum.features.friends.api.FriendsInfoAPI
 import com.project.momentum.features.friends.ui.FriendRequest
 import com.project.momentum.features.friends.ui.User
@@ -9,7 +10,8 @@ import javax.inject.Singleton
 
 @Singleton
 class FriendsRepository @Inject constructor(
-    private val friendsInfoAPI: FriendsInfoAPI
+    private val friendsInfoAPI: FriendsInfoAPI,
+    private val usersInfoAPI: UsersInfoAPI
 ) {
 
     sealed interface RequestBy {
@@ -73,18 +75,23 @@ class FriendsRepository @Inject constructor(
         return false
     }
 
-    suspend fun createFriendRequest(    // TODO допилить обратную связь, если пользователя не существует или другие ошибки
+    suspend fun createFriendRequest(    // TODO сделать ошибки конкретнее
         requestBy: RequestBy
-    ) {
+    ): Boolean {
         when (requestBy) {
             is RequestBy.ByEmail -> {
-                // TODO сделать проверку что такой пользователь вообще есть
+                val ifExists = usersInfoAPI.userByEmailExists(requestBy.identifier)
+                if (!ifExists) {
+                    return false
+                }
                 friendsInfoAPI.createRequestWithEmail(requestBy.identifier)
+                return true
             }
 
             is RequestBy.ByLogin -> println("Not implemented")
             is RequestBy.ByNumber -> println("Not implemented")
         }
+        return false
     }
 
 }

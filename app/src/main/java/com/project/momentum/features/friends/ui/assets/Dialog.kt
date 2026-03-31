@@ -16,10 +16,6 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -77,13 +73,14 @@ fun SingleChoiceSegmentedButton(
 }
 
 @Composable
-fun AddFriendPage(
+fun AddFriendDialog(
     value: String,
     selectedIndex: SelectedIndex,
     onEvent: (FriendsScreenEvent) -> Unit = {},
     placeholder: String = "",
     onValueChange: (String) -> Unit,
     isError: Boolean = false,
+    errorText: String? = "",
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
 
@@ -115,17 +112,18 @@ fun AddFriendPage(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
+                    .weight(2f),
                 contentAlignment = Alignment.Center
             ) {
                 TextFieldRegistration(
                     value = value,
                     onValueChange = onValueChange,
                     isError = isError,
+                    errorText = errorText,
                     placeholder = placeholder,
                     modifier = Modifier
                         .fillMaxWidth(0.8f)
-                        .fillMaxHeight(0.8f),
+                        .fillMaxHeight(0.6f),
                     keyboardOptions = keyboardOptions,
                 )
             }
@@ -155,12 +153,10 @@ fun AddFriendPage(
                 Button(
                     onClick = {
                         when(selectedIndex){
-                            SelectedIndex.EMAIL -> onEvent(FriendsScreenEvent.CreateEmailRequest(value))
+                            SelectedIndex.EMAIL -> onEvent(FriendsScreenEvent.CreateFriendRequest.EmailRequest(value))
                             SelectedIndex.LOGIN -> println("Not implemented yet")
                             SelectedIndex.TELEPHONE -> println("Not implemented yet")
                         }
-                        onEvent(FriendsScreenEvent.ShowPageEvent(false))
-                        onEvent(FriendsScreenEvent.AddFriendQueryChange(""))
                     },
                     modifier = Modifier
                         .fillMaxWidth(0.8f)
@@ -193,11 +189,14 @@ private fun PreviewPager() {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        AddFriendPage(
+        AddFriendDialog(
             "Что это",
             onEvent = {},
             selectedIndex = SelectedIndex.LOGIN,
             placeholder = "Введите имя",
-            onValueChange = {})
+            onValueChange = {},
+            isError = true,
+            errorText = "Ошибочка вышла"
+            )
     }
 }
