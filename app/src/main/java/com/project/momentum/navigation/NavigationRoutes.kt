@@ -67,9 +67,7 @@ NavRoutes : NavKey {
     @Serializable
     data class Settings(val backTo: String) : NavRoutes()
 
-    //
-//    @Serializable
-//    data class PreviewPhoto(val postUrl: String) : NavRoutes()
+
     @Serializable
     data class PreviewPhoto(val post: Int) : NavRoutes()
 

@@ -21,38 +21,20 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.project.momentum.ui.theme.ConstColours
-import com.project.momentum.ui.assets.PhotoGrid
 import com.project.momentum.R
 import com.project.momentum.features.account.models.PostData
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.FriendsPillButton
 import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
-import com.project.momentum.features.posts.BasePostViewModel
 import com.project.momentum.features.posts.viewmodel.GalleryEvent
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.ui.assets.S3PhotoGrid
 import java.time.Instant
 
 
-class GalleryViewModel : BasePostViewModel() {
-    override fun addPhoto(context: Context, url: String) {
-        val event = readRandomEvent(context)
-        val postData = PostData(
-            id = url,
-            userId = "preview-user",
-            userName = event.name,
-            title = event.description,
-            presignedURL = url,
-            createdAt = Instant.now().toString()
-        )
-        _posts.add(0, postData)
-    }
-}
-
-
 @Composable
-fun GallaryScreen(
+fun GalleryScreen(
     modifier: Modifier = Modifier,
     onPostClick: (Int) -> Unit,
     onAddPhoto: () -> Unit = {},
@@ -65,7 +47,6 @@ fun GallaryScreen(
     val bg = ConstColours.BLACK
     val textColor = Color.White
 
-    val context: Context = LocalContext.current
 
     val state = viewModel.state.collectAsStateWithLifecycle()
     val posts = state.value.posts
@@ -137,9 +118,9 @@ fun GallaryScreen(
 
 @Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
 @Composable
-private fun GallaryScreenPreview() {
+private fun GalleryScreenPreview() {
     MaterialTheme {
-        GallaryScreen(
+        GalleryScreen(
             onPostClick = {},
             onProfileClick = {},
             onBackClick = {},

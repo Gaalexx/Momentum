@@ -20,6 +20,7 @@ data class PostsState(
 sealed interface GalleryEvent {
     data object OnLoadPosts : GalleryEvent
     data object OnRefreshPosts : GalleryEvent
+    data class OnLocalLoadPosts(val posts: List<PostData>) : GalleryEvent
 }
 
 @HiltViewModel
@@ -37,6 +38,7 @@ class PostsViewModel @Inject constructor(
         when (event) {
             is GalleryEvent.OnLoadPosts -> loadAllPosts()
             is GalleryEvent.OnRefreshPosts -> refreshPosts()
+            is GalleryEvent.OnLocalLoadPosts -> loadLocalPosts(event)
             else -> println()
         }
     }
@@ -45,6 +47,14 @@ class PostsViewModel @Inject constructor(
         val posts = repo.getAllPosts()
         _state.update {
             it.copy(posts = posts)
+        }
+    }
+
+    private fun loadLocalPosts(event: GalleryEvent.OnLocalLoadPosts){
+        viewModelScope.launch {
+            _state.update {
+                it.copy(posts = event.posts)
+            }
         }
     }
 
