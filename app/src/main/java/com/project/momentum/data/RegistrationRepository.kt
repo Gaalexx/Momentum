@@ -12,8 +12,10 @@ import com.project.momentum.features.auth.models.dto.CheckCodeLoginRequestDTO
 import com.project.momentum.features.auth.models.dto.CheckCodeRequestDTO
 import com.project.momentum.features.auth.models.dto.CheckEmailRequestDTO
 import com.project.momentum.features.auth.models.dto.CheckPhoneNumberRequestDTO
+import com.project.momentum.features.auth.models.dto.GetJWTDTO
 import com.project.momentum.features.auth.models.dto.LoginUserRequestDTO
 import com.project.momentum.features.auth.models.dto.RegisterUserRequestDTO
+import java.net.ConnectException
 import java.security.GeneralSecurityException
 import javax.inject.Inject
 import javax.inject.Singleton
