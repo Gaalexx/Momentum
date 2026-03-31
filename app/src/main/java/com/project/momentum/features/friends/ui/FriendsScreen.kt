@@ -54,7 +54,7 @@ import com.project.momentum.features.friends.viewmodel.FriendsViewModel
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.FriendSearchField
 import com.project.momentum.ui.assets.AddFriendCircleButton
-import com.project.momentum.features.friends.ui.assets.AddFriendPage
+import com.project.momentum.features.friends.ui.assets.AddFriendDialog
 import com.project.momentum.features.friends.ui.assets.FriendRequestCarousel
 import com.project.momentum.features.friends.viewmodel.FriendsScreenState
 
@@ -353,7 +353,7 @@ fun FriendsScreen(
         Dialog(
             onDismissRequest = { onEvent(FriendsScreenEvent.ShowPageEvent(false)) }
         ) {
-            AddFriendPage(
+            AddFriendDialog(
                 value = addFriendQuery,
                 selectedIndex = selectedIndex,
                 onEvent = onEvent,

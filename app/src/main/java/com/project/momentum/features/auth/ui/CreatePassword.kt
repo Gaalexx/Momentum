@@ -87,7 +87,6 @@ fun CreatePasswordScreen(
                     TextFieldRegistration(
                         value = uiState.userData.password,
                         onValueChange = { viewModel.updateUserPassword(it) },
-                        modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
                         isError = uiState.isError,
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Password,
@@ -99,7 +98,6 @@ fun CreatePasswordScreen(
                     TextFieldRegistration(
                         value = viewModel.passwordRepetition,
                         onValueChange = { viewModel.updateUserPasswordRepetition(it) },
-//                        modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
                         isError = uiState.isError,
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Password,
