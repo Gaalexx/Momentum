@@ -206,7 +206,7 @@ fun AccountScreen(
 
             S3PhotoGrid(
                 posts = uiMediaState.posts,
-                onPostClick = onPostClick,
+                onPostClick = {},//onPostClick,
                 onAddPhotoClick = onAddPostClick,
                 modifier = Modifier
                     .fillMaxWidth()

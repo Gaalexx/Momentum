@@ -1,8 +1,10 @@
 package com.project.momentum.features.friends.viewmodel
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import androidx.lifecycle.ViewModel
+import com.project.momentum.R
 import com.project.momentum.features.friends.repo.FriendsRepository
 import com.project.momentum.features.friends.ui.FriendRequest
 import com.project.momentum.features.friends.ui.User
@@ -13,7 +15,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 
-enum class SelectedIndex(val index: Int){
+enum class SelectedIndex(val index: Int) {
     EMAIL(0),
     TELEPHONE(1),
     LOGIN(2);
@@ -32,13 +34,20 @@ data class FriendsScreenState(
     val showPage: Boolean = false,
     val addFriendQuery: String = "",
     val searchQuery: String = "",
-    val selectedIndex: SelectedIndex = SelectedIndex.EMAIL
+    val selectedIndex: SelectedIndex = SelectedIndex.EMAIL,
+    val errorState: Boolean = false,
+    @StringRes val errorText: Int? = null
 )
 
 sealed interface FriendsScreenEvent {
     data class AcceptRequest(val request: FriendRequest) : FriendsScreenEvent
     data class RejectRequest(val request: FriendRequest) : FriendsScreenEvent
-    data class CreateEmailRequest(val email: String) : FriendsScreenEvent
+    sealed interface CreateFriendRequest : FriendsScreenEvent {
+        val identifier: String
+        data class EmailRequest(override val identifier: String) : CreateFriendRequest
+        data class LoginRequest(override val identifier: String) : CreateFriendRequest
+        data class PhoneRequest(override val identifier: String) : CreateFriendRequest
+    }
     data object GetFriends : FriendsScreenEvent
     data object GetRequests : FriendsScreenEvent
 
@@ -78,7 +87,7 @@ class FriendsViewModel @Inject constructor(
             is FriendsScreenEvent.RejectRequest -> rejectRequest(event)
             is FriendsScreenEvent.GetFriends -> getFriends()
             is FriendsScreenEvent.GetRequests -> getRequests()
-            is FriendsScreenEvent.CreateEmailRequest -> createFriendRequestWithEmail(event)
+            is FriendsScreenEvent.CreateFriendRequest -> createFriendRequest(event)
             is FriendsScreenEvent.ShowPageEvent -> onShowPageChange(event)
             is FriendsScreenEvent.AddFriendQueryChange -> onAddFriendQueryChange(event)
             is FriendsScreenEvent.SearchQueryChange -> onSearchQueryChange(event)
@@ -86,14 +95,26 @@ class FriendsViewModel @Inject constructor(
         }
     }
 
-    private fun onChangeSelectedIndex(value: FriendsScreenEvent.ChangeSelectedIndex){
+    private fun onChangeSelectedIndex(value: FriendsScreenEvent.ChangeSelectedIndex) {
         _state.update { it.copy(selectedIndex = value.newIndex) }
+    }
+
+    private suspend fun onChangeSelectedIndexValue(value: SelectedIndex) {
+        _state.update { it.copy(selectedIndex = value) }
     }
 
     private fun onShowPageChange(value: FriendsScreenEvent.ShowPageEvent) {
         _state.update { it.copy(showPage = value.newValue) }
     }
 
+    private suspend fun onShowPageChangeValue(value: Boolean) {
+        _state.update { it.copy(showPage = value) }
+    }
+
+
+    private suspend fun onAddFriendQueryChangeValue(value: String){
+        _state.update { it.copy(addFriendQuery = value) }
+    }
     private fun onAddFriendQueryChange(value: FriendsScreenEvent.AddFriendQueryChange) {
         _state.update { it.copy(addFriendQuery = value.newValue) }
     }
@@ -165,9 +186,39 @@ class FriendsViewModel @Inject constructor(
         }
     }
 
-    private fun createFriendRequestWithEmail(request: FriendsScreenEvent.CreateEmailRequest) {
+    private suspend fun clearError(){
+        if(_state.value.errorState || _state.value.errorText != null){
+            _state.update {
+                it.copy(
+                    errorState = false,
+                    errorText = null
+                )
+            }
+        }
+    }
+
+    private fun createFriendRequest(request: FriendsScreenEvent.CreateFriendRequest) {
         viewModelScope.launch {
-            repo.createFriendRequest(FriendsRepository.RequestBy.ByEmail(request.email))
+            val res = when(request){
+                is FriendsScreenEvent.CreateFriendRequest.EmailRequest -> repo.createFriendRequest(FriendsRepository.RequestBy.ByEmail(request.identifier))
+                is FriendsScreenEvent.CreateFriendRequest.LoginRequest -> repo.createFriendRequest(FriendsRepository.RequestBy.ByLogin(request.identifier))
+                is FriendsScreenEvent.CreateFriendRequest.PhoneRequest -> repo.createFriendRequest(FriendsRepository.RequestBy.ByNumber(request.identifier))
+            }
+            if (!res) {
+                _state.update {
+                    it.copy(
+                        errorState = true,
+                        errorText = R.string.person_wasnt_found
+                    )
+                }
+            }
+            else if(_state.value.errorState || _state.value.errorText != null){
+                clearError()
+            }
+            else{
+                onAddFriendQueryChangeValue("")
+                onShowPageChangeValue(false)
+            }
         }
     }
 

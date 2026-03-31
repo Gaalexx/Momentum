@@ -80,6 +80,7 @@ fun AddFriendDialog(
     placeholder: String = "",
     onValueChange: (String) -> Unit,
     isError: Boolean = false,
+    errorText: String? = "",
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
 
@@ -111,17 +112,18 @@ fun AddFriendDialog(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f),
+                    .weight(2f),
                 contentAlignment = Alignment.Center
             ) {
                 TextFieldRegistration(
                     value = value,
                     onValueChange = onValueChange,
                     isError = isError,
+                    errorText = errorText,
                     placeholder = placeholder,
                     modifier = Modifier
                         .fillMaxWidth(0.8f)
-                        .fillMaxHeight(0.8f),
+                        .fillMaxHeight(0.6f),
                     keyboardOptions = keyboardOptions,
                 )
             }
@@ -151,12 +153,10 @@ fun AddFriendDialog(
                 Button(
                     onClick = {
                         when(selectedIndex){
-                            SelectedIndex.EMAIL -> onEvent(FriendsScreenEvent.CreateEmailRequest(value))
+                            SelectedIndex.EMAIL -> onEvent(FriendsScreenEvent.CreateFriendRequest.EmailRequest(value))
                             SelectedIndex.LOGIN -> println("Not implemented yet")
                             SelectedIndex.TELEPHONE -> println("Not implemented yet")
                         }
-                        onEvent(FriendsScreenEvent.ShowPageEvent(false))
-                        onEvent(FriendsScreenEvent.AddFriendQueryChange(""))
                     },
                     modifier = Modifier
                         .fillMaxWidth(0.8f)
@@ -194,6 +194,9 @@ private fun PreviewPager() {
             onEvent = {},
             selectedIndex = SelectedIndex.LOGIN,
             placeholder = "Введите имя",
-            onValueChange = {})
+            onValueChange = {},
+            isError = true,
+            errorText = "Ошибочка вышла"
+            )
     }
 }

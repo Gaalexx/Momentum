@@ -88,12 +88,16 @@ fun FriendsScreenRoute(
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val addFriend: () -> Unit = { viewModel.onEvent(FriendsScreenEvent.ShowPageEvent(true)) }
     val onEvent = viewModel::onEvent
+    val errorState = uiState.errorState
+    val errorTextId = uiState.errorText
 
     FriendsScreen(
         onBackClick,
         uiState,
         addFriend,
-        onEvent
+        onEvent,
+        errorState,
+        errorTextId
     )
 
 }
@@ -103,7 +107,9 @@ fun FriendsScreen(
     onBackClick: () -> Unit,
     uiState: FriendsScreenState,
     addFriend: () -> Unit,
-    onEvent: (FriendsScreenEvent) -> Unit
+    onEvent: (FriendsScreenEvent) -> Unit,
+    errorState: Boolean = false,
+    errorTextId: Int?
 ) {
     val bg = ConstColours.BLACK
     val textColor = ConstColours.WHITE
@@ -357,7 +363,9 @@ fun FriendsScreen(
                 value = addFriendQuery,
                 selectedIndex = selectedIndex,
                 onEvent = onEvent,
-                onValueChange = { onEvent(FriendsScreenEvent.AddFriendQueryChange(it)) }
+                onValueChange = { onEvent(FriendsScreenEvent.AddFriendQueryChange(it)) },
+                isError = errorState,
+                errorText = if(errorTextId != null && errorState) stringResource(errorTextId) else ""
             )
         }
     }
@@ -480,7 +488,8 @@ fun FriendsScreenPreview() {
                 FriendRequest("22", "2322", "User 5")
             )
         ),
-        {}, {}
+        {}, {},
+        errorState = false, errorTextId = null
     )
 }
 
