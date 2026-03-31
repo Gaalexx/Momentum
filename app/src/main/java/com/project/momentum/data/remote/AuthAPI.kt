@@ -6,6 +6,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import java.net.ConnectException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -18,7 +19,9 @@ class AuthAPI @Inject constructor(
     @Backend private val client: HttpClient
 ) : IAuthAPI {
 
-    override suspend fun tryAuth(token: String): GetJWTDTO =
-        client.post("auth") { setBody(GetJWTDTO(token)) }.body<GetJWTDTO>()
+    override suspend fun tryAuth(token: String): GetJWTDTO {
+        return client.post("auth") { setBody(GetJWTDTO(token)) }.body<GetJWTDTO>()
+    }
+
 
 }
