@@ -23,5 +23,5 @@ data class LoginState(
     val errorMessage: String? = null,
     val isStepValid: Boolean = true,
     val canGoNext: Boolean = false,
-    val canGoBack: Boolean = false
+    val canGoBack: Boolean = true
 )
