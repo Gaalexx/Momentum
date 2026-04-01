@@ -37,6 +37,7 @@ import coil.compose.AsyncImage
 import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.ui.theme.AppTextStyles
 import android.content.res.Configuration
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -347,7 +348,8 @@ fun FriendsScreen(
                         key = { it.id }
                     ) { friend ->
                         FriendItem(
-                            friend = friend
+                            friend = friend,
+                            onEvent = onEvent
                         )
                     }
                 }
@@ -409,7 +411,10 @@ fun FriendButton(
 
 
 @Composable
-fun FriendItem(friend: User) {
+fun FriendItem(
+    friend: User,
+    onEvent: (FriendsScreenEvent) -> Unit
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -417,7 +422,7 @@ fun FriendItem(friend: User) {
             .fillMaxWidth()
             .clip(RoundedCornerShape(15.dp))
             .background(ConstColours.MAIN_BACK_GRAY)
-
+            .clickable(onClick = {onEvent(FriendsScreenEvent.ShowFriendAccount(friend))})
     ) {
         Box(
             modifier = Modifier.padding(end = 12.dp)
@@ -514,7 +519,8 @@ fun FriendItemPreview() {
                     name = "Тестовый Друг",
                     avatarUrl = null,
                     isOnline = true
-                )
+                ),
+                onEvent = {}
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -525,7 +531,8 @@ fun FriendItemPreview() {
                     name = "Друг со статусом",
                     avatarUrl = null,
                     description = "С описанием"
-                )
+                ),
+                onEvent = {}
             )
         }
     }
