@@ -106,6 +106,9 @@ dependencies {
     // Media
     implementation(libs.bundles.camerax)
     implementation(libs.coil.compose)
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.ui)
+    implementation(libs.media3.session)
 
     // Networking
     implementation(libs.kotlinx.coroutines.android)

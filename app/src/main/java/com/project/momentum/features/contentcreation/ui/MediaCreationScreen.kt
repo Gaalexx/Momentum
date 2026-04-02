@@ -176,9 +176,7 @@ private fun takePhoto(
     val contentValues = ContentValues().apply {
         put(MediaStore.MediaColumns.DISPLAY_NAME, name)
         put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Momentum")
-        }
+        put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/Momentum")
     }
 
     val metadata = ImageCapture.Metadata().apply {
@@ -325,8 +323,6 @@ fun CameraLikeScreen(
     onGoToFriends: () -> Unit,
     maxRecordMs: Int = 10_000
 ) {
-    val backGround = ConstColours.BLACK
-    val iconTint = ConstColours.WHITE
 
     val context = LocalContext.current
     var torchEnabled by remember { mutableStateOf(false) }
@@ -424,7 +420,7 @@ fun CameraLikeScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(backGround)
+            .background(ConstColours.BLACK)
             .windowInsetsPadding(WindowInsets.systemBars),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -589,7 +585,7 @@ fun CameraLikeScreen(
                         Icons.Outlined.WbSunny,
                         modifier = Modifier.size(40.dp),
                         contentDescription = stringResource(R.string.icon_flash),
-                        tint = iconTint
+                        tint = ConstColours.WHITE
                     )
                 }
 
@@ -638,7 +634,7 @@ fun CameraLikeScreen(
                         Icons.Outlined.Cached,
                         modifier = Modifier.size(40.dp),
                         contentDescription = "Flip camera",
-                        tint = iconTint
+                        tint = ConstColours.WHITE
                     )
                 }
             }
@@ -649,11 +645,11 @@ fun CameraLikeScreen(
 
         IconButton(
             onClick = onGoToGallery
-        ){
+        ) {
             Icon(
                 imageVector = Icons.Outlined.KeyboardArrowUp,
                 contentDescription = "Swipe up",
-                tint = iconTint.copy(alpha = 0.6f),
+                tint = ConstColours.WHITE.copy(alpha = 0.6f),
                 modifier = Modifier
                     .size(34.dp)
             )
