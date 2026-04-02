@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.NavKey
@@ -202,8 +201,8 @@ fun MainScreen() {
             // Экраны создания контента
             entry<NavRoutes.Camera> {
                 CameraLikeScreen(
-                    onGoToPreview = { uri ->
-                        openOverlay(NavRoutes.SendPhoto(uri.toString()))
+                    onGoToPreview = { uri, mediaType ->
+                        openOverlay(NavRoutes.SendPhoto(uri.toString(), mediaType))
                     },
                     onGoToRecorder = {
                         setBase(NavRoutes.Recorder)
@@ -325,8 +324,10 @@ fun MainScreen() {
 
             entry<NavRoutes.SendPhoto> { route ->
                 val uri = Uri.parse(route.uri)
+                val mediaType = route.mediaTypeToSend
                 SendPhotoScreen(
                     uri = uri,
+                    mediaType = mediaType,
                     onGoToTakePhoto = {
                         closeOverlay()
                     },

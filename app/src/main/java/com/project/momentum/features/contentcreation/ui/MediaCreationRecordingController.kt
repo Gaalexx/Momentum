@@ -1,5 +1,6 @@
 package com.project.momentum.features.contentcreation.ui
 
+import android.net.Uri
 import androidx.camera.video.VideoRecordEvent
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
@@ -9,6 +10,8 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import com.project.momentum.features.contentcreation.data.CameraScreenState
+import com.project.momentum.features.contentcreation.data.MediaTypeToSend
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -25,24 +28,33 @@ class CameraRecordingController(
 
     private var progressJob: Job? = null
 
-    fun start() {
+    fun start(
+        onSaved: (Uri, MediaTypeToSend) -> Unit
+    ) {
         if (state.hasActiveRecording) return
 
         state.prepareRecording()
         var newRecording: androidx.camera.video.Recording? = null
-        newRecording = captureActions.startRecording(state.videoCapture) { event ->
-            when (event) {
-                is VideoRecordEvent.Start -> {
-                    state.markRecordingStarted()
-                    if (state.consumeStopRequest()) {
-                        newRecording?.stop()
+        newRecording =
+            captureActions.startRecording(state.videoCapture, onSaved = onSaved) { event ->
+                when (event) {
+                    is VideoRecordEvent.Start -> {
+                        state.markRecordingStarted()
+                        if (state.consumeStopRequest()) {
+                            newRecording?.stop()
+                        }
                     }
-                }
 
-                is VideoRecordEvent.Finalize -> state.clearRecording()
-                else -> Unit
+                    is VideoRecordEvent.Finalize -> {
+                        if (!event.hasError()) {
+                            onSaved(event.outputResults.outputUri, MediaTypeToSend.VIDEO)
+                        }
+                        state.clearRecording()
+                    }
+
+                    else -> Unit
+                }
             }
-        }
 
         state.attachRecording(newRecording)
         launchProgress()

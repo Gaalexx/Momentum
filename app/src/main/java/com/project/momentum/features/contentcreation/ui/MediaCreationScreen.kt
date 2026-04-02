@@ -9,6 +9,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.project.momentum.features.contentcreation.data.MediaTypeToSend
+import com.project.momentum.features.contentcreation.data.rememberCameraPermissionState
+import com.project.momentum.features.contentcreation.data.rememberCameraScreenState
 import com.project.momentum.features.contentcreation.ui.assets.CameraLikeContent
 
 private const val DefaultMaxRecordMs = 10_000
@@ -16,7 +19,7 @@ private const val DefaultMaxRecordMs = 10_000
 @Composable
 fun CameraLikeScreen(
     modifier: Modifier = Modifier,
-    onGoToPreview: (Uri) -> Unit,
+    onGoToPreview: (Uri, MediaTypeToSend) -> Unit,
     onGoToRecorder: () -> Unit,
     onProfileClick: () -> Unit,
     onGoToGallery: () -> Unit,
@@ -52,8 +55,11 @@ fun CameraLikeScreen(
                 onSaved = onGoToPreview,
             )
         },
-        onStartRecording = recordingController::start,
-        onStopRecording = { recordingController.stop() },
+        onStartRecording = { recordingController.start(onSaved = onGoToPreview) },
+        onStopRecording = {
+
+            recordingController.stop()
+        },
         onGoToRecorder = onGoToRecorder,
         onProfileClick = onProfileClick,
         onGoToGallery = onGoToGallery,

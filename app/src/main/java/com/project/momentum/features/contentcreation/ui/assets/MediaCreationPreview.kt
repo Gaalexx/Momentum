@@ -26,7 +26,7 @@ import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.project.momentum.features.contentcreation.ui.CameraPreviewContainer
-import com.project.momentum.features.contentcreation.ui.CameraScreenState
+import com.project.momentum.features.contentcreation.data.CameraScreenState
 import com.project.momentum.ui.theme.ConstColours
 
 private val PreviewCardShape = RoundedCornerShape(60.dp)

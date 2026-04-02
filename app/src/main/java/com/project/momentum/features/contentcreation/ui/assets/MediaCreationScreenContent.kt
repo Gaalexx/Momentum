@@ -14,7 +14,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.project.momentum.features.contentcreation.ui.CameraScreenState
+import com.project.momentum.features.contentcreation.data.CameraScreenState
 import com.project.momentum.ui.theme.ConstColours
 
 @Composable

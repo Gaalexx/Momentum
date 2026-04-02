@@ -21,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import com.project.momentum.R
+import com.project.momentum.features.contentcreation.data.MediaTypeToSend
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -30,7 +31,7 @@ class CameraCaptureActions(context: Context) {
     fun takePhoto(
         imageCapture: ImageCapture,
         isFrontCamera: Boolean,
-        onSaved: (Uri) -> Unit = {},
+        onSaved: (Uri, MediaTypeToSend) -> Unit,
         onError: (Exception) -> Unit = {},
     ) {
         val name = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US)
@@ -62,7 +63,7 @@ class CameraCaptureActions(context: Context) {
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     val savedUri = output.savedUri
                     if (savedUri != null) {
-                        onSaved(savedUri)
+                        onSaved(savedUri, MediaTypeToSend.PHOTO)
                     } else {
                         onError(IllegalStateException("ImageCapture returned a null Uri"))
                     }
@@ -77,8 +78,10 @@ class CameraCaptureActions(context: Context) {
 
     fun startRecording(
         videoCapture: VideoCapture<Recorder>,
+        onSaved: (Uri, MediaTypeToSend) -> Unit,
         onEvent: (VideoRecordEvent) -> Unit = {},
-    ): Recording {
+
+        ): Recording {
         val hasAudioPermission = ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.RECORD_AUDIO,

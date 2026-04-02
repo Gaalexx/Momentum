@@ -40,6 +40,8 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.project.momentum.R
+import com.project.momentum.features.contentcreation.data.MediaTypeToSend
+import com.project.momentum.features.contentcreation.data.rememberCameraPermissionState
 import com.project.momentum.features.contentcreation.viewmodel.ContentCreationViewModel
 import com.project.momentum.features.contentcreation.viewmodel.UploadEvent
 import com.project.momentum.features.contentcreation.viewmodel.UploadState
@@ -50,6 +52,7 @@ import com.project.momentum.ui.assets.CaptionBasicInput
 import com.project.momentum.ui.assets.FriendsPillButton
 import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
+import com.project.momentum.ui.assets.VideoPreview
 
 
 fun deleteByUri(context: Context, uri: Uri): Boolean {
@@ -66,13 +69,13 @@ fun deleteByUri(context: Context, uri: Uri): Boolean {
 
 @Composable
 fun SendPhotoScreen(
-    previewPainter: Painter? = null,
     modifier: Modifier = Modifier,
     onGoToTakePhoto: () -> Unit,
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
-    uri: Uri?,
+    uri: Uri,
+    mediaType: MediaTypeToSend,
     vm: ContentCreationViewModel = hiltViewModel()
 ) {
 
@@ -91,24 +94,17 @@ fun SendPhotoScreen(
         }
     }
 
-    val bg = ConstColours.BLACK
-    val chrome2 = ConstColours.MAIN_BACK_GRAY
-    val iconTint = ConstColours.WHITE
 
     val context = LocalContext.current
     var caption by rememberSaveable { mutableStateOf("") }
     val captionFocusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
-
-    var torchEnabled by remember { mutableStateOf(false) }
-
-    var lensFacing by remember { mutableIntStateOf(CameraSelector.LENS_FACING_BACK) }
     val hasCameraPermission by rememberCameraPermissionState()
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(bg)
+            .background(ConstColours.BLACK)
             .windowInsetsPadding(WindowInsets.systemBars),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -145,13 +141,25 @@ fun SendPhotoScreen(
                         .background(Color(0xFF2A2E39))
                         .align(Alignment.Center)
                 ) {
-                    AsyncImage(
-                        model = uri,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
+                    when (mediaType) {
+                        MediaTypeToSend.PHOTO -> {
+                            AsyncImage(
+                                model = uri,
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
+
+                        MediaTypeToSend.VIDEO -> {
+                            VideoPreview(context = context, uri)
+                        }
+
+                        MediaTypeToSend.AUDIO -> Box(modifier = Modifier.fillMaxSize())
+                        else -> Unit
+                    }
+
                     CaptionBasicInput(
                         caption,
                         { caption = it },
@@ -220,7 +228,7 @@ fun SendPhotoScreen(
                         Icons.Default.Cancel,
                         modifier = Modifier.size(40.dp),
                         contentDescription = stringResource(R.string.icon_flash),
-                        tint = iconTint
+                        tint = ConstColours.WHITE
                     )
 
                 }
@@ -260,7 +268,7 @@ fun SendPhotoScreen(
                         Icons.Outlined.TextFields,
                         modifier = Modifier.size(40.dp),
                         contentDescription = stringResource(R.string.icon_flip_camera),
-                        tint = iconTint
+                        tint = ConstColours.WHITE
                     )
                 }
             }
@@ -272,7 +280,7 @@ fun SendPhotoScreen(
         Icon(
             imageVector = Icons.Outlined.KeyboardArrowDown,
             contentDescription = "More",
-            tint = iconTint.copy(alpha = 0.9f),
+            tint = ConstColours.WHITE.copy(alpha = 0.9f),
             modifier = Modifier.size(34.dp)
         )
     }
@@ -284,12 +292,12 @@ fun SendPhotoScreen(
 private fun CameraLikeScreenPreview() {
     MaterialTheme {
         SendPhotoScreen(
-            previewPainter = null,
             onGoToTakePhoto = {},
             onProfileClick = {},
             onGoToSettings = {},
             onGoToFriends = {},
-            uri = null
+            mediaType = MediaTypeToSend.VIDEO,
+            uri = Uri.parse("https://avatars.mds.yandex.net/i?id=bd0db579c3e6b8b77e497c3185128489_l-13017849-images-thumbs&n=13")
         )
     }
 }

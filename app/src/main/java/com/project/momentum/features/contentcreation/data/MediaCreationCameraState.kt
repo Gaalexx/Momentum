@@ -1,4 +1,4 @@
-package com.project.momentum.features.contentcreation.ui
+package com.project.momentum.features.contentcreation.data
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -10,6 +10,7 @@ import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -19,6 +20,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+
+
+enum class MediaTypeToSend(val enumerate: Int) {
+    PHOTO(0),
+    VIDEO(1),
+    AUDIO(2)
+}
 
 @Stable
 class CameraScreenState(
@@ -121,7 +129,7 @@ fun rememberCameraPermissionState(): State<Boolean> {
     val hasPermission = remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
-                PackageManager.PERMISSION_GRANTED,
+                    PackageManager.PERMISSION_GRANTED,
         )
     }
 
@@ -131,7 +139,7 @@ fun rememberCameraPermissionState(): State<Boolean> {
         hasPermission.value = granted
     }
 
-    androidx.compose.runtime.LaunchedEffect(Unit) {
+    LaunchedEffect(Unit) {
         if (!hasPermission.value) {
             launcher.launch(Manifest.permission.CAMERA)
         }
