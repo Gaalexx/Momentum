@@ -72,7 +72,7 @@ internal fun CameraPreviewCard(
 }
 
 @Composable
-private fun RecordingBorderProgress(
+fun RecordingBorderProgress(
     progress: Float,
     modifier: Modifier = Modifier,
 ) {
