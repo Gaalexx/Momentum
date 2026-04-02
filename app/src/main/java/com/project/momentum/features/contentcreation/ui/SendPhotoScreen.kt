@@ -135,21 +135,28 @@ fun SendPhotoScreen(
             if (hasCameraPermission) {
                 Box(
                     Modifier
-                        .fillMaxWidth(0.95f)
+                        .fillMaxSize()
                         .aspectRatio(1f)
-                        .clip(RoundedCornerShape(60.dp))
-                        .background(Color(0xFF2A2E39))
-                        .align(Alignment.Center)
                 ) {
                     when (mediaType) {
                         MediaTypeToSend.PHOTO -> {
-                            AsyncImage(
-                                model = uri,
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
+                            Box(
+                                Modifier
+                                    .fillMaxWidth(0.95f)
+                                    .aspectRatio(1f)
+                                    .clip(RoundedCornerShape(60.dp))
+                                    .background(ConstColours.MAIN_BACK_GRAY)
+                                    .align(Alignment.Center)
+                            ){
+                                AsyncImage(
+                                    model = uri,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+
                         }
 
                         MediaTypeToSend.VIDEO -> {
