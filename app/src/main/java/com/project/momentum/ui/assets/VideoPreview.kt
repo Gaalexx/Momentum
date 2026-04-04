@@ -2,6 +2,7 @@ package com.project.momentum.ui.assets
 
 import android.content.Context
 import android.net.Uri
+import androidx.compose.animation.core.animateDecay
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -33,6 +34,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
 import kotlin.math.PI
+import kotlin.math.atan
 import kotlin.math.atan2
 import kotlin.math.hypot
 import kotlin.math.min
@@ -81,12 +83,13 @@ private fun updateCircularProgress(
 
     val center = Offset(size.width / 2f, size.height / 2f)
     val dx = touch.x - center.x
-    val dy = touch.y - center.y
-
-    var angle = atan2(dy, dx)
-    if (angle < 0) angle += 2f * PI.toFloat()
-
-    val progress = angle / (2f * PI.toFloat())
+    val dy = -(touch.y - center.y)
+    val angle = atan(dy / dx)
+    val progress = if (dx > 0) {
+        (PI.toFloat() / 2f - angle) / (2f * PI.toFloat())
+    } else {
+        (3f * PI.toFloat() / 2f - angle) / (2f * PI.toFloat())
+    }
     onProgressChanged(progress.coerceIn(0f, 1f))
 }
 
