@@ -12,36 +12,35 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavBackStack
-import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberDecoratedNavEntries
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.project.momentum.features.account.ui.AccountRoot
-import com.project.momentum.features.contentcreation.ui.CameraLikeScreen
-import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
 import com.project.momentum.features.auth.ui.AuthorizationAccountScreen
 import com.project.momentum.features.auth.ui.AuthorizationPasswordScreen
-import com.project.momentum.features.auth.ui.PasswordRecoveryScreen
-import com.project.momentum.features.posts.ui.GalleryScreen
-import com.project.momentum.features.contentcreation.ui.RecorderScreen
 import com.project.momentum.features.auth.ui.CreateAccountScreen
 import com.project.momentum.features.auth.ui.CreatePasswordScreen
 import com.project.momentum.features.auth.ui.InsertCodeScreen
-import com.project.momentum.features.friends.ui.FriendsScreenRoute
+import com.project.momentum.features.auth.ui.PasswordRecoveryScreen
+import com.project.momentum.features.contentcreation.ui.CameraLikeScreen
+import com.project.momentum.features.contentcreation.ui.RecorderScreen
+import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
 import com.project.momentum.features.editingAccount.EditingAccountRoot
+import com.project.momentum.features.friends.ui.FriendsScreenRoute
+import com.project.momentum.features.posts.ui.GalleryScreen
 import com.project.momentum.features.posts.ui.WatchPhotoScreenRoute
 import com.project.momentum.features.settings.ui.DeleteAccountCheckCodeScreen
+import com.project.momentum.features.settings.ui.DeleteAccountCheckPasswordScreen
+import com.project.momentum.features.settings.ui.DeleteAccountConfirmationScreen
+import com.project.momentum.features.settings.ui.SettingsMainScreen
+import com.project.momentum.features.settings.ui.SettingsPremiumScreen
 import com.project.momentum.navigation.viewmodel.AppStartState
 import com.project.momentum.navigation.viewmodel.AppStartViewModel
 import com.project.momentum.ui.common.LoadingOverlay
-import com.project.momentum.features.settings.ui.SettingsMainScreen
-import com.project.momentum.features.settings.ui.DeleteAccountCheckPasswordScreen
-import com.project.momentum.features.settings.ui.DeleteAccountConfirmationScreen
-import com.project.momentum.features.settings.ui.SettingsPremiumScreen
 
 @Composable
 fun MainScreen() {
@@ -285,8 +284,11 @@ fun MainScreen() {
                 }
             ) {
                 AccountRoot(
-                    onPostClick = { post ->
-                        openOverlay(NavRoutes.PreviewPhoto(post = post))
+                    onPostClick = { post, userName ->
+                        openOverlay(NavRoutes.PreviewPhoto(
+                            post = post,
+                            userName = userName
+                        ))
                     },
                     onEditClick = {
                         openOverlay(NavRoutes.EditAccount)
@@ -349,7 +351,8 @@ fun MainScreen() {
                     onGoToFriends = {
                         openOverlay(NavRoutes.Friends)
                     },
-                    postIndex = route.post
+                    postIndex = route.post,
+                    userName = route.userName
                 )
 
             }

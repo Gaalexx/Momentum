@@ -99,6 +99,9 @@ dependencies {
     implementation(libs.bundles.compose)
     implementation(libs.lottie.compose)
 
+    // Material
+    implementation(libs.androidx.compose.material3)
+
     // Architecture
     implementation(libs.bundles.lifecycle)
     implementation(libs.bundles.navigation)

@@ -2,21 +2,7 @@ package com.project.momentum.features.posts.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -26,48 +12,41 @@ import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.MoreHoriz
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-//import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
-import com.project.momentum.ui.theme.ConstColours
-//import com.project.momentum.ui.theme.AppTextStyles
-import com.project.momentum.ui.assets.BigCircleForMainScreenAction
-import com.project.momentum.ui.assets.FriendsPillButton
-import com.project.momentum.ui.assets.ProfileCircleButton
-import com.project.momentum.ui.assets.SettingsCircleButton
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.project.momentum.R
 import com.project.momentum.features.account.models.PostData
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.ui.assets.CaptionBasicLabel
 import com.project.momentum.ui.assets.ContinueButton
+import com.project.momentum.ui.assets.FriendsPillButton
+import com.project.momentum.ui.assets.ProfileCircleButton
+import com.project.momentum.ui.assets.SettingsCircleButton
+import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
+import com.project.momentum.ui.theme.ConstColours
+import kotlinx.coroutines.flow.MutableStateFlow
 
 
 @Composable
@@ -176,11 +155,22 @@ fun WatchPhotoScreenRoute(
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
     postIndex: Int,
+    userName: String? = null,
     postsViewModel: PostsViewModel = hiltViewModel()
 ) {
 
-    val uiState = postsViewModel.state.collectAsStateWithLifecycle()
-    val posts = uiState.value.posts
+    val uiState by postsViewModel.state.collectAsStateWithLifecycle()
+    
+    val userPosts by remember(userName) {
+        if (userName != null) {
+            postsViewModel.getUserPostsFlow(userName)
+        } else {
+            MutableStateFlow(null)
+        }
+    }.collectAsStateWithLifecycle()
+
+    val posts = if (userName == null) uiState.posts else (userPosts ?: listOf())
+
 
     WatchPhotoScreen(
         onGoToTakePhoto = onGoToTakePhoto,
@@ -191,8 +181,6 @@ fun WatchPhotoScreenRoute(
         postIndex = postIndex,
         posts = posts
     )
-
-
 }
 
 @Composable
@@ -212,7 +200,7 @@ fun WatchPhotoScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val pagerState = rememberPagerState(initialPage = postIndex, pageCount = { posts.size })
 
-    val currentPost by remember(posts, pagerState) {
+    val currentPost by remember(posts, pagerState.currentPage) {
         derivedStateOf { posts.getOrNull(pagerState.currentPage) }
     }
     //var curIndex by remember { mutableIntStateOf(postIndex) }
@@ -242,125 +230,118 @@ fun WatchPhotoScreen(
         Spacer(Modifier.height(12.dp))
 
 
-        VerticalPager(
-            state = pagerState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f)
-        ) { pageIndex ->
-            //curIndex = pageIndex
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.95f)
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(60.dp))
-                    .background(ConstColours.MAIN_BACK_GRAY)
-            ) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    AsyncImage(
-                        model = posts[pageIndex].presignedURL,
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-
-                    if (posts[pageIndex].title.isNotBlank()) {
-                        CaptionBasicLabel(
-                            text = posts[pageIndex].title,
-                            modifier = Modifier
-                                .align(Alignment.BottomStart)
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                                .focusRequester(captionFocusRequester)
-                        )
-                    }
-
-                }
-            }
-        }
-
-        currentPost?.let{
-            post ->
-            Text(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = post.getDate() ?: "",
-                color = ConstColours.WHITE,
-                style = AppTextStyles.SupportingText
-            )
-
-
-            Spacer(Modifier.height(75.dp))
-
-            ProfileLabel(
-                name = post.userName,
-                imageUrl = post.avatarPresignedURL
-            )
-        }
-
-
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            Column(
+        if (posts.isEmpty()) {
+            LoadingOverlay()
+        } else {
+            VerticalPager(
+                state = pagerState,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 40.dp)
-                    .align(Alignment.BottomCenter)
-            ) {
-                Row(
+                    .aspectRatio(1f)
+            ) { pageIndex ->
+                //curIndex = pageIndex
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 28.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .fillMaxWidth(0.95f)
+                        .aspectRatio(1f)
+                        .clip(RoundedCornerShape(60.dp))
+                        .background(ConstColours.MAIN_BACK_GRAY)
                 ) {
-                    IconButton(
-                        onClick = onGoToGallery,
-                        modifier = Modifier.size(50.dp)
-                    ) {
-                        Icon(
-                            Icons.Default.Photo,
-                            modifier = Modifier.size(40.dp),
-                            contentDescription = stringResource(R.string.icon_flash),
-                            tint = iconTint
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        AsyncImage(
+                            model = posts[pageIndex].presignedURL,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
                         )
-                    }
 
-                    Spacer(Modifier.weight(1f))
+                        if (posts[pageIndex].title.isNotBlank()) {
+                            CaptionBasicLabel(
+                                text = posts[pageIndex].title,
+                                modifier = Modifier
+                                    .align(Alignment.BottomStart)
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .focusRequester(captionFocusRequester)
+                            )
+                        }
 
-                    ContinueButton(
-                        onClick = onGoToTakePhoto,
-                        modifier = Modifier
-                            .width(200.dp)
-                            .height(75.dp),
-                        "Ответить",
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = ConstColours.MAIN_BRAND_BLUE,
-                            contentColor = ConstColours.WHITE
-                        )
-                    )
-                    Spacer(Modifier.weight(1f))
-
-                    IconButton(
-                        onClick = {
-                            captionFocusRequester.requestFocus()
-                            keyboardController?.show()
-                        },
-                        modifier = Modifier.size(50.dp)
-                    ) {
-                        Icon(
-                            Icons.Outlined.MoreHoriz,
-                            modifier = Modifier.size(40.dp),
-                            contentDescription = stringResource(R.string.icon_flip_camera),
-                            tint = iconTint
-                        )
                     }
                 }
-
-
             }
-            Spacer(Modifier.height(15.dp))
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
+
+        ) {
+            currentPost?.let { post ->
+                Text(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    text = post.getDate() ?: "",
+                    color = ConstColours.WHITE,
+                    style = AppTextStyles.SupportingText
+                )
+
+
+                Spacer(Modifier.weight(1f))
+
+                ProfileLabel(
+                    name = post.userName,
+                    imageUrl = post.avatarPresignedURL
+                )
+            }
+            Spacer(Modifier.weight(1f))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 28.dp)
+                    .padding(bottom = dimensionResource(R.dimen.medium_padding)),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                IconButton(
+                    onClick = onGoToGallery,
+                    modifier = Modifier.size(50.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Photo,
+                        modifier = Modifier.size(40.dp),
+                        contentDescription = stringResource(R.string.icon_flash),
+                        tint = iconTint
+                    )
+                }
+
+                ContinueButton(
+                    onClick = onGoToTakePhoto,
+                    modifier = Modifier
+                        .width(200.dp)
+                        .height(dimensionResource(R.dimen.button_size)),
+                    "Ответить",
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = ConstColours.MAIN_BRAND_BLUE,
+                        contentColor = ConstColours.WHITE
+                    )
+                )
+
+                IconButton(
+                    onClick = {
+                        captionFocusRequester.requestFocus()
+                        keyboardController?.show()
+                    },
+                    modifier = Modifier.size(50.dp)
+                ) {
+                    Icon(
+                        Icons.Outlined.MoreHoriz,
+                        modifier = Modifier.size(40.dp),
+                        contentDescription = stringResource(R.string.icon_flip_camera),
+                        tint = iconTint
+                    )
+                }
+            }
 
             Icon(
                 imageVector = Icons.Outlined.KeyboardArrowDown,
@@ -368,11 +349,8 @@ fun WatchPhotoScreen(
                 tint = iconTint.copy(alpha = 0.9f),
                 modifier = Modifier
                     .size(34.dp)
-                    .align(Alignment.BottomCenter)
             )
         }
-
-
     }
 }
 
@@ -397,7 +375,7 @@ private fun WatchPhotoScreenPreview() {
                     createdAt = "2026-03-12T14:38:50.690942Z"
                 ),
                 PostData(
-                    id = "1",
+                    id = "2",
                     userId = "preview-user",
                     userName = "PreviewName2",
                     title = "Description2",

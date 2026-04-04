@@ -1,7 +1,6 @@
 package com.project.momentum.navigation
 
 import androidx.navigation3.runtime.NavKey
-import com.project.momentum.features.account.models.PostData
 import kotlinx.serialization.Serializable
 
 // Все маршруты - просто сериализуемые классы
@@ -69,7 +68,10 @@ NavRoutes : NavKey {
 
 
     @Serializable
-    data class PreviewPhoto(val post: Int) : NavRoutes()
+    data class PreviewPhoto(
+        val post: Int,
+        val userName: String? = null
+    ) : NavRoutes()
 
     @Serializable
     data class SendPhoto(val uri: String) : NavRoutes()
