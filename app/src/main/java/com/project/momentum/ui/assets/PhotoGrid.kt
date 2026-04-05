@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
@@ -19,7 +20,6 @@ import coil.compose.SubcomposeAsyncImage
 import com.project.momentum.R
 import com.project.momentum.features.account.models.PostData
 import com.project.momentum.ui.theme.ConstColours
-import com.project.momentum.network.s3.PostDTO
 
 @Composable
 fun PhotoGrid(
@@ -46,7 +46,7 @@ fun PhotoGrid(
             items = displayItems,
             key = { item ->
                 when (item) {
-                    is GridItem.Post -> item.post.presignedURL
+                    is GridItem.Post -> item.post.id + item.post.presignedURL
                     GridItem.PlusButton -> "PLUS"
                 }
             }
@@ -124,8 +124,6 @@ fun S3PhotoGrid(
         posts.forEach { post -> add(S3GridItem.Post(post)) }
     }
 
-
-
     LazyVerticalGrid(
         columns = GridCells.Fixed(columns),
         modifier = modifier,
@@ -133,15 +131,15 @@ fun S3PhotoGrid(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        items(
+        itemsIndexed(
             items = displayItems,
-            key = { item ->
+            key = { index, item ->
                 when (item) {
-                    is S3GridItem.Post -> item.post.presignedURL
+                    is S3GridItem.Post -> "${item.post.id}_$index"
                     S3GridItem.PlusButton -> "PLUS"
                 }
             }
-        ) { item ->
+        ) { index, item ->
             Box(
                 modifier = Modifier
                     .aspectRatio(1f)
@@ -161,10 +159,10 @@ fun S3PhotoGrid(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .clickable {
-                                    onPostClick(
-                                        displayItems.indexOf(item)
-                                    )
-                                }, // TODO переделать под O(1) (просто поменять на indexedItems)
+                                    // Вычисляем индекс в оригинальном списке posts
+                                    val postIndex = if (showPlusButton) index - 1 else index
+                                    onPostClick(postIndex)
+                                },
                             loading = {
                                 Box(
                                     modifier = Modifier.fillMaxSize(),

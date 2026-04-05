@@ -28,6 +28,7 @@
     <string name="offline_auto_refresh">Когда соединение восстановится, попробуйте повторить попытку.</string>
 
     <string name="account_online_status">В сети</string>
+    <string name="account_offline_status">Не в сети</string>
     <string name="account_my_publications">Мои публикации</string>
     <string name="account_avatar">Аватар</string>
     <string name="userName">userName</string>

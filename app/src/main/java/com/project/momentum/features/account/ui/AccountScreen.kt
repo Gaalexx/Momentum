@@ -21,7 +21,7 @@ import com.project.momentum.ui.theme.ConstColours
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import android.content.Context
-import androidx.compose.foundation.Image
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import com.project.momentum.R
 import com.project.momentum.ui.assets.S3PhotoGrid
@@ -30,66 +30,62 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.project.momentum.features.account.models.PostData
 import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.account.viewmodel.AccountInfoViewModel
 import com.project.momentum.features.account.viewmodel.AccountMediaViewModel
 import com.project.momentum.features.account.viewmodel.MediaState
-import com.project.momentum.ui.assets.ButtonForDelete
-import com.project.momentum.ui.assets.EditButton
+import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.ui.assets.EditCircleButton
 import com.project.momentum.ui.theme.AppTextStyles
 
 
 @Composable
 fun AccountRoot(
-    modifier: Modifier = Modifier,
-    userStatus: String = stringResource(R.string.account_online_status),
-    onEditClick: () -> Unit = {},
-    onPostClick: (Int) -> Unit,
-    onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
     onAddPostClick: () -> Unit,
-    accountMediaViewModel: AccountMediaViewModel = hiltViewModel(),
+    modifier: Modifier = Modifier,
+    onEditClick: () -> Unit = {},
+    onPostClick: (Int, String) -> Unit,
+    onProfileClick: () -> Unit = {},
+    userStatus: String = stringResource(R.string.account_online_status),
+    postsViewModel: PostsViewModel = hiltViewModel(),
     accountInfoViewModel: AccountInfoViewModel = hiltViewModel()
 ) {
     val uiInfoState by accountInfoViewModel.state.collectAsStateWithLifecycle()
-    val uiMediaState by accountMediaViewModel.state.collectAsStateWithLifecycle()
+    val posts by postsViewModel.getUserPostsFlow(uiInfoState.name)
+        .collectAsStateWithLifecycle()
 
     AccountScreen(
+        uiInfoState = uiInfoState,
+        uiMediaState = MediaState(posts),
         modifier = modifier,
         userStatus = userStatus,
         onBackClick = onBackClick,
         onAddPostClick = onAddPostClick,
-        onPostClick = onPostClick,
+        onPostClick = { postId -> onPostClick(postId, uiInfoState.name) },
         onEditClick = onEditClick,
-        uiInfoState = uiInfoState,
-        uiMediaState = uiMediaState
     )
 }
 
 @Composable
 fun AccountScreen(
-    modifier: Modifier = Modifier,
-    userStatus: String = stringResource(R.string.account_online_status),
-    onEditClick: () -> Unit,
+    uiInfoState: AccountInfoState,
+    uiMediaState: MediaState,
     onPostClick: (Int) -> Unit,
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
-    onAddPostClick: () -> Unit,
-    uiInfoState: AccountInfoState,
-    uiMediaState: MediaState
+    modifier: Modifier = Modifier,
+    onAddPostClick: (() -> Unit)? = null,
+    onEditClick: (() -> Unit)? = null,
+    userStatus: String = stringResource(R.string.account_online_status),
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
     val iconTint = Color(0xFFEDEEF2) // TODO: fa fa fa what a faaa
     val textColor = ConstColours.WHITE
     val context: Context = LocalContext.current
-
 
 
     Column(
@@ -109,9 +105,12 @@ fun AccountScreen(
                 onClick = onBackClick
             )
             Spacer(Modifier.weight(1f))
-            EditCircleButton(
-                onClick = onEditClick,
-            )
+
+            if (onEditClick != null) {
+                EditCircleButton(
+                    onClick = onEditClick,
+                )
+            }
         }
 
         Spacer(Modifier.height(12.dp))
@@ -206,12 +205,12 @@ fun AccountScreen(
 
             S3PhotoGrid(
                 posts = uiMediaState.posts,
-                onPostClick = {},//onPostClick,
-                onAddPhotoClick = onAddPostClick,
+                onPostClick = onPostClick,
+                onAddPhotoClick = onAddPostClick ?: {},
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                showPlusButton = true,
+                showPlusButton = onAddPostClick != null,
                 columns = 3
             )
         }

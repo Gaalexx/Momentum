@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -37,11 +35,14 @@ import coil.compose.AsyncImage
 import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.ui.theme.AppTextStyles
 import android.content.res.Configuration
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
@@ -57,6 +58,7 @@ import com.project.momentum.ui.assets.AddFriendCircleButton
 import com.project.momentum.features.friends.ui.assets.AddFriendDialog
 import com.project.momentum.features.friends.ui.assets.FriendRequestCarousel
 import com.project.momentum.features.friends.viewmodel.FriendsScreenState
+import kotlinx.serialization.Serializable
 
 
 data class Friend(
@@ -71,6 +73,7 @@ data class FriendRequest(
     val avatarUrl: String? = null,
 )
 
+@Serializable
 data class User(
     val id: String,
     val name: String,
@@ -83,6 +86,7 @@ data class User(
 @Composable
 fun FriendsScreenRoute(
     onBackClick: () -> Unit,
+    onFriendClick: (User) -> Unit,
     viewModel: FriendsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
@@ -93,6 +97,7 @@ fun FriendsScreenRoute(
 
     FriendsScreen(
         onBackClick,
+        onFriendClick,
         uiState,
         addFriend,
         onEvent,
@@ -105,6 +110,7 @@ fun FriendsScreenRoute(
 @Composable
 fun FriendsScreen(
     onBackClick: () -> Unit,
+    onFriendClick: (User) -> Unit,
     uiState: FriendsScreenState,
     addFriend: () -> Unit,
     onEvent: (FriendsScreenEvent) -> Unit,
@@ -347,7 +353,8 @@ fun FriendsScreen(
                         key = { it.id }
                     ) { friend ->
                         FriendItem(
-                            friend = friend
+                            friend = friend,
+                            onFriendClick = onFriendClick
                         )
                     }
                 }
@@ -409,7 +416,10 @@ fun FriendButton(
 
 
 @Composable
-fun FriendItem(friend: User) {
+fun FriendItem(
+    friend: User,
+    onFriendClick: (User) -> Unit
+) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -417,7 +427,7 @@ fun FriendItem(friend: User) {
             .fillMaxWidth()
             .clip(RoundedCornerShape(15.dp))
             .background(ConstColours.MAIN_BACK_GRAY)
-
+            .clickable(onClick = { onFriendClick(friend) })
     ) {
         Box(
             modifier = Modifier.padding(end = 12.dp)
@@ -480,6 +490,7 @@ fun FriendItem(friend: User) {
 fun FriendsScreenPreview() {
     FriendsScreen(
         {},
+        {},
         FriendsScreenState(
             friends = listOf(User("123", "User 1"), User("321", "User 2")),
             friendRequests = listOf(
@@ -514,7 +525,8 @@ fun FriendItemPreview() {
                     name = "Тестовый Друг",
                     avatarUrl = null,
                     isOnline = true
-                )
+                ),
+                onFriendClick = {}
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -525,7 +537,8 @@ fun FriendItemPreview() {
                     name = "Друг со статусом",
                     avatarUrl = null,
                     description = "С описанием"
-                )
+                ),
+                onFriendClick = {}
             )
         }
     }

@@ -122,9 +122,8 @@ fun AddFriendDialog(
                     errorText = errorText,
                     placeholder = placeholder,
                     modifier = Modifier
-                        .fillMaxWidth(0.8f)
-                        .fillMaxHeight(0.6f),
-                    keyboardOptions = keyboardOptions,
+                        .fillMaxWidth(0.8f),
+                    keyboardOptions = keyboardOptions, // TODO: изменять в зависимости от selectedIndex
                 )
             }
 

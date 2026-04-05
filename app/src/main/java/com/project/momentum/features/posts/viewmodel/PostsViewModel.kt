@@ -6,11 +6,15 @@ import com.project.momentum.features.account.models.PostData
 import com.project.momentum.features.posts.repo.PostsRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.Instant
 import javax.inject.Inject
-import kotlin.collections.listOf
 
 data class PostsState(
     val posts: List<PostData>,
@@ -76,4 +80,15 @@ class PostsViewModel @Inject constructor(
         }
     }
 
+    fun getUserPostsFlow(userName: String): StateFlow<List<PostData>> {
+        return state.map { s ->
+            s.posts
+                .filter { it.userName == userName }
+                .sortedByDescending { it.createdAtInstantOrNull() ?: Instant.MIN }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = listOf()
+        )
+    }
 }
