@@ -21,6 +21,7 @@ import com.project.momentum.ui.theme.ConstColours
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import android.content.Context
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import com.project.momentum.R
 import com.project.momentum.ui.assets.S3PhotoGrid
@@ -35,34 +36,36 @@ import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.account.viewmodel.AccountInfoViewModel
 import com.project.momentum.features.account.viewmodel.AccountMediaViewModel
 import com.project.momentum.features.account.viewmodel.MediaState
+import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.ui.assets.EditCircleButton
 import com.project.momentum.ui.theme.AppTextStyles
 
 
 @Composable
 fun AccountRoot(
+    onBackClick: () -> Unit,
+    onAddPostClick: () -> Unit,
     modifier: Modifier = Modifier,
-    userStatus: String = stringResource(R.string.account_online_status),
     onEditClick: () -> Unit = {},
     onPostClick: (Int, String) -> Unit,
     onProfileClick: () -> Unit = {},
-    onBackClick: () -> Unit,
-    onAddPostClick: () -> Unit,
-    accountMediaViewModel: AccountMediaViewModel = hiltViewModel(),
+    userStatus: String = stringResource(R.string.account_online_status),
+    postsViewModel: PostsViewModel = hiltViewModel(),
     accountInfoViewModel: AccountInfoViewModel = hiltViewModel()
 ) {
     val uiInfoState by accountInfoViewModel.state.collectAsStateWithLifecycle()
-    val uiMediaState by accountMediaViewModel.state.collectAsStateWithLifecycle()
+    val posts by postsViewModel.getUserPostsFlow(uiInfoState.name)
+        .collectAsStateWithLifecycle()
 
     AccountScreen(
+        uiInfoState = uiInfoState,
+        uiMediaState = MediaState(posts),
         modifier = modifier,
         userStatus = userStatus,
         onBackClick = onBackClick,
         onAddPostClick = onAddPostClick,
-        onPostClick = onPostClick,
+        onPostClick = { postId -> onPostClick(postId, uiInfoState.name) },
         onEditClick = onEditClick,
-        uiInfoState = uiInfoState,
-        uiMediaState = uiMediaState
     )
 }
 
@@ -70,11 +73,11 @@ fun AccountRoot(
 fun AccountScreen(
     uiInfoState: AccountInfoState,
     uiMediaState: MediaState,
-    onPostClick: (Int, String) -> Unit,
+    onPostClick: (Int) -> Unit,
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
-    onAddPostClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onAddPostClick: (() -> Unit)? = null,
     onEditClick: (() -> Unit)? = null,
     userStatus: String = stringResource(R.string.account_online_status),
 ) {
@@ -202,12 +205,12 @@ fun AccountScreen(
 
             S3PhotoGrid(
                 posts = uiMediaState.posts,
-                onPostClick = { postId -> onPostClick(postId, uiInfoState.name) },
-                onAddPhotoClick = onAddPostClick,
+                onPostClick = onPostClick,
+                onAddPhotoClick = onAddPostClick ?: {},
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                showPlusButton = true,
+                showPlusButton = onAddPostClick != null,
                 columns = 3
             )
         }
@@ -219,7 +222,7 @@ fun AccountScreen(
 private fun AccountScreenPreview() {
     MaterialTheme {
         AccountScreen(
-            onPostClick = { _, _ -> },
+            onPostClick = {},
             onEditClick = {},
             onBackClick = {},
             onAddPostClick = {},
