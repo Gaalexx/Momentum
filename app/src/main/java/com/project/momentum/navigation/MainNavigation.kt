@@ -42,6 +42,7 @@ import com.project.momentum.features.settings.ui.SettingsPremiumScreen
 import com.project.momentum.navigation.viewmodel.AppStartState
 import com.project.momentum.navigation.viewmodel.AppStartViewModel
 import com.project.momentum.ui.common.LoadingOverlay
+import com.project.momentum.features.offline.ui.NoInternetScreen
 
 @Composable
 fun MainScreen() {
@@ -56,6 +57,7 @@ fun MainScreen() {
         AppStartState.Authorized -> NavRoutes.Camera
         AppStartState.Unauthorized -> NavRoutes.RegistrationLogin
         AppStartState.Loading -> null
+        AppStartState.NoInternetConnection -> NavRoutes.NoInternetConnection
     }
 
 
@@ -114,6 +116,15 @@ fun MainScreen() {
         )
 
         val navEntryProvider = entryProvider<NavKey> {
+            entry<NavRoutes.NoInternetConnection> {
+                NoInternetScreen(
+                    onRetryClick = {
+                        appStartViewModel.retrySession()
+                    },
+                    onOpenSettingsClick = {}
+                )
+            }
+
             // Экраны регистрации
             entry<NavRoutes.RegistrationLogin> {
                 CreateAccountScreen(
@@ -452,6 +463,7 @@ fun MainScreen() {
 
 private fun NavKey.isOverlayRoute(): Boolean {
     return when (this) {
+        is NavRoutes.NoInternetConnection,
         is NavRoutes.Camera,
         is NavRoutes.Recorder,
         is NavRoutes.Gallery -> false

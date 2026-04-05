@@ -9,6 +9,10 @@ import kotlinx.serialization.Serializable
 sealed class
 NavRoutes : NavKey {
     // Экраны без аргументов
+
+    @Serializable
+    data object NoInternetConnection : NavRoutes()
+
     @Serializable
     data object Camera : NavRoutes()
 

@@ -20,6 +20,13 @@
     <string name="button_plus">Добавить</string>
     <string name="button_send">Отправить</string>
 
+    <!-- Offline screen -->
+    <string name="offline_title">Нет интернета</string>
+    <string name="offline_description">Проверьте подключение к Wi-Fi или мобильной сети и попробуйте снова.</string>
+    <string name="offline_retry">Повторить</string>
+    <string name="offline_open_settings">Открыть настройки</string>
+    <string name="offline_auto_refresh">Когда соединение восстановится, попробуйте повторить попытку.</string>
+
     <string name="account_online_status">В сети</string>
     <string name="account_offline_status">Не в сети</string>
     <string name="account_my_publications">Мои публикации</string>

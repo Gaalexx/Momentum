@@ -7,21 +7,38 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import javax.inject.Singleton
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.retain.retain
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import java.net.ConnectException
+
+sealed interface AuthError {
+    data object NoInternetConnectionError : AuthError
+}
+
+sealed interface AuthResult {
+    data class Success(val token: String?) : AuthResult
+    data class Error(val error: AuthError) : AuthResult
+}
 
 @Singleton
 class AuthUseCase @Inject constructor(
     private val registrationRepository: RegistrationRepository
 ) {
-    suspend fun authorize(): String? {
-        return registrationRepository.authorize()
-    }
+    suspend fun authorize(): AuthResult =
+        try {
+            AuthResult.Success(registrationRepository.authorize())
+        } catch (ex: Exception) {
+            AuthResult.Error(AuthError.NoInternetConnectionError)
+        }
+
+
 }
 
 sealed interface AppStartState {
     data object Loading : AppStartState
+    data object NoInternetConnection : AppStartState
     data object Authorized : AppStartState
     data object Unauthorized : AppStartState
 }
@@ -39,18 +56,30 @@ class AppStartViewModel @Inject constructor(
         if (state != AppStartState.Loading) return
 
         viewModelScope.launch {
-            val token = auth.authorize()
+            val res = auth.authorize()
 
-            state = if (token != null) {
-                AppStartState.Authorized
-            } else {
-                AppStartState.Unauthorized
+
+            state = when (res) {
+                is AuthResult.Success -> {
+                    if (res.token != null) {
+                        AppStartState.Authorized
+                    } else {
+                        AppStartState.Unauthorized
+                    }
+                }
+
+                is AuthResult.Error -> {
+                    when (res.error) {
+                        is AuthError.NoInternetConnectionError -> AppStartState.NoInternetConnection
+                    }
+                }
             }
         }
     }
 
-    suspend fun tryAuth(): Boolean {
-        return auth.authorize() != null
+    fun retrySession() {
+        state = AppStartState.Loading
+        restoreSession()
     }
-}
 
+}
