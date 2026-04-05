@@ -227,6 +227,9 @@ fun MainScreen() {
                     onCameraClick = {
                         setBase(NavRoutes.Camera)
                     },
+                    onGoToPreview = { uri, mediaType ->
+                        openOverlay(NavRoutes.SendPhoto(uri.toString(), mediaType))
+                    },
                     onGoToFriends = {
                         openOverlay(NavRoutes.Friends)
                     },

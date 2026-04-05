@@ -63,6 +63,7 @@ import com.project.momentum.features.contentcreation.viewmodel.UploadEvent
 import com.project.momentum.features.contentcreation.viewmodel.UploadState
 import com.project.momentum.network.s3.MediaType
 import com.project.momentum.network.s3.PostInformation
+import com.project.momentum.ui.assets.AudioPreview
 import com.project.momentum.ui.assets.BigCircleSendPhotoAction
 import com.project.momentum.ui.assets.CaptionBasicInput
 import com.project.momentum.ui.assets.FriendsPillButton
@@ -177,11 +178,12 @@ fun SendPhotoScreen(
                         }
 
                         MediaTypeToSend.VIDEO -> {
-                            VideoPreview(context = context, uri)
+                            VideoPreview(context = context, uri = uri)
                         }
 
-                        MediaTypeToSend.AUDIO -> Box(modifier = Modifier.fillMaxSize())
-                        else -> Unit
+                        MediaTypeToSend.AUDIO -> {
+                            AudioPreview(context = context, uri = uri)
+                        }
                     }
 
                     CaptionBasicInput(
@@ -243,9 +245,7 @@ fun SendPhotoScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = {
-                    if (uri != null) {
-                        deleteByUri(context = context, uri = uri)
-                    }
+                    deleteByUri(context = context, uri = uri)
                     onGoToTakePhoto()
                 }, modifier = Modifier.size(50.dp)) {
                     Icon(
@@ -260,8 +260,17 @@ fun SendPhotoScreen(
                 Spacer(Modifier.weight(1f))
                 BigCircleSendPhotoAction(
                     onClick = {
-                        val safeUri = uri ?: return@BigCircleSendPhotoAction
-                        val mimeType = context.contentResolver.getType(safeUri) ?: "image/jpeg"
+                        val safeUri = uri
+                        val mimeType = context.contentResolver.getType(safeUri) ?: when (mediaType) {
+                            MediaTypeToSend.PHOTO -> "image/jpeg"
+                            MediaTypeToSend.VIDEO -> "video/mp4"
+                            MediaTypeToSend.AUDIO -> "audio/3gpp"
+                        }
+                        val uploadMediaType = when (mediaType) {
+                            MediaTypeToSend.PHOTO -> MediaType.IMAGE
+                            MediaTypeToSend.VIDEO -> MediaType.VIDEO
+                            MediaTypeToSend.AUDIO -> MediaType.AUDIO
+                        }
                         val size = context.contentResolver.openFileDescriptor(safeUri, "r")
                             ?.use { pfd -> pfd.statSize }?.takeIf { it >= 0 } ?: 0L
 
@@ -270,7 +279,7 @@ fun SendPhotoScreen(
                                 PostInformation(
                                     safeUri,
                                     mimeType,
-                                    MediaType.IMAGE,
+                                    uploadMediaType,
                                     size = size,
                                     label = caption
                                 )

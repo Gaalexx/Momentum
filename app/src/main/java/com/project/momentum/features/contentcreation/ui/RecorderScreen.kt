@@ -40,7 +40,6 @@ import androidx.core.content.ContextCompat
 import android.media.MediaRecorder
 import android.os.Environment
 import android.provider.MediaStore
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import java.io.File
@@ -59,6 +58,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.drawscope.Stroke
 import com.project.momentum.R
+import com.project.momentum.features.contentcreation.data.MediaTypeToSend
 import com.project.momentum.ui.assets.BigCircleMicroButton
 import com.project.momentum.ui.assets.BigCircleSendPhotoAction
 import com.project.momentum.ui.assets.CaptionBasicInput
@@ -238,6 +238,7 @@ fun RecorderScreen(
     onGoToFriends: () -> Unit,              // Для перехода к друзьям
     onProfileClick: () -> Unit,              // Для перехода в профиль
     onGoToSettings: () -> Unit,              // Для перехода в настройки
+    onGoToPreview: (Uri, MediaTypeToSend) -> Unit,
     onGoToGallery: () -> Unit,               // Для перехода в галерею
     modifier: Modifier = Modifier
 ) {
@@ -371,6 +372,7 @@ fun RecorderScreen(
         // Нижняя секция с микрофоном и состояниями
         SecondaryImagesSection(
             mainState = mainState,
+            onGoToPreview = onGoToPreview,
             onGoToGallery = onGoToGallery
         )
     }
@@ -392,6 +394,7 @@ class MainState {
 @Composable
 fun SecondaryImagesSection(
     mainState: MainState,
+    onGoToPreview: (Uri, MediaTypeToSend) -> Unit,
     onGoToGallery: () -> Unit
 ) {
     var isImage1Tinted by remember { mutableStateOf(false) }
@@ -471,16 +474,26 @@ fun SecondaryImagesSection(
     }
 
     fun longPressEnd() {
-        if (isImage1Tinted) {
-            if (mainState.isRecording) {
-                stopRecording(mainState)
-                isLongPressActive = false
-            } else {
-                stopRequested = true
-            }
-            progressJob?.cancel()
-            mainState.recordingProgress = 0f
+        if (!isImage1Tinted) return
+
+        if (!mainState.isRecording) {
+            stopRequested = true
+            return
         }
+
+        stopRecording(mainState)
+        progressJob?.cancel()
+        mainState.recordingProgress = 0f
+
+        val previewUri = mainState.audioFile?.let { file ->
+            saveToMediaStore(context, file)?.also {
+                file.delete()
+                mainState.audioFile = null
+            }
+        }
+
+        resetToInitialState()
+        previewUri?.let { onGoToPreview(it, MediaTypeToSend.AUDIO) }
     }
 
     fun startProgressAnimation() {
@@ -554,11 +567,11 @@ fun SecondaryImagesSection(
                             onClick = {
                                 mainState.audioFile?.let { file ->
                                     saveToMediaStore(context, file)?.let { uri ->
-                                        Toast.makeText(
-                                            context,
-                                            "Аудио сохранено: $uri",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        file.delete()
+                                        mainState.audioFile = null
+                                        resetToInitialState()
+                                        onGoToPreview(uri, MediaTypeToSend.AUDIO)
+                                        return@BigCircleSendPhotoAction
                                     }
                                 }
                                 resetToInitialState()
@@ -657,5 +670,5 @@ private fun formatElapsedTime(milliseconds: Long): String {
 @Preview()
 @Composable
 fun preview() {
-    RecorderScreen({}, {}, {}, {}, {})
+    RecorderScreen({}, {}, {}, {}, { _, _ -> }, {})
 }
