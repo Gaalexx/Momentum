@@ -9,6 +9,7 @@ import com.project.momentum.features.account.models.PostData
 import com.project.momentum.features.editingAccount.EditAccountErrorFields
 import com.project.momentum.features.editingAccount.EditAccountFields
 import com.project.momentum.features.editingAccount.ErrorType
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -33,6 +34,8 @@ class AccountRepository @Inject constructor(
                 )
             )
         }
+        posts.sortByDescending { it.createdAtInstantOrNull() ?: Instant.MIN }
+
         return posts
     }
 

@@ -135,7 +135,7 @@ class RegistrationViewModel @Inject constructor(
     }
 
     override fun previousStep() {
-        if (!_state.value.canGoBack) return
+//        if (!_state.value.canGoBack) return
 
         _state.update {
             it.copy(

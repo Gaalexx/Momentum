@@ -44,14 +44,39 @@ fun GalleryScreen(
     onGoToFriends: () -> Unit,
     viewModel: PostsViewModel = hiltViewModel()
 ) {
-    val bg = ConstColours.BLACK
-    val textColor = Color.White
-
-
     val state = viewModel.state.collectAsStateWithLifecycle()
     val posts = state.value.posts
     val isLoading = state.value.isRefreshing
 
+    GalleryScreenContent(
+        modifier = modifier,
+        posts = posts,
+        isLoading = isLoading,
+        onRefresh = { viewModel.onEvent(GalleryEvent.OnRefreshPosts) },
+        onPostClick = onPostClick,
+        onAddPhoto = onAddPhoto,
+        onProfileClick = onProfileClick,
+        onBackClick = onBackClick,
+        onGoToSettings = onGoToSettings,
+        onGoToFriends = onGoToFriends
+    )
+}
+
+@Composable
+private fun GalleryScreenContent(
+    modifier: Modifier = Modifier,
+    posts: List<PostData>,
+    isLoading: Boolean,
+    onRefresh: () -> Unit,
+    onPostClick: (Int) -> Unit,
+    onAddPhoto: () -> Unit = {},
+    onProfileClick: () -> Unit = {},
+    onBackClick: () -> Unit,
+    onGoToSettings: () -> Unit,
+    onGoToFriends: () -> Unit,
+) {
+    val bg = ConstColours.BLACK
+    val textColor = Color.White
 
     Box(
         modifier = modifier
@@ -99,7 +124,7 @@ fun GalleryScreen(
                     .fillMaxWidth()
                     .weight(1f),
                 isRefreshing = isLoading,
-                onRefresh = { viewModel.onEvent(GalleryEvent.OnRefreshPosts) }
+                onRefresh = onRefresh
             ) {
                 S3PhotoGrid(
                     posts = posts,
@@ -120,13 +145,15 @@ fun GalleryScreen(
 @Composable
 private fun GalleryScreenPreview() {
     MaterialTheme {
-        GalleryScreen(
+        GalleryScreenContent(
+            posts = listOf(),
+            isLoading = false,
+            onRefresh = {},
             onPostClick = {},
             onProfileClick = {},
             onBackClick = {},
             onGoToSettings = {},
-            onGoToFriends = {},
-            viewModel = viewModel()
+            onGoToFriends = {}
         )
     }
 }
