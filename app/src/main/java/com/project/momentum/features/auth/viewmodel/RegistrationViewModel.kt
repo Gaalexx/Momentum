@@ -22,9 +22,9 @@ class RegistrationViewModel @Inject constructor(
     var passwordRepetition by mutableStateOf("")
         private set
 
-    override fun isValidPassword(): PasswordState {
+    override fun isValidPassword(): ErrorLogin {
         if (_state.value.userData.password != passwordRepetition) {
-            return PasswordState.NOT_MATCH
+            return ErrorLogin.PasswordError.NOT_MATCH
         }
         return super.isValidPassword()
     }
@@ -34,8 +34,8 @@ class RegistrationViewModel @Inject constructor(
     }
 
     override fun nextStep() {
-        validateCurrentStep()
-        if (!_state.value.isStepValid) return
+        validateCurrentStep(isValidPassword())
+        if (_state.value.isError) return
 
         when (_state.value.currentStep) {
             LoginStep.LOGIN -> {
@@ -61,11 +61,7 @@ class RegistrationViewModel @Inject constructor(
                                 it.copy(
                                     isError = true,
                                     isLoading = false,
-                                    //TODO: завести класс для ошибок enum или что-то поумнее
-                                    errorMessage = when (_state.value.loginType) {
-                                        LoginType.EMAIL -> "Аккаунт с такой почтой уже существует"
-                                        else -> "Аккаунт с таким телефоном уже существует"
-                                    }
+                                    errorMessage = ErrorLogin.LoginError.ALREADY_EXISTS_IN_DB
                                 )
                             }
                         }
@@ -75,7 +71,7 @@ class RegistrationViewModel @Inject constructor(
                             it.copy(
                                 isError = true,
                                 isLoading = false,
-                                errorMessage = "Такого Email не существует"
+                                errorMessage = ErrorLogin.LoginError.NOT_EXISTS
                             )
                         }
                     }
@@ -100,8 +96,7 @@ class RegistrationViewModel @Inject constructor(
                             it.copy(
                                 isError = true,
                                 isLoading = false,
-                                //TODO: завести класс для ошибок enum или что-то поумнее
-                                errorMessage = "Неверный код"
+                                errorMessage = ErrorLogin.CodeError.INVALID
                             )
                         }
                     }
@@ -146,7 +141,7 @@ class RegistrationViewModel @Inject constructor(
                 }
             )
         }
-        validateCurrentStep()
+        validateCurrentStep(isValidPassword())
     }
 
     fun sendCodeAgain() {

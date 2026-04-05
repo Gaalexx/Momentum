@@ -16,7 +16,7 @@ class AuthorizationViewModel @Inject constructor(
 ) : LoginViewModel() {
     override fun nextStep() {
         validateCurrentStep()
-        if (!_state.value.isStepValid) return
+        if (_state.value.isError) return
 
         when (_state.value.currentStep) {
             LoginStep.LOGIN -> {
@@ -37,11 +37,7 @@ class AuthorizationViewModel @Inject constructor(
                             it.copy(
                                 isError = true,
                                 isLoading = false,
-                                //TODO: завести класс для ошибок enum или что-то поумнее
-                                errorMessage = when (_state.value.loginType) {
-                                    LoginType.EMAIL -> "Аккаунта с такой почтой не существует"
-                                    else -> "Аккаунта с таким телефоном не существует"
-                                }
+                                errorMessage = ErrorLogin.LoginError.NOT_EXISTS_IN_DB
                             )
                         }
                     }
@@ -69,7 +65,7 @@ class AuthorizationViewModel @Inject constructor(
                             it.copy(
                                 isError = true,
                                 isLoading = false,
-                                errorMessage = "Неверный пароль"
+                                errorMessage = ErrorLogin.CodeError.INVALID
                             )
                         }
                     }
@@ -99,8 +95,7 @@ class AuthorizationViewModel @Inject constructor(
                             it.copy(
                                 isError = true,
                                 isLoading = false,
-                                //TODO: завести класс для ошибок enum или что-то поумнее
-                                errorMessage = "Неверный код"
+                                errorMessage = ErrorLogin.CodeError.INVALID
                             )
                         }
                     }

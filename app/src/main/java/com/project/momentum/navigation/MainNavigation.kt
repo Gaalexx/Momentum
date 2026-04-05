@@ -20,11 +20,15 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.project.momentum.features.account.ui.AccountRoot
+import com.project.momentum.features.auth.ui.AuthorizationAccountRoot
 import com.project.momentum.features.auth.ui.AuthorizationAccountScreen
+import com.project.momentum.features.auth.ui.AuthorizationPasswordRoot
 import com.project.momentum.features.auth.ui.AuthorizationPasswordScreen
 import com.project.momentum.features.auth.ui.CreateAccountRoot
 import com.project.momentum.features.auth.ui.CreatePasswordRoot
+import com.project.momentum.features.auth.ui.InsertCodeRoot
 import com.project.momentum.features.auth.ui.InsertCodeScreen
+import com.project.momentum.features.auth.ui.PasswordRecoveryRoot
 import com.project.momentum.features.auth.ui.PasswordRecoveryScreen
 import com.project.momentum.features.contentcreation.ui.CameraLikeScreen
 import com.project.momentum.features.contentcreation.ui.RecorderScreen
@@ -141,7 +145,7 @@ fun MainScreen() {
             }
 
             entry<NavRoutes.RegistrationCode> {
-                InsertCodeScreen(
+                InsertCodeRoot(
                     onBackClick = {
                         closeOverlay()
                     },
@@ -164,7 +168,7 @@ fun MainScreen() {
 
             // Экраны входа
             entry<NavRoutes.AuthorizationLogin> {
-                AuthorizationAccountScreen(
+                AuthorizationAccountRoot(
                     onBackClick = {
                         closeOverlay()
                     },
@@ -175,7 +179,7 @@ fun MainScreen() {
             }
 
             entry<NavRoutes.AuthorizationPassword> {
-                AuthorizationPasswordScreen(
+                AuthorizationPasswordRoot(
                     onBackClick = {
                         closeOverlay()
                     },
@@ -189,7 +193,7 @@ fun MainScreen() {
             }
 
             entry<NavRoutes.AuthorizationCode> {
-                PasswordRecoveryScreen(
+                PasswordRecoveryRoot(
                     onBackClick = {
                         closeOverlay()
                     },
