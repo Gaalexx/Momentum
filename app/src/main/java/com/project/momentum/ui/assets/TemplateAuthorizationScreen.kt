@@ -40,6 +40,7 @@ fun TemplateAuthorizationScreen(
     modifier: Modifier = Modifier,
     placeholder: String? = null,
     isError: Boolean = false,
+    errorText: String? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
     val bg = ConstColours.BLACK
@@ -76,6 +77,7 @@ fun TemplateAuthorizationScreen(
 //                    modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
                     placeholder = placeholder,
                     isError = isError,
+                    errorText = errorText,
                     keyboardOptions = keyboardOptions,
                 )
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))

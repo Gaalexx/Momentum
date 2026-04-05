@@ -22,8 +22,8 @@ import androidx.navigation3.ui.NavDisplay
 import com.project.momentum.features.account.ui.AccountRoot
 import com.project.momentum.features.auth.ui.AuthorizationAccountScreen
 import com.project.momentum.features.auth.ui.AuthorizationPasswordScreen
-import com.project.momentum.features.auth.ui.CreateAccountScreen
-import com.project.momentum.features.auth.ui.CreatePasswordScreen
+import com.project.momentum.features.auth.ui.CreateAccountRoot
+import com.project.momentum.features.auth.ui.CreatePasswordRoot
 import com.project.momentum.features.auth.ui.InsertCodeScreen
 import com.project.momentum.features.auth.ui.PasswordRecoveryScreen
 import com.project.momentum.features.contentcreation.ui.CameraLikeScreen
@@ -32,6 +32,7 @@ import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
 import com.project.momentum.features.editingAccount.EditingAccountRoot
 import com.project.momentum.features.friends.ui.FriendAccountRoot
 import com.project.momentum.features.friends.ui.FriendsScreenRoute
+import com.project.momentum.features.offline.ui.NoInternetScreen
 import com.project.momentum.features.posts.ui.GalleryScreen
 import com.project.momentum.features.posts.ui.WatchPhotoScreenRoute
 import com.project.momentum.features.settings.ui.DeleteAccountCheckCodeScreen
@@ -42,7 +43,6 @@ import com.project.momentum.features.settings.ui.SettingsPremiumScreen
 import com.project.momentum.navigation.viewmodel.AppStartState
 import com.project.momentum.navigation.viewmodel.AppStartViewModel
 import com.project.momentum.ui.common.LoadingOverlay
-import com.project.momentum.features.offline.ui.NoInternetScreen
 
 @Composable
 fun MainScreen() {
@@ -127,7 +127,7 @@ fun MainScreen() {
 
             // Экраны регистрации
             entry<NavRoutes.RegistrationLogin> {
-                CreateAccountScreen(
+                CreateAccountRoot(
                     onBackClick = {
                         closeOverlay()
                     },
@@ -152,7 +152,7 @@ fun MainScreen() {
             }
 
             entry<NavRoutes.RegistrationPassword> {
-                CreatePasswordScreen(
+                CreatePasswordRoot(
                     onBackClick = {
                         closeOverlay()
                     },

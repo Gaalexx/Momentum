@@ -6,18 +6,32 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.project.momentum.R
+import com.project.momentum.features.auth.models.LoginState
 import com.project.momentum.features.auth.models.LoginType
 import com.project.momentum.features.auth.models.NavEvent
 import com.project.momentum.features.auth.viewmodel.AuthorizationViewModel
 import com.project.momentum.ui.assets.TemplateAuthorizationScreen
 
+@Preview
 @Composable
-fun AuthorizationAccountScreen(
+fun AuthorizationAccountScreenPreview() {
+    AuthorizationAccountScreen(
+        uiState = LoginState(),
+        onValueChange = {},
+        onBackClick = {},
+        onContinueClick = {},
+        onSubButtonClick = {}
+    )
+}
+
+@Composable
+fun AuthorizationAccountRoot(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -34,6 +48,32 @@ fun AuthorizationAccountScreen(
         }
     }
 
+    AuthorizationAccountScreen(
+        uiState = uiState,
+        onValueChange = { viewModel.updateUserEmail(it) },
+        onBackClick = {
+            viewModel.previousStep()
+            onBackClick()
+        },
+        onContinueClick = {
+            viewModel.nextStep()
+        },
+        onSubButtonClick = {
+            viewModel.switchLoginType()
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun AuthorizationAccountScreen(
+    uiState: LoginState,
+    onValueChange: (String) -> Unit,
+    onBackClick: () -> Unit,
+    onContinueClick: () -> Unit,
+    onSubButtonClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     TemplateAuthorizationScreen(
         value = when (uiState.loginType) {
             LoginType.EMAIL -> uiState.userData.email
@@ -50,19 +90,18 @@ fun AuthorizationAccountScreen(
                 LoginType.EMAIL -> R.string.button_authorization_by_phone_number
                 else -> R.string.button_authorization_by_email
             },
-        onValueChange = { viewModel.updateUserEmail(it) },
-        onBackClick = {
-            viewModel.previousStep()
-            onBackClick()
-        },
-        onContinueClick = {
-            viewModel.nextStep()
-        },
-        onSubButtonClick = {
-            viewModel.switchLoginType()
-        },
+        onValueChange = onValueChange,
+        onBackClick = onBackClick,
+        onContinueClick = onContinueClick,
+        onSubButtonClick = onSubButtonClick,
         modifier = modifier,
+        placeholder =
+            stringResource(when (uiState.loginType) {
+                LoginType.EMAIL -> R.string.placeholder_email
+                else -> R.string.placeholder_phone_number
+            }),
         isError = uiState.isError,
+        errorText = uiState.errorMessage,
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType =
                 when (uiState.loginType) {
@@ -71,14 +110,5 @@ fun AuthorizationAccountScreen(
                 },
             imeAction = ImeAction.Done
         ),
-    )
-}
-
-@Preview
-@Composable
-fun AuthorizationAccountScreenPreview() {
-    AuthorizationAccountScreen(
-        onBackClick = {},
-        onContinueClick = {},
     )
 }

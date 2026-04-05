@@ -26,6 +26,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.R
+import com.project.momentum.features.auth.models.LoginState
+import com.project.momentum.features.auth.models.LoginStep
 import com.project.momentum.features.auth.models.NavEvent
 import com.project.momentum.features.auth.viewmodel.RegistrationViewModel
 import com.project.momentum.ui.assets.TextFieldRegistration
@@ -33,8 +35,21 @@ import com.project.momentum.ui.assets.TopBarTemplate
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
 
+@Preview(showBackground = true)
 @Composable
-fun CreatePasswordScreen(
+fun CreatePasswordScreenPreview() {
+    CreatePasswordScreen(
+        uiState = LoginState(currentStep = LoginStep.PASSWORD, isError = true, errorMessage = "Что-то пошло не так"),
+        passwordRepetition = "",
+        onValueChangeFirst = {},
+        onValueChangeSecond = {},
+        onBackClick = {},
+        onContinueClick = {}
+    )
+}
+
+@Composable
+fun CreatePasswordRoot(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -51,12 +66,37 @@ fun CreatePasswordScreen(
         }
     }
 
-    TopBarTemplate(
-        label = R.string.label_create_account,
+    CreatePasswordScreen(
+        uiState = uiState,
+        passwordRepetition = viewModel.passwordRepetition,
         onBackClick = {
             viewModel.previousStep()
             onBackClick()
         },
+        onValueChangeFirst = { viewModel.updateUserPassword(it) },
+        onValueChangeSecond = { viewModel.updateUserPasswordRepetition(it) },
+        onContinueClick = {
+            viewModel.nextStep()
+        },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun CreatePasswordScreen(
+    uiState: LoginState,
+    passwordRepetition: String,
+    onValueChangeFirst: (String) -> Unit,
+    onValueChangeSecond: (String) -> Unit,
+    onBackClick: () -> Unit,
+    onContinueClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+
+
+    TopBarTemplate(
+        label = R.string.label_create_account,
+        onBackClick = onBackClick,
         modifier = modifier
     ) { paddingValues ->
         Box(
@@ -86,9 +126,11 @@ fun CreatePasswordScreen(
 
                     TextFieldRegistration(
                         value = uiState.userData.password,
-                        onValueChange = { viewModel.updateUserPassword(it) },
+                        onValueChange = onValueChangeFirst,
 //                        modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
+                        placeholder = stringResource(R.string.placeholder_password),
                         isError = uiState.isError,
+                        errorText = uiState.errorMessage,
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Password,
                             imeAction = ImeAction.Next
@@ -97,10 +139,12 @@ fun CreatePasswordScreen(
                     Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
 
                     TextFieldRegistration(
-                        value = viewModel.passwordRepetition,
-                        onValueChange = { viewModel.updateUserPasswordRepetition(it) },
+                        value = passwordRepetition,
+                        onValueChange = onValueChangeSecond,
 //                        modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
+                        placeholder = stringResource(R.string.placeholder_password_repetition),
                         isError = uiState.isError,
+                        errorText = uiState.errorMessage,
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Password,
                             imeAction = ImeAction.Done
@@ -109,22 +153,11 @@ fun CreatePasswordScreen(
                     Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
 
                     ContinueButton(
-                        onClick = {
-                            viewModel.nextStep()
-                        },
+                        onClick = onContinueClick,
                         modifier = Modifier.height(dimensionResource(R.dimen.button_size))
                     )
                 }
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun CreatePasswordScreenPreview() {
-    CreatePasswordScreen(
-        onBackClick = {},
-        onContinueClick = {}
-    )
 }

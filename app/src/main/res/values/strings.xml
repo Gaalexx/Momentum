@@ -90,6 +90,10 @@
     <string name="insert_email">Введите почту</string>
     <string name="insert_phone_number">Введите номер телефона</string>
     <string name="insert_code_phone">Введите код с телефона</string>
+    <string name="placeholder_email">email@gmail.com</string>
+    <string name="placeholder_phone_number">+X (XXX) XXX XXXX</string>
+    <string name="placeholder_password">Пароль</string>
+    <string name="placeholder_password_repetition">Повторите пароль</string>
 
     //Authorization
     <string name="label_authorization">Вход</string>
@@ -149,6 +153,7 @@
     <string name="email">Почта</string>
     <string name="telephone_number">Номер</string>
     <string name="login">Логин</string>
+    <string name="placeholder_code">X X X X X X</string>
 
 
 </resources>

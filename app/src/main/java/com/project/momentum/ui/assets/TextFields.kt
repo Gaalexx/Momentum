@@ -1,6 +1,9 @@
 package com.project.momentum.ui.assets
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
@@ -80,11 +83,21 @@ fun TextFieldRegistration(
 @Preview(showBackground = false)
 @Composable
 fun TextFieldRegistrationPreview() {
-    TextFieldRegistration(
-        value = "",
-        onValueChange = {},
-        placeholder = "Введите текст...",
-        errorText = "Ошибочка",
-        isError = true
-    )
+    Column {
+        TextFieldRegistration(
+            value = "",
+            onValueChange = {},
+            placeholder = "Введите текст...",
+            errorText = "Ошибочка",
+            isError = true
+        )
+        Spacer(Modifier.height(8.dp))
+        TextFieldRegistration(
+            value = "",
+            onValueChange = {},
+            placeholder = "Введите текст...",
+            errorText = "Ошибочка",
+            isError = true
+        )
+    }
 }

@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.R
+import com.project.momentum.features.auth.models.LoginState
 import com.project.momentum.features.auth.models.NavEvent
 import com.project.momentum.features.auth.viewmodel.RegistrationViewModel
 import com.project.momentum.ui.assets.TemplateAuthorizationScreen
@@ -37,6 +39,8 @@ import com.project.momentum.ui.common.LoadingOverlay
 @Composable
 fun CreateAccountScreenPreview() {
     CreateAccountScreen(
+        uiState = LoginState(), // (isError = true, errorMessage = "Что-то пошло не так"),
+        onValueChange = {},
         onBackClick = {},
         onContinueClick = {},
         onSubButtonClick = {}
@@ -44,7 +48,7 @@ fun CreateAccountScreenPreview() {
 }
 
 @Composable
-fun CreateAccountScreen(
+fun CreateAccountRoot(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
     onSubButtonClick: () -> Unit,
@@ -62,6 +66,31 @@ fun CreateAccountScreen(
         }
     }
 
+    CreateAccountScreen(
+        uiState = uiState,
+        onValueChange = { viewModel.updateUserEmail(it) },
+        onBackClick = {
+            viewModel.previousStep() // TODO: if canGoBack == false => не показывать кнопку
+            onBackClick()
+        },
+        onContinueClick = {
+            viewModel.nextStep()
+        },
+        onSubButtonClick = onSubButtonClick,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun CreateAccountScreen(
+    uiState: LoginState,
+    onValueChange: (String) -> Unit,
+    onBackClick: () -> Unit,
+    onContinueClick: () -> Unit,
+    onSubButtonClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+
     Box{
         if (uiState.isLoading) {
             LoadingOverlay()
@@ -71,17 +100,14 @@ fun CreateAccountScreen(
                 label = R.string.label_create_account,
                 title = R.string.insert_email,
                 subButtonText = R.string.button_already_have_account,
-                onValueChange = { viewModel.updateUserEmail(it) },
-                onBackClick = {
-                    viewModel.previousStep() // TODO: if canGoBack == false => не показывать кнопку
-                    onBackClick()
-                },
-                onContinueClick = {
-                    viewModel.nextStep()
-                },
+                onValueChange = onValueChange,
+                onBackClick = onBackClick,
+                onContinueClick = onContinueClick,
                 onSubButtonClick = onSubButtonClick,
                 modifier = modifier,
+                placeholder = stringResource(R.string.placeholder_email),
                 isError = uiState.isError,
+                errorText = uiState.errorMessage,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Done

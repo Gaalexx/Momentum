@@ -6,19 +6,34 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.project.momentum.R
+import com.project.momentum.features.auth.models.LoginState
+import com.project.momentum.features.auth.models.LoginStep
 import com.project.momentum.features.auth.models.LoginType
 import com.project.momentum.features.auth.models.NavEvent
 import com.project.momentum.features.auth.viewmodel.RegistrationViewModel
 import com.project.momentum.ui.assets.TemplateAuthorizationScreen
 import com.project.momentum.ui.common.LoadingOverlay
 
+@Preview(showBackground = true)
 @Composable
-fun InsertCodeScreen(
+fun InsertCodeScreenPreview() {
+    InsertCodeScreen(
+        uiState = LoginState(currentStep = LoginStep.VERIFICATION),
+        onValueChange = {},
+        onBackClick = {},
+        onContinueClick = {},
+        onSubButtonClick = {},
+    )
+}
+
+@Composable
+fun InsertCodeRoot(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -34,6 +49,34 @@ fun InsertCodeScreen(
             }
         }
     }
+
+    InsertCodeScreen(
+        uiState = uiState,
+        onValueChange = { viewModel.updateUserCode(it) },
+        onBackClick = {
+            viewModel.previousStep()
+            onBackClick()
+        },
+        onContinueClick = {
+            viewModel.nextStep()
+        },
+        onSubButtonClick = {
+            viewModel.sendCodeAgain()
+        },
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun InsertCodeScreen(
+    uiState: LoginState,
+    onValueChange: (String) -> Unit,
+    onBackClick: () -> Unit,
+    onContinueClick: () -> Unit,
+    onSubButtonClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+
     if (uiState.isLoading) {
         LoadingOverlay()
     } else {
@@ -46,32 +89,18 @@ fun InsertCodeScreen(
                     else -> R.string.insert_code_phone
                 },
             subButtonText = R.string.button_send_code_again,
-            onValueChange = { viewModel.updateUserCode(it) },
-            onBackClick = {
-                viewModel.previousStep()
-                onBackClick()
-            },
-            onContinueClick = {
-                viewModel.nextStep()
-            },
-            onSubButtonClick = {
-                viewModel.sendCodeAgain()
-            },
+            onValueChange = onValueChange,
+            onBackClick = onBackClick,
+            onContinueClick = onContinueClick,
+            onSubButtonClick = onSubButtonClick,
             modifier = modifier,
+            placeholder = stringResource(R.string.placeholder_code),
             isError = uiState.isError,
+            errorText = uiState.errorMessage,
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
             ),
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun InsertCodeScreenPreview() {
-    InsertCodeScreen(
-        onBackClick = {},
-        onContinueClick = {},
-    )
 }
