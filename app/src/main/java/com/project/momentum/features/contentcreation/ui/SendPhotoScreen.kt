@@ -2,54 +2,75 @@
 
 package com.project.momentum.features.contentcreation.ui
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import com.project.momentum.ui.theme.ConstColours
-
 import android.content.Context
 import android.net.Uri
-import coil.compose.AsyncImage
-import androidx.camera.core.CameraSelector
-import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.PhotoCamera
+import androidx.compose.material.icons.outlined.TextFields
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.project.momentum.R
+import com.project.momentum.features.contentcreation.data.MediaTypeToSend
+import com.project.momentum.features.contentcreation.data.rememberCameraPermissionState
 import com.project.momentum.features.contentcreation.viewmodel.ContentCreationViewModel
 import com.project.momentum.features.contentcreation.viewmodel.UploadEvent
 import com.project.momentum.features.contentcreation.viewmodel.UploadState
 import com.project.momentum.network.s3.MediaType
 import com.project.momentum.network.s3.PostInformation
+import com.project.momentum.ui.assets.AudioPreview
 import com.project.momentum.ui.assets.BigCircleSendPhotoAction
 import com.project.momentum.ui.assets.CaptionBasicInput
 import com.project.momentum.ui.assets.FriendsPillButton
 import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
+import com.project.momentum.ui.assets.VideoPreview
+import com.project.momentum.ui.theme.ConstColours
 
 
 fun deleteByUri(context: Context, uri: Uri): Boolean {
@@ -66,13 +87,13 @@ fun deleteByUri(context: Context, uri: Uri): Boolean {
 
 @Composable
 fun SendPhotoScreen(
-    previewPainter: Painter? = null,
     modifier: Modifier = Modifier,
     onGoToTakePhoto: () -> Unit,
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
-    uri: Uri?,
+    uri: Uri,
+    mediaType: MediaTypeToSend,
     vm: ContentCreationViewModel = hiltViewModel()
 ) {
 
@@ -91,24 +112,17 @@ fun SendPhotoScreen(
         }
     }
 
-    val bg = ConstColours.BLACK
-    val chrome2 = ConstColours.MAIN_BACK_GRAY
-    val iconTint = ConstColours.WHITE
 
     val context = LocalContext.current
     var caption by rememberSaveable { mutableStateOf("") }
     val captionFocusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
-
-    var torchEnabled by remember { mutableStateOf(false) }
-
-    var lensFacing by remember { mutableIntStateOf(CameraSelector.LENS_FACING_BACK) }
     val hasCameraPermission by rememberCameraPermissionState()
 
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(bg)
+            .background(ConstColours.BLACK)
             .windowInsetsPadding(WindowInsets.systemBars),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -139,19 +153,39 @@ fun SendPhotoScreen(
             if (hasCameraPermission) {
                 Box(
                     Modifier
-                        .fillMaxWidth(0.95f)
+                        .fillMaxSize()
                         .aspectRatio(1f)
-                        .clip(RoundedCornerShape(60.dp))
-                        .background(Color(0xFF2A2E39))
-                        .align(Alignment.Center)
                 ) {
-                    AsyncImage(
-                        model = uri,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
+                    when (mediaType) {
+                        MediaTypeToSend.PHOTO -> {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth(0.95f)
+                                    .aspectRatio(1f)
+                                    .clip(RoundedCornerShape(60.dp))
+                                    .background(ConstColours.MAIN_BACK_GRAY)
+                                    .align(Alignment.Center)
+                            ) {
+                                AsyncImage(
+                                    model = uri,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+
+                        }
+
+                        MediaTypeToSend.VIDEO -> {
+                            VideoPreview(context = context, uri = uri)
+                        }
+
+                        MediaTypeToSend.AUDIO -> {
+                            AudioPreview(context = context, uri = uri)
+                        }
+                    }
+
                     CaptionBasicInput(
                         caption,
                         { caption = it },
@@ -211,16 +245,14 @@ fun SendPhotoScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = {
-                    if (uri != null) {
-                        deleteByUri(context = context, uri = uri)
-                    }
+                    deleteByUri(context = context, uri = uri)
                     onGoToTakePhoto()
                 }, modifier = Modifier.size(50.dp)) {
                     Icon(
                         Icons.Default.Cancel,
                         modifier = Modifier.size(40.dp),
                         contentDescription = stringResource(R.string.icon_flash),
-                        tint = iconTint
+                        tint = ConstColours.WHITE
                     )
 
                 }
@@ -228,8 +260,17 @@ fun SendPhotoScreen(
                 Spacer(Modifier.weight(1f))
                 BigCircleSendPhotoAction(
                     onClick = {
-                        val safeUri = uri ?: return@BigCircleSendPhotoAction
-                        val mimeType = context.contentResolver.getType(safeUri) ?: "image/jpeg"
+                        val safeUri = uri
+                        val mimeType = context.contentResolver.getType(safeUri) ?: when (mediaType) {
+                            MediaTypeToSend.PHOTO -> "image/jpeg"
+                            MediaTypeToSend.VIDEO -> "video/mp4"
+                            MediaTypeToSend.AUDIO -> "audio/3gpp"
+                        }
+                        val uploadMediaType = when (mediaType) {
+                            MediaTypeToSend.PHOTO -> MediaType.IMAGE
+                            MediaTypeToSend.VIDEO -> MediaType.VIDEO
+                            MediaTypeToSend.AUDIO -> MediaType.AUDIO
+                        }
                         val size = context.contentResolver.openFileDescriptor(safeUri, "r")
                             ?.use { pfd -> pfd.statSize }?.takeIf { it >= 0 } ?: 0L
 
@@ -238,7 +279,7 @@ fun SendPhotoScreen(
                                 PostInformation(
                                     safeUri,
                                     mimeType,
-                                    MediaType.IMAGE,
+                                    uploadMediaType,
                                     size = size,
                                     label = caption
                                 )
@@ -260,7 +301,7 @@ fun SendPhotoScreen(
                         Icons.Outlined.TextFields,
                         modifier = Modifier.size(40.dp),
                         contentDescription = stringResource(R.string.icon_flip_camera),
-                        tint = iconTint
+                        tint = ConstColours.WHITE
                     )
                 }
             }
@@ -272,7 +313,7 @@ fun SendPhotoScreen(
         Icon(
             imageVector = Icons.Outlined.KeyboardArrowDown,
             contentDescription = "More",
-            tint = iconTint.copy(alpha = 0.9f),
+            tint = ConstColours.WHITE.copy(alpha = 0.9f),
             modifier = Modifier.size(34.dp)
         )
     }
@@ -284,12 +325,12 @@ fun SendPhotoScreen(
 private fun CameraLikeScreenPreview() {
     MaterialTheme {
         SendPhotoScreen(
-            previewPainter = null,
             onGoToTakePhoto = {},
             onProfileClick = {},
             onGoToSettings = {},
             onGoToFriends = {},
-            uri = null
+            mediaType = MediaTypeToSend.VIDEO,
+            uri = Uri.parse("https://avatars.mds.yandex.net/i?id=bd0db579c3e6b8b77e497c3185128489_l-13017849-images-thumbs&n=13")
         )
     }
 }

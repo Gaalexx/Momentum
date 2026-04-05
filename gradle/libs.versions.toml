@@ -33,6 +33,7 @@ camerax = "1.3.4"
 coil = "2.7.0"
 composeBom = "2024.09.00"
 lottie = "6.7.1"
+media3 = "1.10.0"
 
 # Testing
 androidxJunit = "1.3.0"
@@ -89,6 +90,10 @@ ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "kto
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
 # Media and imaging
+media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3" }
+media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
+media3-session = { module = "androidx.media3:media3-session", version.ref = "media3" }
+media3-compose = { module = "androidx.media3:media3-ui-compose", version.ref = "media3" }
 camerax-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camerax" }
 camerax-core = { module = "androidx.camera:camera-core", version.ref = "camerax" }
 camerax-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camerax" }

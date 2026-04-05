@@ -202,8 +202,8 @@ fun MainScreen() {
             // Экраны создания контента
             entry<NavRoutes.Camera> {
                 CameraLikeScreen(
-                    onGoToPreview = { uri ->
-                        openOverlay(NavRoutes.SendPhoto(uri.toString()))
+                    onGoToPreview = { uri, mediaType ->
+                        openOverlay(NavRoutes.SendPhoto(uri.toString(), mediaType))
                     },
                     onGoToRecorder = {
                         setBase(NavRoutes.Recorder)
@@ -227,6 +227,9 @@ fun MainScreen() {
                 RecorderScreen(
                     onCameraClick = {
                         setBase(NavRoutes.Camera)
+                    },
+                    onGoToPreview = { uri, mediaType ->
+                        openOverlay(NavRoutes.SendPhoto(uri.toString(), mediaType))
                     },
                     onGoToFriends = {
                         openOverlay(NavRoutes.Friends)
@@ -354,8 +357,10 @@ fun MainScreen() {
 
             entry<NavRoutes.SendPhoto> { route ->
                 val uri = Uri.parse(route.uri)
+                val mediaType = route.mediaTypeToSend
                 SendPhotoScreen(
                     uri = uri,
+                    mediaType = mediaType,
                     onGoToTakePhoto = {
                         closeOverlay()
                     },
