@@ -1,6 +1,7 @@
 package com.project.momentum.navigation
 
 import androidx.navigation3.runtime.NavKey
+import com.project.momentum.features.friends.ui.User
 import kotlinx.serialization.Serializable
 
 // Все маршруты - просто сериализуемые классы
@@ -62,6 +63,9 @@ NavRoutes : NavKey {
     // Экраны с аргументами
     @Serializable
     data class Account(val backTo: String) : NavRoutes()
+
+    @Serializable
+    data class FriendAccount(val friend: User) : NavRoutes()
 
     @Serializable
     data class Settings(val backTo: String) : NavRoutes()

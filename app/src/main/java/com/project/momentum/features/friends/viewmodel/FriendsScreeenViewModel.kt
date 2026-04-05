@@ -57,8 +57,6 @@ sealed interface FriendsScreenEvent {
 
     data class AddFriendQueryChange(val newValue: String) : FriendsScreenEvent
     data class ChangeSelectedIndex(val newIndex: SelectedIndex) : FriendsScreenEvent
-
-    data class ShowFriendAccount(val friend: User) : FriendsScreenEvent
 }
 
 @HiltViewModel
@@ -94,12 +92,7 @@ class FriendsViewModel @Inject constructor(
             is FriendsScreenEvent.AddFriendQueryChange -> onAddFriendQueryChange(event)
             is FriendsScreenEvent.SearchQueryChange -> onSearchQueryChange(event)
             is FriendsScreenEvent.ChangeSelectedIndex -> onChangeSelectedIndex(event)
-            is FriendsScreenEvent.ShowFriendAccount -> onShowFriendAccount(event)
         }
-    }
-
-    private fun onShowFriendAccount(value: FriendsScreenEvent.ShowFriendAccount) {
-        //TODO: переход в аккаунт друга
     }
 
     private fun onChangeSelectedIndex(value: FriendsScreenEvent.ChangeSelectedIndex) {

@@ -30,6 +30,7 @@ import com.project.momentum.features.contentcreation.ui.CameraLikeScreen
 import com.project.momentum.features.contentcreation.ui.RecorderScreen
 import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
 import com.project.momentum.features.editingAccount.EditingAccountRoot
+import com.project.momentum.features.friends.ui.FriendAccountRoot
 import com.project.momentum.features.friends.ui.FriendsScreenRoute
 import com.project.momentum.features.posts.ui.GalleryScreen
 import com.project.momentum.features.posts.ui.WatchPhotoScreenRoute
@@ -299,6 +300,29 @@ fun MainScreen() {
                     onAddPostClick = { openOverlay(NavRoutes.Camera) }
                 )
             }
+
+            entry<NavRoutes.FriendAccount>(
+                metadata = NavDisplay.transitionSpec {
+                    slideInHorizontally(
+                        initialOffsetX = { -it },
+                        animationSpec = tween(500)
+                    ) togetherWith ExitTransition.KeepUntilTransitionsFinished
+                }
+            ) { route ->
+                FriendAccountRoot(
+                    friend = route.friend,
+                    onPostClick = { post, userName ->
+                        openOverlay(NavRoutes.PreviewPhoto(
+                            post = post,
+                            userName = userName
+                        ))
+                    },
+                    onBackClick = {
+                        closeOverlay()
+                    }
+                )
+            }
+
             entry<NavRoutes.EditAccount> {
                 EditingAccountRoot(
                     onBackClick = { closeOverlay() },
@@ -310,6 +334,9 @@ fun MainScreen() {
                 FriendsScreenRoute(
                     onBackClick = {
                         closeOverlay()
+                    },
+                    onFriendClick = { friend ->
+                        openOverlay(NavRoutes.FriendAccount(friend))
                     }
                 )
             }
