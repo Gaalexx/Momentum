@@ -101,7 +101,7 @@ fun AuthorizationAccountScreen(
                 else -> R.string.placeholder_phone_number
             }),
         isError = uiState.isError,
-        errorText = uiState.errorMessage,
+        errorText = handlingErrorLogin(uiState),
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType =
                 when (uiState.loginType) {

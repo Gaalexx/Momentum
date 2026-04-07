@@ -14,8 +14,13 @@ import javax.inject.Inject
 class AuthorizationViewModel @Inject constructor(
     private val repository: RegistrationRepository,
 ) : LoginViewModel() {
+    override fun isValidPassword(): ErrorLogin {
+        if (super.isValidPassword() !is ErrorLogin.None) return ErrorLogin.PasswordError.INVALID
+        return ErrorLogin.None
+    }
+
     override fun nextStep() {
-        validateCurrentStep()
+        validateCurrentStep(isValidPassword())
         if (_state.value.isError) return
 
         when (_state.value.currentStep) {
@@ -65,7 +70,7 @@ class AuthorizationViewModel @Inject constructor(
                             it.copy(
                                 isError = true,
                                 isLoading = false,
-                                errorMessage = ErrorLogin.CodeError.INVALID
+                                errorMessage = ErrorLogin.PasswordError.INVALID
                             )
                         }
                     }
@@ -119,7 +124,7 @@ class AuthorizationViewModel @Inject constructor(
                 }
             )
         }
-        validateCurrentStep()
+        validateCurrentStep(isValidPassword())
     }
 
     fun onCodeAuthorization() {

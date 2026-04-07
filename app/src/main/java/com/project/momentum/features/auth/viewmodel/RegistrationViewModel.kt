@@ -107,7 +107,7 @@ class RegistrationViewModel @Inject constructor(
                 _state.update { it.copy(isLoading = true) }
 
                 viewModelScope.launch {
-                    val refreshToken = repository.sendUserData(_state.value)
+                    val refreshToken = repository.register(_state.value)
                     if (refreshToken != null) {
                         repository.apply {
                             saveToken(refreshToken)

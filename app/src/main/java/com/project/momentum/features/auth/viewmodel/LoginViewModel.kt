@@ -20,7 +20,7 @@ sealed interface ErrorLogin {
     object None: ErrorLogin
 
     enum class PasswordError: ErrorLogin {
-        NOT_MATCH, EMPTY, TOO_SHORT, NO_DIGITS, NO_LOWERCASE_LETTERS, NO_UPPERCASE_LETTERS
+        NOT_MATCH, EMPTY, TOO_SHORT, NO_DIGITS, NO_LOWERCASE_LETTERS, NO_UPPERCASE_LETTERS, INVALID
     }
 
     enum class LoginError: ErrorLogin {

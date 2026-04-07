@@ -75,7 +75,7 @@ fun AuthorizationPasswordScreen(
         modifier = modifier,
         placeholder = stringResource(R.string.placeholder_password),
         isError = uiState.isError,
-        errorText = uiState.errorMessage,
+        errorText = handlingErrorLogin(uiState),
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Password,
             imeAction = ImeAction.Done

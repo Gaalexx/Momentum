@@ -29,6 +29,7 @@ import com.project.momentum.R
 import com.project.momentum.features.auth.models.LoginState
 import com.project.momentum.features.auth.models.LoginStep
 import com.project.momentum.features.auth.models.NavEvent
+import com.project.momentum.features.auth.viewmodel.ErrorLogin
 import com.project.momentum.features.auth.viewmodel.RegistrationViewModel
 import com.project.momentum.ui.assets.TextFieldRegistration
 import com.project.momentum.ui.assets.TopBarTemplate
@@ -39,7 +40,7 @@ import com.project.momentum.ui.theme.AppTextStyles
 @Composable
 fun CreatePasswordScreenPreview() {
     CreatePasswordScreen(
-        uiState = LoginState(currentStep = LoginStep.PASSWORD, isError = true, errorMessage = "Что-то пошло не так"),
+    uiState = LoginState(currentStep = LoginStep.PASSWORD, isError = true, errorMessage = ErrorLogin.PasswordError.NO_DIGITS),
         passwordRepetition = "",
         onValueChangeFirst = {},
         onValueChangeSecond = {},
@@ -130,7 +131,7 @@ fun CreatePasswordScreen(
 //                        modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
                         placeholder = stringResource(R.string.placeholder_password),
                         isError = uiState.isError,
-                        errorText = uiState.errorMessage,
+                        errorText = handlingErrorLogin(uiState),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Password,
                             imeAction = ImeAction.Next
@@ -144,7 +145,7 @@ fun CreatePasswordScreen(
 //                        modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
                         placeholder = stringResource(R.string.placeholder_password_repetition),
                         isError = uiState.isError,
-                        errorText = uiState.errorMessage,
+                        errorText = handlingErrorLogin(uiState),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Password,
                             imeAction = ImeAction.Done

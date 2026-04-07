@@ -107,7 +107,7 @@ fun CreateAccountScreen(
                 modifier = modifier,
                 placeholder = stringResource(R.string.placeholder_email),
                 isError = uiState.isError,
-                errorText = uiState.errorMessage,
+                errorText = handlingErrorLogin(uiState),
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Done
