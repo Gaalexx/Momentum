@@ -94,19 +94,19 @@ fun TemplateSettingsMain(
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_in_app_switch),
                 enabled = state.serverSettingsState.inAppNotifications,
-                onEnabledChange = { onEvent(SettingsEvent.onInAppNotifications) }
+                onEnabledChange = { onEvent(SettingsEvent.OnInAppNotifications) }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_publications),
                 enabled = state.serverSettingsState.publicationsEnabled,
-                onEnabledChange = { onEvent(SettingsEvent.onPublicationsEnabled) }
+                onEnabledChange = { onEvent(SettingsEvent.OnPublicationsEnabled) }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_reactions),
                 enabled = state.serverSettingsState.reactionsEnabled,
-                onEnabledChange = { onEvent(SettingsEvent.onReactionsEnabled) }
+                onEnabledChange = { onEvent(SettingsEvent.OnReactionsEnabled) }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -121,13 +121,13 @@ fun TemplateSettingsMain(
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_recommend_to_contacts),
                 enabled = state.serverSettingsState.recommendToContacts,
-                onEnabledChange = { onEvent(SettingsEvent.onRecommendToContacts) }
+                onEnabledChange = { onEvent(SettingsEvent.OnRecommendToContacts) }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_allow_add_from_anyone),
                 enabled = state.serverSettingsState.allowAddFromAnyone,
-                onEnabledChange = { onEvent(SettingsEvent.onAllowAddFromAnyone) }
+                onEnabledChange = { onEvent(SettingsEvent.OnAllowAddFromAnyone) }
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -142,7 +142,7 @@ fun TemplateSettingsMain(
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_confirm_before_posting),
                 enabled = state.localSettingsState.confirmBeforePosting,
-                onEnabledChange = { onEvent(SettingsEvent.onConfirmBeforePosting) }
+                onEnabledChange = { onEvent(SettingsEvent.OnConfirmBeforePosting) }
             )
 
             Spacer(modifier = Modifier.weight(1f))
