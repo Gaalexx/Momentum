@@ -1,7 +1,7 @@
 package com.project.momentum.features.settings.api
 
 import com.project.momentum.data.auth.SessionManager
-import com.project.momentum.features.auth.models.dto.CheckResponseDTO
+import com.project.momentum.features.settings.models.dto.*
 import com.project.momentum.network.di.Backend
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -14,11 +14,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 interface ISettingsMainAPI {
-    suspend fun changeInAppNotifications(newValue: Boolean): CheckResponseDTO
-    suspend fun changePublicationsEnabled(newValue: Boolean): CheckResponseDTO
-    suspend fun changeReactionsEnabled(newValue: Boolean): CheckResponseDTO
-    suspend fun changeRecommendToContacts(newValue: Boolean): CheckResponseDTO
-    suspend fun changeAllowAddFromAnyone(newValue: Boolean): CheckResponseDTO
+    suspend fun changeInAppNotifications(newValue: Boolean): SettingsActionDTO
+    suspend fun changePublicationsEnabled(newValue: Boolean): SettingsActionDTO
+    suspend fun changeReactionsEnabled(newValue: Boolean): SettingsActionDTO
+    suspend fun changeRecommendToContacts(newValue: Boolean): SettingsActionDTO
+    suspend fun changeAllowAddFromAnyone(newValue: Boolean): SettingsActionDTO
 }
 
 @Singleton
@@ -26,59 +26,32 @@ class SettingsMainAPI @Inject constructor(
     @Backend private val client: HttpClient,
     private val sessionManager: SessionManager
 ): ISettingsMainAPI{
-    override suspend fun changeInAppNotifications(newValue: Boolean) : CheckResponseDTO{
-        val response = client.post("change-in-app-notifications") {
+
+    private suspend fun changeSetting(url: String, body: Any) : SettingsActionDTO{
+        val response = client.post(url) {
             header(HttpHeaders.Authorization, "Bearer ${sessionManager.getToken()}")
-            setBody(newValue)
+            setBody(body)
         }
-        if (response.status == HttpStatusCode.OK) {
-            return response.body<CheckResponseDTO>()
-        } else {
-            throw Exception() // TODO прописать свои Exception
-        }
+        return response.body<SettingsActionDTO>()
     }
-    override suspend fun changePublicationsEnabled(newValue: Boolean) : CheckResponseDTO{
-        val response = client.post("change-publications-enabled") {
-            header(HttpHeaders.Authorization, "Bearer ${sessionManager.getToken()}")
-            setBody(newValue)
-        }
-        if (response.status == HttpStatusCode.OK) {
-            return response.body<CheckResponseDTO>()
-        } else {
-            throw Exception() // TODO прописать свои Exception
-        }
+
+    override suspend fun changeInAppNotifications(newValue: Boolean) : SettingsActionDTO{
+        return changeSetting("settings/change-in-app-notifications", ChangeInAppNotificationsDTO(newValue))
     }
-    override suspend fun changeReactionsEnabled(newValue: Boolean) : CheckResponseDTO{
-        val response = client.post("change-reactions-enabled") {
-            header(HttpHeaders.Authorization, "Bearer ${sessionManager.getToken()}")
-            setBody(newValue)
-        }
-        if (response.status == HttpStatusCode.OK) {
-            return response.body<CheckResponseDTO>()
-        } else {
-            throw Exception() // TODO прописать свои Exception
-        }
+    override suspend fun changePublicationsEnabled(newValue: Boolean): SettingsActionDTO {
+        return changeSetting("settings/change-publications-enabled", ChangePublicationsEnabledDTO(newValue))
     }
-    override suspend fun changeRecommendToContacts(newValue: Boolean) : CheckResponseDTO{
-        val response = client.post("change-recommend-to-contacts") {
-            header(HttpHeaders.Authorization, "Bearer ${sessionManager.getToken()}")
-            setBody(newValue)
-        }
-        if (response.status == HttpStatusCode.OK) {
-            return response.body<CheckResponseDTO>()
-        } else {
-            throw Exception() // TODO прописать свои Exception
-        }
+
+    override suspend fun changeReactionsEnabled(newValue: Boolean): SettingsActionDTO {
+        return changeSetting("settings/change-reactions-enabled", ChangeReactionsEnabledDTO(newValue))
     }
-    override suspend fun changeAllowAddFromAnyone(newValue: Boolean) : CheckResponseDTO{
-        val response = client.post("change-allow-add-from-anyone") {
-            header(HttpHeaders.Authorization, "Bearer ${sessionManager.getToken()}")
-            setBody(newValue)
-        }
-        if (response.status == HttpStatusCode.OK) {
-            return response.body<CheckResponseDTO>()
-        } else {
-            throw Exception() // TODO прописать свои Exception
-        }
+
+    override suspend fun changeRecommendToContacts(newValue: Boolean): SettingsActionDTO {
+        return changeSetting("settings/change-recommend-to-contacts", ChangeRecommendToContactsDTO(newValue))
     }
+
+    override suspend fun changeAllowAddFromAnyone(newValue: Boolean): SettingsActionDTO {
+        return changeSetting("settings/change-allow-add-from-anyone", ChangeAllowAddFromAnyoneDTO(newValue))
+    }
+
 }

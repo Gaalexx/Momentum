@@ -106,7 +106,6 @@
     <string name="settings_privacy_caution">Осторожность</string>
     <string name="settings_privacy_confirm_before_posting">Подтверждение перед тем как выложить пост</string>
 
-
     // Settings Premium Screen
     <string name="settings_premium_title">Premium </string>
     <string name="settings_premium_description_1">- больше тепла,</string>
@@ -135,6 +134,12 @@
     <string name="settings_notifications_in_app">В приложении</string>
     <string name="settings_notifications_in_app_switch">Уведомления</string>
     <string name="label_editing">Редактирование профиля</string>
+
+    // Settings Errors
+    <string name="error_network">Нет соединения</string>
+    <string name="error_unauthorized">Авторизация истекла</string>
+    <string name="error_unknown">Произошла неизвестная ошибка</string>
+    <string name="error_server">Нет соединения</string>
 
     // Words
     <string name="email">Почта</string>
