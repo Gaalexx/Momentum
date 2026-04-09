@@ -131,7 +131,6 @@ fun CreatePasswordScreen(
 //                        modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
                         placeholder = stringResource(R.string.placeholder_password),
                         isError = uiState.isError,
-                        errorText = handlingErrorLogin(uiState),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Password,
                             imeAction = ImeAction.Next
