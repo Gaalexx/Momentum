@@ -102,3 +102,31 @@ fun AudioPreview(
             }
         })
 }
+
+@Composable
+fun AudioPreview(
+    context: Context,
+    uri: String
+) {
+    val player = remember(uri) {
+        ExoPlayer.Builder(context).build().apply {
+            setMediaItem(MediaItem.fromUri(uri))
+            prepare()
+            playWhenReady = true
+        }
+    }
+
+    DisposableEffect(player) {
+        onDispose { player.release() }
+    }
+
+    AudioPreviewBox(
+        player = player,
+        onSeekRequested = { progress ->
+            val duration = player.duration
+            if (duration > 0) {
+                val targetPosition = (duration * progress).toLong()
+                player.seekTo(targetPosition)
+            }
+        })
+}

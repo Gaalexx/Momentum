@@ -1,5 +1,6 @@
 package com.project.momentum.features.account.models
 
+import com.project.momentum.network.s3.MediaType
 import kotlinx.serialization.Serializable
 import java.time.Instant
 import java.time.ZoneId
@@ -12,6 +13,7 @@ data class PostData(
     val userName: String,
     val title: String,
     val presignedURL: String,
+    val mediaType: MediaType,
     val avatarPresignedURL: String? = null,
     val createdAt: String? = null
 ) {

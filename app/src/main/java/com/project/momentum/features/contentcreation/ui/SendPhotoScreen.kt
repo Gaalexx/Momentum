@@ -107,9 +107,15 @@ fun SendPhotoScreen(
     )
 
     LaunchedEffect(uploadState) {
-        if (uploadState is UploadState.Success) {
-            onGoToTakePhoto()
+        when(uploadState){
+            is UploadState.Success -> onGoToTakePhoto()
+            is UploadState.Error -> onGoToSettings()
+            else -> Unit
         }
+//        if (uploadState is UploadState.Success) {
+//            onGoToTakePhoto()
+//        }
+//        if()
     }
 
 
@@ -262,9 +268,10 @@ fun SendPhotoScreen(
                     onClick = {
                         val safeUri = uri
                         val mimeType = context.contentResolver.getType(safeUri) ?: when (mediaType) {
-                            MediaTypeToSend.PHOTO -> "image/jpeg"
-                            MediaTypeToSend.VIDEO -> "video/mp4"
+                            MediaTypeToSend.PHOTO -> context.contentResolver.getType(safeUri) ?: "image/jpeg"
+                            MediaTypeToSend.VIDEO -> context.contentResolver.getType(safeUri) ?: "video/mp4"
                             MediaTypeToSend.AUDIO -> "audio/3gpp"
+
                         }
                         val uploadMediaType = when (mediaType) {
                             MediaTypeToSend.PHOTO -> MediaType.IMAGE

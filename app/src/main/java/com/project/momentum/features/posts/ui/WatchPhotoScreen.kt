@@ -26,6 +26,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -38,11 +39,14 @@ import coil.compose.AsyncImage
 import com.project.momentum.R
 import com.project.momentum.features.account.models.PostData
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
+import com.project.momentum.network.s3.MediaType
+import com.project.momentum.ui.assets.AudioPreview
 import com.project.momentum.ui.assets.CaptionBasicLabel
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.ui.assets.FriendsPillButton
 import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
+import com.project.momentum.ui.assets.VideoPreview
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
@@ -160,7 +164,7 @@ fun WatchPhotoScreenRoute(
 ) {
 
     val uiState by postsViewModel.state.collectAsStateWithLifecycle()
-    
+
     val userPosts by remember(userName) {
         if (userName != null) {
             postsViewModel.getUserPostsFlow(userName)
@@ -195,7 +199,7 @@ fun WatchPhotoScreen(
 ) {
     val bg = ConstColours.BLACK
     val iconTint = ConstColours.WHITE
-
+    val context = LocalContext.current
     val captionFocusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
     val pagerState = rememberPagerState(initialPage = postIndex, pageCount = { posts.size })
@@ -240,34 +244,72 @@ fun WatchPhotoScreen(
                     .aspectRatio(1f)
             ) { pageIndex ->
                 //curIndex = pageIndex
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.95f)
-                        .aspectRatio(1f)
-                        .clip(RoundedCornerShape(60.dp))
-                        .background(ConstColours.MAIN_BACK_GRAY)
-                ) {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        AsyncImage(
-                            model = posts[pageIndex].presignedURL,
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
+                val post = posts[pageIndex]
+
+                when(post.mediaType){
+                    MediaType.IMAGE -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(0.95f)
+                                .aspectRatio(1f)
+                                .clip(RoundedCornerShape(60.dp))
+                                .background(ConstColours.MAIN_BACK_GRAY)
+                        ) {
+                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+
+                                AsyncImage(
+                                    model = posts[pageIndex].presignedURL,
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+
+                                if (posts[pageIndex].title.isNotBlank()) {
+                                    CaptionBasicLabel(
+                                        text = posts[pageIndex].title,
+                                        modifier = Modifier
+                                            .align(Alignment.BottomStart)
+                                            .fillMaxWidth()
+                                            .padding(16.dp)
+                                            .focusRequester(captionFocusRequester)
+                                    )
+                                }
+
+                            }
+                        }
+                    }
+
+                    MediaType.VIDEO -> {
+                        VideoPreview(context = context, uri = post.presignedURL)
 
                         if (posts[pageIndex].title.isNotBlank()) {
                             CaptionBasicLabel(
                                 text = posts[pageIndex].title,
                                 modifier = Modifier
-                                    .align(Alignment.BottomStart)
                                     .fillMaxWidth()
                                     .padding(16.dp)
                                     .focusRequester(captionFocusRequester)
+                                    .align(Alignment.End)
                             )
                         }
+                    }
 
+                    MediaType.AUDIO -> {
+                        AudioPreview(context = context, uri = post.presignedURL)
+
+                        if (posts[pageIndex].title.isNotBlank()) {
+                            CaptionBasicLabel(
+                                text = posts[pageIndex].title,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .focusRequester(captionFocusRequester)
+                                    .align(Alignment.End)
+                            )
+                        }
                     }
                 }
+
             }
         }
 
@@ -372,6 +414,7 @@ private fun WatchPhotoScreenPreview() {
                     userName = "PreviewName",
                     title = "Description",
                     presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+                    mediaType = MediaType.IMAGE,
                     createdAt = "2026-03-12T14:38:50.690942Z"
                 ),
                 PostData(
@@ -380,6 +423,7 @@ private fun WatchPhotoScreenPreview() {
                     userName = "PreviewName2",
                     title = "Description2",
                     presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+                    mediaType = MediaType.IMAGE,
                     createdAt = "2026-03-12T14:38:50.690942Z"
                 )
             )

@@ -175,64 +175,31 @@ fun VideoPreview(
     )
 }
 
-//@Composable
-//fun VideoPreview(
-//    context: Context,
-//    uri: Uri
-//) {
-//    var positionMs by remember { mutableLongStateOf(0L) }
-//
-//    var progress by remember { mutableFloatStateOf(0f) }
-//
-//    val player = remember(uri) {
-//        ExoPlayer.Builder(context).build().apply {
-//            setMediaItem(MediaItem.fromUri(uri))
-//            prepare()
-//            playWhenReady = true
-//        }
-//    }
-//
-//    DisposableEffect(player) {
-//        onDispose {
-//            player.release()
-//        }
-//    }
-//
-//    LaunchedEffect(player) {
-//        while (true) {
-//            positionMs = player.currentPosition
-//            val durationMs = player.duration
-//            progress = if (durationMs > 0L) {
-//                (positionMs.toFloat() / durationMs.toFloat()).coerceIn(0f, 1f)
-//            } else {
-//                0f
-//            }
-//
-//            if (progress > 0.999) {
-//                player.seekTo(0)
-//            }
-//            delay(16)
-//        }
-//    }
-//
-//
-//    Box(modifier = Modifier.fillMaxSize()) {
-//        Box(
-//            Modifier
-//                .fillMaxWidth(0.95f)
-//                .aspectRatio(1f)
-//                .clip(RoundedCornerShape(60.dp))
-//                .background(ConstColours.MAIN_BACK_GRAY)
-//                .align(Alignment.Center)
-//        ) {
-//            PlayerSurface(
-//                player = player,
-//                modifier = Modifier.fillMaxSize(),
-//            )
-//        }
-//        RecordingBorderProgress(
-//            progress = progress,
-//            modifier = Modifier.fillMaxSize(),
-//        )
-//    }
-//}
+@Composable
+fun VideoPreview(
+    context: Context,
+    uri: String
+) {
+    val player = remember(uri) {
+        ExoPlayer.Builder(context).build().apply {
+            setMediaItem(MediaItem.fromUri(uri))
+            prepare()
+            playWhenReady = true
+        }
+    }
+
+    DisposableEffect(player) {
+        onDispose { player.release() }
+    }
+
+    VideoPreviewBox(
+        player = player,
+        onSeekRequested = { progress ->
+            val duration = player.duration
+            if (duration > 0) {
+                val targetPosition = (duration * progress).toLong()
+                player.seekTo(targetPosition)
+            }
+        }
+    )
+}
