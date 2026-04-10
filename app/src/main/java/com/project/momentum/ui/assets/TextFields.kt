@@ -92,7 +92,8 @@ fun TextFieldRegistration(
 
 @Composable
 fun GlassTextField(
-    state: TextFieldState,
+    value: String,
+    onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     placeholder: String? = null,
     isError: Boolean = false,
@@ -104,7 +105,7 @@ fun GlassTextField(
     val isFocused by interactionSource.collectIsFocusedAsState()
 
     val accentColor = if (isError) ConstColours.ERROR_RED else textColor
-    val currentBorderColor = if (isFocused) accentColor else accentColor.copy(alpha = 0.4f)
+    val currentBorderColor = if (isFocused) accentColor else accentColor.copy(alpha = 0.6f)
 
     val glassGradient = Brush.linearGradient(
         colors = listOf(
@@ -114,7 +115,8 @@ fun GlassTextField(
     )
 
     BasicTextField(
-        state = state,
+        value = value,
+        onValueChange = onValueChange,
         modifier = modifier.fillMaxWidth(),
         interactionSource = interactionSource,
         textStyle = AppTextStyles.MainText.copy(
@@ -122,9 +124,9 @@ fun GlassTextField(
             textAlign = TextAlign.Center
         ),
         keyboardOptions = keyboardOptions,
-        lineLimits = TextFieldLineLimits.SingleLine,
+        singleLine = true,
         cursorBrush = SolidColor(textColor),
-        decorator = { innerTextField ->
+        decorationBox = { innerTextField ->
             Column(modifier = Modifier.fillMaxWidth()) {
                 Box(
                     modifier = Modifier
@@ -138,7 +140,7 @@ fun GlassTextField(
                         .background(glassGradient, RoundedCornerShape(36.dp))
                         .drawBehind {
                             val cornerRadiusPx = 36.dp.toPx()
-                            val radius = CornerRadius(cornerRadiusPx, cornerRadiusPx)
+                            val radius = CornerRadius(cornerRadiusPx)
 
                             drawRoundRect(
                                 brush = Brush.radialGradient(
@@ -153,21 +155,21 @@ fun GlassTextField(
                             drawRoundRect(
                                 brush = Brush.verticalGradient(
                                     colors = listOf(
-                                        Color.White.copy(alpha = 0.4f),
+                                        currentBorderColor.copy(alpha = 0.4f),
                                         Color.Transparent
                                     ),
                                     startY = 0f,
                                     endY = size.height * 0.5f
                                 ),
                                 cornerRadius = radius,
-                                style = Stroke(width = 1.5.dp.toPx())
+                                style = Stroke(width = 2.dp.toPx())
                             )
 
                             drawRoundRect(
-                                color = Color.Black.copy(alpha = 0.1f),
+                                color = ConstColours.BLACK.copy(alpha = 0.2f),
                                 cornerRadius = radius,
-                                style = Stroke(width = 1.dp.toPx()),
-                                alpha = 0.5f
+                                style = Stroke(width = 1.5.dp.toPx()),
+//                                alpha = 0.5f
                             )
                         }
                         .border(
@@ -183,7 +185,7 @@ fun GlassTextField(
                         .padding(horizontal = 24.dp, vertical = 16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (state.text.isEmpty() && placeholder != null) {
+                    if (value.isEmpty() && placeholder != null) {
                         Text(
                             text = placeholder,
                             style = AppTextStyles.MainText,
@@ -225,10 +227,9 @@ fun GlassTextField(
     )
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF121212)
+@Preview(showBackground = true, backgroundColor = 0x00000000)// 0xFF121212)
 @Composable
 fun GlassTextFieldPreview() {
-    val glassState = rememberTextFieldState()
     
     Column(Modifier.padding(16.dp)) {
         Text("Standard Registration:", color = Color.White)
@@ -242,9 +243,10 @@ fun GlassTextFieldPreview() {
 
         Text("Glass Design (BasicTextField + TextFieldState):", color = Color.White)
         GlassTextField(
-            state = glassState,
+            value = "",
+            onValueChange = {},
             placeholder = "Введите пароль...",
-            isError = false
+            isError = true
         )
     }
 }

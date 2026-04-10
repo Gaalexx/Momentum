@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -31,6 +33,7 @@ import com.project.momentum.features.auth.models.LoginStep
 import com.project.momentum.features.auth.models.NavEvent
 import com.project.momentum.features.auth.viewmodel.ErrorLogin
 import com.project.momentum.features.auth.viewmodel.RegistrationViewModel
+import com.project.momentum.ui.assets.GlassTextField
 import com.project.momentum.ui.assets.TextFieldRegistration
 import com.project.momentum.ui.assets.TopBarTemplate
 import com.project.momentum.ui.common.LoadingOverlay
@@ -40,7 +43,7 @@ import com.project.momentum.ui.theme.AppTextStyles
 @Composable
 fun CreatePasswordScreenPreview() {
     CreatePasswordScreen(
-    uiState = LoginState(currentStep = LoginStep.PASSWORD, isError = true, errorMessage = ErrorLogin.PasswordError.NO_DIGITS),
+    uiState = LoginState(currentStep = LoginStep.PASSWORD, isError = false, errorMessage = ErrorLogin.PasswordError.NO_DIGITS),
         passwordRepetition = "",
         onValueChangeFirst = {},
         onValueChangeSecond = {},
@@ -125,7 +128,8 @@ fun CreatePasswordScreen(
                     )
                     Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
 
-                    TextFieldRegistration(
+                    GlassTextField(
+//                    TextFieldRegistration(
                         value = uiState.userData.password,
                         onValueChange = onValueChangeFirst,
 //                        modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
@@ -136,9 +140,11 @@ fun CreatePasswordScreen(
                             imeAction = ImeAction.Next
                         ),
                     )
+
                     Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
 
-                    TextFieldRegistration(
+                    GlassTextField(
+//                    TextFieldRegistration(
                         value = passwordRepetition,
                         onValueChange = onValueChangeSecond,
 //                        modifier = Modifier.height(dimensionResource(R.dimen.button_size)),

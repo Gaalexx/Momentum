@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.project.momentum.features.account.models.AccountInformationDTO
 import com.project.momentum.features.account.repo.AccountRepository
 import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.auth.features.EmailChecker
@@ -82,13 +83,31 @@ class EditAccountViewModel @Inject constructor(
     private val repo: AccountRepository,
     private val uploaderRepo: S3InteractionRepository
 ) : ViewModel() {
-    private var _state = MutableStateFlow<EditAccountState>(EditAccountState.Content(
-        fields = EditAccountFields()
-    ))
+    private var _state = MutableStateFlow<EditAccountState>(
+        EditAccountState.Loading(fields = EditAccountFields())
+    )
     val state: StateFlow<EditAccountState> = _state.asStateFlow()
+    var currentUserData = EditAccountFields()
+        private set
+
+    init {
+        viewModelScope.launch {
+            update()
+            setContent()
+        }
+    }
 
     private val _navigationEvents = MutableSharedFlow<NavEvent>()
     val navigationEvents: SharedFlow<NavEvent> = _navigationEvents.asSharedFlow()
+
+    suspend fun update() {
+        val userdata = repo.getMyInfo() ?: return  //TODO: handle error
+
+        currentUserData = EditAccountFields(
+            username = userdata.name,
+            profilePhotoURL = userdata.accountPhotoURL,
+        )
+    }
 
     fun next() {
         viewModelScope.launch {
@@ -98,6 +117,8 @@ class EditAccountViewModel @Inject constructor(
                 //TODO: update user info on client
                 try {
                     val newUserInfo = repo.updateUserInfo(_state.value.fields)
+                    update()
+                    clearState()
                     _navigationEvents.emit(NavEvent.NavigateToNextScreen)
                 } catch (e: Exception) {
                     //TODO: обработка ошибки сети
@@ -209,6 +230,17 @@ class EditAccountViewModel @Inject constructor(
                     emailError = currentErrors?.emailError ?: emailError,
                     phoneError = currentErrors?.phoneError ?: phoneError
                 )
+            )
+        }
+    }
+
+    private fun clearState() {
+        updateState{
+            it.copy(
+                username = null,
+                email = null,
+                phone = null,
+                profilePhotoURL = null
             )
         }
     }
