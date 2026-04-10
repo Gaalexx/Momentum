@@ -2,6 +2,7 @@ package com.project.momentum.navigation
 
 import androidx.navigation3.runtime.NavKey
 import com.project.momentum.features.contentcreation.data.MediaTypeToSend
+import com.project.momentum.features.editingAccount.EditAccountFields
 import com.project.momentum.features.friends.ui.User
 import kotlinx.serialization.Serializable
 
@@ -63,7 +64,7 @@ NavRoutes : NavKey {
     data object AuthorizationPasswordRecovery : NavRoutes()
 
     @Serializable
-    data object EditAccount : NavRoutes()
+    data class EditAccount(val currentUserInfo: EditAccountFields) : NavRoutes()
 
     // Экраны с аргументами
     @Serializable

@@ -32,6 +32,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.project.momentum.features.account.viewmodel.AccountInfoEvent
 import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.account.viewmodel.AccountInfoViewModel
 import com.project.momentum.features.account.viewmodel.AccountMediaViewModel
@@ -46,15 +47,17 @@ fun AccountRoot(
     onBackClick: () -> Unit,
     onAddPostClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onEditClick: () -> Unit = {},
+    onEditClick: (AccountInfoState) -> Unit = {},
     onPostClick: (Int, String) -> Unit,
     onProfileClick: () -> Unit = {},
     userStatus: String = stringResource(R.string.account_online_status),
     postsViewModel: PostsViewModel = hiltViewModel(),
     accountInfoViewModel: AccountInfoViewModel = hiltViewModel()
 ) {
+    accountInfoViewModel.onEvent(AccountInfoEvent.GetInfo)
+
     val uiInfoState by accountInfoViewModel.state.collectAsStateWithLifecycle()
-    val posts by postsViewModel.getUserPostsFlow(uiInfoState.name)
+    val posts by postsViewModel.getUserPostsFlow(uiInfoState.name) // TODO: брать посты по id пользователя
         .collectAsStateWithLifecycle()
 
     AccountScreen(
@@ -65,7 +68,7 @@ fun AccountRoot(
         onBackClick = onBackClick,
         onAddPostClick = onAddPostClick,
         onPostClick = { postId -> onPostClick(postId, uiInfoState.name) },
-        onEditClick = onEditClick,
+        onEditClick = { onEditClick(uiInfoState) },
     )
 }
 

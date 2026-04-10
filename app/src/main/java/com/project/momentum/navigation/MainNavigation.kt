@@ -33,6 +33,7 @@ import com.project.momentum.features.auth.ui.PasswordRecoveryScreen
 import com.project.momentum.features.contentcreation.ui.CameraLikeScreen
 import com.project.momentum.features.contentcreation.ui.RecorderScreen
 import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
+import com.project.momentum.features.editingAccount.EditAccountFields
 import com.project.momentum.features.editingAccount.EditingAccountRoot
 import com.project.momentum.features.friends.ui.FriendAccountRoot
 import com.project.momentum.features.friends.ui.FriendsScreenRoute
@@ -309,8 +310,15 @@ fun MainScreen() {
                             userName = userName
                         ))
                     },
-                    onEditClick = {
-                        openOverlay(NavRoutes.EditAccount)
+                    onEditClick = { uiInfoState ->
+                        openOverlay(NavRoutes.EditAccount(
+                            currentUserInfo = EditAccountFields(
+                                username = uiInfoState.name,
+                                email = null, // TODO: поменять структуру AccountInfoState
+                                phone = null,
+                                profilePhotoURL = uiInfoState.profilePhotoURL
+                            )
+                        ))
                     },
                     onBackClick = {
                         closeOverlay()
@@ -341,8 +349,9 @@ fun MainScreen() {
                 )
             }
 
-            entry<NavRoutes.EditAccount> {
+            entry<NavRoutes.EditAccount> { route ->
                 EditingAccountRoot(
+                    currentUserInfo = route.currentUserInfo,
                     onBackClick = { closeOverlay() },
                     onContinueClick = { closeOverlay() }
                 )

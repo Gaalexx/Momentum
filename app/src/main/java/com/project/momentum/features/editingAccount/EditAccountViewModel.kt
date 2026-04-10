@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 
 enum class ErrorType {
@@ -37,6 +38,8 @@ enum class ErrorType {
 enum class PasswordErrorType {
     TOO_SHORT, NO_DIGITS, NO_LOWERCASE_LETTERS, NO_UPPERCASE_LETTERS
 }
+
+@Serializable
 data class EditAccountFields (
     val username: String? = null,
     val email: String? = null,

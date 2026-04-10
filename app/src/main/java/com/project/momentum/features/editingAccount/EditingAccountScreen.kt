@@ -57,6 +57,7 @@ import com.project.momentum.ui.theme.ConstColours
 
 @Composable
 fun EditingAccountRoot(
+    currentUserInfo: EditAccountFields,
     onBackClick: () -> Unit,
     onContinueClick: () ->Unit,
     modifier: Modifier = Modifier
@@ -87,7 +88,7 @@ fun EditingAccountRoot(
 
     EditingAccountScreen(
         uiInfoState = uiState.value,
-        userData = viewModel.currentUserData,
+        userData = currentUserInfo,
         onLoginChange = { viewModel.updateLogin(it) },
         onEmailChange = { viewModel.updateEmail(it) },
         onPhoneChange = { viewModel.updatePhone(it) },
