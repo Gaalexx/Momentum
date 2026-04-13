@@ -33,6 +33,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntSize
+import androidx.media3.common.Player
 import kotlin.math.PI
 import kotlin.math.atan
 import kotlin.math.atan2
@@ -43,36 +44,45 @@ import kotlin.math.min
 fun CircularSeekArea(
     modifier: Modifier = Modifier,
     onProgressChanged: (Float) -> Unit,
-    content: @Composable () -> Unit
+    isEditable: Boolean = true,
+    content: @Composable () -> Unit,
 ) {
     var sizePx by remember { mutableStateOf(IntSize.Zero) }
+    val currentOnProgressChanged by rememberUpdatedState(onProgressChanged)
+
+    val seekModifier = if (isEditable) {
+        Modifier.pointerInput(sizePx) {
+            detectDragGestures(
+                onDragStart = { offset ->
+                    updateCircularProgress(
+                        touch = offset,
+                        size = sizePx,
+                        onProgressChanged = currentOnProgressChanged
+                    )
+                },
+                onDrag = { change, _ ->
+                    updateCircularProgress(
+                        touch = change.position,
+                        size = sizePx,
+                        onProgressChanged = currentOnProgressChanged
+                    )
+                    change.consume()
+                }
+            )
+        }
+    } else {
+        Modifier
+    }
 
     Box(
         modifier = modifier
             .onSizeChanged { sizePx = it }
-            .pointerInput(sizePx) {
-                detectDragGestures(
-                    onDragStart = { offset ->
-                        updateCircularProgress(
-                            touch = offset,
-                            size = sizePx,
-                            onProgressChanged = onProgressChanged
-                        )
-                    },
-                    onDrag = { change, _ ->
-                        updateCircularProgress(
-                            touch = change.position,
-                            size = sizePx,
-                            onProgressChanged = onProgressChanged
-                        )
-                        change.consume()
-                    }
-                )
-            }
+            .then(seekModifier)
     ) {
         content()
     }
 }
+
 
 private fun updateCircularProgress(
     touch: Offset,
@@ -97,7 +107,8 @@ private fun updateCircularProgress(
 @Composable
 fun VideoPreviewBox(
     player: ExoPlayer,
-    onSeekRequested: (Float) -> Unit
+    onSeekRequested: (Float) -> Unit,
+    isEditable: Boolean = true
 ) {
     var progress by remember { mutableFloatStateOf(0f) }
 
@@ -110,15 +121,14 @@ fun VideoPreviewBox(
             } else {
                 0f
             }
-            if (progress > 0.999) {
-                player.seekTo(0)
-            }
+
             delay(16)
         }
     }
 
     CircularSeekArea(
         modifier = Modifier.fillMaxSize(),
+        isEditable = isEditable,
         onProgressChanged = { newProgress ->
             onSeekRequested(newProgress)
         }
@@ -155,6 +165,7 @@ fun VideoPreview(
         ExoPlayer.Builder(context).build().apply {
             setMediaItem(MediaItem.fromUri(uri))
             prepare()
+            repeatMode = Player.REPEAT_MODE_ONE
             playWhenReady = true
         }
     }
@@ -176,14 +187,16 @@ fun VideoPreview(
 }
 
 @Composable
-fun VideoPreview(
+fun VideoView(
     context: Context,
-    uri: String
+    uri: String,
+    isEditable: Boolean
 ) {
     val player = remember(uri) {
         ExoPlayer.Builder(context).build().apply {
             setMediaItem(MediaItem.fromUri(uri))
             prepare()
+            repeatMode = Player.REPEAT_MODE_ONE
             playWhenReady = true
         }
     }
@@ -200,6 +213,7 @@ fun VideoPreview(
                 val targetPosition = (duration * progress).toLong()
                 player.seekTo(targetPosition)
             }
-        }
+        },
+        isEditable = isEditable
     )
 }

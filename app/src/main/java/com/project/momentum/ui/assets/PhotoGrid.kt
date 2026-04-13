@@ -136,6 +136,8 @@ fun S3PhotoGrid(
             key = { index, item ->
                 when (item) {
                     is S3GridItem.Post -> "${item.post.id}_$index"
+                    is S3GridItem.AudioPost -> "${item.post.id}_$index"
+                    is S3GridItem.VideoPost -> "${item.post.id}_$index"
                     S3GridItem.PlusButton -> "PLUS"
                 }
             }
@@ -178,6 +180,13 @@ fun S3PhotoGrid(
                         )
                     }
 
+                    is S3GridItem.AudioPost -> {
+
+                    }
+                    is S3GridItem.VideoPost -> {
+
+                    }
+
                     S3GridItem.PlusButton -> {
                         Box(
                             modifier = Modifier.fillMaxSize(),
@@ -199,5 +208,7 @@ fun S3PhotoGrid(
 
 sealed class S3GridItem {
     data class Post(val post: PostData) : S3GridItem()
+    data class VideoPost(val post: PostData) : S3GridItem()
+    data class AudioPost(val post: PostData) : S3GridItem()
     data object PlusButton : S3GridItem()
 }

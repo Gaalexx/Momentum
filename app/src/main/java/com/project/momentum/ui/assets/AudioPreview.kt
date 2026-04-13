@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.compose.PlayerSurface
 import com.project.momentum.features.contentcreation.ui.assets.RecordingBorderProgress
@@ -30,7 +31,8 @@ import kotlinx.coroutines.delay
 @Composable
 fun AudioPreviewBox(
     player: ExoPlayer,
-    onSeekRequested: (Float) -> Unit
+    onSeekRequested: (Float) -> Unit,
+    isEditable: Boolean = true
 ) {
     var progress by remember { mutableFloatStateOf(0f) }
 
@@ -43,9 +45,6 @@ fun AudioPreviewBox(
             } else {
                 0f
             }
-            if (progress > 0.999) {
-                player.seekTo(0)
-            }
             delay(16)
         }
     }
@@ -54,7 +53,8 @@ fun AudioPreviewBox(
         modifier = Modifier.fillMaxSize(),
         onProgressChanged = { newProgress ->
             onSeekRequested(newProgress)
-        }
+        },
+        isEditable = isEditable
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             Box(
@@ -84,6 +84,7 @@ fun AudioPreview(
         ExoPlayer.Builder(context).build().apply {
             setMediaItem(MediaItem.fromUri(uri))
             prepare()
+            repeatMode = Player.REPEAT_MODE_ONE
             playWhenReady = true
         }
     }
@@ -104,14 +105,16 @@ fun AudioPreview(
 }
 
 @Composable
-fun AudioPreview(
+fun AudioView(
     context: Context,
-    uri: String
+    uri: String,
+    isEditable: Boolean = true
 ) {
     val player = remember(uri) {
         ExoPlayer.Builder(context).build().apply {
             setMediaItem(MediaItem.fromUri(uri))
             prepare()
+            repeatMode = Player.REPEAT_MODE_ONE
             playWhenReady = true
         }
     }
@@ -128,5 +131,7 @@ fun AudioPreview(
                 val targetPosition = (duration * progress).toLong()
                 player.seekTo(targetPosition)
             }
-        })
+        },
+        isEditable = isEditable
+    )
 }

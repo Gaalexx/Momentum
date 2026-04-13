@@ -2,6 +2,7 @@ package com.project.momentum.features.posts.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -41,12 +42,18 @@ import com.project.momentum.features.account.models.PostData
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.network.s3.MediaType
 import com.project.momentum.ui.assets.AudioPreview
+import com.project.momentum.ui.assets.AudioView
 import com.project.momentum.ui.assets.CaptionBasicLabel
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.ui.assets.FriendsPillButton
 import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
+import androidx.compose.ui.draw.blur
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import com.project.momentum.ui.assets.VideoPreview
+import com.project.momentum.ui.assets.VideoView
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
@@ -204,6 +211,14 @@ fun WatchPhotoScreen(
     val keyboardController = LocalSoftwareKeyboardController.current
     val pagerState = rememberPagerState(initialPage = postIndex, pageCount = { posts.size })
 
+    var isEditable by remember { mutableStateOf(false) }
+    val backgroundBlur by animateDpAsState(
+        targetValue = if (isEditable) 18.dp else 0.dp,
+        label = "watch_photo_background_blur"
+    )
+    val blurClickInteractionSource = remember { MutableInteractionSource() }
+
+
     val currentPost by remember(posts, pagerState.currentPage) {
         derivedStateOf { posts.getOrNull(pagerState.currentPage) }
     }
@@ -219,6 +234,14 @@ fun WatchPhotoScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .blur(backgroundBlur)
+                .clickable(
+                    enabled = isEditable,
+                    interactionSource = blurClickInteractionSource,
+                    indication = null
+                ) {
+                    isEditable = false
+                }
                 .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -239,6 +262,7 @@ fun WatchPhotoScreen(
         } else {
             VerticalPager(
                 state = pagerState,
+                userScrollEnabled = !isEditable,
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
@@ -246,7 +270,7 @@ fun WatchPhotoScreen(
                 //curIndex = pageIndex
                 val post = posts[pageIndex]
 
-                when(post.mediaType){
+                when (post.mediaType) {
                     MediaType.IMAGE -> {
                         Box(
                             modifier = Modifier
@@ -280,7 +304,23 @@ fun WatchPhotoScreen(
                     }
 
                     MediaType.VIDEO -> {
-                        VideoPreview(context = context, uri = post.presignedURL)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .combinedClickable(
+                                    onClick = {},
+                                    onLongClick = { isEditable = !isEditable }
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            VideoView(
+                                context = context,
+                                uri = post.presignedURL,
+                                isEditable = isEditable
+                            )
+                        }
+
+
 
                         if (posts[pageIndex].title.isNotBlank()) {
                             CaptionBasicLabel(
@@ -295,7 +335,21 @@ fun WatchPhotoScreen(
                     }
 
                     MediaType.AUDIO -> {
-                        AudioPreview(context = context, uri = post.presignedURL)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .combinedClickable(
+                                    onClick = {},
+                                    onLongClick = { isEditable = !isEditable }
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            AudioView(
+                                context = context,
+                                uri = post.presignedURL,
+                                isEditable = isEditable
+                            )
+                        }
 
                         if (posts[pageIndex].title.isNotBlank()) {
                             CaptionBasicLabel(
@@ -315,7 +369,15 @@ fun WatchPhotoScreen(
 
         Column(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .blur(backgroundBlur)
+                .clickable(
+                    enabled = isEditable,
+                    interactionSource = blurClickInteractionSource,
+                    indication = null
+                ) {
+                    isEditable = false
+                },
             horizontalAlignment = Alignment.CenterHorizontally
 
         ) {
