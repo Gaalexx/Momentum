@@ -38,7 +38,6 @@ fun SingleChoiceSegmentedButton(
 ) {
     val options = listOf(
         stringResource(R.string.email),
-        stringResource(R.string.telephone_number),
         stringResource(R.string.login)
     )
 
@@ -153,8 +152,8 @@ fun AddFriendDialog(
                     onClick = {
                         when(selectedIndex){
                             SelectedIndex.EMAIL -> onEvent(FriendsScreenEvent.CreateFriendRequest.EmailRequest(value))
-                            SelectedIndex.LOGIN -> println("Not implemented yet")
-                            SelectedIndex.TELEPHONE -> println("Not implemented yet")
+                            SelectedIndex.LOGIN -> onEvent(FriendsScreenEvent.CreateFriendRequest.LoginRequest(value))
+                            else -> Unit
                         }
                     },
                     modifier = Modifier
