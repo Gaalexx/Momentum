@@ -402,6 +402,7 @@ fun WatchPhotoScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .weight(1f)
                     .padding(horizontal = 28.dp)
                     .padding(bottom = dimensionResource(R.dimen.medium_padding)),
                 verticalAlignment = Alignment.CenterVertically,
@@ -424,7 +425,7 @@ fun WatchPhotoScreen(
                     modifier = Modifier
                         .width(200.dp)
                         .height(dimensionResource(R.dimen.button_size)),
-                    "Ответить",
+                    stringResource(R.string.reply),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = ConstColours.MAIN_BRAND_BLUE,
                         contentColor = ConstColours.WHITE

@@ -26,28 +26,61 @@ class S3UploadApi @Inject constructor(
         uploadURL: String,
         uri: Uri,
         mimeType: String,
-        byteSize: Long
+        byteSize: Long,
+        onProgress: (Int) -> Unit = {}
     ) {
         val input = requireNotNull(contentResolver.openInputStream(uri)) {
             "Cannot open InputStream for uri=$uri"
         }
 
         input.use { stream ->
+            onProgress(0)
+
             s3Client.put(uploadURL) {
                 header(HttpHeaders.ContentType, mimeType)
                 header(HttpHeaders.ContentLength, byteSize.toString())
-                setBody(stream.asOutgoingContent(byteSize))
+                setBody(stream.asOutgoingContent(byteSize, onProgress))
             }
+
+            onProgress(100)
         }
     }
 }
 
-private fun InputStream.asOutgoingContent(contentLength: Long) =
+private fun InputStream.asOutgoingContent(
+    contentLength: Long,
+    onProgress: (Int) -> Unit
+) =
     object : OutgoingContent.WriteChannelContent() {
         override val contentLength: Long = contentLength
+
         override suspend fun writeTo(channel: ByteWriteChannel) {
             withContext(Dispatchers.IO) {
-                this@asOutgoingContent.copyTo(channel.toOutputStream())
+                val output = channel.toOutputStream()
+                val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                var uploadedBytes = 0L
+                var lastProgress = -1
+
+                while (true) {
+                    val read = this@asOutgoingContent.read(buffer)
+                    if (read == -1) break
+
+                    output.write(buffer, 0, read)
+                    uploadedBytes += read
+
+                    if (contentLength > 0) {
+                        val progress = ((uploadedBytes * 100) / contentLength)
+                            .toInt()
+                            .coerceIn(0, 100)
+
+                        if (progress != lastProgress) {
+                            lastProgress = progress
+                            onProgress(progress)
+                        }
+                    }
+                }
+
+                output.flush()
             }
         }
     }

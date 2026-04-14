@@ -27,7 +27,9 @@ import androidx.compose.material.icons.outlined.TextFields
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -98,12 +100,12 @@ fun SendPhotoScreen(
 ) {
 
     val uploadState by vm.state.collectAsStateWithLifecycle()
-    var isLoading by remember { mutableStateOf(false) }
+    val uploadingState = uploadState as? UploadState.Uploading
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
     val progress by animateLottieCompositionAsState(
         composition = composition,
         iterations = LottieConstants.IterateForever,
-        isPlaying = true
+        isPlaying = uploadingState != null
     )
 
     LaunchedEffect(uploadState) {
@@ -202,7 +204,7 @@ fun SendPhotoScreen(
                             .padding(16.dp)
                             .focusRequester(captionFocusRequester)
                     )
-                    if (isLoading) {
+                    if (uploadingState != null) {
                         LottieAnimation(
                             composition = composition,
                             progress = { progress },
@@ -232,6 +234,8 @@ fun SendPhotoScreen(
             }
 
         }
+
+        UploadProgress(uploadingState = uploadingState)
 
 
 
@@ -292,7 +296,6 @@ fun SendPhotoScreen(
                                 )
                             )
                         )
-                        isLoading = true
                     }
                 )
                 Spacer(Modifier.weight(1f))
@@ -323,6 +326,38 @@ fun SendPhotoScreen(
             tint = ConstColours.WHITE.copy(alpha = 0.9f),
             modifier = Modifier.size(34.dp)
         )
+    }
+}
+
+@Composable
+private fun UploadProgress(uploadingState: UploadState.Uploading?) {
+    if (uploadingState == null) return
+
+    val progress = uploadingState.progress
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 28.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (progress != null) {
+            LinearProgressIndicator(
+                progress = { progress / 100f },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            Text(
+                text = "$progress%",
+                color = ConstColours.WHITE
+            )
+        } else {
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }
 

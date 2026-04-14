@@ -50,8 +50,10 @@ class ContentCreationViewModel @Inject constructor(
     private fun upload(postInfo: PostInformation) {
         viewModelScope.launch {
             runCatching {
-                _state.value = UploadState.Uploading()
-                uploaderRepo.sendContent(postInfo)
+                _state.value = UploadState.Uploading(progress = 0)
+                uploaderRepo.sendContent(postInfo) { progress ->
+                    _state.value = UploadState.Uploading(progress = progress)
+                }
             }.onSuccess {
                 _state.value = UploadState.Success()
                 // TODO реализовать случай успеха
