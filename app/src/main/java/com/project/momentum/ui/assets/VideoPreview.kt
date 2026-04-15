@@ -190,14 +190,23 @@ fun VideoPreview(
 fun VideoView(
     context: Context,
     uri: String,
-    isEditable: Boolean
+    isEditable: Boolean,
+    isPlaying: Boolean = true
 ) {
+    val isLifecycleStarted = rememberIsLifecycleStarted()
     val player = remember(uri) {
         ExoPlayer.Builder(context).build().apply {
             setMediaItem(MediaItem.fromUri(uri))
             prepare()
             repeatMode = Player.REPEAT_MODE_ONE
-            playWhenReady = true
+        }
+    }
+
+    LaunchedEffect(player, isPlaying, isLifecycleStarted) {
+        if (isPlaying && isLifecycleStarted) {
+            player.play()
+        } else {
+            player.pause()
         }
     }
 

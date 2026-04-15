@@ -222,7 +222,6 @@ fun WatchPhotoScreen(
     val currentPost by remember(posts, pagerState.currentPage) {
         derivedStateOf { posts.getOrNull(pagerState.currentPage) }
     }
-    //var curIndex by remember { mutableIntStateOf(postIndex) }
 
     Column(
         modifier = Modifier
@@ -267,7 +266,6 @@ fun WatchPhotoScreen(
                     .fillMaxWidth()
                     .aspectRatio(1f)
             ) { pageIndex ->
-                //curIndex = pageIndex
                 val post = posts[pageIndex]
 
                 when (post.mediaType) {
@@ -316,7 +314,8 @@ fun WatchPhotoScreen(
                             VideoView(
                                 context = context,
                                 uri = post.presignedURL,
-                                isEditable = isEditable
+                                isEditable = isEditable,
+                                isPlaying = pageIndex == pagerState.currentPage
                             )
                         }
 
@@ -347,7 +346,8 @@ fun WatchPhotoScreen(
                             AudioView(
                                 context = context,
                                 uri = post.presignedURL,
-                                isEditable = isEditable
+                                isEditable = isEditable,
+                                isPlaying = pageIndex == pagerState.currentPage
                             )
                         }
 
