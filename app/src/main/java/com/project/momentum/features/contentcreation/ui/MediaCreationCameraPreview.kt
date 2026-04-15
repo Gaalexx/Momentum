@@ -100,6 +100,7 @@ private fun bindCameraUseCases(
 
     val rotation = previewView.display?.rotation ?: Surface.ROTATION_0
     imageCapture.targetRotation = rotation
+    videoCapture.targetRotation = rotation
     imageCapture.setCropAspectRatio(Rational(1, 1))
 
     val viewPort = ViewPort.Builder(Rational(1, 1), rotation)

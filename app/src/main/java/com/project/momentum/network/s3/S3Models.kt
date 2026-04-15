@@ -51,6 +51,7 @@ data class PostDTO(
     val title: String,
     val inUse: Boolean,
     val presignedURL: String,
+    val mediaType: MediaType,
     val avatarPresignedURL: String? = null,
     val createdAt: String? = null
 )

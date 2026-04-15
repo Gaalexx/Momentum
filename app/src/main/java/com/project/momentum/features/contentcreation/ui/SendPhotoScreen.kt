@@ -27,7 +27,9 @@ import androidx.compose.material.icons.outlined.TextFields
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -92,24 +94,28 @@ fun SendPhotoScreen(
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
+    onError: () -> Unit,
     uri: Uri,
     mediaType: MediaTypeToSend,
     vm: ContentCreationViewModel = hiltViewModel()
 ) {
 
     val uploadState by vm.state.collectAsStateWithLifecycle()
-    var isLoading by remember { mutableStateOf(false) }
+    val uploadingState = uploadState as? UploadState.Uploading
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
     val progress by animateLottieCompositionAsState(
         composition = composition,
         iterations = LottieConstants.IterateForever,
-        isPlaying = true
+        isPlaying = uploadingState != null
     )
 
     LaunchedEffect(uploadState) {
-        if (uploadState is UploadState.Success) {
-            onGoToTakePhoto()
+        when(uploadState){
+            is UploadState.Success -> onGoToTakePhoto()
+            is UploadState.Error -> onError()
+            else -> Unit
         }
+
     }
 
 
@@ -154,7 +160,8 @@ fun SendPhotoScreen(
                 Box(
                     Modifier
                         .fillMaxSize()
-                        .aspectRatio(1f)
+                        .aspectRatio(1f),
+                    contentAlignment = Alignment.Center
                 ) {
                     when (mediaType) {
                         MediaTypeToSend.PHOTO -> {
@@ -196,7 +203,7 @@ fun SendPhotoScreen(
                             .padding(16.dp)
                             .focusRequester(captionFocusRequester)
                     )
-                    if (isLoading) {
+                    if (uploadingState != null) {
                         LottieAnimation(
                             composition = composition,
                             progress = { progress },
@@ -226,6 +233,8 @@ fun SendPhotoScreen(
             }
 
         }
+
+        UploadProgress(uploadingState = uploadingState)
 
 
 
@@ -262,9 +271,10 @@ fun SendPhotoScreen(
                     onClick = {
                         val safeUri = uri
                         val mimeType = context.contentResolver.getType(safeUri) ?: when (mediaType) {
-                            MediaTypeToSend.PHOTO -> "image/jpeg"
-                            MediaTypeToSend.VIDEO -> "video/mp4"
+                            MediaTypeToSend.PHOTO -> context.contentResolver.getType(safeUri) ?: "image/jpeg"
+                            MediaTypeToSend.VIDEO -> context.contentResolver.getType(safeUri) ?: "video/mp4"
                             MediaTypeToSend.AUDIO -> "audio/3gpp"
+
                         }
                         val uploadMediaType = when (mediaType) {
                             MediaTypeToSend.PHOTO -> MediaType.IMAGE
@@ -285,7 +295,6 @@ fun SendPhotoScreen(
                                 )
                             )
                         )
-                        isLoading = true
                     }
                 )
                 Spacer(Modifier.weight(1f))
@@ -319,6 +328,38 @@ fun SendPhotoScreen(
     }
 }
 
+@Composable
+private fun UploadProgress(uploadingState: UploadState.Uploading?) {
+    if (uploadingState == null) return
+
+    val progress = uploadingState.progress
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 28.dp, vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (progress != null) {
+            LinearProgressIndicator(
+                progress = { progress / 100f },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            Text(
+                text = "$progress%",
+                color = ConstColours.WHITE
+            )
+        } else {
+            LinearProgressIndicator(
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
 
 @Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
 @Composable
@@ -328,6 +369,7 @@ private fun CameraLikeScreenPreview() {
             onGoToTakePhoto = {},
             onProfileClick = {},
             onGoToSettings = {},
+            onError = {},
             onGoToFriends = {},
             mediaType = MediaTypeToSend.VIDEO,
             uri = Uri.parse("https://avatars.mds.yandex.net/i?id=bd0db579c3e6b8b77e497c3185128489_l-13017849-images-thumbs&n=13")

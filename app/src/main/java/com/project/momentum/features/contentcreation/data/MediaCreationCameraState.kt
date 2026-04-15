@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
+import androidx.camera.core.MirrorMode
 import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
@@ -111,7 +112,9 @@ fun rememberCameraScreenState(
             .build()
     }
     val videoCapture = remember {
-        VideoCapture.withOutput(Recorder.Builder().build())
+        VideoCapture.Builder(Recorder.Builder().build())
+            .setMirrorMode(MirrorMode.MIRROR_MODE_ON_FRONT_ONLY)
+            .build()
     }
 
     return remember(imageCapture, videoCapture, initialLensFacing) {

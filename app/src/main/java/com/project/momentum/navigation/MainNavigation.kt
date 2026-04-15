@@ -300,10 +300,12 @@ fun MainScreen() {
             ) {
                 AccountRoot(
                     onPostClick = { post, userName ->
-                        openOverlay(NavRoutes.PreviewPhoto(
-                            post = post,
-                            userName = userName
-                        ))
+                        openOverlay(
+                            NavRoutes.PreviewPhoto(
+                                post = post,
+                                userName = userName
+                            )
+                        )
                     },
                     onEditClick = {
                         openOverlay(NavRoutes.EditAccount)
@@ -326,10 +328,12 @@ fun MainScreen() {
                 FriendAccountRoot(
                     friend = route.friend,
                     onPostClick = { post, userName ->
-                        openOverlay(NavRoutes.PreviewPhoto(
-                            post = post,
-                            userName = userName
-                        ))
+                        openOverlay(
+                            NavRoutes.PreviewPhoto(
+                                post = post,
+                                userName = userName
+                            )
+                        )
                     },
                     onBackClick = {
                         closeOverlay()
@@ -372,6 +376,9 @@ fun MainScreen() {
                     },
                     onGoToFriends = {
                         openOverlay(NavRoutes.Friends)
+                    },
+                    onError = {
+                        openOverlay(NavRoutes.NoInternetConnection)
                     }
                 )
             }
