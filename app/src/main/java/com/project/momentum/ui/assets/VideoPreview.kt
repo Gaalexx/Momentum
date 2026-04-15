@@ -2,7 +2,6 @@ package com.project.momentum.ui.assets
 
 import android.content.Context
 import android.net.Uri
-import androidx.compose.animation.core.animateDecay
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -14,7 +13,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -36,9 +34,13 @@ import androidx.compose.ui.unit.IntSize
 import androidx.media3.common.Player
 import kotlin.math.PI
 import kotlin.math.atan
-import kotlin.math.atan2
-import kotlin.math.hypot
-import kotlin.math.min
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import coil.compose.AsyncImage
+import coil.decode.VideoFrameDecoder
+import coil.request.ImageRequest
+import coil.request.videoFrameMillis
+
 
 @Composable
 fun CircularSeekArea(
@@ -224,5 +226,30 @@ fun VideoView(
             }
         },
         isEditable = isEditable
+    )
+}
+
+@Composable
+fun VideoThumbnail(
+    url: String,
+    modifier: Modifier = Modifier,
+    cacheKey: String = url,
+) {
+    val context = LocalContext.current
+    val frameMillis = 250L
+
+    AsyncImage(
+        model = ImageRequest.Builder(context)
+            .data(url)
+            .videoFrameMillis(frameMillis)
+            .decoderFactory { result, options, _ ->
+                VideoFrameDecoder(result.source, options)
+            }
+            .memoryCacheKey("video-thumbnail:$cacheKey:$frameMillis")
+            .crossfade(true)
+            .build(),
+        contentDescription = null,
+        contentScale = ContentScale.Crop,
+        modifier = modifier,
     )
 }

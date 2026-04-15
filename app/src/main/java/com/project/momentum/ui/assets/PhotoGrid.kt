@@ -221,6 +221,7 @@ fun S3PhotoGrid(
                 }
 
                 is S3GridItem.VideoPost -> {
+                    val post = item.post
                     Box(
                         modifier = Modifier
                             .aspectRatio(1f)
@@ -232,6 +233,7 @@ fun S3PhotoGrid(
                             },
                         contentAlignment = Alignment.Center
                     ) {
+                        VideoThumbnail(post.presignedURL)
                         Icon(
                             modifier = Modifier.fillMaxSize(0.5f),
                             imageVector = Icons.Outlined.PlayArrow,
