@@ -94,6 +94,7 @@ fun SendPhotoScreen(
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
+    onError: () -> Unit,
     uri: Uri,
     mediaType: MediaTypeToSend,
     vm: ContentCreationViewModel = hiltViewModel()
@@ -111,13 +112,10 @@ fun SendPhotoScreen(
     LaunchedEffect(uploadState) {
         when(uploadState){
             is UploadState.Success -> onGoToTakePhoto()
-            is UploadState.Error -> onGoToSettings()
+            is UploadState.Error -> onError()
             else -> Unit
         }
-//        if (uploadState is UploadState.Success) {
-//            onGoToTakePhoto()
-//        }
-//        if()
+
     }
 
 
@@ -162,7 +160,8 @@ fun SendPhotoScreen(
                 Box(
                     Modifier
                         .fillMaxSize()
-                        .aspectRatio(1f)
+                        .aspectRatio(1f),
+                    contentAlignment = Alignment.Center
                 ) {
                     when (mediaType) {
                         MediaTypeToSend.PHOTO -> {
@@ -370,6 +369,7 @@ private fun CameraLikeScreenPreview() {
             onGoToTakePhoto = {},
             onProfileClick = {},
             onGoToSettings = {},
+            onError = {},
             onGoToFriends = {},
             mediaType = MediaTypeToSend.VIDEO,
             uri = Uri.parse("https://avatars.mds.yandex.net/i?id=bd0db579c3e6b8b77e497c3185128489_l-13017849-images-thumbs&n=13")
