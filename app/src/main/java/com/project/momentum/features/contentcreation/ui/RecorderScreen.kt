@@ -1,5 +1,9 @@
 package com.project.momentum.features.contentcreation.ui
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
@@ -53,6 +57,8 @@ import java.util.Locale
 import kotlin.math.sqrt
 import android.Manifest
 import androidx.core.content.ContextCompat
+import android.util.Log
+import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun AudioRadialVisualizer(amplitude: Float) {
@@ -121,55 +127,66 @@ fun AudioRadialVisualizer(amplitude: Float) {
 
 @SuppressLint("MissingPermission")
 fun startAudioPreview(context: Context, uri: Uri, mainState: MainState) {
-    val player = MediaPlayer().apply {
-        setDataSource(context, uri)
-        prepare()
-        start()
-    }
+    try {
+        val player = MediaPlayer().apply {
+            setDataSource(context, uri)
+            prepare()
+            start()
+            isLooping = true
+        }
 
-    val visualizer = Visualizer(player.audioSessionId).apply {
-        captureSize = Visualizer.getCaptureSizeRange()[1]
+        val visualizer = Visualizer(player.audioSessionId).apply {
+            captureSize = Visualizer.getCaptureSizeRange()[1]
 
-        setDataCaptureListener(
-            object : Visualizer.OnDataCaptureListener {
-                override fun onWaveFormDataCapture(
-                    visualizer: Visualizer?,
-                    waveform: ByteArray?,
-                    samplingRate: Int
-                ) {
-                    waveform?.let {
-                        var sum = 0.0
-                        for (b in it) {
-                            sum += b * b
+            setDataCaptureListener(
+                object : Visualizer.OnDataCaptureListener {
+                    override fun onWaveFormDataCapture(
+                        visualizer: Visualizer?,
+                        waveform: ByteArray?,
+                        samplingRate: Int
+                    ) {
+                        waveform?.let {
+                            var sum = 0.0
+                            for (b in it) {
+                                sum += b * b
+                            }
+                            val rms = sqrt(sum / it.size).toFloat()
+                            mainState.amplitude = rms
                         }
-                        val rms = sqrt(sum / it.size).toFloat()
-                        mainState.amplitude = rms
                     }
-                }
 
-                override fun onFftDataCapture(
-                    visualizer: Visualizer?,
-                    fft: ByteArray?,
-                    samplingRate: Int
-                ) {}
-            },
-            Visualizer.getMaxCaptureRate() / 2,
-            true,
-            false
-        )
+                    override fun onFftDataCapture(
+                        visualizer: Visualizer?,
+                        fft: ByteArray?,
+                        samplingRate: Int
+                    ) {}
+                },
+                Visualizer.getMaxCaptureRate() / 2,
+                true,
+                false
+            )
 
-        enabled = true
+            enabled = true
+        }
+
+        mainState.mediaPlayer = player
+        mainState.visualizer = visualizer
+
+        mainState.isPlaying = true
+        mainState.startProgressUpdate()
+
+    } catch (e: Exception) {
+        Log.e("AudioPreview", "Error starting preview: ${e.message}", e)
     }
-
-    mainState.mediaPlayer = player
-    mainState.visualizer = visualizer
 }
 
 fun stopAudioPreview(mainState: MainState) {
     mainState.visualizer?.release()
     mainState.visualizer = null
+    mainState.mediaPlayer?.stop()
     mainState.mediaPlayer?.release()
     mainState.mediaPlayer = null
+    mainState.amplitude = 0f
 }
 
 @SuppressLint("MissingPermission")
@@ -408,12 +425,9 @@ fun RecorderScreen(
             .fillMaxSize()
             .background(bg)
             .windowInsetsPadding(WindowInsets.systemBars)
-            .pointerInput(Unit) {
-                // Здесь можно добавить обработку жестов
-            },
+            .pointerInput(Unit) {},
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Верхняя панель с кнопками
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -439,7 +453,6 @@ fun RecorderScreen(
 
         Spacer(Modifier.height(12.dp))
 
-        // Основное изображение
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -447,9 +460,13 @@ fun RecorderScreen(
                 .clip(RoundedCornerShape(60.dp))
                 .background(ConstColours.BLACK)
         ) {
-            if (mainState.currentState == "STATE_1" && mainState.isRecording) {
+            if ((mainState.currentState == "STATE_1" && mainState.isRecording) ||
+                (mainState.currentState == "STATE_2" && mainState.isPlaying)) {
                 RecordingProgressRing(
-                    progress = mainState.recordingProgress,
+                    progress = if (mainState.currentState == "STATE_2")
+                        mainState.playbackProgress
+                    else
+                        mainState.recordingProgress,
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -462,7 +479,7 @@ fun RecorderScreen(
                     .background(Color(0xFF2A2E39))
                     .align(Alignment.Center)
             ) {
-                if (mainState.currentState == "STATE_1") {
+                if (mainState.currentState == "STATE_1" || mainState.currentState == "STATE_2") {
                     AudioRadialVisualizer(mainState.amplitude)
                 } else {
                     AsyncImage(
@@ -477,14 +494,17 @@ fun RecorderScreen(
                     val context = LocalContext.current
                     val previewUri = mainState.audioFile?.let { Uri.fromFile(it) }
 
-                    LaunchedEffect(previewUri) {
+                    LaunchedEffect(Unit) {
                         previewUri?.let {
+                            Log.d("STATE_2", "Starting audio preview")
                             startAudioPreview(context, it, mainState)
                         }
                     }
 
                     DisposableEffect(Unit) {
                         onDispose {
+                            Log.d("STATE_2", "Stopping audio preview")
+                            mainState.stopProgressUpdate()
                             stopAudioPreview(mainState)
                         }
                     }
@@ -544,7 +564,6 @@ fun RecorderScreen(
 
         Spacer(modifier = Modifier.weight(1f))
 
-        // Нижняя секция с микрофоном и состояниями
         SecondaryImagesSection(
             mainState = mainState,
             onGoToPreview = onGoToPreview,
@@ -567,6 +586,29 @@ class MainState {
     var isFftRunning by mutableStateOf(false)
     var mediaPlayer: MediaPlayer? by mutableStateOf(null)
     var visualizer: Visualizer? by mutableStateOf(null)
+    var previewRestartKey by mutableStateOf(0)
+    var playbackProgress by mutableStateOf(0f)
+
+    var isPlaying by mutableStateOf(false)
+    var progressUpdateJob: Job? = null
+
+    fun startProgressUpdate() {
+        progressUpdateJob?.cancel()
+        progressUpdateJob = CoroutineScope(Dispatchers.Main).launch {
+            while (isPlaying && mediaPlayer != null) {
+                delay(50)
+                val current = mediaPlayer?.currentPosition ?: 0
+                val duration = mediaPlayer?.duration ?: 1
+                playbackProgress = current.toFloat() / duration.toFloat()
+            }
+        }
+    }
+
+    fun stopProgressUpdate() {
+        isPlaying = false
+        progressUpdateJob?.cancel()
+        progressUpdateJob = null
+    }
 }
 
 @Composable
@@ -616,14 +658,31 @@ fun SecondaryImagesSection(
     }
 
     LaunchedEffect(isImage1Tinted, isLongPressActive) {
-        mainState.currentState = when {
+        val newState = when {
             !isImage1Tinted && !isLongPressActive -> "INITIAL"
             isImage1Tinted && isLongPressActive -> "STATE_1"
             isImage1Tinted && !isLongPressActive -> "STATE_2"
             else -> "INITIAL"
         }
 
-        if (mainState.currentState == "STATE_2") {
+        when (newState) {
+            "STATE_2" -> {
+                stopAudioCapture(mainState)
+            }
+            "STATE_1" -> {
+                if (mainState.currentState == "STATE_2") {
+                    startAudioCapture(mainState)
+                }
+            }
+            "INITIAL" -> {
+                stopAudioCapture(mainState)
+                stopRecording(mainState)
+            }
+        }
+
+        mainState.currentState = newState
+
+        if (newState == "STATE_2") {
             delay(100)
             captionFocusRequester.requestFocus()
             keyboardController?.show()
@@ -640,7 +699,14 @@ fun SecondaryImagesSection(
     }
 
     fun resetToInitialState() {
+        mainState.stopProgressUpdate()
+        stopAudioPreview(mainState)
         stopRecording(mainState)
+        stopAudioCapture(mainState)
+
+        mainState.audioFile?.delete()
+        mainState.audioFile = null
+
         isImage1Tinted = false
         isImage2Visible = true
         isLongPressActive = false
@@ -649,6 +715,8 @@ fun SecondaryImagesSection(
         progressJob?.cancel()
         progressJob = null
         mainState.recordingProgress = 0f
+        mainState.playbackProgress = 0f
+        mainState.previewRestartKey = 0
         keyboardController?.hide()
     }
 
@@ -665,18 +733,9 @@ fun SecondaryImagesSection(
         progressJob?.cancel()
         mainState.recordingProgress = 0f
 
-        val previewUri = mainState.audioFile?.let { file ->
-            saveToMediaStore(context, file)?.also {
-                file.delete()
-                mainState.audioFile = null
-            }
-        }
-
-        resetToInitialState()
-        previewUri?.let {
-            onGoToPreview(it, MediaTypeToSend.AUDIO)
-        }
+        isLongPressActive = false
     }
+
 
     fun startProgressAnimation() {
         progressJob?.cancel()
@@ -747,13 +806,17 @@ fun SecondaryImagesSection(
                         BigCircleSendPhotoAction(
                             onClick = {
                                 mainState.audioFile?.let { file ->
-                                    saveToMediaStore(context, file)?.let { uri ->
-                                        file.delete()
-                                        mainState.audioFile = null
-                                        resetToInitialState()
-                                        onGoToPreview(uri, MediaTypeToSend.AUDIO)
-                                        return@BigCircleSendPhotoAction
-                                    }
+                                    mainState.stopProgressUpdate()
+                                    stopAudioPreview(mainState)
+
+                                    val savedUri = saveToMediaStore(context, file)
+
+                                    file.delete()
+                                    mainState.audioFile = null
+                                    resetToInitialState()
+
+                                    // TODO: Здесь можно добавить сохранение URI в базу данных или уведомление
+                                    // НЕ использовать onGoToPreview, чтобы не открывать другой экран!
                                 }
                                 resetToInitialState()
                             }
