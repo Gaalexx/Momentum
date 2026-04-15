@@ -15,18 +15,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.project.momentum.features.contentcreation.data.CameraScreenState
+import com.project.momentum.features.contentcreation.data.ContentCreationMode
 import com.project.momentum.ui.theme.ConstColours
 
 @Composable
-internal fun CameraLikeContent(
+internal fun MediaCreationContent(
+    mode: ContentCreationMode,
     hasCameraPermission: Boolean,
-    state: CameraScreenState,
-    recordingProgress: Float,
-    captureButtonState: MutableState<Boolean>,
+    hasMicrophonePermission: Boolean,
+    cameraState: CameraScreenState,
+    cameraRecordingProgress: Float,
+    cameraCaptureButtonState: MutableState<Boolean>,
+    audioRecordingProgress: Float,
+    audioLevel: Float,
+    isAudioRecording: Boolean,
+    modeSwitchEnabled: Boolean,
+    onModeChange: (ContentCreationMode) -> Unit,
     onTakePhoto: () -> Unit,
-    onStartRecording: () -> Unit,
-    onStopRecording: () -> Unit,
-    onGoToRecorder: () -> Unit,
+    onStartVideoRecording: () -> Unit,
+    onStopVideoRecording: () -> Unit,
+    onStartAudioRecording: () -> Unit,
+    onStopAudioRecording: () -> Unit,
     onProfileClick: () -> Unit,
     onGoToGallery: () -> Unit,
     onGoToSettings: () -> Unit,
@@ -56,13 +65,21 @@ internal fun CameraLikeContent(
                 .padding(top = 82.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            CameraPreviewCard(
+            MediaCreationPreviewCard(
+                mode = mode,
                 hasCameraPermission = hasCameraPermission,
-                state = state,
-                progress = recordingProgress,
+                hasMicrophonePermission = hasMicrophonePermission,
+                cameraState = cameraState,
+                progress = when (mode) {
+                    ContentCreationMode.Camera -> cameraRecordingProgress
+                    ContentCreationMode.Audio -> audioRecordingProgress
+                },
+                audioLevel = audioLevel,
             )
-            CameraModeSwitcher(
-                onGoToRecorder = onGoToRecorder,
+            MediaCreationModeSwitcher(
+                mode = mode,
+                enabled = modeSwitchEnabled,
+                onModeChange = onModeChange,
                 modifier = Modifier.padding(top = 16.dp),
             )
         }
@@ -74,19 +91,36 @@ internal fun CameraLikeContent(
                 .padding(horizontal = 28.dp, vertical = 15.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            CameraBottomControls(
-                torchEnabled = state.torchEnabled,
-                captureEnabled = hasCameraPermission,
-                captureButtonState = captureButtonState,
-                onToggleTorch = state::toggleTorch,
-                onTakePhoto = onTakePhoto,
-                onStartRecording = onStartRecording,
-                onStopRecording = onStopRecording,
-                onFlipCamera = state::flipCamera,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 25.dp),
-            )
+            when (mode) {
+                ContentCreationMode.Camera -> {
+                    CameraBottomControls(
+                        torchEnabled = cameraState.torchEnabled,
+                        captureEnabled = hasCameraPermission,
+                        captureButtonState = cameraCaptureButtonState,
+                        onToggleTorch = cameraState::toggleTorch,
+                        onTakePhoto = onTakePhoto,
+                        onStartRecording = onStartVideoRecording,
+                        onStopRecording = onStopVideoRecording,
+                        onFlipCamera = cameraState::flipCamera,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 25.dp),
+                    )
+                }
+
+                ContentCreationMode.Audio -> {
+                    AudioBottomControls(
+                        enabled = hasMicrophonePermission,
+                        isRecording = isAudioRecording,
+                        onStartRecording = onStartAudioRecording,
+                        onStopRecording = onStopAudioRecording,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 25.dp),
+                    )
+                }
+            }
+
             GalleryButton(onClick = onGoToGallery)
         }
     }

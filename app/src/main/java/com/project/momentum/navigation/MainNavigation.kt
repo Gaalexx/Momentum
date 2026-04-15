@@ -26,8 +26,8 @@ import com.project.momentum.features.auth.ui.CreateAccountScreen
 import com.project.momentum.features.auth.ui.CreatePasswordScreen
 import com.project.momentum.features.auth.ui.InsertCodeScreen
 import com.project.momentum.features.auth.ui.PasswordRecoveryScreen
-import com.project.momentum.features.contentcreation.ui.CameraLikeScreen
-import com.project.momentum.features.contentcreation.ui.RecorderScreen
+import com.project.momentum.features.contentcreation.data.ContentCreationMode
+import com.project.momentum.features.contentcreation.ui.MediaCreationScreen
 import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
 import com.project.momentum.features.editingAccount.EditingAccountRoot
 import com.project.momentum.features.friends.ui.FriendAccountRoot
@@ -201,12 +201,10 @@ fun MainScreen() {
 
             // Экраны создания контента
             entry<NavRoutes.Camera> {
-                CameraLikeScreen(
+                MediaCreationScreen(
+                    initialMode = ContentCreationMode.Camera,
                     onGoToPreview = { uri, mediaType ->
                         openOverlay(NavRoutes.SendPhoto(uri.toString(), mediaType))
-                    },
-                    onGoToRecorder = {
-                        setBase(NavRoutes.Recorder)
                     },
                     onProfileClick = {
                         openOverlay(NavRoutes.Account("camera"))
@@ -224,10 +222,8 @@ fun MainScreen() {
             }
 
             entry<NavRoutes.Recorder> {
-                RecorderScreen(
-                    onCameraClick = {
-                        setBase(NavRoutes.Camera)
-                    },
+                MediaCreationScreen(
+                    initialMode = ContentCreationMode.Audio,
                     onGoToPreview = { uri, mediaType ->
                         openOverlay(NavRoutes.SendPhoto(uri.toString(), mediaType))
                     },

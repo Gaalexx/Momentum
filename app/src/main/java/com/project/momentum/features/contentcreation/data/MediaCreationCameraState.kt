@@ -127,7 +127,9 @@ fun rememberCameraScreenState(
 }
 
 @Composable
-fun rememberCameraPermissionState(): State<Boolean> {
+fun rememberCameraPermissionState(
+    shouldRequest: Boolean = true,
+): State<Boolean> {
     val context = LocalContext.current
     val hasPermission = remember {
         mutableStateOf(
@@ -142,8 +144,8 @@ fun rememberCameraPermissionState(): State<Boolean> {
         hasPermission.value = granted
     }
 
-    LaunchedEffect(Unit) {
-        if (!hasPermission.value) {
+    LaunchedEffect(shouldRequest) {
+        if (shouldRequest && !hasPermission.value) {
             launcher.launch(Manifest.permission.CAMERA)
         }
     }
