@@ -26,9 +26,8 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
-import com.project.momentum.features.contentcreation.data.CameraScreenState
-import com.project.momentum.features.contentcreation.data.ContentCreationMode
-import com.project.momentum.features.contentcreation.ui.CameraPreviewContainer
+import com.project.momentum.features.contentcreation.models.ContentCreationMode
+import com.project.momentum.features.contentcreation.state.CameraScreenState
 import com.project.momentum.ui.assets.AudioRadialVisualizer
 import com.project.momentum.ui.theme.ConstColours
 

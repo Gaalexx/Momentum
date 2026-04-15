@@ -11,11 +11,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.project.momentum.features.contentcreation.data.ContentCreationMode
-import com.project.momentum.features.contentcreation.data.MediaTypeToSend
-import com.project.momentum.features.contentcreation.data.rememberCameraPermissionState
-import com.project.momentum.features.contentcreation.data.rememberCameraScreenState
-import com.project.momentum.features.contentcreation.data.rememberMicrophonePermissionState
+import com.project.momentum.features.contentcreation.media.rememberAudioRecordingController
+import com.project.momentum.features.contentcreation.media.rememberCameraCaptureActions
+import com.project.momentum.features.contentcreation.media.rememberCameraRecordingController
+import com.project.momentum.features.contentcreation.models.ContentCreationMode
+import com.project.momentum.features.contentcreation.models.MediaTypeToSend
+import com.project.momentum.features.contentcreation.permissions.rememberCameraPermissionState
+import com.project.momentum.features.contentcreation.permissions.rememberMicrophonePermissionState
+import com.project.momentum.features.contentcreation.state.rememberCameraScreenState
 import com.project.momentum.features.contentcreation.ui.assets.MediaCreationContent
 
 private const val DefaultMaxRecordMs = 10_000

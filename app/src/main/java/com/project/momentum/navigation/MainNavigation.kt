@@ -26,7 +26,7 @@ import com.project.momentum.features.auth.ui.CreateAccountScreen
 import com.project.momentum.features.auth.ui.CreatePasswordScreen
 import com.project.momentum.features.auth.ui.InsertCodeScreen
 import com.project.momentum.features.auth.ui.PasswordRecoveryScreen
-import com.project.momentum.features.contentcreation.data.ContentCreationMode
+import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.ui.MediaCreationScreen
 import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
 import com.project.momentum.features.editingAccount.EditingAccountRoot

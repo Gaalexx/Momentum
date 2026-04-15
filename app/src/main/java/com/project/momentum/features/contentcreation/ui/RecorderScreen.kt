@@ -4,8 +4,8 @@ import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.project.momentum.features.contentcreation.data.ContentCreationMode
-import com.project.momentum.features.contentcreation.data.MediaTypeToSend
+import com.project.momentum.features.contentcreation.models.ContentCreationMode
+import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 
 @Composable
 fun RecorderScreen(

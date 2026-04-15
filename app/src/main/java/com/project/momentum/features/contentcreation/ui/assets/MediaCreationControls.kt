@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.project.momentum.R
-import com.project.momentum.features.contentcreation.data.ContentCreationMode
+import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.ui.assets.BigCircleForMainScreenAction
 import com.project.momentum.ui.assets.BigCircleMicroButton
 import com.project.momentum.ui.assets.CircleButton

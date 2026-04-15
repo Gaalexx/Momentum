@@ -1,4 +1,4 @@
-package com.project.momentum.features.contentcreation.data
+package com.project.momentum.features.contentcreation.permissions
 
 import android.Manifest
 import android.content.pm.PackageManager
