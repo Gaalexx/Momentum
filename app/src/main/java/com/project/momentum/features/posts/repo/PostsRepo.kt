@@ -25,6 +25,7 @@ class PostsRepo @Inject constructor(
                     title = it.title,
                     presignedURL = it.presignedURL,
                     avatarPresignedURL = it.avatarPresignedURL,
+                    mediaType = it.mediaType,
                     createdAt = it.createdAt
                 )
             )
@@ -38,6 +39,7 @@ class PostsRepo @Inject constructor(
                     title = it.title,
                     presignedURL = it.presignedURL,
                     avatarPresignedURL = it.avatarPresignedURL,
+                    mediaType = it.mediaType,
                     createdAt = it.createdAt
                 )
             )

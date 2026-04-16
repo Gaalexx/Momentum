@@ -2,6 +2,7 @@ package com.project.momentum.features.posts.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -26,6 +27,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -38,11 +40,20 @@ import coil.compose.AsyncImage
 import com.project.momentum.R
 import com.project.momentum.features.account.models.PostData
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
+import com.project.momentum.network.s3.MediaType
+import com.project.momentum.ui.assets.AudioPreview
+import com.project.momentum.ui.assets.AudioView
 import com.project.momentum.ui.assets.CaptionBasicLabel
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.ui.assets.FriendsPillButton
 import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
+import androidx.compose.ui.draw.blur
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import com.project.momentum.ui.assets.VideoPreview
+import com.project.momentum.ui.assets.VideoView
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
@@ -160,7 +171,7 @@ fun WatchPhotoScreenRoute(
 ) {
 
     val uiState by postsViewModel.state.collectAsStateWithLifecycle()
-    
+
     val userPosts by remember(userName) {
         if (userName != null) {
             postsViewModel.getUserPostsFlow(userName)
@@ -195,15 +206,22 @@ fun WatchPhotoScreen(
 ) {
     val bg = ConstColours.BLACK
     val iconTint = ConstColours.WHITE
-
+    val context = LocalContext.current
     val captionFocusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
     val pagerState = rememberPagerState(initialPage = postIndex, pageCount = { posts.size })
 
+    var isEditable by remember { mutableStateOf(false) }
+    val backgroundBlur by animateDpAsState(
+        targetValue = if (isEditable) 18.dp else 0.dp,
+        label = "watch_photo_background_blur"
+    )
+    val blurClickInteractionSource = remember { MutableInteractionSource() }
+
+
     val currentPost by remember(posts, pagerState.currentPage) {
         derivedStateOf { posts.getOrNull(pagerState.currentPage) }
     }
-    //var curIndex by remember { mutableIntStateOf(postIndex) }
 
     Column(
         modifier = Modifier
@@ -215,6 +233,14 @@ fun WatchPhotoScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .blur(backgroundBlur)
+                .clickable(
+                    enabled = isEditable,
+                    interactionSource = blurClickInteractionSource,
+                    indication = null
+                ) {
+                    isEditable = false
+                }
                 .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -235,45 +261,123 @@ fun WatchPhotoScreen(
         } else {
             VerticalPager(
                 state = pagerState,
+                userScrollEnabled = !isEditable,
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
             ) { pageIndex ->
-                //curIndex = pageIndex
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.95f)
-                        .aspectRatio(1f)
-                        .clip(RoundedCornerShape(60.dp))
-                        .background(ConstColours.MAIN_BACK_GRAY)
-                ) {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        AsyncImage(
-                            model = posts[pageIndex].presignedURL,
-                            contentDescription = null,
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
+                val post = posts[pageIndex]
+
+                when (post.mediaType) {
+                    MediaType.IMAGE -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth(0.95f)
+                                .aspectRatio(1f)
+                                .clip(RoundedCornerShape(60.dp))
+                                .background(ConstColours.MAIN_BACK_GRAY)
+                        ) {
+                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+
+                                AsyncImage(
+                                    model = posts[pageIndex].presignedURL,
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+
+                                if (posts[pageIndex].title.isNotBlank()) {
+                                    CaptionBasicLabel(
+                                        text = posts[pageIndex].title,
+                                        modifier = Modifier
+                                            .align(Alignment.BottomStart)
+                                            .fillMaxWidth()
+                                            .padding(16.dp)
+                                            .focusRequester(captionFocusRequester)
+                                    )
+                                }
+
+                            }
+                        }
+                    }
+
+                    MediaType.VIDEO -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .combinedClickable(
+                                    onClick = {},
+                                    onLongClick = { isEditable = !isEditable }
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            VideoView(
+                                context = context,
+                                uri = post.presignedURL,
+                                isEditable = isEditable,
+                                isPlaying = pageIndex == pagerState.currentPage
+                            )
+                        }
+
+
 
                         if (posts[pageIndex].title.isNotBlank()) {
                             CaptionBasicLabel(
                                 text = posts[pageIndex].title,
                                 modifier = Modifier
-                                    .align(Alignment.BottomStart)
                                     .fillMaxWidth()
                                     .padding(16.dp)
                                     .focusRequester(captionFocusRequester)
+                                    .align(Alignment.End)
+                            )
+                        }
+                    }
+
+                    MediaType.AUDIO -> {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .combinedClickable(
+                                    onClick = {},
+                                    onLongClick = { isEditable = !isEditable }
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            AudioView(
+                                context = context,
+                                uri = post.presignedURL,
+                                isEditable = isEditable,
+                                isPlaying = pageIndex == pagerState.currentPage
                             )
                         }
 
+                        if (posts[pageIndex].title.isNotBlank()) {
+                            CaptionBasicLabel(
+                                text = posts[pageIndex].title,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                                    .focusRequester(captionFocusRequester)
+                                    .align(Alignment.End)
+                            )
+                        }
                     }
                 }
+
             }
         }
 
         Column(
             modifier = Modifier
-                .fillMaxSize(),
+                .fillMaxSize()
+                .blur(backgroundBlur)
+                .clickable(
+                    enabled = isEditable,
+                    interactionSource = blurClickInteractionSource,
+                    indication = null
+                ) {
+                    isEditable = false
+                },
             horizontalAlignment = Alignment.CenterHorizontally
 
         ) {
@@ -298,6 +402,7 @@ fun WatchPhotoScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .weight(1f)
                     .padding(horizontal = 28.dp)
                     .padding(bottom = dimensionResource(R.dimen.medium_padding)),
                 verticalAlignment = Alignment.CenterVertically,
@@ -320,7 +425,7 @@ fun WatchPhotoScreen(
                     modifier = Modifier
                         .width(200.dp)
                         .height(dimensionResource(R.dimen.button_size)),
-                    "Ответить",
+                    stringResource(R.string.reply),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = ConstColours.MAIN_BRAND_BLUE,
                         contentColor = ConstColours.WHITE
@@ -372,6 +477,7 @@ private fun WatchPhotoScreenPreview() {
                     userName = "PreviewName",
                     title = "Description",
                     presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+                    mediaType = MediaType.IMAGE,
                     createdAt = "2026-03-12T14:38:50.690942Z"
                 ),
                 PostData(
@@ -380,6 +486,7 @@ private fun WatchPhotoScreenPreview() {
                     userName = "PreviewName2",
                     title = "Description2",
                     presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+                    mediaType = MediaType.IMAGE,
                     createdAt = "2026-03-12T14:38:50.690942Z"
                 )
             )

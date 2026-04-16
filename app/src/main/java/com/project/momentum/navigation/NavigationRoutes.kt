@@ -3,6 +3,7 @@ package com.project.momentum.navigation
 import androidx.navigation3.runtime.NavKey
 import com.project.momentum.features.contentcreation.data.MediaTypeToSend
 import com.project.momentum.features.editingAccount.EditAccountFields
+import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.friends.ui.User
 import kotlinx.serialization.Serializable
 

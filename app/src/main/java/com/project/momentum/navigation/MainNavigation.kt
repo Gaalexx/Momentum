@@ -30,8 +30,8 @@ import com.project.momentum.features.auth.ui.InsertCodeRoot
 import com.project.momentum.features.auth.ui.InsertCodeScreen
 import com.project.momentum.features.auth.ui.PasswordRecoveryRoot
 import com.project.momentum.features.auth.ui.PasswordRecoveryScreen
-import com.project.momentum.features.contentcreation.ui.CameraLikeScreen
-import com.project.momentum.features.contentcreation.ui.RecorderScreen
+import com.project.momentum.features.contentcreation.models.ContentCreationMode
+import com.project.momentum.features.contentcreation.ui.MediaCreationScreen
 import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
 import com.project.momentum.features.editingAccount.EditAccountFields
 import com.project.momentum.features.editingAccount.EditingAccountRoot
@@ -206,12 +206,10 @@ fun MainScreen() {
 
             // Экраны создания контента
             entry<NavRoutes.Camera> {
-                CameraLikeScreen(
+                MediaCreationScreen(
+                    initialMode = ContentCreationMode.Camera,
                     onGoToPreview = { uri, mediaType ->
                         openOverlay(NavRoutes.SendPhoto(uri.toString(), mediaType))
-                    },
-                    onGoToRecorder = {
-                        setBase(NavRoutes.Recorder)
                     },
                     onProfileClick = {
                         openOverlay(NavRoutes.Account("camera"))
@@ -229,10 +227,8 @@ fun MainScreen() {
             }
 
             entry<NavRoutes.Recorder> {
-                RecorderScreen(
-                    onCameraClick = {
-                        setBase(NavRoutes.Camera)
-                    },
+                MediaCreationScreen(
+                    initialMode = ContentCreationMode.Audio,
                     onGoToPreview = { uri, mediaType ->
                         openOverlay(NavRoutes.SendPhoto(uri.toString(), mediaType))
                     },
@@ -305,10 +301,12 @@ fun MainScreen() {
             ) {
                 AccountRoot(
                     onPostClick = { post, userName ->
-                        openOverlay(NavRoutes.PreviewPhoto(
-                            post = post,
-                            userName = userName
-                        ))
+                        openOverlay(
+                            NavRoutes.PreviewPhoto(
+                                post = post,
+                                userName = userName
+                            )
+                        )
                     },
                     onEditClick = { uiInfoState ->
                         openOverlay(NavRoutes.EditAccount(
@@ -338,10 +336,12 @@ fun MainScreen() {
                 FriendAccountRoot(
                     friend = route.friend,
                     onPostClick = { post, userName ->
-                        openOverlay(NavRoutes.PreviewPhoto(
-                            post = post,
-                            userName = userName
-                        ))
+                        openOverlay(
+                            NavRoutes.PreviewPhoto(
+                                post = post,
+                                userName = userName
+                            )
+                        )
                     },
                     onBackClick = {
                         closeOverlay()
@@ -385,6 +385,9 @@ fun MainScreen() {
                     },
                     onGoToFriends = {
                         openOverlay(NavRoutes.Friends)
+                    },
+                    onError = {
+                        openOverlay(NavRoutes.NoInternetConnection)
                     }
                 )
             }

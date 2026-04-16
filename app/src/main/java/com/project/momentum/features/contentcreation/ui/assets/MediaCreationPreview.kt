@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -25,18 +26,22 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
-import com.project.momentum.features.contentcreation.ui.CameraPreviewContainer
-import com.project.momentum.features.contentcreation.data.CameraScreenState
+import com.project.momentum.features.contentcreation.models.ContentCreationMode
+import com.project.momentum.features.contentcreation.state.CameraScreenState
+import com.project.momentum.ui.assets.AudioRadialVisualizer
 import com.project.momentum.ui.theme.ConstColours
 
 private val PreviewCardShape = RoundedCornerShape(60.dp)
 private const val RecordingProgressStartShiftFraction = 0.3425f
 
 @Composable
-internal fun CameraPreviewCard(
+internal fun MediaCreationPreviewCard(
+    mode: ContentCreationMode,
     hasCameraPermission: Boolean,
-    state: CameraScreenState,
+    hasMicrophonePermission: Boolean,
+    cameraState: CameraScreenState,
     progress: Float,
+    audioLevel: Float,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -59,16 +64,48 @@ internal fun CameraPreviewCard(
                 .background(ConstColours.MAIN_BACK_GRAY)
                 .align(Alignment.Center),
         ) {
-            if (hasCameraPermission) {
-                CameraPreviewContainer(
-                    state = state,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            } else {
-                CameraPermissionPlaceholder()
+            when (mode) {
+                ContentCreationMode.Camera -> {
+                    if (hasCameraPermission) {
+                        CameraPreviewContainer(
+                            state = cameraState,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                    } else {
+                        PermissionPlaceholder(iconMode = ContentCreationMode.Camera)
+                    }
+                }
+
+                ContentCreationMode.Audio -> {
+                    AudioRadialVisualizer(
+                        level = audioLevel,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                    if (!hasMicrophonePermission) {
+                        PermissionPlaceholder(iconMode = ContentCreationMode.Audio)
+                    }
+                }
             }
         }
     }
+}
+
+@Composable
+internal fun CameraPreviewCard(
+    hasCameraPermission: Boolean,
+    state: CameraScreenState,
+    progress: Float,
+    modifier: Modifier = Modifier,
+) {
+    MediaCreationPreviewCard(
+        mode = ContentCreationMode.Camera,
+        hasCameraPermission = hasCameraPermission,
+        hasMicrophonePermission = true,
+        cameraState = state,
+        progress = progress,
+        audioLevel = 0f,
+        modifier = modifier,
+    )
 }
 
 @Composable
@@ -95,7 +132,7 @@ fun RecordingBorderProgress(
         progressPath.setPath(fullPath, forceClosed = true)
         val totalLength = progressPath.length
         val start = totalLength * RecordingProgressStartShiftFraction
-        val visibleLength = totalLength * progress
+        val visibleLength = totalLength * progress.coerceIn(0f, 1f)
         val end = start + visibleLength
         val segmentPath = Path()
 
@@ -133,7 +170,8 @@ fun RecordingBorderProgress(
 }
 
 @Composable
-private fun CameraPermissionPlaceholder(
+private fun PermissionPlaceholder(
+    iconMode: ContentCreationMode,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -141,7 +179,10 @@ private fun CameraPermissionPlaceholder(
         contentAlignment = Alignment.Center,
     ) {
         Icon(
-            imageVector = Icons.Outlined.PhotoCamera,
+            imageVector = when (iconMode) {
+                ContentCreationMode.Camera -> Icons.Outlined.PhotoCamera
+                ContentCreationMode.Audio -> Icons.Outlined.Mic
+            },
             contentDescription = null,
             tint = Color.White.copy(alpha = 0.35f),
             modifier = Modifier.size(56.dp),

@@ -93,7 +93,14 @@ class FriendsRepository @Inject constructor(
                 return true
             }
 
-            is RequestBy.ByLogin -> println("Not implemented")
+            is RequestBy.ByLogin -> {
+                val ifExists = usersInfoAPI.userByLoginExists(requestBy.identifier)
+                if (!ifExists) {
+                    return false
+                }
+                friendsInfoAPI.createRequestWithLogin(requestBy.identifier)
+                return true
+            }
             is RequestBy.ByNumber -> println("Not implemented")
         }
         return false

@@ -18,8 +18,8 @@ import javax.inject.Inject
 
 enum class SelectedIndex(val index: Int) {
     EMAIL(0),
-    TELEPHONE(1),
-    LOGIN(2);
+    LOGIN(1),
+    TELEPHONE(2);
 
     companion object {
         fun fromIndex(index: Int): SelectedIndex =
@@ -45,10 +45,12 @@ sealed interface FriendsScreenEvent {
     data class RejectRequest(val request: FriendRequest) : FriendsScreenEvent
     sealed interface CreateFriendRequest : FriendsScreenEvent {
         val identifier: String
+
         data class EmailRequest(override val identifier: String) : CreateFriendRequest
         data class LoginRequest(override val identifier: String) : CreateFriendRequest
         data class PhoneRequest(override val identifier: String) : CreateFriendRequest
     }
+
     data object GetFriends : FriendsScreenEvent
     data object GetRequests : FriendsScreenEvent
 
@@ -113,9 +115,10 @@ class FriendsViewModel @Inject constructor(
     }
 
 
-    private suspend fun onAddFriendQueryChangeValue(value: String){
+    private suspend fun onAddFriendQueryChangeValue(value: String) {
         _state.update { it.copy(addFriendQuery = value) }
     }
+
     private fun onAddFriendQueryChange(value: FriendsScreenEvent.AddFriendQueryChange) {
         _state.update { it.copy(addFriendQuery = value.newValue) }
     }
@@ -185,8 +188,8 @@ class FriendsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun clearError(){
-        if(_state.value.errorState || _state.value.errorText != null){
+    private suspend fun clearError() {
+        if (_state.value.errorState || _state.value.errorText != null) {
             _state.update {
                 it.copy(
                     errorState = false,
@@ -198,10 +201,18 @@ class FriendsViewModel @Inject constructor(
 
     private fun createFriendRequest(request: FriendsScreenEvent.CreateFriendRequest) {
         viewModelScope.launch {
-            val res = when(request){
-                is FriendsScreenEvent.CreateFriendRequest.EmailRequest -> repo.createFriendRequest(FriendsRepository.RequestBy.ByEmail(request.identifier))
-                is FriendsScreenEvent.CreateFriendRequest.LoginRequest -> repo.createFriendRequest(FriendsRepository.RequestBy.ByLogin(request.identifier))
-                is FriendsScreenEvent.CreateFriendRequest.PhoneRequest -> repo.createFriendRequest(FriendsRepository.RequestBy.ByNumber(request.identifier))
+            val res = when (request) {
+                is FriendsScreenEvent.CreateFriendRequest.EmailRequest -> repo.createFriendRequest(
+                    FriendsRepository.RequestBy.ByEmail(request.identifier)
+                )
+
+                is FriendsScreenEvent.CreateFriendRequest.LoginRequest -> repo.createFriendRequest(
+                    FriendsRepository.RequestBy.ByLogin(request.identifier)
+                )
+
+                is FriendsScreenEvent.CreateFriendRequest.PhoneRequest -> repo.createFriendRequest(
+                    FriendsRepository.RequestBy.ByNumber(request.identifier)
+                )
             }
             if (!res) {
                 _state.update {
@@ -210,11 +221,9 @@ class FriendsViewModel @Inject constructor(
                         errorText = R.string.person_wasnt_found
                     )
                 }
-            }
-            else if(_state.value.errorState || _state.value.errorText != null){
+            } else if (_state.value.errorState || _state.value.errorText != null) {
                 clearError()
-            }
-            else{
+            } else {
                 onAddFriendQueryChangeValue("")
                 onShowPageChangeValue(false)
             }

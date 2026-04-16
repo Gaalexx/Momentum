@@ -30,6 +30,7 @@ class AccountRepository @Inject constructor(
                     title = post.title,
                     presignedURL = post.presignedURL,
                     avatarPresignedURL = post.avatarPresignedURL,
+                    mediaType = post.mediaType,
                     createdAt = post.createdAt
                 )
             )

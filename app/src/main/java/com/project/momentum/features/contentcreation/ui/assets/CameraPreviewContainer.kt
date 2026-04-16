@@ -1,4 +1,4 @@
-package com.project.momentum.features.contentcreation.ui
+package com.project.momentum.features.contentcreation.ui.assets
 
 import android.util.Rational
 import android.view.Surface
@@ -26,7 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.google.common.util.concurrent.ListenableFuture
-import com.project.momentum.features.contentcreation.data.CameraScreenState
+import com.project.momentum.features.contentcreation.state.CameraScreenState
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -100,6 +100,7 @@ private fun bindCameraUseCases(
 
     val rotation = previewView.display?.rotation ?: Surface.ROTATION_0
     imageCapture.targetRotation = rotation
+    videoCapture.targetRotation = rotation
     imageCapture.setCropAspectRatio(Rational(1, 1))
 
     val viewPort = ViewPort.Builder(Rational(1, 1), rotation)

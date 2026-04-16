@@ -23,7 +23,10 @@ class S3InteractionRepository @Inject constructor(
     private val s3UploadAPI: S3UploadApi
 ) {
 
-    suspend fun sendPhoto(postInfo: PostInformation) {
+    suspend fun sendContent(
+        postInfo: PostInformation,
+        onProgress: (Int) -> Unit = {}
+    ) {
         val presignedURLDTO: PresignedURLDTO =
             client.sendUploadRequest(
                 UploadInfoDTO(
@@ -39,7 +42,8 @@ class S3InteractionRepository @Inject constructor(
             presignedURLDTO.urlToLoad,
             postInfo.uri,
             postInfo.mimeType,
-            postInfo.size
+            postInfo.size,
+            onProgress
         )
 
         val body =

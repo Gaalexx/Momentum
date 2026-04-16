@@ -1,5 +1,6 @@
 package com.project.momentum.features.contentcreation.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.momentum.network.s3.PostInformation
@@ -14,6 +15,7 @@ sealed interface UploadState {
     data object Idle : UploadState
     data class Uploading(val progress: Int? = null) : UploadState
     data class Success(val mediaId: String? = null) : UploadState
+    data object Error : UploadState
 }
 
 sealed interface UploadEvent {
@@ -26,6 +28,9 @@ sealed interface UploadEvent {
 class ContentCreationViewModel @Inject constructor(
     private val uploaderRepo: S3InteractionRepository
 ) : ViewModel() {
+    private companion object {
+        const val TAG = "ContentUpload"
+    }
 
     private val _state = MutableStateFlow<UploadState>(UploadState.Idle)
     val state = _state.asStateFlow()
@@ -45,13 +50,22 @@ class ContentCreationViewModel @Inject constructor(
     private fun upload(postInfo: PostInformation) {
         viewModelScope.launch {
             runCatching {
-                _state.value = UploadState.Uploading()
-                uploaderRepo.sendPhoto(postInfo)
+                _state.value = UploadState.Uploading(progress = 0)
+                uploaderRepo.sendContent(postInfo) { progress ->
+                    _state.value = UploadState.Uploading(progress = progress)
+                }
             }.onSuccess {
                 _state.value = UploadState.Success()
                 // TODO реализовать случай успеха
-            }.onFailure {
-                _state.value = UploadState.Uploading()
+            }.onFailure { throwable ->
+                Log.e(
+                    TAG,
+                    "Failed to upload content: uri=${postInfo.uri}, mimeType=${postInfo.mimeType}, " +
+                            "mediaType=${postInfo.mediaType}, size=${postInfo.size}",
+                    throwable
+                )
+                _state.value = UploadState.Error
+                //_state.value = UploadState.Uploading()
                 // TODO реализовать случай неудачи :(
             }
         }

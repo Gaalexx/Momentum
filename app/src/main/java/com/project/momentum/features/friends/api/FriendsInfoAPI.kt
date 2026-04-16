@@ -34,6 +34,15 @@ class FriendsInfoAPI @Inject constructor(
         }.body<FriendRequestActionDTO>()
     }
 
+    suspend fun createRequestWithLogin(
+        login: String
+    ) {
+        val result = client.post("friends/request/by-login") {
+            setBody(FriendRequestCreateByEmailDTO(login))
+            header(HttpHeaders.Authorization, sessionManager.getHeader())
+        }.body<FriendRequestActionDTO>()
+    }
+
     suspend fun getIncomingRequests(): List<FriendRequestWithUserDetailsDTO> {
         val result = client.get("friends/requests/incoming") {
             header(HttpHeaders.Authorization, sessionManager.getHeader())
