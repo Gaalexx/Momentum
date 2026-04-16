@@ -1,6 +1,7 @@
 package com.project.momentum.features.auth.models
 
 import com.project.momentum.features.auth.models.UserData
+import com.project.momentum.features.auth.viewmodel.ErrorLogin
 
 enum class LoginStep {
     LOGIN,
@@ -20,8 +21,7 @@ data class LoginState(
     val isLoading: Boolean = false,
     val isError: Boolean = false,
     val loginType: LoginType = LoginType.EMAIL,
-    val errorMessage: String? = null,
-    val isStepValid: Boolean = true,
+    val errorMessage: ErrorLogin = ErrorLogin.None,
     val canGoNext: Boolean = false,
     val canGoBack: Boolean = true
 )

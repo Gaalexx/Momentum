@@ -14,9 +14,14 @@ import javax.inject.Inject
 class AuthorizationViewModel @Inject constructor(
     private val repository: RegistrationRepository,
 ) : LoginViewModel() {
+    override fun isValidPassword(): ErrorLogin {
+        if (super.isValidPassword() !is ErrorLogin.None) return ErrorLogin.PasswordError.INVALID
+        return ErrorLogin.None
+    }
+
     override fun nextStep() {
-        validateCurrentStep()
-        if (!_state.value.isStepValid) return
+        validateCurrentStep(isValidPassword())
+        if (_state.value.isError) return
 
         when (_state.value.currentStep) {
             LoginStep.LOGIN -> {
@@ -37,11 +42,7 @@ class AuthorizationViewModel @Inject constructor(
                             it.copy(
                                 isError = true,
                                 isLoading = false,
-                                //TODO: завести класс для ошибок enum или что-то поумнее
-                                errorMessage = when (_state.value.loginType) {
-                                    LoginType.EMAIL -> "Аккаунта с такой почтой не существует"
-                                    else -> "Аккаунта с таким телефоном не существует"
-                                }
+                                errorMessage = ErrorLogin.LoginError.NOT_EXISTS_IN_DB
                             )
                         }
                     }
@@ -69,7 +70,7 @@ class AuthorizationViewModel @Inject constructor(
                             it.copy(
                                 isError = true,
                                 isLoading = false,
-                                errorMessage = "Неверный пароль"
+                                errorMessage = ErrorLogin.PasswordError.INVALID
                             )
                         }
                     }
@@ -99,8 +100,7 @@ class AuthorizationViewModel @Inject constructor(
                             it.copy(
                                 isError = true,
                                 isLoading = false,
-                                //TODO: завести класс для ошибок enum или что-то поумнее
-                                errorMessage = "Неверный код"
+                                errorMessage = ErrorLogin.CodeError.INVALID
                             )
                         }
                     }
@@ -124,7 +124,7 @@ class AuthorizationViewModel @Inject constructor(
                 }
             )
         }
-        validateCurrentStep()
+        validateCurrentStep(isValidPassword())
     }
 
     fun onCodeAuthorization() {

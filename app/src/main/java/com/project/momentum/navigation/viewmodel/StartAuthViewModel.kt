@@ -1,5 +1,6 @@
 package com.project.momentum.navigation.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.project.momentum.data.RegistrationRepository
@@ -30,10 +31,9 @@ class AuthUseCase @Inject constructor(
         try {
             AuthResult.Success(registrationRepository.authorize())
         } catch (ex: Exception) {
+            Log.e("Authorization", ex.message ?: "unknown")
             AuthResult.Error(AuthError.NoInternetConnectionError)
         }
-
-
 }
 
 sealed interface AppStartState {

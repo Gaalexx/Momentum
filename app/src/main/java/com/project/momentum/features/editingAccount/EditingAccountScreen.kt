@@ -47,6 +47,7 @@ import com.project.momentum.R
 import com.project.momentum.features.auth.models.NavEvent
 import com.project.momentum.ui.assets.CancelButton
 import com.project.momentum.ui.assets.ContinueButton
+import com.project.momentum.ui.assets.GlassTextField
 import com.project.momentum.ui.assets.TextFieldRegistration
 import com.project.momentum.ui.assets.TopBarTemplate
 import com.project.momentum.ui.common.LoadingOverlay
@@ -56,6 +57,7 @@ import com.project.momentum.ui.theme.ConstColours
 
 @Composable
 fun EditingAccountRoot(
+    currentUserInfo: EditAccountFields,
     onBackClick: () -> Unit,
     onContinueClick: () ->Unit,
     modifier: Modifier = Modifier
@@ -69,7 +71,7 @@ fun EditingAccountRoot(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri == null) {
-            //TODO: сообщить что обмена выбора мб
+            //TODO: сообщить что обтена выбора мб
             return@rememberLauncherForActivityResult
         }
         viewModel.selectPhoto(context, uri)
@@ -86,6 +88,7 @@ fun EditingAccountRoot(
 
     EditingAccountScreen(
         uiInfoState = uiState.value,
+        userData = currentUserInfo,
         onLoginChange = { viewModel.updateLogin(it) },
         onEmailChange = { viewModel.updateEmail(it) },
         onPhoneChange = { viewModel.updatePhone(it) },
@@ -105,6 +108,7 @@ fun EditingAccountRoot(
 @Composable
 fun EditingAccountScreen(
     uiInfoState: EditAccountState,
+    userData: EditAccountFields,
     onLoginChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPhoneChange: (String) -> Unit,
@@ -141,7 +145,7 @@ fun EditingAccountScreen(
                 .padding(bottom = dimensionResource(R.dimen.small_padding))
         )
 
-        TextFieldRegistration(
+        GlassTextField(
             value = value,
             onValueChange = onValueChange,
             modifier = Modifier,
@@ -188,14 +192,26 @@ fun EditingAccountScreen(
     //                                .aspectRatio(1f)
     //                                .align(Alignment.Center),
     //                        )
-                            Icon(
-                                imageVector = Icons.Outlined.AccountCircle,
-                                contentDescription = stringResource(R.string.account_avatar),
-                                tint = iconTint.copy(alpha = 0.7f),
-                                modifier = Modifier
-                                    .size(80.dp)
-                                    .align(Alignment.Center)
-                            )
+                            if (userData.profilePhotoURL == null) {
+                                Icon(
+                                    imageVector = Icons.Outlined.AccountCircle,
+                                    contentDescription = stringResource(R.string.account_avatar),
+                                    tint = iconTint.copy(alpha = 0.7f),
+                                    modifier = Modifier
+                                        .size(80.dp)
+                                        .align(Alignment.Center)
+                                )
+                            } else {
+                                AsyncImage(
+                                    model = userData.profilePhotoURL,
+                                    contentDescription = stringResource(R.string.account_avatar),
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(2.dp)
+                                        .clip(CircleShape)
+                                )
+                            }
                         } else {
                             AsyncImage(
                                 model = uiInfoState.fields.profilePhotoURL,
@@ -223,12 +239,14 @@ fun EditingAccountScreen(
                         title = "Логин",
                         value = uiInfoState.fields.username ?: "",
                         onValueChange = onLoginChange,
+                        placeholder = userData.username,
                         isError = uiInfoState.getErrorForUsername() != null,
                     )
                     EditTextField(
                         title = "Почта",
                         value = uiInfoState.fields.email ?: "",
                         onValueChange = onEmailChange,
+                        placeholder = userData.email,
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Email,
                             imeAction = ImeAction.Next
@@ -239,6 +257,7 @@ fun EditingAccountScreen(
                         title = "Телефон",
                         value = uiInfoState.fields.phone ?: "",
                         onValueChange = onPhoneChange,
+                        placeholder = userData.phone,
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Phone,
                             imeAction = ImeAction.Done
@@ -275,6 +294,7 @@ fun EditingAccountScreen(
 fun EditingAccountScreenPreview() {
     EditingAccountScreen(
         uiInfoState = EditAccountState.Content(EditAccountFields()),
+        userData = EditAccountFields(),
         onLoginChange = {},
         onEmailChange = {},
         onPhoneChange = {},

@@ -20,18 +20,24 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.project.momentum.features.account.ui.AccountRoot
+import com.project.momentum.features.auth.ui.AuthorizationAccountRoot
 import com.project.momentum.features.auth.ui.AuthorizationAccountScreen
+import com.project.momentum.features.auth.ui.AuthorizationPasswordRoot
 import com.project.momentum.features.auth.ui.AuthorizationPasswordScreen
-import com.project.momentum.features.auth.ui.CreateAccountScreen
-import com.project.momentum.features.auth.ui.CreatePasswordScreen
+import com.project.momentum.features.auth.ui.CreateAccountRoot
+import com.project.momentum.features.auth.ui.CreatePasswordRoot
+import com.project.momentum.features.auth.ui.InsertCodeRoot
 import com.project.momentum.features.auth.ui.InsertCodeScreen
+import com.project.momentum.features.auth.ui.PasswordRecoveryRoot
 import com.project.momentum.features.auth.ui.PasswordRecoveryScreen
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.ui.MediaCreationScreen
 import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
+import com.project.momentum.features.editingAccount.EditAccountFields
 import com.project.momentum.features.editingAccount.EditingAccountRoot
 import com.project.momentum.features.friends.ui.FriendAccountRoot
 import com.project.momentum.features.friends.ui.FriendsScreenRoute
+import com.project.momentum.features.offline.ui.NoInternetScreen
 import com.project.momentum.features.posts.ui.GalleryScreen
 import com.project.momentum.features.posts.ui.WatchPhotoScreenRoute
 import com.project.momentum.features.settings.ui.DeleteAccountCheckCodeScreen
@@ -42,7 +48,6 @@ import com.project.momentum.features.settings.ui.SettingsPremiumScreen
 import com.project.momentum.navigation.viewmodel.AppStartState
 import com.project.momentum.navigation.viewmodel.AppStartViewModel
 import com.project.momentum.ui.common.LoadingOverlay
-import com.project.momentum.features.offline.ui.NoInternetScreen
 
 @Composable
 fun MainScreen() {
@@ -127,7 +132,7 @@ fun MainScreen() {
 
             // Экраны регистрации
             entry<NavRoutes.RegistrationLogin> {
-                CreateAccountScreen(
+                CreateAccountRoot(
                     onBackClick = {
                         closeOverlay()
                     },
@@ -141,7 +146,7 @@ fun MainScreen() {
             }
 
             entry<NavRoutes.RegistrationCode> {
-                InsertCodeScreen(
+                InsertCodeRoot(
                     onBackClick = {
                         closeOverlay()
                     },
@@ -152,7 +157,7 @@ fun MainScreen() {
             }
 
             entry<NavRoutes.RegistrationPassword> {
-                CreatePasswordScreen(
+                CreatePasswordRoot(
                     onBackClick = {
                         closeOverlay()
                     },
@@ -164,7 +169,7 @@ fun MainScreen() {
 
             // Экраны входа
             entry<NavRoutes.AuthorizationLogin> {
-                AuthorizationAccountScreen(
+                AuthorizationAccountRoot(
                     onBackClick = {
                         closeOverlay()
                     },
@@ -175,7 +180,7 @@ fun MainScreen() {
             }
 
             entry<NavRoutes.AuthorizationPassword> {
-                AuthorizationPasswordScreen(
+                AuthorizationPasswordRoot(
                     onBackClick = {
                         closeOverlay()
                     },
@@ -189,7 +194,7 @@ fun MainScreen() {
             }
 
             entry<NavRoutes.AuthorizationCode> {
-                PasswordRecoveryScreen(
+                PasswordRecoveryRoot(
                     onBackClick = {
                         closeOverlay()
                     },
@@ -303,8 +308,15 @@ fun MainScreen() {
                             )
                         )
                     },
-                    onEditClick = {
-                        openOverlay(NavRoutes.EditAccount)
+                    onEditClick = { uiInfoState ->
+                        openOverlay(NavRoutes.EditAccount(
+                            currentUserInfo = EditAccountFields(
+                                username = uiInfoState.name,
+                                email = null, // TODO: поменять структуру AccountInfoState
+                                phone = null,
+                                profilePhotoURL = uiInfoState.profilePhotoURL
+                            )
+                        ))
                     },
                     onBackClick = {
                         closeOverlay()
@@ -337,8 +349,9 @@ fun MainScreen() {
                 )
             }
 
-            entry<NavRoutes.EditAccount> {
+            entry<NavRoutes.EditAccount> { route ->
                 EditingAccountRoot(
+                    currentUserInfo = route.currentUserInfo,
                     onBackClick = { closeOverlay() },
                     onContinueClick = { closeOverlay() }
                 )

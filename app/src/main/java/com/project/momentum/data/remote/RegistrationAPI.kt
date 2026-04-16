@@ -1,5 +1,6 @@
 package com.project.momentum.data.remote
 
+import android.util.Log
 import com.project.momentum.features.auth.models.dto.CheckCodeLoginRequestDTO
 import com.project.momentum.features.auth.models.dto.CheckCodeLoginResponseDTO
 import com.project.momentum.features.auth.models.dto.CheckCodeRequestDTO
@@ -24,7 +25,7 @@ interface IRegistrationLoginClient {
 
     suspend fun sendPhoneToChecker(phone: CheckPhoneNumberRequestDTO): CheckResponseDTO
 
-    suspend fun sendData(userData: RegisterUserRequestDTO): LoginResponseDTO
+    suspend fun register(userData: RegisterUserRequestDTO): LoginResponseDTO
 
     suspend fun sendCodeToChecker(code: CheckCodeRequestDTO): CheckResponseDTO
 
@@ -41,11 +42,16 @@ class RegistrationAPI @Inject constructor(
 ) : IRegistrationLoginClient {
 
     override suspend fun sendEmailToRegistrationChecker(email: CheckEmailRequestDTO): CheckResponseDTO {
-        val response: CheckResponseDTO = client.post("check-email") {
+        val response = client.post("check-email") {
             setBody(email)
-        }.body<CheckResponseDTO>()
+        }
 
-        return response
+        if (response.status.value in 200..299) {
+            return response.body<CheckResponseDTO>()
+        } else {
+            Log.e("RegistrationAPI", "Server error: ${response.body<String>()}")
+            throw Exception("Server error: ${response.status.value}")
+        }
     }
 
     override suspend fun sendEmailToAuthorizationChecker(email: CheckEmailRequestDTO): CheckResponseDTO {
@@ -64,7 +70,7 @@ class RegistrationAPI @Inject constructor(
         return response
     }
 
-    override suspend fun sendData(userData: RegisterUserRequestDTO): LoginResponseDTO {
+    override suspend fun register(userData: RegisterUserRequestDTO): LoginResponseDTO {
         val response: LoginResponseDTO = client.post("register") {
             setBody(userData)
         }.body<LoginResponseDTO>()

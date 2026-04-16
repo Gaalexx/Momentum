@@ -74,12 +74,12 @@
     <string name="friends_screen_no_friends">У вас пока нет друзей</string>
     <string name="friends_screen_no_friends_support_mess">Попробуйте изменить запрос</string>
 
-    //Templates
+    <!-- Templates -->
     <string name="template_label">Заголовок экрана</string>
     <string name="template_page_title">Название действия</string>
     <string name="template_sub_button">Вспомогательное действие</string>
 
-    // Registration
+    <!-- Registration -->
     <string name="label_create_account">Создание аккаунта</string>
     <string name="button_continue">Продолжить</string>
     <string name="button_send_code_again">Отправить код повторно</string>
@@ -90,8 +90,12 @@
     <string name="insert_email">Введите почту</string>
     <string name="insert_phone_number">Введите номер телефона</string>
     <string name="insert_code_phone">Введите код с телефона</string>
+    <string name="placeholder_email">email@gmail.com</string>
+    <string name="placeholder_phone_number">+X (XXX) XXX XXXX</string>
+    <string name="placeholder_password">Пароль</string>
+    <string name="placeholder_password_repetition">Повторите пароль</string>
 
-    //Authorization
+    <!-- Authorization -->
     <string name="label_authorization">Вход</string>
     <string name="label_password_recovery">Восстановление пароля</string>
     <string name="button_authorization_by_phone_number">Войти по номеру телефона</string>
@@ -100,14 +104,33 @@
     <string name="button_password_recovery">Восстановить пароль</string>
     <string name="button_already_have_account">У меня уже есть аккаунт</string>
 
-    // Settings
+    <!-- Registration and Authorization errors -->
+    <string name="error_text_email_already_exists_in_db">Пользователь с такой почтой уже существует</string>
+    <string name="error_text_email_not_exists">Такой почты не существует</string>
+    <string name="error_text_email_not_exists_in_db">Пользователь с такой почтой не зарегистрирован</string>
+    <string name="error_text_email_empty">Введите почту :3</string>
+    <string name="error_text_phone_already_exists_in_db">Пользователь с таким номером телефона уже существует</string>
+    <string name="error_text_phone_not_exists">Такого номера телефона не существует</string>
+    <string name="error_text_phone_not_exists_in_db">Пользователь с таким номером телефона не зарегистрирован</string>
+    <string name="error_text_phone_empty">Введите номер телефона :3</string>
+    <string name="error_text_password_empty">Заполните поле :3</string>
+    <string name="error_text_password_too_short">Пароль должен содержать неменее 8 символов</string>
+    <string name="error_text_password_no_digits">Пароль должен содержать хотя бы одну цифру</string>
+    <string name="error_text_password_no_lowercase_letters">Пароль должен содержать хотя бы одну строчную букву</string>
+    <string name="error_text_password_no_uppercase_letters">Пароль должен содержать хотя бы одну заглавную букву</string>
+    <string name="error_text_password_not_match">Пароли не совпадают</string>
+    <string name="error_text_password_invalid">Неверный пароль</string>
+    <string name="error_text_code_empty">ВВедите код подтверждения :3</string>
+    <string name="error_text_code_invalid">Неверный код подтверждения</string>
+
+    <!-- Settings -->
     <string name="label_delete_account">Удаление аккаунта</string>
     <string name="button_delete_account">Удалить аккаунт</string>
     <string name="label_delete_account_confirmation">Вы действительно хотите удалить аккаунт?</string>
     <string name="button_delete_account_yes">Да</string>
     <string name="button_delete_account_no">Нет</string>
 
-    // Settings Privacy Screen
+    <!-- Settings Privacy Screen -->
     <string name="settings_privacy_title">Конфиденциальность</string>
     <string name="settings_privacy_account_visibility">Видимость аккаунта</string>
     <string name="settings_privacy_recommend_to_contacts">Рекомендовать меня контактам</string>
@@ -115,6 +138,8 @@
     <string name="settings_privacy_caution">Осторожность</string>
     <string name="settings_privacy_confirm_before_posting">Подтверждение перед тем как выложить пост</string>
 
+
+    <!-- Settings Premium Screen -->
     // Settings Premium Screen
     <string name="settings_premium_title">Premium </string>
     <string name="settings_premium_description_1">- больше тепла,</string>
@@ -135,7 +160,7 @@
     <string name="settings_premium_one_year_cost_per_month">249,1₽/мес</string>
     <string name="settings_premium_buy">Купить премиум</string>
 
-    // Settings Notifications Screen
+    <!-- Settings Notifications Screen -->
     <string name="settings_notifications_title">Уведомления и звуки</string>
     <string name="settings_notifications_section">Уведомления</string>
     <string name="settings_notifications_publications">Публикации</string>
@@ -144,6 +169,11 @@
     <string name="settings_notifications_in_app_switch">Уведомления</string>
     <string name="label_editing">Редактирование профиля</string>
 
+    <!-- Words -->
+    <string name="email">Почта</string>
+    <string name="telephone_number">Номер</string>
+    <string name="login">Логин</string>
+    <string name="placeholder_code">X X X X X X</string>
     // Settings Errors
     <string name="error_network">Нет соединения</string>
     <string name="error_unauthorized">Авторизация истекла</string>

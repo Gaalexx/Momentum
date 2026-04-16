@@ -59,6 +59,7 @@ import com.project.momentum.features.friends.ui.assets.AddFriendDialog
 import com.project.momentum.features.friends.ui.assets.FriendRequestCarousel
 import com.project.momentum.features.friends.viewmodel.FriendsScreenState
 import kotlinx.serialization.Serializable
+import java.time.LocalDateTime
 
 
 data class Friend(
@@ -77,9 +78,12 @@ data class FriendRequest(
 data class User(
     val id: String,
     val name: String,
+    val email: String,
+    val phoneNumber: String? = null,
     val avatarUrl: String? = null,
     val isOnline: Boolean = false,
-    val description: String? = null
+    val description: String? = null,
+    val hasPremium: Boolean = false,
 )
 
 
@@ -492,7 +496,7 @@ fun FriendsScreenPreview() {
         {},
         {},
         FriendsScreenState(
-            friends = listOf(User("123", "User 1"), User("321", "User 2")),
+            friends = listOf(User("123", "User 1", "email1"), User("321", "User 2", "email2")),
             friendRequests = listOf(
                 FriendRequest("312", "132", "User 3"),
                 FriendRequest("313", "134", "User 4"),
@@ -523,8 +527,9 @@ fun FriendItemPreview() {
                 friend = User(
                     id = "preview1",
                     name = "Тестовый Друг",
+                    email = "test.email",
                     avatarUrl = null,
-                    isOnline = true
+                    isOnline = true,
                 ),
                 onFriendClick = {}
             )
@@ -535,6 +540,7 @@ fun FriendItemPreview() {
                 friend = User(
                     id = "preview2",
                     name = "Друг со статусом",
+                    email = "test.email.2",
                     avatarUrl = null,
                     description = "С описанием"
                 ),

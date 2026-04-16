@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.sp
@@ -624,7 +625,7 @@ fun ContinueButton(
     modifier: Modifier = Modifier,
     text: String = stringResource(R.string.button_continue),
     colors: ButtonColors = ButtonDefaults.buttonColors(
-        containerColor = ConstColours.MAIN_BRAND_BLUE,
+        containerColor = ConstColours.TRANSPARENT_WHITE_ALPHA0,
         contentColor = ConstColours.WHITE
     )
 ) {
@@ -632,9 +633,21 @@ fun ContinueButton(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .height(dimensionResource(R.dimen.button_size)),
+            .height(dimensionResource(R.dimen.button_size))
+            .clip(RoundedCornerShape(50.dp))
+            .background(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        ConstColours.MAIN_BRAND_BLUE,
+                        ConstColours.MAIN_BRAND_BLUE.copy(alpha = 0.5f)
+                    )
+                ),
+                shape = RoundedCornerShape(50.dp)
+
+            ),
         shape = RoundedCornerShape(50.dp),
-        colors = colors
+        colors = colors,
+        contentPadding = PaddingValues()
     ) {
         Text(
             text = text,

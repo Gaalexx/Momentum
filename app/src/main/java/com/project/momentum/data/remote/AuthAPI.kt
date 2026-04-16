@@ -1,5 +1,6 @@
 package com.project.momentum.data.remote
 
+import android.util.Log
 import com.project.momentum.features.auth.models.dto.GetJWTDTO
 import com.project.momentum.network.di.Backend
 import io.ktor.client.HttpClient
@@ -20,7 +21,16 @@ class AuthAPI @Inject constructor(
 ) : IAuthAPI {
 
     override suspend fun tryAuth(token: String): GetJWTDTO {
-        return client.post("auth") { setBody(GetJWTDTO(token)) }.body<GetJWTDTO>()
+        val result = client.post("auth") {
+            setBody(GetJWTDTO(token))
+        }
+
+        return try {
+                result.body<GetJWTDTO>()
+            } catch (e: ConnectException) {
+                Log.e("tryAuth", result.toString())
+                GetJWTDTO(null)
+            }
     }
 
 
