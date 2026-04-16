@@ -58,8 +58,8 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.project.momentum.R
-import com.project.momentum.features.contentcreation.data.MediaTypeToSend
-import com.project.momentum.features.contentcreation.data.rememberCameraPermissionState
+import com.project.momentum.features.contentcreation.models.MediaTypeToSend
+import com.project.momentum.features.contentcreation.permissions.rememberCameraPermissionState
 import com.project.momentum.features.contentcreation.viewmodel.ContentCreationViewModel
 import com.project.momentum.features.contentcreation.viewmodel.UploadEvent
 import com.project.momentum.features.contentcreation.viewmodel.UploadState
