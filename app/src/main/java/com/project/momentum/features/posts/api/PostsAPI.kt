@@ -1,5 +1,6 @@
 package com.project.momentum.features.posts.api
 
+import android.util.Log
 import com.project.momentum.data.auth.SessionManager
 import com.project.momentum.network.di.Backend
 import com.project.momentum.network.s3.PostDTO
@@ -20,25 +21,37 @@ class PostsAPI @Inject constructor(
 ) {
 
     suspend fun getMyPosts(): List<PostDTO> {
-        val response = client.post("get-my-media") {
-            header(HttpHeaders.Authorization, sessionManager.getHeader())
-        }
-        if (response.status == HttpStatusCode.OK) {
-            return response.body<List<PostDTO>>()
-        } else {
-            throw Exception()
+        return try {
+            val response = client.post("get-my-media") {
+                header(HttpHeaders.Authorization, sessionManager.getHeader())
+            }
+            if (response.status == HttpStatusCode.OK) {
+                response.body<List<PostDTO>>()
+            } else {
+                Log.e("PostsAPI", "Error getting my posts: ${response.status}")
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e("PostsAPI", "Network error in getMyPosts", e)
+            emptyList()
         }
     }
 
     suspend fun getMyFriendsPosts(): List<PostDTO> {
-        val response = client.post("get-friends-media") {
-            header(HttpHeaders.Authorization, sessionManager.getHeader())
-        }
+        return try {
+            val response = client.post("get-friends-media") {
+                header(HttpHeaders.Authorization, sessionManager.getHeader())
+            }
 
-        if (response.status == HttpStatusCode.OK) {
-            return response.body<List<PostDTO>>()
-        } else {
-            throw Exception()
+            if (response.status == HttpStatusCode.OK) {
+                response.body<List<PostDTO>>()
+            } else {
+                Log.e("PostsAPI", "Error getting friends posts: ${response.status}")
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e("PostsAPI", "Network error in getMyFriendsPosts", e)
+            emptyList()
         }
     }
 

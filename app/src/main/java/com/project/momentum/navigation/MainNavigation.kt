@@ -300,11 +300,11 @@ fun MainScreen() {
                 }
             ) {
                 AccountRoot(
-                    onPostClick = { post, userName ->
+                    onPostClick = { post, userId ->
                         openOverlay(
                             NavRoutes.PreviewPhoto(
                                 post = post,
-                                userName = userName
+                                userId = userId
                             )
                         )
                     },
@@ -312,8 +312,8 @@ fun MainScreen() {
                         openOverlay(NavRoutes.EditAccount(
                             currentUserInfo = EditAccountFields(
                                 username = uiInfoState.name,
-                                email = null, // TODO: поменять структуру AccountInfoState
-                                phone = null,
+                                email = uiInfoState.email,
+                                phone = uiInfoState.phone,
                                 profilePhotoURL = uiInfoState.profilePhotoURL
                             )
                         ))
@@ -335,11 +335,11 @@ fun MainScreen() {
             ) { route ->
                 FriendAccountRoot(
                     friend = route.friend,
-                    onPostClick = { post, userName ->
+                    onPostClick = { post, userId ->
                         openOverlay(
                             NavRoutes.PreviewPhoto(
                                 post = post,
-                                userName = userName
+                                userId = userId
                             )
                         )
                     },
@@ -411,7 +411,7 @@ fun MainScreen() {
                         openOverlay(NavRoutes.Friends)
                     },
                     postIndex = route.post,
-                    userName = route.userName
+                    userId = route.userId
                 )
 
             }

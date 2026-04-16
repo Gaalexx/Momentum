@@ -103,7 +103,6 @@ data class FriendshipResponseDTO(
     val userId: String,
     val username: String,
     val email: String,
-    val isOnline: Boolean,
     val friendsSince: String,
     val phoneNumber: String? = null,
     val description: String? = null,

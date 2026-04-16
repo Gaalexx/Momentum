@@ -21,17 +21,19 @@ fun FriendAccountRoot(
     onBackClick: () -> Unit,
     postsViewModel: PostsViewModel = hiltViewModel()
 ) {
-    val friendPosts by postsViewModel.getUserPostsFlow(friend.name).collectAsStateWithLifecycle()
+    val friendPosts by postsViewModel.getUserPostsFlow(friend.id).collectAsStateWithLifecycle()
 
     AccountScreen(
         uiInfoState = AccountInfoState(
             userId = friend.id,
             name = friend.name,
             email = friend.email,
-            profilePhotoURL = friend.avatarUrl
+            phone = friend.phoneNumber,
+            profilePhotoURL = friend.avatarUrl,
+            hasPremium = friend.hasPremium
         ),
         uiMediaState = MediaState(friendPosts),
-        onPostClick = { postIndex -> onPostClick(postIndex, friend.name) },
+        onPostClick = { postIndex -> onPostClick(postIndex, friend.id) },
         onBackClick = onBackClick,
         modifier = modifier,
         userStatus =

@@ -80,10 +80,10 @@ class PostsViewModel @Inject constructor(
         }
     }
 
-    fun getUserPostsFlow(userName: String): StateFlow<List<PostData>> {
+    fun getUserPostsFlow(userId: String): StateFlow<List<PostData>> {
         return state.map { s ->
             s.posts
-                .filter { it.userName == userName }
+                .filter { it.userId == userId }
                 .sortedByDescending { it.createdAtInstantOrNull() ?: Instant.MIN }
         }.stateIn(
             scope = viewModelScope,
