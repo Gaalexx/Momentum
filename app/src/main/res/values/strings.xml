@@ -140,7 +140,6 @@
 
 
     <!-- Settings Premium Screen -->
-    // Settings Premium Screen
     <string name="settings_premium_title">Premium </string>
     <string name="settings_premium_description_1">- больше тепла,</string>
     <string name="settings_premium_description_2">меньше ограничений</string>
@@ -172,18 +171,13 @@
     <!-- Words -->
 
     <string name="placeholder_code">X X X X X X</string>
-    // Settings Errors
+    <string name="reply">Ответить</string>
+    <string name="play">Проиграть</string>
+
+    <!-- Settings Errors -->
     <string name="error_network">Нет соединения</string>
     <string name="error_unauthorized">Авторизация истекла</string>
     <string name="error_unknown">Произошла неизвестная ошибка</string>
     <string name="error_server">Нет соединения</string>
-
-    // Words
-    <string name="email">Почта</string>
-    <string name="telephone_number">Номер</string>
-    <string name="login">Логин</string>
-    <string name="reply">Ответить</string>
-    <string name="play">Проиграть</string>
-
 
 </resources>

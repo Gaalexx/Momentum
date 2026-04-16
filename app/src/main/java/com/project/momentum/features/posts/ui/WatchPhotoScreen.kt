@@ -166,21 +166,21 @@ fun WatchPhotoScreenRoute(
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
     postIndex: Int,
-    userName: String? = null,
+    userId: String? = null,
     postsViewModel: PostsViewModel = hiltViewModel()
 ) {
 
     val uiState by postsViewModel.state.collectAsStateWithLifecycle()
 
-    val userPosts by remember(userName) {
-        if (userName != null) {
-            postsViewModel.getUserPostsFlow(userName)
+    val userPosts by remember(userId) {
+        if (userId != null) {
+            postsViewModel.getUserPostsFlow(userId)
         } else {
             MutableStateFlow(null)
         }
     }.collectAsStateWithLifecycle()
 
-    val posts = if (userName == null) uiState.posts else (userPosts ?: listOf())
+    val posts = if (userId == null) uiState.posts else (userPosts ?: listOf())
 
 
     WatchPhotoScreen(

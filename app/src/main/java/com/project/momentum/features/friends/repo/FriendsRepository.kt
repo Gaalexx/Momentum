@@ -31,7 +31,7 @@ class FriendsRepository @Inject constructor(
                 name = friend.username,
                 email = friend.email,
                 phoneNumber = friend.phoneNumber,
-                isOnline = friend.isOnline,
+                isOnline = false,
                 description = friend.description,
                 avatarUrl = friend.userAvatarUrl,
                 hasPremium = friend.hasPremium

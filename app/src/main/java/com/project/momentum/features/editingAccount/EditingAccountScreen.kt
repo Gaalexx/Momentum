@@ -100,7 +100,9 @@ fun EditingAccountRoot(
             )
         },
         onBackClick = onBackClick,
-        onContinueClick = { viewModel.next() },
+        onContinueClick = {
+            viewModel.next()
+        },
         modifier = modifier
     )
 }

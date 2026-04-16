@@ -1,5 +1,6 @@
 package com.project.momentum.features.friends.api
 
+import android.util.Log
 import com.example.Models.FriendRequestActionDTO
 import com.example.Models.FriendRequestCreateByEmailDTO
 import com.example.Models.FriendRequestWithUserDetailsDTO
@@ -89,6 +90,7 @@ class FriendsInfoAPI @Inject constructor(
         }
 
         return if (result.status == HttpStatusCode.OK) {
+            Log.d("Friends", "${result.body<FriendshipListDTO>()}")
             result.body<FriendshipListDTO>()
         } else {
             FriendshipListDTO(listOf())

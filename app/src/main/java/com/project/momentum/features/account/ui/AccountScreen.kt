@@ -57,7 +57,7 @@ fun AccountRoot(
     accountInfoViewModel.onEvent(AccountInfoEvent.GetInfo)
 
     val uiInfoState by accountInfoViewModel.state.collectAsStateWithLifecycle()
-    val posts by postsViewModel.getUserPostsFlow(uiInfoState.name) // TODO: брать посты по id пользователя
+    val posts by postsViewModel.getUserPostsFlow(uiInfoState.userId) // TODO: брать посты по id пользователя
         .collectAsStateWithLifecycle()
 
     AccountScreen(
@@ -67,7 +67,7 @@ fun AccountRoot(
         userStatus = userStatus,
         onBackClick = onBackClick,
         onAddPostClick = onAddPostClick,
-        onPostClick = { postId -> onPostClick(postId, uiInfoState.name) },
+        onPostClick = { postId -> onPostClick(postId, uiInfoState.userId) },
         onEditClick = { onEditClick(uiInfoState) },
     )
 }

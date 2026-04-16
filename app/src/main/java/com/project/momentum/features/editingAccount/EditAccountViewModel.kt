@@ -123,7 +123,7 @@ class EditAccountViewModel @Inject constructor(
                 try {
                     val newUserInfo = repo.updateUserInfo(_state.value.fields)
                     update()
-                    clearState()
+//                    clearState()
                     _navigationEvents.emit(NavEvent.NavigateToNextScreen)
                 } catch (e: Exception) {
                     //TODO: обработка ошибки сети
@@ -223,7 +223,7 @@ class EditAccountViewModel @Inject constructor(
         phoneError: ErrorType? = null
     ) {
         if (usernameError == null && emailError == null && phoneError == null) {
-            setContent()
+            setContent() //TODO: переделать из-за этого экран зангрузки пропадает раньше чем надо
             return
         }
         _state.update { state ->

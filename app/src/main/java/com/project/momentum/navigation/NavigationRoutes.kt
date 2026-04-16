@@ -80,7 +80,7 @@ NavRoutes : NavKey {
     @Serializable
     data class PreviewPhoto(
         val post: Int,
-        val userName: String? = null
+        val userId: String? = null
     ) : NavRoutes()
 
     @Serializable
