@@ -29,7 +29,12 @@ class FriendsRepository @Inject constructor(
             User(
                 id = friend.userId,
                 name = friend.username,
-                avatarUrl = friend.userAvatarUrl
+                email = friend.email,
+                phoneNumber = friend.phoneNumber,
+                isOnline = friend.isOnline,
+                description = friend.description,
+                avatarUrl = friend.userAvatarUrl,
+                hasPremium = friend.hasPremium
             )
         }
     }
@@ -94,4 +99,15 @@ class FriendsRepository @Inject constructor(
         return false
     }
 
+    suspend fun getUserById(id: String): User {
+        val response = usersInfoAPI.getUserById(id)
+        return User(
+            id = response.userId,
+            name = response.name,
+            email = response.email,
+            phoneNumber = response.phone,
+            avatarUrl = response.profilePhotoURL,
+            hasPremium = response.hasPremium
+        )
+    }
 }

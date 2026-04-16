@@ -229,7 +229,14 @@ private fun AccountScreenPreview() {
             onEditClick = {},
             onBackClick = {},
             onAddPostClick = {},
-            uiInfoState = AccountInfoState("Preview", null),
+            uiInfoState = AccountInfoState(
+                "52",
+                "Preview",
+                "Preview",
+                null,
+                null,
+                false
+            ),
             uiMediaState = MediaState(listOf())
         )
     }

@@ -108,7 +108,9 @@ class EditAccountViewModel @Inject constructor(
 
         currentUserData = EditAccountFields(
             username = userdata.name,
-            profilePhotoURL = userdata.accountPhotoURL,
+            email = userdata.email,
+            phone = userdata.phone,
+            profilePhotoURL = userdata.profilePhotoURL,
         )
     }
 

@@ -24,7 +24,12 @@ fun FriendAccountRoot(
     val friendPosts by postsViewModel.getUserPostsFlow(friend.name).collectAsStateWithLifecycle()
 
     AccountScreen(
-        uiInfoState = AccountInfoState(friend.name, friend.avatarUrl),
+        uiInfoState = AccountInfoState(
+            userId = friend.id,
+            name = friend.name,
+            email = friend.email,
+            profilePhotoURL = friend.avatarUrl
+        ),
         uiMediaState = MediaState(friendPosts),
         onPostClick = { postIndex -> onPostClick(postIndex, friend.name) },
         onBackClick = onBackClick,

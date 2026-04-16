@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import androidx.lifecycle.ViewModel
 import com.project.momentum.R
+import com.project.momentum.data.usersinfo.UsersInfoAPI
 import com.project.momentum.features.friends.repo.FriendsRepository
 import com.project.momentum.features.friends.ui.FriendRequest
 import com.project.momentum.features.friends.ui.User
@@ -61,7 +62,7 @@ sealed interface FriendsScreenEvent {
 
 @HiltViewModel
 class FriendsViewModel @Inject constructor(
-    private val repo: FriendsRepository
+    private val repo: FriendsRepository,
 ) : ViewModel() {
 
     private val _state =
@@ -144,12 +145,10 @@ class FriendsViewModel @Inject constructor(
         viewModelScope.launch {
             repo.acceptFriendRequest(accept.request.id)
 
+
             _state.value = _state.value.copy(
                 friends = _state.value.friends.plus(
-                    User(
-                        accept.request.userId,
-                        accept.request.userName
-                    )
+                    repo.getUserById(accept.request.userId)
                 ),
                 friendRequests = _state.value.friendRequests.filterNot { it.id == accept.request.id }
             )
