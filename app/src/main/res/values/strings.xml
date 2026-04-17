@@ -179,5 +179,8 @@
     <string name="error_unauthorized">Авторизация истекла</string>
     <string name="error_unknown">Произошла неизвестная ошибка</string>
     <string name="error_server">Нет соединения</string>
+    <string name="email">Почта</string>
+    <string name="telephone_number">Номер</string>
+    <string name="login">Логин</string>
 
 </resources>
