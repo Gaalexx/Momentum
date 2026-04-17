@@ -57,7 +57,7 @@ import com.project.momentum.ui.theme.ConstColours
 
 @Composable
 fun EditingAccountRoot(
-    currentUserInfo: EditAccountFields,
+    currentUserInfo: AccountInfo,
     onBackClick: () -> Unit,
     onContinueClick: () ->Unit,
     modifier: Modifier = Modifier
@@ -74,7 +74,8 @@ fun EditingAccountRoot(
             //TODO: сообщить что обтена выбора мб
             return@rememberLauncherForActivityResult
         }
-        viewModel.selectPhoto(context, uri)
+        viewModel.updateProfilePhoto(uri)
+//        viewModel.selectPhoto(context, uri)
     }
 
     LaunchedEffect(Unit) {
@@ -110,7 +111,7 @@ fun EditingAccountRoot(
 @Composable
 fun EditingAccountScreen(
     uiInfoState: EditAccountState,
-    userData: EditAccountFields,
+    userData: AccountInfo,
     onLoginChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPhoneChange: (String) -> Unit,
@@ -296,7 +297,7 @@ fun EditingAccountScreen(
 fun EditingAccountScreenPreview() {
     EditingAccountScreen(
         uiInfoState = EditAccountState.Content(EditAccountFields()),
-        userData = EditAccountFields(),
+        userData = AccountInfo("login", "email", "phone"),
         onLoginChange = {},
         onEmailChange = {},
         onPhoneChange = {},

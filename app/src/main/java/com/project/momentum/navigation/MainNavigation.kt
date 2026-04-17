@@ -33,6 +33,7 @@ import com.project.momentum.features.auth.ui.PasswordRecoveryScreen
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.ui.MediaCreationScreen
 import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
+import com.project.momentum.features.editingAccount.AccountInfo
 import com.project.momentum.features.editingAccount.EditAccountFields
 import com.project.momentum.features.editingAccount.EditingAccountRoot
 import com.project.momentum.features.friends.ui.FriendAccountRoot
@@ -310,7 +311,7 @@ fun MainScreen() {
                     },
                     onEditClick = { uiInfoState ->
                         openOverlay(NavRoutes.EditAccount(
-                            currentUserInfo = EditAccountFields(
+                            currentUserInfo = AccountInfo (
                                 username = uiInfoState.name,
                                 email = uiInfoState.email,
                                 phone = uiInfoState.phone,

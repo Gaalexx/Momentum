@@ -57,8 +57,7 @@ class S3InteractionRepository @Inject constructor(
     }
 
     suspend fun sendAvatar(avatarInfo: AvatarInfo) {
-        val presignedURLDTO: PresignedURLDTO = client
-            .sendAvatarUploadRequest (
+        val presignedURLDTO: PresignedURLDTO = client.sendAvatarUploadRequest (
                 UploadAvatarInfoDTO(
                     avatarInfo.mimeType,
                     avatarInfo.size
