@@ -1,22 +1,14 @@
-package com.project.momentum.features.editingAccount
+package com.project.momentum.features.editingAccount.viewmodel
 
 import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.util.Patterns
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.project.momentum.features.account.models.AccountInformationDTO
 import com.project.momentum.features.account.repo.AccountRepository
-import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.auth.features.EmailChecker
 import com.project.momentum.features.auth.models.NavEvent
-import com.project.momentum.network.s3.MediaType
 import com.project.momentum.network.s3.S3InteractionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext

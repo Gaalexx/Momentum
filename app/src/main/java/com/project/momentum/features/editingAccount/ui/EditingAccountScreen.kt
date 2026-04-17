@@ -1,4 +1,4 @@
-package com.project.momentum.features.editingAccount
+package com.project.momentum.features.editingAccount.ui
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -17,11 +17,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -31,7 +29,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -45,10 +42,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.project.momentum.R
 import com.project.momentum.features.auth.models.NavEvent
+import com.project.momentum.features.editingAccount.viewmodel.AccountInfo
+import com.project.momentum.features.editingAccount.viewmodel.EditAccountFields
+import com.project.momentum.features.editingAccount.viewmodel.EditAccountState
+import com.project.momentum.features.editingAccount.viewmodel.EditAccountViewModel
 import com.project.momentum.ui.assets.CancelButton
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.ui.assets.GlassTextField
-import com.project.momentum.ui.assets.TextFieldRegistration
 import com.project.momentum.ui.assets.TopBarTemplate
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
@@ -75,7 +75,6 @@ fun EditingAccountRoot(
             return@rememberLauncherForActivityResult
         }
         viewModel.updateProfilePhoto(uri)
-//        viewModel.selectPhoto(context, uri)
     }
 
     LaunchedEffect(Unit) {
@@ -135,6 +134,7 @@ fun EditingAccountScreen(
         onValueChange: (String) -> Unit,
         placeholder: String? = null,
         isError: Boolean = false,
+        errorText: String? = null,
         keyboardOptions: KeyboardOptions = KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Next
@@ -154,6 +154,7 @@ fun EditingAccountScreen(
             modifier = Modifier,
             placeholder = placeholder,
             isError = isError,
+            errorText = errorText,
             keyboardOptions = keyboardOptions,
         )
     }
@@ -244,6 +245,7 @@ fun EditingAccountScreen(
                         onValueChange = onLoginChange,
                         placeholder = userData.username,
                         isError = uiInfoState.getErrorForUsername() != null,
+                        errorText = handlingErrorEdit(uiInfoState, EditingFieldType.USERNAME)
                     )
                     EditTextField(
                         title = "Почта",
@@ -255,6 +257,7 @@ fun EditingAccountScreen(
                             imeAction = ImeAction.Next
                         ),
                         isError = uiInfoState.getErrorForEmail() != null,
+                        errorText = handlingErrorEdit(uiInfoState, EditingFieldType.EMAIL)
                     )
                     EditTextField(
                         title = "Телефон",
@@ -266,6 +269,7 @@ fun EditingAccountScreen(
                             imeAction = ImeAction.Done
                         ),
                         isError = uiInfoState.getErrorForPhone() != null,
+                        errorText = handlingErrorEdit(uiInfoState, EditingFieldType.PHONE)
                     )
                 }
                 Spacer(Modifier.weight(1f))

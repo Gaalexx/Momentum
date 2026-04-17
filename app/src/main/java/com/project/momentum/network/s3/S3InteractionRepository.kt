@@ -2,7 +2,7 @@ package com.project.momentum.network.s3
 
 import android.net.Uri
 import android.util.Log
-import com.project.momentum.features.editingAccount.AvatarInfo
+import com.project.momentum.features.editingAccount.viewmodel.AvatarInfo
 import com.project.momentum.network.s3.upload.UploadMediaAPI
 import com.project.momentum.network.s3.upload.S3UploadApi
 import javax.inject.Inject

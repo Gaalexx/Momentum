@@ -9,7 +9,7 @@ import com.project.momentum.features.auth.models.LoginType
 import com.project.momentum.features.auth.viewmodel.ErrorLogin
 
 @Composable
-fun handlingErrorLogin(state: LoginState): String? = // TODO: вынести в ресурсы
+fun handlingErrorLogin(state: LoginState): String? =
     when (state.errorMessage) {
         is ErrorLogin.LoginError ->
             when (state.loginType) {

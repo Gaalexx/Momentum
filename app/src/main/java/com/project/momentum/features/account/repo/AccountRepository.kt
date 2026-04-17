@@ -6,10 +6,9 @@ import com.project.momentum.features.account.models.AccountInformationDTO
 import com.project.momentum.features.account.models.CheckUserInfoIsFreeRequestDTO
 import com.project.momentum.features.account.models.EditAccountDTO
 import com.project.momentum.features.account.models.PostData
-import com.project.momentum.features.editingAccount.AccountInfo
-import com.project.momentum.features.editingAccount.EditAccountErrorFields
-import com.project.momentum.features.editingAccount.EditAccountFields
-import com.project.momentum.features.editingAccount.ErrorType
+import com.project.momentum.features.editingAccount.viewmodel.EditAccountErrorFields
+import com.project.momentum.features.editingAccount.viewmodel.EditAccountFields
+import com.project.momentum.features.editingAccount.viewmodel.ErrorType
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
