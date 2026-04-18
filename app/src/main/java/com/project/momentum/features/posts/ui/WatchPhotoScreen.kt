@@ -1,9 +1,16 @@
 package com.project.momentum.features.posts.ui
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -14,7 +21,6 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -22,37 +28,40 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.project.momentum.R
 import com.project.momentum.features.account.models.PostData
+import com.project.momentum.features.posts.features.reactions.ReactionData
+import com.project.momentum.features.posts.features.reactions.ReactionType
+import com.project.momentum.features.posts.features.reactions.ui.DialogReactions
+import com.project.momentum.features.posts.features.reactions.ui.ReactionsGrid
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.network.s3.MediaType
-import com.project.momentum.ui.assets.AudioPreview
 import com.project.momentum.ui.assets.AudioView
 import com.project.momentum.ui.assets.CaptionBasicLabel
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.ui.assets.FriendsPillButton
 import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
-import androidx.compose.ui.draw.blur
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import com.project.momentum.ui.assets.VideoPreview
 import com.project.momentum.ui.assets.VideoView
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
@@ -382,13 +391,27 @@ fun WatchPhotoScreen(
 
         ) {
             currentPost?.let { post ->
+                if (post.reactions != null) {
+                    ReactionsGrid(
+                        postOwner = post.userId,
+                        reactionsData = post.reactions,
+                        modifier = Modifier.padding(bottom = 16.dp, start = 8.dp, end = 8.dp)
+                    )
+                }
+
                 Text(
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     text = post.getDate() ?: "",
                     color = ConstColours.WHITE,
                     style = AppTextStyles.SupportingText
                 )
-
+                if (false) {
+                    Dialog(
+                        onDismissRequest = { },
+                    ) {
+                        DialogReactions()
+                    }
+                }
 
                 Spacer(Modifier.weight(1f))
 
@@ -478,6 +501,38 @@ private fun WatchPhotoScreenPreview() {
                     title = "Description",
                     presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
                     mediaType = MediaType.IMAGE,
+                    reactions = listOf(
+//                        ReactionData(
+//                            emoji = ReactionType.HEART,
+//                            count = 1,
+//                            users = listOf("user1")
+//                        ),
+//                        ReactionData(
+//                            emoji = ReactionType.CLOWN,
+//                            count = 3,
+//                            users = listOf("user1", "user2", "preview-user")
+//                        ),
+//                        ReactionData(
+//                            emoji = ReactionType.POOP,
+//                            count = 2,
+//                            users = listOf("preview-user", "user3")
+//                        ),
+//                        ReactionData(
+//                            emoji = ReactionType.LOUDLYCRYING,
+//                            count = 1,
+//                            users = listOf("user1")
+//                        ),
+//                        ReactionData(
+//                            emoji = ReactionType.CHECK_MARK,
+//                            count = 3,
+//                            users = listOf("user1", "user2", "user3")
+//                        ),
+//                        ReactionData(
+//                            emoji = ReactionType.SMILE,
+//                            count = 2,
+//                            users = listOf("user1", "user3")
+//                        )
+                    ),
                     createdAt = "2026-03-12T14:38:50.690942Z"
                 ),
                 PostData(
