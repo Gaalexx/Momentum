@@ -7,6 +7,7 @@ import com.project.momentum.features.contentcreation.ui.deleteByUri
 import com.project.momentum.network.s3.PostInformation
 import com.project.momentum.network.s3.S3InteractionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -57,6 +58,8 @@ class ContentCreationViewModel @Inject constructor(
                 }
             }.onSuccess {
                 _state.value = UploadState.Success()
+                delay(200)
+                _state.value = UploadState.Idle
                 // TODO реализовать случай успеха
             }.onFailure { throwable ->
                 Log.e(

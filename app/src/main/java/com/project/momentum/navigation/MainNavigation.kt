@@ -113,7 +113,6 @@ fun MainScreen() {
         val saveableStateHolder = rememberSaveableStateHolder()
         val entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator<NavKey>(saveableStateHolder),
-//        rememberViewModelStoreNavEntryDecorator<NavKey>()
         )
 
         val navEntryProvider = entryProvider<NavKey> {
@@ -226,6 +225,7 @@ fun MainScreen() {
                 MediaCreationScreen(
                     initialMode = ContentCreationMode.Audio,
                     onGoToPreview = { uri, mediaType ->
+
                         openOverlay(NavRoutes.SendPhoto(uri.toString(), mediaType))
                     },
                     onGoToFriends = {
