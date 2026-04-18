@@ -29,7 +29,7 @@ class S3InteractionRepository @Inject constructor(
 
     suspend fun sendContent(
         postInfo: PostInformation,
-        onProgress: (Int) -> Unit = {}
+        onProgress: (Long, Long?) -> Unit = { _, _ -> }
     ) {
         val presignedURLDTO: PresignedURLDTO =
             client.sendUploadRequest(

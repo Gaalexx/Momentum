@@ -49,13 +49,26 @@ class ContentCreationViewModel @Inject constructor(
         }
     }
 
+    private fun calculateUploadPercent(
+        sentBytes: Long,
+        totalBytes: Long?
+    ): Int? {
+        val total = totalBytes?.takeIf { it > 0L } ?: return null
+
+        return ((sentBytes * 100L) / total)
+            .toInt()
+            .coerceIn(0, 95)
+    }
+
     private fun upload(postInfo: PostInformation) {
         viewModelScope.launch {
             runCatching {
                 _state.value = UploadState.Uploading(progress = 0)
-                uploaderRepo.sendContent(postInfo) { progress ->
-                    _state.value = UploadState.Uploading(progress = progress)
+                uploaderRepo.sendContent(postInfo) { progress, total ->
+                    _state.value =
+                        UploadState.Uploading(progress = calculateUploadPercent(progress, total))
                 }
+                _state.value = UploadState.Uploading(progress = 100)
             }.onSuccess {
                 _state.value = UploadState.Success()
                 delay(200)

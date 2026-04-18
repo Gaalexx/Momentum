@@ -15,6 +15,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import javax.inject.Singleton
 import com.project.momentum.BuildConfig
+import io.ktor.client.plugins.BodyProgress
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpCallValidator
 import io.ktor.client.plugins.HttpTimeout
@@ -111,6 +112,8 @@ object NetworkModule {
                 writeTimeout(60, TimeUnit.SECONDS)
             }
         }
+
+        install(BodyProgress)
 
         install(HttpTimeout) {
             connectTimeoutMillis = 30_000
