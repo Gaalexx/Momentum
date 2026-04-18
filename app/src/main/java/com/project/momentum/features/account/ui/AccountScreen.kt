@@ -85,7 +85,7 @@ fun AccountScreen(
     modifier: Modifier = Modifier,
     onAddPostClick: (() -> Unit)? = null,
     onEditClick: (() -> Unit)? = null,
-    userStatus: String = stringResource(R.string.account_online_status),
+    userStatus: String = stringResource(R.string.account_online_status)
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
@@ -134,14 +134,6 @@ fun AccountScreen(
                     .border(2.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
             ) {
                 if (uiInfoState.profilePhotoURL == null) {
-//                    Image(
-//                        painter = painterResource(R.drawable.profile_image_small),
-//                        contentDescription = null,
-//                        modifier = Modifier
-//                            .height(80.dp)
-//                            .aspectRatio(1f)
-//                            .align(Alignment.Center),
-//                    )
                     Icon(
                         imageVector = Icons.Outlined.AccountCircle,
                         contentDescription = stringResource(R.string.account_avatar),
@@ -178,12 +170,22 @@ fun AccountScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(Color.Green)
-                )
+                if (userStatus == stringResource(R.string.account_online_status)) {
+                    Box(                         // пока у нас не определяется статус онлайн на бэке, будет такое :)
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(Color.Green)
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(Color.Gray)
+                    )
+                }
+
                 Spacer(Modifier.width(dimensionResource(R.dimen.small_padding)))
                 Text(
                     text = userStatus,

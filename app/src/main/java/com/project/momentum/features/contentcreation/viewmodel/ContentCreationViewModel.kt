@@ -3,9 +3,11 @@ package com.project.momentum.features.contentcreation.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.project.momentum.features.contentcreation.ui.deleteByUri
 import com.project.momentum.network.s3.PostInformation
 import com.project.momentum.network.s3.S3InteractionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -47,15 +49,30 @@ class ContentCreationViewModel @Inject constructor(
         }
     }
 
+    private fun calculateUploadPercent(
+        sentBytes: Long,
+        totalBytes: Long?
+    ): Int? {
+        val total = totalBytes?.takeIf { it > 0L } ?: return null
+
+        return ((sentBytes * 100L) / total)
+            .toInt()
+            .coerceIn(0, 95)
+    }
+
     private fun upload(postInfo: PostInformation) {
         viewModelScope.launch {
             runCatching {
                 _state.value = UploadState.Uploading(progress = 0)
-                uploaderRepo.sendContent(postInfo) { progress ->
-                    _state.value = UploadState.Uploading(progress = progress)
+                uploaderRepo.sendContent(postInfo) { progress, total ->
+                    _state.value =
+                        UploadState.Uploading(progress = calculateUploadPercent(progress, total))
                 }
+                _state.value = UploadState.Uploading(progress = 100)
             }.onSuccess {
                 _state.value = UploadState.Success()
+                delay(200)
+                _state.value = UploadState.Idle
                 // TODO реализовать случай успеха
             }.onFailure { throwable ->
                 Log.e(

@@ -28,6 +28,8 @@ import com.project.momentum.features.auth.ui.InsertCodeRoot
 import com.project.momentum.features.auth.ui.PasswordRecoveryRoot
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.ui.MediaCreationScreen
+import com.project.momentum.features.editingAccount.EditAccountFields
+import com.project.momentum.features.editingAccount.EditingAccountRoot
 import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
 import com.project.momentum.features.editingAccount.viewmodel.AccountInfo
 import com.project.momentum.features.editingAccount.ui.EditingAccountRoot
@@ -113,7 +115,6 @@ fun MainScreen() {
         val saveableStateHolder = rememberSaveableStateHolder()
         val entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator<NavKey>(saveableStateHolder),
-//        rememberViewModelStoreNavEntryDecorator<NavKey>()
         )
 
         val navEntryProvider = entryProvider<NavKey> {
@@ -226,6 +227,7 @@ fun MainScreen() {
                 MediaCreationScreen(
                     initialMode = ContentCreationMode.Audio,
                     onGoToPreview = { uri, mediaType ->
+
                         openOverlay(NavRoutes.SendPhoto(uri.toString(), mediaType))
                     },
                     onGoToFriends = {
@@ -305,14 +307,16 @@ fun MainScreen() {
                         )
                     },
                     onEditClick = { uiInfoState ->
-                        openOverlay(NavRoutes.EditAccount(
-                            currentUserInfo = AccountInfo (
-                                username = uiInfoState.name,
-                                email = uiInfoState.email,
-                                phone = uiInfoState.phone,
-                                profilePhotoURL = uiInfoState.profilePhotoURL
+                        openOverlay(
+                            NavRoutes.EditAccount(
+                                currentUserInfo = EditAccountFields(
+                                    username = uiInfoState.name,
+                                    email = uiInfoState.email,
+                                    phone = uiInfoState.phone,
+                                    profilePhotoURL = uiInfoState.profilePhotoURL
+                                )
                             )
-                        ))
+                        )
                     },
                     onBackClick = {
                         closeOverlay()
@@ -367,7 +371,7 @@ fun MainScreen() {
             entry<NavRoutes.SendPhoto> { route ->
                 val uri = Uri.parse(route.uri)
                 val mediaType = route.mediaTypeToSend
-                SendPhotoScreen(
+                SendContentScreen(
                     uri = uri,
                     mediaType = mediaType,
                     onGoToTakePhoto = {

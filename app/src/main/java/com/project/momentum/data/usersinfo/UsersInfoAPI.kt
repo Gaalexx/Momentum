@@ -15,52 +15,47 @@ class UsersInfoAPI @Inject constructor(
     @Backend private val client: HttpClient
 ) {
 
-    suspend fun userByIdExists(id: String) : Boolean {
+    suspend fun userByIdExists(id: String): Boolean {
         val answer = client.get("users/exists/id/${id}")
         if (answer.status == HttpStatusCode.OK) {
             return answer.body<Boolean>()
-        }
-        else{
+        } else {
             throw Exception()
         }
     }
 
-    suspend fun userByEmailExists(email: String) : Boolean {
+    suspend fun userByEmailExists(email: String): Boolean {
         val answer = client.get("users/exists/email/${email}")
         if (answer.status == HttpStatusCode.OK) {
             return answer.body<Boolean>()
-        }
-        else{
+        } else {
             throw Exception()
         }
     }
 
-    suspend fun userByPhoneExists(phone: String) : Boolean {
+    suspend fun userByPhoneExists(phone: String): Boolean {
         val answer = client.get("users/exists/phone/${phone}")
         if (answer.status == HttpStatusCode.OK) {
             return answer.body<Boolean>()
-        }
-        else{
+        } else {
             throw Exception()
         }
     }
 
-    suspend fun userByLoginExists(login: String) : Boolean {
-        val answer = client.get("users/exists/phone/${login}")
+    suspend fun userByLoginExists(login: String): Boolean {
+        val answer = client.get("users/exists/login/${login}")
         if (answer.status == HttpStatusCode.OK) {
             return answer.body<Boolean>()
-        }
-        else{
+        } else {
             throw Exception()
         }
     }
 
-    suspend fun getUserById(id: String) : AccountInformationDTO {
+    suspend fun getUserById(id: String): AccountInformationDTO {
         val answer = client.get("users/get-info/id/${id}")
         if (answer.status == HttpStatusCode.OK) {
             return answer.body<AccountInformationDTO>()
-        }
-        else{
+        } else {
             throw Exception()
         }
     }
