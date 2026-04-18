@@ -21,18 +21,14 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.project.momentum.features.account.ui.AccountRoot
 import com.project.momentum.features.auth.ui.AuthorizationAccountRoot
-import com.project.momentum.features.auth.ui.AuthorizationAccountScreen
 import com.project.momentum.features.auth.ui.AuthorizationPasswordRoot
-import com.project.momentum.features.auth.ui.AuthorizationPasswordScreen
 import com.project.momentum.features.auth.ui.CreateAccountRoot
 import com.project.momentum.features.auth.ui.CreatePasswordRoot
 import com.project.momentum.features.auth.ui.InsertCodeRoot
-import com.project.momentum.features.auth.ui.InsertCodeScreen
 import com.project.momentum.features.auth.ui.PasswordRecoveryRoot
-import com.project.momentum.features.auth.ui.PasswordRecoveryScreen
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.ui.MediaCreationScreen
-import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
+import com.project.momentum.features.contentcreation.ui.SendContentScreen
 import com.project.momentum.features.editingAccount.EditAccountFields
 import com.project.momentum.features.editingAccount.EditingAccountRoot
 import com.project.momentum.features.friends.ui.FriendAccountRoot
@@ -309,14 +305,16 @@ fun MainScreen() {
                         )
                     },
                     onEditClick = { uiInfoState ->
-                        openOverlay(NavRoutes.EditAccount(
-                            currentUserInfo = EditAccountFields(
-                                username = uiInfoState.name,
-                                email = uiInfoState.email,
-                                phone = uiInfoState.phone,
-                                profilePhotoURL = uiInfoState.profilePhotoURL
+                        openOverlay(
+                            NavRoutes.EditAccount(
+                                currentUserInfo = EditAccountFields(
+                                    username = uiInfoState.name,
+                                    email = uiInfoState.email,
+                                    phone = uiInfoState.phone,
+                                    profilePhotoURL = uiInfoState.profilePhotoURL
+                                )
                             )
-                        ))
+                        )
                     },
                     onBackClick = {
                         closeOverlay()
@@ -371,7 +369,7 @@ fun MainScreen() {
             entry<NavRoutes.SendPhoto> { route ->
                 val uri = Uri.parse(route.uri)
                 val mediaType = route.mediaTypeToSend
-                SendPhotoScreen(
+                SendContentScreen(
                     uri = uri,
                     mediaType = mediaType,
                     onGoToTakePhoto = {
