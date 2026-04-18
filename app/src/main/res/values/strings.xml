@@ -123,6 +123,10 @@
     <string name="error_text_code_empty">ВВедите код подтверждения :3</string>
     <string name="error_text_code_invalid">Неверный код подтверждения</string>
 
+    <!-- Editing errors-->
+    <string name="error_text_username_already_exists_in_db">Пользователь с такой логином уже существует</string>
+    <string name="error_text_username_wrong_format">Неверный формат логина</string>
+
     <!-- Settings -->
     <string name="label_delete_account">Удаление аккаунта</string>
     <string name="button_delete_account">Удалить аккаунт</string>

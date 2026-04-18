@@ -2,7 +2,7 @@ package com.project.momentum.network.s3
 
 import android.net.Uri
 import android.util.Log
-import com.project.momentum.features.editingAccount.AvatarInfo
+import com.project.momentum.features.editingAccount.viewmodel.AvatarInfo
 import com.project.momentum.network.s3.upload.UploadMediaAPI
 import com.project.momentum.network.s3.upload.S3UploadApi
 import javax.inject.Inject
@@ -57,8 +57,7 @@ class S3InteractionRepository @Inject constructor(
     }
 
     suspend fun sendAvatar(avatarInfo: AvatarInfo) {
-        val presignedURLDTO: PresignedURLDTO = client
-            .sendAvatarUploadRequest (
+        val presignedURLDTO: PresignedURLDTO = client.sendAvatarUploadRequest (
                 UploadAvatarInfoDTO(
                     avatarInfo.mimeType,
                     avatarInfo.size

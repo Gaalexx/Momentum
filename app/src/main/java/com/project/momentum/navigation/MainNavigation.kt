@@ -21,20 +21,16 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.project.momentum.features.account.ui.AccountRoot
 import com.project.momentum.features.auth.ui.AuthorizationAccountRoot
-import com.project.momentum.features.auth.ui.AuthorizationAccountScreen
 import com.project.momentum.features.auth.ui.AuthorizationPasswordRoot
-import com.project.momentum.features.auth.ui.AuthorizationPasswordScreen
 import com.project.momentum.features.auth.ui.CreateAccountRoot
 import com.project.momentum.features.auth.ui.CreatePasswordRoot
 import com.project.momentum.features.auth.ui.InsertCodeRoot
-import com.project.momentum.features.auth.ui.InsertCodeScreen
 import com.project.momentum.features.auth.ui.PasswordRecoveryRoot
-import com.project.momentum.features.auth.ui.PasswordRecoveryScreen
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.ui.MediaCreationScreen
 import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
-import com.project.momentum.features.editingAccount.EditAccountFields
-import com.project.momentum.features.editingAccount.EditingAccountRoot
+import com.project.momentum.features.editingAccount.viewmodel.AccountInfo
+import com.project.momentum.features.editingAccount.ui.EditingAccountRoot
 import com.project.momentum.features.friends.ui.FriendAccountRoot
 import com.project.momentum.features.friends.ui.FriendsScreenRoute
 import com.project.momentum.features.offline.ui.NoInternetScreen
@@ -310,7 +306,7 @@ fun MainScreen() {
                     },
                     onEditClick = { uiInfoState ->
                         openOverlay(NavRoutes.EditAccount(
-                            currentUserInfo = EditAccountFields(
+                            currentUserInfo = AccountInfo (
                                 username = uiInfoState.name,
                                 email = uiInfoState.email,
                                 phone = uiInfoState.phone,

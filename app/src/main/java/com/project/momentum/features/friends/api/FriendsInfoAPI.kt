@@ -93,6 +93,7 @@ class FriendsInfoAPI @Inject constructor(
             Log.d("Friends", "${result.body<FriendshipListDTO>()}")
             result.body<FriendshipListDTO>()
         } else {
+            Log.e("Friends", result.body())
             FriendshipListDTO(listOf())
         }
     }
