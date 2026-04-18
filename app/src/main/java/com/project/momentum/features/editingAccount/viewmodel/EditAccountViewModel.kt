@@ -1,24 +1,17 @@
-package com.project.momentum.features.editingAccount
+package com.project.momentum.features.editingAccount.viewmodel
 
 import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.util.Patterns
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.project.momentum.features.account.models.AccountInformationDTO
 import com.project.momentum.features.account.repo.AccountRepository
-import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.auth.features.EmailChecker
 import com.project.momentum.features.auth.models.NavEvent
-import com.project.momentum.network.s3.MediaType
 import com.project.momentum.network.s3.S3InteractionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,11 +33,18 @@ enum class PasswordErrorType {
 }
 
 @Serializable
-data class EditAccountFields (
+data class AccountInfo (
     val username: String? = null,
     val email: String? = null,
     val phone: String? = null,
     val profilePhotoURL: String? = null
+)
+
+data class EditAccountFields (
+    val username: String? = null,
+    val email: String? = null,
+    val phone: String? = null,
+    val profilePhotoURL: Uri? = null
 )
 
 data class EditAccountErrorFields (
@@ -84,13 +84,14 @@ data class AvatarInfo(
 class EditAccountViewModel @Inject constructor(
     private val emailChecker: EmailChecker,
     private val repo: AccountRepository,
-    private val uploaderRepo: S3InteractionRepository
+    private val uploaderRepo: S3InteractionRepository,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
     private var _state = MutableStateFlow<EditAccountState>(
         EditAccountState.Loading(fields = EditAccountFields())
     )
     val state: StateFlow<EditAccountState> = _state.asStateFlow()
-    var currentUserData = EditAccountFields()
+    var currentUserData = AccountInfo()
         private set
 
     init {
@@ -106,7 +107,7 @@ class EditAccountViewModel @Inject constructor(
     suspend fun update() {
         val userdata = repo.getMyInfo() ?: return  //TODO: handle error
 
-        currentUserData = EditAccountFields(
+        currentUserData = AccountInfo(
             username = userdata.name,
             email = userdata.email,
             phone = userdata.phone,
@@ -118,22 +119,30 @@ class EditAccountViewModel @Inject constructor(
         viewModelScope.launch {
             validateFields()
 
-            if (_state.value is EditAccountState.Content) {
+            if (_state.value !is EditAccountState.Error) {
                 //TODO: update user info on client
                 try {
-                    val newUserInfo = repo.updateUserInfo(_state.value.fields)
-                    update()
-//                    clearState()
+                    if (_state.value.fields.username != null ||
+                        _state.value.fields.email != null ||
+                        _state.value.fields.phone != null)
+                        repo.updateUserInfo(_state.value.fields)
+                    selectPhoto(context, _state.value.fields.profilePhotoURL)
+//                    update()
+                    clearState()
                     _navigationEvents.emit(NavEvent.NavigateToNextScreen)
                 } catch (e: Exception) {
                     //TODO: обработка ошибки сети
                     Log.e("Momentum", e.message.toString())
                 }
+                setContent()
             }
         }
     }
 
-    fun selectPhoto(context: Context, uri: Uri) {
+
+
+    fun selectPhoto(context: Context, uri: Uri?) {
+        if (uri == null) return
         viewModelScope.launch {
             val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
             val size = context.contentResolver.openFileDescriptor(uri, "r")
@@ -151,6 +160,7 @@ class EditAccountViewModel @Inject constructor(
 
     suspend fun validateFields() {
         val fields = _state.value.fields
+        setLoading()
 
         setError(
             usernameError =
@@ -165,7 +175,6 @@ class EditAccountViewModel @Inject constructor(
         )
         if (_state.value is EditAccountState.Error) return
 
-        setLoading()
         try {
             if (!fields.email.isNullOrBlank() && emailChecker.checkEmail(fields.email)) {
                 setError(emailError = ErrorType.NOT_EXIST)
@@ -223,7 +232,7 @@ class EditAccountViewModel @Inject constructor(
         phoneError: ErrorType? = null
     ) {
         if (usernameError == null && emailError == null && phoneError == null) {
-            setContent() //TODO: переделать из-за этого экран зангрузки пропадает раньше чем надо
+//            setContent() //TODO: переделать из-за этого экран загрузки пропадает раньше чем надо
             return
         }
         _state.update { state ->
@@ -280,7 +289,7 @@ class EditAccountViewModel @Inject constructor(
     }
 
     //TODO: add update profile photo
-    fun updateProfilePhoto(profilePhotoURL: String) {
+    fun updateProfilePhoto(profilePhotoURL: Uri) {
         updateState {
             it.copy(profilePhotoURL = profilePhotoURL)
         }

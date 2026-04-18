@@ -21,6 +21,7 @@ import com.project.momentum.ui.theme.ConstColours
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import android.content.Context
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import com.project.momentum.R
@@ -54,7 +55,9 @@ fun AccountRoot(
     postsViewModel: PostsViewModel = hiltViewModel(),
     accountInfoViewModel: AccountInfoViewModel = hiltViewModel()
 ) {
-    accountInfoViewModel.onEvent(AccountInfoEvent.GetInfo)
+    LaunchedEffect(Unit) {
+        accountInfoViewModel.onEvent(AccountInfoEvent.GetInfo)
+    }
 
     val uiInfoState by accountInfoViewModel.state.collectAsStateWithLifecycle()
     val posts by postsViewModel.getUserPostsFlow(uiInfoState.userId) // TODO: брать посты по id пользователя
@@ -90,6 +93,7 @@ fun AccountScreen(
     val textColor = ConstColours.WHITE
     val context: Context = LocalContext.current
 
+    //TODO: экран загрузки (ну и состояние)
 
     Column(
         modifier = modifier
