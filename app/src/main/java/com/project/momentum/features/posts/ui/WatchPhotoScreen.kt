@@ -139,8 +139,8 @@ fun ProfileLabel(
 
 @Composable
 fun ReactToPhoto(
+    onReact: () -> Unit,
     modifier: Modifier = Modifier,
-    onReact: () -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -285,6 +285,7 @@ fun WatchPhotoScreen(
                                 .aspectRatio(1f)
                                 .clip(RoundedCornerShape(60.dp))
                                 .background(ConstColours.MAIN_BACK_GRAY)
+                                .clickable{}  // TODO
                         ) {
                             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
