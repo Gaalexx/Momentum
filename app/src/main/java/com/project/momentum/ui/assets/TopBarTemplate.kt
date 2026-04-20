@@ -43,7 +43,7 @@ fun TopBarTemplate(
                 modifier
                     .fillMaxWidth()
             ) {
-                BackCircleButton(
+                BackCircleButtonHardCoded(
                     onClick = onBackClick
                 )
                 Text (

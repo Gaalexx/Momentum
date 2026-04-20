@@ -14,7 +14,6 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,18 +40,16 @@ import com.project.momentum.R
 import com.project.momentum.features.account.models.PostData
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.network.s3.MediaType
-import com.project.momentum.ui.assets.AudioPreview
 import com.project.momentum.ui.assets.AudioView
 import com.project.momentum.ui.assets.CaptionBasicLabel
-import com.project.momentum.ui.assets.ContinueButton
-import com.project.momentum.ui.assets.FriendsPillButton
-import com.project.momentum.ui.assets.ProfileCircleButton
-import com.project.momentum.ui.assets.SettingsCircleButton
+import com.project.momentum.ui.assets.ContinueButtonHardCoded
+import com.project.momentum.ui.assets.FriendsPillButtonHardCoded
+import com.project.momentum.ui.assets.ProfileCircleButtonHardCoded
+import com.project.momentum.ui.assets.SettingsCircleButtonHardCoded
 import androidx.compose.ui.draw.blur
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import com.project.momentum.ui.assets.VideoPreview
 import com.project.momentum.ui.assets.VideoView
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
@@ -244,13 +241,13 @@ fun WatchPhotoScreen(
                 .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ProfileCircleButton(onClick = onProfileClick)
+            ProfileCircleButtonHardCoded(onClick = onProfileClick)
 
             Spacer(Modifier.weight(1f))
-            FriendsPillButton(onClick = onGoToFriends)
+            FriendsPillButtonHardCoded(onClick = onGoToFriends)
             Spacer(Modifier.weight(1f))
 
-            SettingsCircleButton(onClick = onGoToSettings)
+            SettingsCircleButtonHardCoded(onClick = onGoToSettings)
         }
 
         Spacer(Modifier.height(12.dp))
@@ -420,7 +417,7 @@ fun WatchPhotoScreen(
                     )
                 }
 
-                ContinueButton(
+                ContinueButtonHardCoded(
                     onClick = onGoToTakePhoto,
                     modifier = Modifier
                         .width(200.dp)

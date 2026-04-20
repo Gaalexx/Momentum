@@ -15,7 +15,7 @@ import androidx.compose.ui.res.stringResource
 import com.project.momentum.R
 import com.project.momentum.features.settings.viewmodel.SettingsEvent
 import com.project.momentum.features.settings.viewmodel.SettingsState
-import com.project.momentum.ui.assets.BackCircleButton
+import com.project.momentum.ui.assets.BackCircleButtonHardCoded
 import com.project.momentum.ui.assets.SettingsButton
 import com.project.momentum.ui.assets.SwitchRow
 import com.project.momentum.ui.common.LoadingOverlay
@@ -67,7 +67,7 @@ fun TemplateSettingsMain(
                 .fillMaxWidth()
                 .padding(horizontal = 14.dp, vertical = 10.dp)
         ) {
-            BackCircleButton(
+            BackCircleButtonHardCoded(
                 onClick = onBackClick
             )
 

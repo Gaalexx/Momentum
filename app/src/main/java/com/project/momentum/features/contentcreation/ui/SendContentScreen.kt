@@ -66,11 +66,11 @@ import com.project.momentum.features.contentcreation.viewmodel.UploadState
 import com.project.momentum.network.s3.MediaType
 import com.project.momentum.network.s3.PostInformation
 import com.project.momentum.ui.assets.AudioPreview
-import com.project.momentum.ui.assets.BigCircleSendPhotoAction
+import com.project.momentum.ui.assets.BigCircleSendPhotoActionHardCoded
 import com.project.momentum.ui.assets.CaptionBasicInput
-import com.project.momentum.ui.assets.FriendsPillButton
-import com.project.momentum.ui.assets.ProfileCircleButton
-import com.project.momentum.ui.assets.SettingsCircleButton
+import com.project.momentum.ui.assets.FriendsPillButtonHardCoded
+import com.project.momentum.ui.assets.ProfileCircleButtonHardCoded
+import com.project.momentum.ui.assets.SettingsCircleButtonHardCoded
 import com.project.momentum.ui.assets.VideoPreview
 import com.project.momentum.ui.theme.ConstColours
 
@@ -138,13 +138,13 @@ fun SendContentScreen(
                 .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ProfileCircleButton(onClick = onProfileClick)
+            ProfileCircleButtonHardCoded(onClick = onProfileClick)
 
             Spacer(Modifier.weight(1f))
-            FriendsPillButton(onClick = onGoToFriends)
+            FriendsPillButtonHardCoded(onClick = onGoToFriends)
             Spacer(Modifier.weight(1f))
 
-            SettingsCircleButton(onClick = onGoToSettings)
+            SettingsCircleButtonHardCoded(onClick = onGoToSettings)
         }
 
         Spacer(Modifier.height(12.dp))
@@ -267,7 +267,7 @@ fun SendContentScreen(
                 }
 
                 Spacer(Modifier.weight(1f))
-                BigCircleSendPhotoAction(
+                BigCircleSendPhotoActionHardCoded(
                     onClick = {
                         val safeUri = uri
                         val mimeType =

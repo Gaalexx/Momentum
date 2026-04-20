@@ -81,7 +81,7 @@ fun TemplateAuthorizationScreen(
                     keyboardOptions = keyboardOptions,
                 )
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
-                ContinueButton(
+                ContinueButtonHardCoded(
                     onClick = onContinueClick,
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size))
                 )

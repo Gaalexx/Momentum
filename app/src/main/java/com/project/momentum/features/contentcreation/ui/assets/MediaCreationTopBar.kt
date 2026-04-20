@@ -4,9 +4,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.project.momentum.ui.assets.FriendsPillButton
-import com.project.momentum.ui.assets.ProfileCircleButton
-import com.project.momentum.ui.assets.SettingsCircleButton
+import com.project.momentum.ui.assets.FriendsPillButtonHardCoded
+import com.project.momentum.ui.assets.ProfileCircleButtonHardCoded
+import com.project.momentum.ui.assets.SettingsCircleButtonHardCoded
 
 @Composable
 internal fun CameraTopBar(
@@ -19,15 +19,15 @@ internal fun CameraTopBar(
         modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
-        ProfileCircleButton(
+        ProfileCircleButtonHardCoded(
             onClick = onProfileClick,
             modifier = Modifier.align(Alignment.CenterStart),
         )
-        FriendsPillButton(
+        FriendsPillButtonHardCoded(
             onClick = onGoToFriends,
             modifier = Modifier.align(Alignment.Center),
         )
-        SettingsCircleButton(
+        SettingsCircleButtonHardCoded(
             onClick = onGoToSettings,
             modifier = Modifier.align(Alignment.CenterEnd),
         )
