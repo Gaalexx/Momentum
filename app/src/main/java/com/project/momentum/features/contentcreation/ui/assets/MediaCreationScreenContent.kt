@@ -3,9 +3,11 @@ package com.project.momentum.features.contentcreation.ui.assets
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -162,75 +164,74 @@ internal fun MediaCreationContentCompact(
             onGoToSettings = onGoToSettings,
             onGoToFriends = onGoToFriends,
             modifier = Modifier
-                //.align(Alignment.TopCenter)
                 .fillMaxWidth()
+                .height(50.dp)
                 .padding(horizontal = 14.dp),
         )
 
-        Column(
-            modifier = Modifier
-                // .align(Alignment.TopCenter)
-                .fillMaxWidth()
-                .padding(top = 10.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            MediaCreationPreviewCard(
-                mode = mode,
-                hasCameraPermission = hasCameraPermission,
-                hasMicrophonePermission = hasMicrophonePermission,
-                cameraState = cameraState,
-                progress = when (mode) {
-                    ContentCreationMode.Camera -> cameraRecordingProgress
-                    ContentCreationMode.Audio -> audioRecordingProgress
-                },
-                audioLevel = audioLevel,
-            )
-            MediaCreationModeSwitcher(
-                mode = mode,
-                enabled = modeSwitchEnabled,
-                onModeChange = onModeChange,
-                modifier = Modifier.padding(top = 16.dp),
-            )
-        }
+        Spacer(Modifier.height(5.dp))
 
-        Column(
-            modifier = Modifier
-                //.align(Alignment.BottomCenter)
-                .fillMaxWidth()
-                .padding(horizontal = 28.dp, vertical = 15.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            when (mode) {
-                ContentCreationMode.Camera -> {
-                    CameraBottomControls(
-                        torchEnabled = cameraState.torchEnabled,
-                        captureEnabled = hasCameraPermission,
-                        captureButtonState = cameraCaptureButtonState,
-                        onToggleTorch = cameraState::toggleTorch,
-                        onTakePhoto = onTakePhoto,
-                        onStartRecording = onStartVideoRecording,
-                        onStopRecording = onStopVideoRecording,
-                        onFlipCamera = cameraState::flipCamera,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 25.dp),
-                    )
-                }
+        MediaCreationPreviewCard(
+            mode = mode,
+            hasCameraPermission = hasCameraPermission,
+            hasMicrophonePermission = hasMicrophonePermission,
+            cameraState = cameraState,
+            progress = when (mode) {
+                ContentCreationMode.Camera -> cameraRecordingProgress
+                ContentCreationMode.Audio -> audioRecordingProgress
+            },
+            audioLevel = audioLevel,
+        )
 
-                ContentCreationMode.Audio -> {
-                    AudioBottomControls(
-                        enabled = hasMicrophonePermission,
-                        isRecording = isAudioRecording,
-                        onStartRecording = onStartAudioRecording,
-                        onStopRecording = onStopAudioRecording,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 25.dp),
-                    )
-                }
+        MediaCreationModeSwitcher(
+            mode = mode,
+            enabled = modeSwitchEnabled,
+            onModeChange = onModeChange,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .weight(1f),
+        )
+
+        Spacer(modifier = Modifier.weight(0.3f))
+
+        when (mode) {
+            ContentCreationMode.Camera -> {
+                CameraBottomControls(
+                    torchEnabled = cameraState.torchEnabled,
+                    captureEnabled = hasCameraPermission,
+                    captureButtonState = cameraCaptureButtonState,
+                    onToggleTorch = cameraState::toggleTorch,
+                    onTakePhoto = onTakePhoto,
+                    onStartRecording = onStartVideoRecording,
+                    onStopRecording = onStopVideoRecording,
+                    onFlipCamera = cameraState::flipCamera,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 25.dp)
+                        .weight(2f),
+                )
             }
 
-            GalleryButton(onClick = onGoToGallery)
+            ContentCreationMode.Audio -> {
+                AudioBottomControls(
+                    enabled = hasMicrophonePermission,
+                    isRecording = isAudioRecording,
+                    onStartRecording = onStartAudioRecording,
+                    onStopRecording = onStopAudioRecording,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 25.dp)
+                        .weight(2f),
+                )
+            }
+        }
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            GalleryButton(modifier = Modifier, onClick = onGoToGallery)
         }
     }
 }

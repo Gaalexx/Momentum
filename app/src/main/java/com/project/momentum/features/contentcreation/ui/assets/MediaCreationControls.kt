@@ -3,6 +3,7 @@ package com.project.momentum.features.contentcreation.ui.assets
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -22,7 +23,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.project.momentum.R
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
+import com.project.momentum.ui.assets.BigCircleForMainScreenAction
 import com.project.momentum.ui.assets.BigCircleForMainScreenActionHardCoded
+import com.project.momentum.ui.assets.BigCircleMicroButton
 import com.project.momentum.ui.assets.BigCircleMicroButtonHardCoded
 import com.project.momentum.ui.assets.CircleButtonHardCoded
 import com.project.momentum.ui.theme.ConstColours
@@ -107,15 +110,17 @@ internal fun CameraBottomControls(
         ConstColours.WHITE.copy(alpha = 0.4f)
     }
 
-    Box(
+
+    Row(
         modifier = modifier,
-        contentAlignment = Alignment.Center,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(
             onClick = onToggleTorch,
             enabled = captureEnabled,
             modifier = Modifier
-                .align(Alignment.CenterStart)
+                .weight(1f)
+                .align(Alignment.CenterVertically)
                 .size(50.dp),
         ) {
             Icon(
@@ -126,22 +131,27 @@ internal fun CameraBottomControls(
             )
         }
 
-        BigCircleForMainScreenActionHardCoded(
-            onClick = onTakePhoto,
-            onLongPressStart = onStartRecording,
-            onLongPressEnd = onStopRecording,
-            onStartProgress = {},
-            onEndProgress = {},
-            enabled = captureEnabled,
-            progressStarted = captureButtonState,
-            modifier = Modifier.align(Alignment.Center),
-        )
+        Box(modifier = Modifier.weight(1.5f), contentAlignment = Alignment.Center) {
+            BigCircleForMainScreenAction(
+                onClick = onTakePhoto,
+                onLongPressStart = onStartRecording,
+                onLongPressEnd = onStopRecording,
+                onStartProgress = {},
+                onEndProgress = {},
+                enabled = captureEnabled,
+                progressStarted = captureButtonState,
+                modifier = Modifier
+                    .aspectRatio(1f)//.align(Alignment.Center),
+            )
+        }
+
 
         IconButton(
             onClick = onFlipCamera,
             enabled = captureEnabled,
             modifier = Modifier
-                .align(Alignment.CenterEnd)
+                .weight(1f)
+                .align(Alignment.CenterVertically)
                 .size(50.dp),
         ) {
             Icon(
@@ -166,7 +176,7 @@ internal fun AudioBottomControls(
         modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
-        BigCircleMicroButtonHardCoded(
+        BigCircleMicroButton(
             onLongPress = onStartRecording,
             onLongPressEnd = onStopRecording,
             enabled = enabled,
@@ -181,7 +191,9 @@ internal fun AudioBottomControls(
             } else {
                 Color.White.copy(alpha = 0.55f)
             },
-            modifier = Modifier.align(Alignment.Center),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .aspectRatio(1f),
         )
     }
 }

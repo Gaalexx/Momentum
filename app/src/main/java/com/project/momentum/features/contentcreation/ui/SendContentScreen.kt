@@ -7,7 +7,6 @@ import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
@@ -60,6 +59,7 @@ import com.airbnb.lottie.compose.rememberLottieComposition
 import com.project.momentum.R
 import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.contentcreation.permissions.rememberCameraPermissionState
+import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
 import com.project.momentum.features.contentcreation.viewmodel.ContentCreationViewModel
 import com.project.momentum.features.contentcreation.viewmodel.UploadEvent
 import com.project.momentum.features.contentcreation.viewmodel.UploadState
@@ -68,9 +68,6 @@ import com.project.momentum.network.s3.PostInformation
 import com.project.momentum.ui.assets.AudioPreview
 import com.project.momentum.ui.assets.BigCircleSendPhotoActionHardCoded
 import com.project.momentum.ui.assets.CaptionBasicInput
-import com.project.momentum.ui.assets.FriendsPillButtonHardCoded
-import com.project.momentum.ui.assets.ProfileCircleButtonHardCoded
-import com.project.momentum.ui.assets.SettingsCircleButtonHardCoded
 import com.project.momentum.ui.assets.VideoPreview
 import com.project.momentum.ui.theme.ConstColours
 
@@ -123,31 +120,55 @@ fun SendContentScreen(
     var caption by rememberSaveable { mutableStateOf("") }
     val captionFocusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val hasCameraPermission by rememberCameraPermissionState()
+    val hasCameraPermission by rememberCameraPermissionState(
+        shouldRequest = mediaType != MediaTypeToSend.AUDIO
+    )
+
+    fun sendContent() {
+        val safeUri = uri
+        val mimeType = context.contentResolver.getType(safeUri) ?: when (mediaType) {
+            MediaTypeToSend.PHOTO -> context.contentResolver.getType(safeUri) ?: "image/jpeg"
+            MediaTypeToSend.VIDEO -> context.contentResolver.getType(safeUri) ?: "video/mp4"
+            MediaTypeToSend.AUDIO -> "audio/3gpp"
+        }
+        val uploadMediaType = when (mediaType) {
+            MediaTypeToSend.PHOTO -> MediaType.IMAGE
+            MediaTypeToSend.VIDEO -> MediaType.VIDEO
+            MediaTypeToSend.AUDIO -> MediaType.AUDIO
+        }
+        val size = context.contentResolver.openFileDescriptor(safeUri, "r")
+            ?.use { pfd -> pfd.statSize }?.takeIf { it >= 0 } ?: 0L
+
+        vm.onEvent(
+            UploadEvent.Send(
+                PostInformation(
+                    safeUri,
+                    mimeType,
+                    uploadMediaType,
+                    size = size,
+                    label = caption
+                )
+            )
+        )
+    }
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(ConstColours.BLACK)
             .windowInsetsPadding(WindowInsets.systemBars),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
+        CameraTopBar(
+            onProfileClick = onProfileClick,
+            onGoToSettings = onGoToSettings,
+            onGoToFriends = onGoToFriends,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            ProfileCircleButtonHardCoded(onClick = onProfileClick)
+                .height(50.dp)
+                .padding(horizontal = 14.dp),
+        )
 
-            Spacer(Modifier.weight(1f))
-            FriendsPillButtonHardCoded(onClick = onGoToFriends)
-            Spacer(Modifier.weight(1f))
-
-            SettingsCircleButtonHardCoded(onClick = onGoToSettings)
-        }
-
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(5.dp))
 
         Box(
             modifier = Modifier
@@ -156,64 +177,34 @@ fun SendContentScreen(
                 .clip(RoundedCornerShape(60.dp))
                 .background(ConstColours.BLACK)
         ) {
-            if (hasCameraPermission) {
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .aspectRatio(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    when (mediaType) {
-                        MediaTypeToSend.PHOTO -> {
-                            Box(
-                                Modifier
-                                    .fillMaxWidth(0.95f)
-                                    .aspectRatio(1f)
-                                    .clip(RoundedCornerShape(60.dp))
-                                    .background(ConstColours.MAIN_BACK_GRAY)
-                                    .align(Alignment.Center)
-                            ) {
-                                AsyncImage(
-                                    model = uri,
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .fillMaxSize(),
-                                    contentScale = ContentScale.Crop
-                                )
-                            }
-
-                        }
-
-                        MediaTypeToSend.VIDEO -> {
-                            VideoPreview(context = context, uri = uri)
-                        }
-
-                        MediaTypeToSend.AUDIO -> {
-                            AudioPreview(context = context, uri = uri)
+            if (hasCameraPermission || mediaType == MediaTypeToSend.AUDIO) {
+                when (mediaType) {
+                    MediaTypeToSend.PHOTO -> {
+                        Box(
+                            Modifier
+                                .fillMaxWidth(0.95f)
+                                .aspectRatio(1f)
+                                .clip(RoundedCornerShape(60.dp))
+                                .background(ConstColours.MAIN_BACK_GRAY)
+                                .align(Alignment.Center)
+                        ) {
+                            AsyncImage(
+                                model = uri,
+                                contentDescription = null,
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Crop
+                            )
                         }
                     }
 
-                    CaptionBasicInput(
-                        caption,
-                        { caption = it },
-                        placeholder = stringResource(R.string.label_write_comment),
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                            .focusRequester(captionFocusRequester)
-                    )
-                    if (uploadingState != null) {
-                        LottieAnimation(
-                            composition = composition,
-                            progress = { progress },
-                            modifier = Modifier.fillMaxSize()
-                        )
+                    MediaTypeToSend.VIDEO -> {
+                        VideoPreview(context = context, uri = uri)
                     }
 
-
+                    MediaTypeToSend.AUDIO -> {
+                        AudioPreview(context = context, uri = uri)
+                    }
                 }
-
             } else {
                 Box(
                     Modifier
@@ -232,103 +223,86 @@ fun SendContentScreen(
                 }
             }
 
+            CaptionBasicInput(
+                caption,
+                { caption = it },
+                placeholder = stringResource(R.string.label_write_comment),
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .focusRequester(captionFocusRequester)
+            )
+
+            if (uploadingState != null) {
+                LottieAnimation(
+                    composition = composition,
+                    progress = { progress },
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
         }
 
         UploadProgress(uploadingState = uploadingState)
 
-
-
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 40.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 28.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = {
-                    deleteByUri(context = context, uri = uri)
-                    onGoToTakePhoto()
-                }, modifier = Modifier.size(50.dp)) {
-                    Icon(
-                        Icons.Default.Cancel,
-                        modifier = Modifier.size(40.dp),
-                        contentDescription = stringResource(R.string.icon_flash),
-                        tint = ConstColours.WHITE
-                    )
-
-                }
-
-                Spacer(Modifier.weight(1f))
-                BigCircleSendPhotoActionHardCoded(
-                    onClick = {
-                        val safeUri = uri
-                        val mimeType =
-                            context.contentResolver.getType(safeUri) ?: when (mediaType) {
-                                MediaTypeToSend.PHOTO -> context.contentResolver.getType(safeUri)
-                                    ?: "image/jpeg"
-
-                                MediaTypeToSend.VIDEO -> context.contentResolver.getType(safeUri)
-                                    ?: "video/mp4"
-
-                                MediaTypeToSend.AUDIO -> "audio/3gpp"
-
-                            }
-                        val uploadMediaType = when (mediaType) {
-                            MediaTypeToSend.PHOTO -> MediaType.IMAGE
-                            MediaTypeToSend.VIDEO -> MediaType.VIDEO
-                            MediaTypeToSend.AUDIO -> MediaType.AUDIO
-                        }
-                        val size = context.contentResolver.openFileDescriptor(safeUri, "r")
-                            ?.use { pfd -> pfd.statSize }?.takeIf { it >= 0 } ?: 0L
-
-                        vm.onEvent(
-                            UploadEvent.Send(
-                                PostInformation(
-                                    safeUri,
-                                    mimeType,
-                                    uploadMediaType,
-                                    size = size,
-                                    label = caption
-                                )
-                            )
-                        )
-                    }
-                )
-                Spacer(Modifier.weight(1f))
-
-                IconButton(
-                    onClick = {
-                        captionFocusRequester.requestFocus()
-                        keyboardController?.show()
-                    },
-                    modifier = Modifier.size(50.dp)
-                ) {
-                    Icon(
-                        Icons.Outlined.TextFields,
-                        modifier = Modifier.size(40.dp),
-                        contentDescription = stringResource(R.string.icon_flip_camera),
-                        tint = ConstColours.WHITE
-                    )
-                }
-            }
-
+        if (uploadingState == null) {
+            Spacer(Modifier.height(60.dp))
         }
 
-        Spacer(Modifier.height(15.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 28.dp)
+                .padding(bottom = 25.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            IconButton(
+                onClick = {
+                    deleteByUri(context = context, uri = uri)
+                    onGoToTakePhoto()
+                },
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .size(50.dp)
+            ) {
+                Icon(
+                    Icons.Default.Cancel,
+                    modifier = Modifier.size(40.dp),
+                    contentDescription = stringResource(R.string.icon_flash),
+                    tint = ConstColours.WHITE
+                )
+            }
+
+            BigCircleSendPhotoActionHardCoded(
+                onClick = ::sendContent,
+                modifier = Modifier.align(Alignment.Center)
+            )
+
+            IconButton(
+                onClick = {
+                    captionFocusRequester.requestFocus()
+                    keyboardController?.show()
+                },
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .size(50.dp)
+            ) {
+                Icon(
+                    Icons.Outlined.TextFields,
+                    modifier = Modifier.size(40.dp),
+                    contentDescription = stringResource(R.string.icon_flip_camera),
+                    tint = ConstColours.WHITE
+                )
+            }
+        }
 
         Icon(
             imageVector = Icons.Outlined.KeyboardArrowDown,
             contentDescription = "More",
             tint = ConstColours.WHITE.copy(alpha = 0.9f),
-            modifier = Modifier.size(34.dp)
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .size(34.dp)
         )
     }
 }
