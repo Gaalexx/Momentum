@@ -125,3 +125,113 @@ internal fun MediaCreationContent(
         }
     }
 }
+
+
+@Composable
+internal fun MediaCreationContentCompact(
+    mode: ContentCreationMode,
+    hasCameraPermission: Boolean,
+    hasMicrophonePermission: Boolean,
+    cameraState: CameraScreenState,
+    cameraRecordingProgress: Float,
+    cameraCaptureButtonState: MutableState<Boolean>,
+    audioRecordingProgress: Float,
+    audioLevel: Float,
+    isAudioRecording: Boolean,
+    modeSwitchEnabled: Boolean,
+    onModeChange: (ContentCreationMode) -> Unit,
+    onTakePhoto: () -> Unit,
+    onStartVideoRecording: () -> Unit,
+    onStopVideoRecording: () -> Unit,
+    onStartAudioRecording: () -> Unit,
+    onStopAudioRecording: () -> Unit,
+    onProfileClick: () -> Unit,
+    onGoToGallery: () -> Unit,
+    onGoToSettings: () -> Unit,
+    onGoToFriends: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(ConstColours.BLACK)
+            .windowInsetsPadding(WindowInsets.systemBars),
+    ) {
+        CameraTopBar(
+            onProfileClick = onProfileClick,
+            onGoToSettings = onGoToSettings,
+            onGoToFriends = onGoToFriends,
+            modifier = Modifier
+                //.align(Alignment.TopCenter)
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp),
+        )
+
+        Column(
+            modifier = Modifier
+                // .align(Alignment.TopCenter)
+                .fillMaxWidth()
+                .padding(top = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            MediaCreationPreviewCard(
+                mode = mode,
+                hasCameraPermission = hasCameraPermission,
+                hasMicrophonePermission = hasMicrophonePermission,
+                cameraState = cameraState,
+                progress = when (mode) {
+                    ContentCreationMode.Camera -> cameraRecordingProgress
+                    ContentCreationMode.Audio -> audioRecordingProgress
+                },
+                audioLevel = audioLevel,
+            )
+            MediaCreationModeSwitcher(
+                mode = mode,
+                enabled = modeSwitchEnabled,
+                onModeChange = onModeChange,
+                modifier = Modifier.padding(top = 16.dp),
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                //.align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(horizontal = 28.dp, vertical = 15.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            when (mode) {
+                ContentCreationMode.Camera -> {
+                    CameraBottomControls(
+                        torchEnabled = cameraState.torchEnabled,
+                        captureEnabled = hasCameraPermission,
+                        captureButtonState = cameraCaptureButtonState,
+                        onToggleTorch = cameraState::toggleTorch,
+                        onTakePhoto = onTakePhoto,
+                        onStartRecording = onStartVideoRecording,
+                        onStopRecording = onStopVideoRecording,
+                        onFlipCamera = cameraState::flipCamera,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 25.dp),
+                    )
+                }
+
+                ContentCreationMode.Audio -> {
+                    AudioBottomControls(
+                        enabled = hasMicrophonePermission,
+                        isRecording = isAudioRecording,
+                        onStartRecording = onStartAudioRecording,
+                        onStopRecording = onStopAudioRecording,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 25.dp),
+                    )
+                }
+            }
+
+            GalleryButton(onClick = onGoToGallery)
+        }
+    }
+}
+
