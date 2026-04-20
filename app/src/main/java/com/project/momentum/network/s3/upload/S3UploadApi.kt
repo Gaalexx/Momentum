@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.net.Uri
 import com.project.momentum.network.di.S3
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.onUpload
 import io.ktor.client.request.put
 import io.ktor.http.HttpHeaders
 import io.ktor.http.content.OutgoingContent
@@ -15,6 +16,7 @@ import java.io.InputStream
 import javax.inject.Inject
 import io.ktor.client.request.header
 import io.ktor.client.request.setBody
+import io.ktor.utils.io.writeFully
 import javax.inject.Singleton
 
 @Singleton
@@ -27,60 +29,53 @@ class S3UploadApi @Inject constructor(
         uri: Uri,
         mimeType: String,
         byteSize: Long,
-        onProgress: (Int) -> Unit = {}
+        onProgress: (Long, Long?) -> Unit = { _, _ -> }
     ) {
+
+        require(byteSize > 0L) {
+            "Cannot upload uri=$uri because byteSize=$byteSize"
+        }
+
         val input = requireNotNull(contentResolver.openInputStream(uri)) {
             "Cannot open InputStream for uri=$uri"
         }
 
         input.use { stream ->
-            onProgress(0)
 
-            s3Client.put(uploadURL) {
+            val response = s3Client.put(uploadURL) {
                 header(HttpHeaders.ContentType, mimeType)
                 header(HttpHeaders.ContentLength, byteSize.toString())
-                setBody(stream.asOutgoingContent(byteSize, onProgress))
+                setBody(stream.asOutgoingContent(byteSize))
+
+                onUpload { bytesSentTotal, contentLength ->
+                    onProgress(bytesSentTotal, contentLength ?: byteSize)
+                }
             }
 
-            onProgress(100)
         }
     }
 }
 
 private fun InputStream.asOutgoingContent(
-    contentLength: Long,
-    onProgress: (Int) -> Unit
+    size: Long
 ) =
     object : OutgoingContent.WriteChannelContent() {
-        override val contentLength: Long = contentLength
+        override val contentLength: Long = size
 
         override suspend fun writeTo(channel: ByteWriteChannel) {
-            withContext(Dispatchers.IO) {
-                val output = channel.toOutputStream()
-                val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-                var uploadedBytes = 0L
-                var lastProgress = -1
+            val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
 
-                while (true) {
-                    val read = this@asOutgoingContent.read(buffer)
-                    if (read == -1) break
-
-                    output.write(buffer, 0, read)
-                    uploadedBytes += read
-
-                    if (contentLength > 0) {
-                        val progress = ((uploadedBytes * 100) / contentLength)
-                            .toInt()
-                            .coerceIn(0, 100)
-
-                        if (progress != lastProgress) {
-                            lastProgress = progress
-                            onProgress(progress)
-                        }
-                    }
+            while (true) {
+                val read = withContext(Dispatchers.IO) {
+                    this@asOutgoingContent.read(buffer)
                 }
 
-                output.flush()
+                if (read == -1) break
+
+                channel.writeFully(buffer, 0, read)
             }
+
+            channel.flush()
         }
     }
+

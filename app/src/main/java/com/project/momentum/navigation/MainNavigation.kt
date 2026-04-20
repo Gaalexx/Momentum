@@ -28,9 +28,9 @@ import com.project.momentum.features.auth.ui.InsertCodeRoot
 import com.project.momentum.features.auth.ui.PasswordRecoveryRoot
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.ui.MediaCreationScreen
-import com.project.momentum.features.contentcreation.ui.SendPhotoScreen
-import com.project.momentum.features.editingAccount.viewmodel.AccountInfo
+import com.project.momentum.features.contentcreation.ui.SendContentScreen
 import com.project.momentum.features.editingAccount.ui.EditingAccountRoot
+import com.project.momentum.features.editingAccount.viewmodel.AccountInfo
 import com.project.momentum.features.friends.ui.FriendAccountRoot
 import com.project.momentum.features.friends.ui.FriendsScreenRoute
 import com.project.momentum.features.offline.ui.NoInternetScreen
@@ -305,14 +305,16 @@ fun MainScreen() {
                         )
                     },
                     onEditClick = { uiInfoState ->
-                        openOverlay(NavRoutes.EditAccount(
-                            currentUserInfo = AccountInfo (
-                                username = uiInfoState.name,
-                                email = uiInfoState.email,
-                                phone = uiInfoState.phone,
-                                profilePhotoURL = uiInfoState.profilePhotoURL
+                        openOverlay(
+                            NavRoutes.EditAccount(
+                                currentUserInfo = AccountInfo(
+                                    username = uiInfoState.name,
+                                    email = uiInfoState.email,
+                                    phone = uiInfoState.phone,
+                                    profilePhotoURL = uiInfoState.profilePhotoURL
+                                )
                             )
-                        ))
+                        )
                     },
                     onBackClick = {
                         closeOverlay()
@@ -367,7 +369,7 @@ fun MainScreen() {
             entry<NavRoutes.SendPhoto> { route ->
                 val uri = Uri.parse(route.uri)
                 val mediaType = route.mediaTypeToSend
-                SendPhotoScreen(
+                SendContentScreen(
                     uri = uri,
                     mediaType = mediaType,
                     onGoToTakePhoto = {

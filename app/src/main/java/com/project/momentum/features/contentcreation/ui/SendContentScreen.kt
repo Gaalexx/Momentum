@@ -88,7 +88,7 @@ fun deleteByUri(context: Context, uri: Uri): Boolean {
 
 
 @Composable
-fun SendPhotoScreen(
+fun SendContentScreen(
     modifier: Modifier = Modifier,
     onGoToTakePhoto: () -> Unit,
     onProfileClick: () -> Unit,
@@ -110,7 +110,7 @@ fun SendPhotoScreen(
     )
 
     LaunchedEffect(uploadState) {
-        when(uploadState){
+        when (uploadState) {
             is UploadState.Success -> onGoToTakePhoto()
             is UploadState.Error -> onError()
             else -> Unit
@@ -270,12 +270,17 @@ fun SendPhotoScreen(
                 BigCircleSendPhotoAction(
                     onClick = {
                         val safeUri = uri
-                        val mimeType = context.contentResolver.getType(safeUri) ?: when (mediaType) {
-                            MediaTypeToSend.PHOTO -> context.contentResolver.getType(safeUri) ?: "image/jpeg"
-                            MediaTypeToSend.VIDEO -> context.contentResolver.getType(safeUri) ?: "video/mp4"
-                            MediaTypeToSend.AUDIO -> "audio/3gpp"
+                        val mimeType =
+                            context.contentResolver.getType(safeUri) ?: when (mediaType) {
+                                MediaTypeToSend.PHOTO -> context.contentResolver.getType(safeUri)
+                                    ?: "image/jpeg"
 
-                        }
+                                MediaTypeToSend.VIDEO -> context.contentResolver.getType(safeUri)
+                                    ?: "video/mp4"
+
+                                MediaTypeToSend.AUDIO -> "audio/3gpp"
+
+                            }
                         val uploadMediaType = when (mediaType) {
                             MediaTypeToSend.PHOTO -> MediaType.IMAGE
                             MediaTypeToSend.VIDEO -> MediaType.VIDEO
@@ -365,7 +370,7 @@ private fun UploadProgress(uploadingState: UploadState.Uploading?) {
 @Composable
 private fun CameraLikeScreenPreview() {
     MaterialTheme {
-        SendPhotoScreen(
+        SendContentScreen(
             onGoToTakePhoto = {},
             onProfileClick = {},
             onGoToSettings = {},

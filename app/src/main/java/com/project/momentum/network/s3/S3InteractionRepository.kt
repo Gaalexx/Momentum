@@ -1,10 +1,13 @@
 package com.project.momentum.network.s3
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
+import com.project.momentum.features.contentcreation.ui.deleteByUri
 import com.project.momentum.features.editingAccount.viewmodel.AvatarInfo
 import com.project.momentum.network.s3.upload.UploadMediaAPI
 import com.project.momentum.network.s3.upload.S3UploadApi
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -20,12 +23,13 @@ data class PostInformation(
 @Singleton
 class S3InteractionRepository @Inject constructor(
     private val client: UploadMediaAPI,
-    private val s3UploadAPI: S3UploadApi
+    private val s3UploadAPI: S3UploadApi,
+    @ApplicationContext private val context: Context
 ) {
 
     suspend fun sendContent(
         postInfo: PostInformation,
-        onProgress: (Int) -> Unit = {}
+        onProgress: (Long, Long?) -> Unit = { _, _ -> }
     ) {
         val presignedURLDTO: PresignedURLDTO =
             client.sendUploadRequest(
@@ -54,10 +58,13 @@ class S3InteractionRepository @Inject constructor(
                     postInfo.label
                 )
             )
+
+        deleteByUri(context = context, uri = postInfo.uri)
     }
 
     suspend fun sendAvatar(avatarInfo: AvatarInfo) {
-        val presignedURLDTO: PresignedURLDTO = client.sendAvatarUploadRequest (
+        val presignedURLDTO: PresignedURLDTO = client
+            .sendAvatarUploadRequest(
                 UploadAvatarInfoDTO(
                     avatarInfo.mimeType,
                     avatarInfo.size
