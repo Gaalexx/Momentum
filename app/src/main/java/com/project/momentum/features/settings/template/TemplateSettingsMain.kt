@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import com.project.momentum.R
+import com.project.momentum.features.settings.models.dto.ServerSettingsStateDTO
 import com.project.momentum.features.settings.viewmodel.SettingsEvent
 import com.project.momentum.features.settings.viewmodel.SettingsState
 import com.project.momentum.ui.assets.BackCircleButton
@@ -30,6 +31,7 @@ fun SettingsMainScreenPreview() {
             onBackClick = {},
             onEvent = {},
             state = SettingsState(),
+            serverState = ServerSettingsStateDTO(),
             onPremiumClick = {},
             onLogoutClick = {},
             onDeleteAccountClick = {}
@@ -42,6 +44,7 @@ fun TemplateSettingsMain(
     onBackClick: () -> Unit = {},
     onEvent: (SettingsEvent)-> Unit,
     state: SettingsState?,
+    serverState: ServerSettingsStateDTO,
     onPremiumClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     onDeleteAccountClick: () -> Unit = {},
@@ -93,19 +96,19 @@ fun TemplateSettingsMain(
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_in_app_switch),
-                enabled = state.serverSettingsState.inAppNotifications,
+                enabled = serverState.inAppNotifications,
                 onEnabledChange = { onEvent(SettingsEvent.OnInAppNotifications) }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_publications),
-                enabled = state.serverSettingsState.publicationsEnabled,
+                enabled = serverState.publicationsEnabled,
                 onEnabledChange = { onEvent(SettingsEvent.OnPublicationsEnabled) }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_reactions),
-                enabled = state.serverSettingsState.reactionsEnabled,
+                enabled = serverState.reactionsEnabled,
                 onEnabledChange = { onEvent(SettingsEvent.OnReactionsEnabled) }
             )
 
@@ -120,13 +123,13 @@ fun TemplateSettingsMain(
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_recommend_to_contacts),
-                enabled = state.serverSettingsState.recommendToContacts,
+                enabled = serverState.recommendToContacts,
                 onEnabledChange = { onEvent(SettingsEvent.OnRecommendToContacts) }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_allow_add_from_anyone),
-                enabled = state.serverSettingsState.allowAddFromAnyone,
+                enabled = serverState.allowAddFromAnyone,
                 onEnabledChange = { onEvent(SettingsEvent.OnAllowAddFromAnyone) }
             )
 

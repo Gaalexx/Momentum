@@ -10,9 +10,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.project.momentum.features.settings.models.dto.ServerSettingsStateDTO
 import com.project.momentum.features.settings.template.TemplateSettingsMain
 import com.project.momentum.features.settings.viewmodel.SettingsEffect
 import com.project.momentum.features.settings.viewmodel.SettingsMainScreenViewModel
+import com.project.momentum.navigation.viewmodel.AppStartViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -21,12 +23,15 @@ fun SettingsMainScreen(
     onPremiumClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     onDeleteAccountClick: () -> Unit = {},
-    viewModel: SettingsMainScreenViewModel = hiltViewModel()
+    viewModel: SettingsMainScreenViewModel = hiltViewModel(),
+    appStartViewModel: AppStartViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val serverState by appStartViewModel.serverSettings.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
+        viewModel.bind(appStartViewModel)
         viewModel.effects.collect { effect ->
             when (effect) {
                 is SettingsEffect.ShowError -> {
@@ -40,8 +45,9 @@ fun SettingsMainScreen(
     ) {
         TemplateSettingsMain(
             onBackClick = onBackClick,
-            onEvent = viewModel::onEvent,
+            onEvent = { event -> viewModel.onEvent(event, appStartViewModel) },
             state = uiState,
+            serverState = serverState ?: ServerSettingsStateDTO(),
             onPremiumClick = onPremiumClick,
             onLogoutClick = onLogoutClick,
             onDeleteAccountClick = onDeleteAccountClick

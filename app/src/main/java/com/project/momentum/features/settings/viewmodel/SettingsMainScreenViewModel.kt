@@ -8,18 +8,20 @@ import com.project.momentum.features.settings.models.dto.LocalSettingsStateDTO
 import com.project.momentum.features.settings.repo.AppSettingsHolder
 import com.project.momentum.features.settings.repo.ServerSettingsRepository
 import com.project.momentum.features.settings.repo.SettingsLocalRepository
+import com.project.momentum.navigation.viewmodel.AppStartViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class SettingsState (
-    val serverSettingsState: ServerSettingsStateDTO = ServerSettingsStateDTO(),
+    //val serverSettingsState: ServerSettingsStateDTO = ServerSettingsStateDTO(),
     val localSettingsState: LocalSettingsStateDTO = LocalSettingsStateDTO(),
     val isLoading: Boolean = false,
     /*val isError: Boolean = false,
@@ -48,7 +50,7 @@ class SettingsMainScreenViewModel @Inject constructor(
     private val appSettings: AppSettingsHolder
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<SettingsState?>(SettingsState())
+    private val _state = MutableStateFlow<SettingsState?>(null)
     val state = _state.asStateFlow()
 
     private val _effects = MutableSharedFlow<SettingsEffect>(replay = 0)
@@ -59,7 +61,6 @@ class SettingsMainScreenViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 getLocalSettingsInfo()
-                getServerSettingsInfo()
             } catch (e: Exception) {
                 _effects.emit(SettingsEffect.ShowError("Ошибка инициализации"))
             }
@@ -67,16 +68,51 @@ class SettingsMainScreenViewModel @Inject constructor(
     }
 
 
-    fun onEvent(event: SettingsEvent) {
+    fun onEvent(event: SettingsEvent, appStartViewModel: AppStartViewModel) {
+        val server = appStartViewModel.getServerSettings() ?: return
+
         when (event) {
-            is SettingsEvent.OnInAppNotifications -> onInAppNotifications()
-            is SettingsEvent.OnPublicationsEnabled -> onPublicationsEnabled()
-            is SettingsEvent.OnReactionsEnabled -> onReactionsEnabled()
-            is SettingsEvent.OnRecommendToContacts -> onRecommendToContacts()
-            is SettingsEvent.OnAllowAddFromAnyone -> onAllowAddFromAnyone()
-            is SettingsEvent.OnConfirmBeforePosting -> onConfirmBeforePosting()
+            SettingsEvent.OnInAppNotifications ->
+                onSettingChange(appStartViewModel) {
+                    serverRep.changeInAppNotifications(!server.inAppNotifications)
+                }
+
+            SettingsEvent.OnPublicationsEnabled ->
+                onSettingChange(appStartViewModel) {
+                    serverRep.changePublicationsEnabled(!server.publicationsEnabled)
+                }
+
+            SettingsEvent.OnReactionsEnabled ->
+                onSettingChange(appStartViewModel) {
+                    serverRep.changeReactionsEnabled(!server.reactionsEnabled)
+                }
+
+            SettingsEvent.OnRecommendToContacts ->
+                onSettingChange(appStartViewModel) {
+                    serverRep.changeRecommendToContacts(!server.recommendToContacts)
+                }
+
+            SettingsEvent.OnAllowAddFromAnyone ->
+                onSettingChange(appStartViewModel) {
+                    serverRep.changeAllowAddFromAnyone(!server.allowAddFromAnyone)
+                }
+
+            SettingsEvent.OnConfirmBeforePosting ->
+                onConfirmBeforePosting()
         }
     }
+
+    fun bind(appStartViewModel: AppStartViewModel) {
+        viewModelScope.launch {
+            appSettings.confirmBeforePost.collect { local ->
+                _state.value = SettingsState(
+                    localSettingsState = LocalSettingsStateDTO(local),
+                    isLoading = false
+                )
+            }
+        }
+    }
+
 
     private fun getLocalSettingsInfo() {
         _state.update { it?.copy(isLoading = true) }
@@ -111,67 +147,17 @@ class SettingsMainScreenViewModel @Inject constructor(
     }
 
     private fun onSettingChange(
+        appStartViewModel: AppStartViewModel,
         changeFun: suspend () -> Result<ServerSettingsStateDTO>
     ){
         viewModelScope.launch {
             changeFun()
                 .onSuccess { newState ->
-                    _state.update {
-                        it?.copy(
-                            serverSettingsState = newState
-                        )
-                    }
+                    appStartViewModel.updateServerSettings(newState)
                 }
                 .onFailure { e -> onError(e) }
         }
     }
-    private fun onInAppNotifications() {
-        val currentState = _state.value ?: return
-        val current = currentState.serverSettingsState.inAppNotifications
-        onSettingChange { serverRep.changeInAppNotifications(!current) }
-    }
-
-    private fun onPublicationsEnabled() {
-        val currentState = _state.value ?: return
-        val current = currentState.serverSettingsState.publicationsEnabled
-        onSettingChange { serverRep.changePublicationsEnabled(!current) }
-    }
-
-    private fun onReactionsEnabled() {
-        val currentState = _state.value ?: return
-        val current = currentState.serverSettingsState.reactionsEnabled
-        onSettingChange { serverRep.changeReactionsEnabled(!current) }
-    }
-
-    private fun onRecommendToContacts() {
-        val currentState = _state.value ?: return
-        val current = currentState.serverSettingsState.recommendToContacts
-        onSettingChange { serverRep.changeRecommendToContacts(!current) }
-    }
-    private fun onAllowAddFromAnyone() {
-        val currentState = _state.value ?: return
-        val current = currentState.serverSettingsState.allowAddFromAnyone
-        onSettingChange { serverRep.changeAllowAddFromAnyone(!current) }
-    }
-
-    private fun getServerSettingsInfo() {
-        _state.update { it?.copy(isLoading = true) }
-        viewModelScope.launch {
-            serverRep.getServerSettingsInfo()
-                .onSuccess { info ->
-                    _state.update {
-                        it?.copy(
-                            isLoading = false,
-                            serverSettingsState = info
-                        )
-                    }
-                }
-                .onFailure {
-                    //getErrorHandler()
-                }
-        }
-    }
-
 
     private suspend fun onError(error: Throwable) {
         val message = when (error) {

@@ -10,6 +10,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.retain.retain
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.project.momentum.features.settings.models.dto.ServerSettingsStateDTO
+import com.project.momentum.features.settings.repo.ServerSettingsRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.net.ConnectException
 
@@ -46,11 +50,30 @@ sealed interface AppStartState {
 
 @HiltViewModel
 class AppStartViewModel @Inject constructor(
-    private val auth: AuthUseCase
+    private val auth: AuthUseCase,
+    private val serverRep: ServerSettingsRepository
 ) : ViewModel() {
     var state by mutableStateOf<AppStartState>(AppStartState.Loading)
         private set
 
+    private val _serverSettings = MutableStateFlow<ServerSettingsStateDTO?>(null)
+    val serverSettings = _serverSettings.asStateFlow()
+
+    fun loadServerSettings() {
+        viewModelScope.launch {
+            serverRep.getServerSettingsInfo()
+                .onSuccess { _serverSettings.value = it }
+                .onFailure { /* обработка */ }
+        }
+    }
+
+    fun updateServerSettings(newState: ServerSettingsStateDTO) {
+        _serverSettings.value = newState
+    }
+
+    fun getServerSettings() : ServerSettingsStateDTO?{
+        return _serverSettings.value
+    }
 
     fun restoreSession() {
         if (state != AppStartState.Loading) return
@@ -74,6 +97,8 @@ class AppStartViewModel @Inject constructor(
                     }
                 }
             }
+
+            loadServerSettings()
         }
     }
 
