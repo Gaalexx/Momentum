@@ -41,8 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.project.momentum.R
-import com.project.momentum.features.posts.features.reactions.ReactionData
-import com.project.momentum.features.posts.features.reactions.ReactionType
+import com.project.momentum.features.posts.features.reactions.models.ReactionData
+import com.project.momentum.features.posts.features.reactions.models.ReactionType
 import com.project.momentum.ui.assets.SubButton
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
@@ -124,7 +124,9 @@ fun ReactionButtonWithCounter(
 }
 
 @Composable
-fun DialogReactions() {
+fun ReactionsDialog(
+    onReactionClick: (ReactionType) -> Unit,
+) {
     Column(
 //        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -175,13 +177,15 @@ fun DialogReactions() {
                     reactions.take(maxVisibleItems - 1).forEach { reaction ->
                         ReactionButton(
                             emoji = reaction.emoji,
-                            size = itemApproxWidth
+                            size = itemApproxWidth,
+                            onClick = { onReactionClick(reaction) }
                         )
                     }
                     Box(
                         modifier = Modifier
                             .width(itemApproxWidth)
-                            .aspectRatio(1f),
+                            .aspectRatio(1f)
+                            .clickable(onClick = {}), // TODO открыть расширенный список эмодзи
                         contentAlignment = Alignment.Center
                     ){
                         Icon(
@@ -194,7 +198,8 @@ fun DialogReactions() {
                     reactions.forEach { reaction ->
                         ReactionButton(
                             emoji = reaction.emoji,
-                            size = itemApproxWidth
+                            size = itemApproxWidth,
+                            onClick = { onReactionClick(reaction) }
                         )
                     }
 
@@ -238,7 +243,7 @@ fun EventButton(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.clickable(onClick = onClick),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -248,7 +253,7 @@ fun EventButton(
         )
         SubButton(
             text = text,
-            onClick = onClick
+            onClick = {}
         )
     }
 }
@@ -280,9 +285,9 @@ fun ReactionsGrid(
 
 @Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
 @Composable
-private fun DialogReactionsPreview() {
+private fun ReactionsDialogPreview() {
     MaterialTheme {
-        DialogReactions()
+        ReactionsDialog({ _ -> })
     }
 }
 

@@ -1,5 +1,7 @@
 package com.project.momentum.network.s3
 
+import com.project.momentum.features.posts.features.reactions.models.ReactionData
+import com.project.momentum.features.posts.features.reactions.models.ReactionType
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -44,6 +46,13 @@ data class PresignedURLDTO(
 )
 
 @Serializable
+data class ReactionsDTO(
+    val emoji: String,
+    val count: Int,
+    val users: List<String>
+)
+
+@Serializable
 data class PostDTO(
     val id: String,
     val userId: String,
@@ -52,6 +61,7 @@ data class PostDTO(
     val inUse: Boolean,
     val presignedURL: String,
     val mediaType: MediaType,
+    val reactions: List<ReactionsDTO>,
     val avatarPresignedURL: String? = null,
     val createdAt: String? = null
 )

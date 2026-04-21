@@ -1,4 +1,4 @@
-package com.project.momentum.features.posts.features.reactions
+package com.project.momentum.features.posts.features.reactions.models
 
 enum class ReactionType(val emoji: String, val serverKey: String) {
     LIKE("\uD83D\uDC4D", "like"),
@@ -6,7 +6,7 @@ enum class ReactionType(val emoji: String, val serverKey: String) {
     FIRE("\uD83D\uDD25", "fire"),
     CLOWN("\uD83E\uDD21", "clown"),
     HANDSHAKE("\uD83E\uDD1D", "handshake"),
-    LOUDLYCRYING("\uD83D\uDE2D", "loudly_crying"),
+    LOUDLY_CRYING("\uD83D\uDE2D", "loudly_crying"),
     TRASH("\uD83E\uDD2E", "trash"),
     POOP("\uD83D\uDCA9", "poop"),
     SAD("☹\uFE0F", "sad"),

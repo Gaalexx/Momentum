@@ -1,6 +1,6 @@
 package com.project.momentum.features.account.models
 
-import com.project.momentum.features.posts.features.reactions.ReactionData
+import com.project.momentum.features.posts.features.reactions.models.ReactionData
 import com.project.momentum.network.s3.MediaType
 import kotlinx.serialization.Serializable
 import java.time.Instant

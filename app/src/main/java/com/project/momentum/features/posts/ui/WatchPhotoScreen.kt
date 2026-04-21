@@ -6,11 +6,21 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -25,7 +35,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -35,26 +50,24 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.project.momentum.R
 import com.project.momentum.features.account.models.PostData
-import com.project.momentum.features.posts.features.reactions.ReactionData
-import com.project.momentum.features.posts.features.reactions.ReactionType
-import com.project.momentum.features.posts.features.reactions.ui.DialogReactions
+import com.project.momentum.features.posts.features.reactions.models.ReactionData
+import com.project.momentum.features.posts.features.reactions.models.ReactionType
+import com.project.momentum.features.posts.features.reactions.ui.ReactionsDialog
 import com.project.momentum.features.posts.features.reactions.ui.ReactionsGrid
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
+import com.project.momentum.features.posts.viewmodel.WatchPhotoEvent
 import com.project.momentum.network.s3.MediaType
 import com.project.momentum.ui.assets.AudioView
 import com.project.momentum.ui.assets.CaptionBasicLabel
@@ -193,25 +206,35 @@ fun WatchPhotoScreenRoute(
 
 
     WatchPhotoScreen(
+        onShowReactionDialog = { postsViewModel.onWatchPhotoEvent(
+            WatchPhotoEvent.OnShowReactionDialogEvent(!uiState.isShowingReactionsDialog)
+        ) },
+        onReactionClick = { postId, reaction -> postsViewModel.onWatchPhotoEvent(
+            WatchPhotoEvent.OnSendReaction(postId, reaction))
+        },
         onGoToTakePhoto = onGoToTakePhoto,
         onGoToGallery = onGoToGallery,
         onProfileClick = onProfileClick,
         onGoToSettings = onGoToSettings,
         onGoToFriends = onGoToFriends,
         postIndex = postIndex,
-        posts = posts
+        posts = posts,
+        isShowingReactionsDialog = uiState.isShowingReactionsDialog
     )
 }
 
 @Composable
 fun WatchPhotoScreen(
+    onShowReactionDialog: () -> Unit,
+    onReactionClick: (String, ReactionType) -> Unit,
     onGoToTakePhoto: () -> Unit,
     onGoToGallery: () -> Unit,
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
     postIndex: Int,
-    posts: List<PostData>
+    posts: List<PostData>,
+    isShowingReactionsDialog: Boolean,
 ) {
     val bg = ConstColours.BLACK
     val iconTint = ConstColours.WHITE
@@ -285,7 +308,7 @@ fun WatchPhotoScreen(
                                 .aspectRatio(1f)
                                 .clip(RoundedCornerShape(60.dp))
                                 .background(ConstColours.MAIN_BACK_GRAY)
-                                .clickable{}  // TODO
+                                .clickable { onShowReactionDialog() }
                         ) {
                             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
@@ -406,11 +429,16 @@ fun WatchPhotoScreen(
                     color = ConstColours.WHITE,
                     style = AppTextStyles.SupportingText
                 )
-                if (false) {
+                if (isShowingReactionsDialog) {
                     Dialog(
-                        onDismissRequest = { },
+                        onDismissRequest = { onShowReactionDialog() }
                     ) {
-                        DialogReactions()
+                        ReactionsDialog(
+                            onReactionClick = { reaction ->
+                                onReactionClick(post.id, reaction)
+                                onShowReactionDialog()
+                            }
+                        )
                     }
                 }
 
@@ -488,6 +516,8 @@ fun WatchPhotoScreen(
 private fun WatchPhotoScreenPreview() {
     MaterialTheme {
         WatchPhotoScreen(
+            onShowReactionDialog = {},
+            onReactionClick = { _, _ -> },
             onGoToTakePhoto = {},
             onGoToGallery = {},
             onGoToSettings = {},
@@ -503,16 +533,16 @@ private fun WatchPhotoScreenPreview() {
                     presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
                     mediaType = MediaType.IMAGE,
                     reactions = listOf(
-//                        ReactionData(
-//                            emoji = ReactionType.HEART,
-//                            count = 1,
-//                            users = listOf("user1")
-//                        ),
-//                        ReactionData(
-//                            emoji = ReactionType.CLOWN,
-//                            count = 3,
-//                            users = listOf("user1", "user2", "preview-user")
-//                        ),
+                        ReactionData(
+                            emoji = ReactionType.HEART,
+                            count = 1,
+                            users = listOf("user1")
+                        ),
+                        ReactionData(
+                            emoji = ReactionType.CLOWN,
+                            count = 3,
+                            users = listOf("user1", "user2", "preview-user")
+                        ),
 //                        ReactionData(
 //                            emoji = ReactionType.POOP,
 //                            count = 2,
@@ -545,7 +575,8 @@ private fun WatchPhotoScreenPreview() {
                     mediaType = MediaType.IMAGE,
                     createdAt = "2026-03-12T14:38:50.690942Z"
                 )
-            )
+            ),
+            isShowingReactionsDialog = false
         )
     }
 }
