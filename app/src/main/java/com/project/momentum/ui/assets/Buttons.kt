@@ -579,8 +579,8 @@ fun BigCircleForMainScreenAction(
 
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(ring - (ring.value * progress.value).dp)
+                .fillMaxSize(0.8f + 0.2f * progress.value)
+                //.padding(ring - (ring.value * progress.value).dp)
                 .clip(CircleShape)
                 .pointerInput(enabled) {
                     if (!enabled) return@pointerInput
@@ -656,8 +656,7 @@ fun BigCircleSendPhotoAction(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(ring)
+                .fillMaxSize(0.8f)
                 .clip(CircleShape)
                 .background(innerColor)
         )
@@ -788,8 +787,8 @@ fun BigCircleMicroButton(
     ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(ring - (ring.value * progress.value).dp)
+                .fillMaxSize(0.8f + 0.2f * progress.value)
+                //.padding(ring - (ring.value * progress.value).dp)
                 .clip(CircleShape)
                 .background(innerColor),
             contentAlignment = Alignment.Center

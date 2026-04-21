@@ -189,10 +189,10 @@ internal fun MediaCreationContentCompact(
             onModeChange = onModeChange,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
-                .weight(1f),
+                .weight(0.7f),
         )
 
-        Spacer(modifier = Modifier.weight(0.3f))
+        Spacer(modifier = Modifier.weight(0.6f))
 
         when (mode) {
             ContentCreationMode.Camera -> {
