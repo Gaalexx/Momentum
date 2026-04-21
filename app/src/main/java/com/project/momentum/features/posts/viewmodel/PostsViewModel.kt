@@ -23,6 +23,7 @@ import javax.inject.Inject
 data class PostsState(
     val posts: List<PostData>,
     val isRefreshing: Boolean,
+    val currentUserId: String,
     val isShowingReactionsDialog: Boolean = false
 )
 
@@ -46,11 +47,14 @@ class PostsViewModel @Inject constructor(
     private val repo: PostsRepo,
     private val sessionManager: SessionManager
 ) : ViewModel() {
-    private val _state = MutableStateFlow<PostsState>(PostsState(listOf(), false))
+    private val _state = MutableStateFlow<PostsState>(PostsState(listOf(), false, ""))
     val state = _state.asStateFlow()
 
     init {
         loadAllPosts()
+        _state.update {
+            it.copy(currentUserId = getCurrentUserId())
+        }
     }
 
     fun onEvent(event: GalleryEvent) {
@@ -126,6 +130,8 @@ class PostsViewModel @Inject constructor(
             }
         }
     }
+
+    private fun getCurrentUserId(): String = sessionManager.getUserId() ?: throw Exception("Unauthenticated")
 
     private suspend fun postsUpdate() {
         val posts = repo.getAllPosts()

@@ -260,7 +260,7 @@ fun EventButton(
 
 @Composable
 fun ReactionsGrid(
-    postOwner: String,
+    curUser: String,
     reactionsData: List<ReactionData>,
     modifier: Modifier = Modifier
 ) {
@@ -277,7 +277,7 @@ fun ReactionsGrid(
             ReactionButtonWithCounter(
                 emoji = it.emoji,
                 counter = it.count,
-                isActive = postOwner in it.users
+                isActive = curUser in it.users
             )
         }
     }

@@ -219,6 +219,7 @@ fun WatchPhotoScreenRoute(
         onGoToFriends = onGoToFriends,
         postIndex = postIndex,
         posts = posts,
+        currentUserId = uiState.currentUserId,
         isShowingReactionsDialog = uiState.isShowingReactionsDialog
     )
 }
@@ -233,6 +234,7 @@ fun WatchPhotoScreen(
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
     postIndex: Int,
+    currentUserId: String,
     posts: List<PostData>,
     isShowingReactionsDialog: Boolean,
 ) {
@@ -417,7 +419,7 @@ fun WatchPhotoScreen(
             currentPost?.let { post ->
                 if (post.reactions != null) {
                     ReactionsGrid(
-                        postOwner = post.userId,
+                        curUser = currentUserId,
                         reactionsData = post.reactions,
                         modifier = Modifier.padding(bottom = 16.dp, start = 8.dp, end = 8.dp)
                     )
@@ -576,6 +578,7 @@ private fun WatchPhotoScreenPreview() {
                     createdAt = "2026-03-12T14:38:50.690942Z"
                 )
             ),
+            currentUserId = "preview-user",
             isShowingReactionsDialog = false
         )
     }
