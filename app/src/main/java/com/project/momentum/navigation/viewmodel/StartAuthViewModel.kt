@@ -10,10 +10,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.retain.retain
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.project.momentum.features.settings.models.dto.LocalSettingsStateDTO
 import com.project.momentum.features.settings.models.dto.ServerSettingsStateDTO
+import com.project.momentum.features.settings.repo.AppSettingsHolder
 import com.project.momentum.features.settings.repo.ServerSettingsRepository
+import com.project.momentum.features.settings.repo.SettingsLocalRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.net.ConnectException
 
@@ -47,33 +52,65 @@ sealed interface AppStartState {
     data object Unauthorized : AppStartState
 }
 
+data class SwitchesState (
+    val serverSettingsState: ServerSettingsStateDTO = ServerSettingsStateDTO(),
+    val localSettingsState: LocalSettingsStateDTO = LocalSettingsStateDTO(),
+)
+
 
 @HiltViewModel
 class AppStartViewModel @Inject constructor(
     private val auth: AuthUseCase,
-    private val serverRep: ServerSettingsRepository
+    private val serverRep: ServerSettingsRepository,
+    private val appSettings: AppSettingsHolder
 ) : ViewModel() {
     var state by mutableStateOf<AppStartState>(AppStartState.Loading)
         private set
 
-    private val _serverSettings = MutableStateFlow<ServerSettingsStateDTO?>(null)
-    val serverSettings = _serverSettings.asStateFlow()
+    private val _settingsState = MutableStateFlow(SwitchesState())
+    val settingsState = _settingsState.asStateFlow()
 
+    init {
+        viewModelScope.launch {
+            appSettings.confirmBeforePost.collect { local ->
+                _settingsState.update {
+                    it.copy(
+                        localSettingsState = LocalSettingsStateDTO(
+                            confirmBeforePosting = local
+                        )
+                    )
+                }
+            }
+        }
+    }
     fun loadServerSettings() {
         viewModelScope.launch {
             serverRep.getServerSettingsInfo()
-                .onSuccess { _serverSettings.value = it }
-                .onFailure { /* обработка */ }
+                .onSuccess { server ->
+                    _settingsState.update {
+                        it.copy(serverSettingsState = server)
+                    }
+                }
+                .onFailure {
+                // TODO: обработка ошибок
+                }
         }
     }
 
     fun updateServerSettings(newState: ServerSettingsStateDTO) {
-        _serverSettings.value = newState
+        _settingsState.update {
+            it.copy(serverSettingsState = newState)
+        }
     }
 
-    fun getServerSettings() : ServerSettingsStateDTO?{
-        return _serverSettings.value
+    fun updateLocalSettings(newState: LocalSettingsStateDTO) {
+        _settingsState.update {
+            it.copy(localSettingsState = newState)
+        }
     }
+
+    fun getSettings(): SwitchesState =
+        _settingsState.value
 
     fun restoreSession() {
         if (state != AppStartState.Loading) return
@@ -85,6 +122,7 @@ class AppStartViewModel @Inject constructor(
             state = when (res) {
                 is AuthResult.Success -> {
                     if (res.token != null) {
+                        loadServerSettings()
                         AppStartState.Authorized
                     } else {
                         AppStartState.Unauthorized
@@ -98,7 +136,6 @@ class AppStartViewModel @Inject constructor(
                 }
             }
 
-            loadServerSettings()
         }
     }
 

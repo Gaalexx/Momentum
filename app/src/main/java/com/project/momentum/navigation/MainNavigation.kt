@@ -286,7 +286,8 @@ fun MainScreen() {
                     },
                     onDeleteAccountClick = {
                         openOverlay(NavRoutes.DeleteAccountCheckPassword)
-                    }
+                    },
+                    appStartViewModel = appStartViewModel
                 )
             }
 

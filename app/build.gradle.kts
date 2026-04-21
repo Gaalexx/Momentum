@@ -47,7 +47,7 @@ android {
         buildConfigField(
             "String",
             "BACKEND_BUILD_URL",
-            "\"http://193.233.20.47/api/momentum/\""
+            "\"http://192.168.0.43/api/momentum/\""
         )
 
         buildConfigField(

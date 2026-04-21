@@ -13,9 +13,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
 import com.project.momentum.R
-import com.project.momentum.features.settings.models.dto.ServerSettingsStateDTO
 import com.project.momentum.features.settings.viewmodel.SettingsEvent
 import com.project.momentum.features.settings.viewmodel.SettingsState
+import com.project.momentum.navigation.viewmodel.SwitchesState
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.SettingsButton
 import com.project.momentum.ui.assets.SwitchRow
@@ -31,7 +31,7 @@ fun SettingsMainScreenPreview() {
             onBackClick = {},
             onEvent = {},
             state = SettingsState(),
-            serverState = ServerSettingsStateDTO(),
+            switchesState = SwitchesState(),
             onPremiumClick = {},
             onLogoutClick = {},
             onDeleteAccountClick = {}
@@ -44,7 +44,7 @@ fun TemplateSettingsMain(
     onBackClick: () -> Unit = {},
     onEvent: (SettingsEvent)-> Unit,
     state: SettingsState?,
-    serverState: ServerSettingsStateDTO,
+    switchesState: SwitchesState,
     onPremiumClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     onDeleteAccountClick: () -> Unit = {},
@@ -96,19 +96,19 @@ fun TemplateSettingsMain(
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_in_app_switch),
-                enabled = serverState.inAppNotifications,
+                enabled = switchesState.serverSettingsState.inAppNotifications,
                 onEnabledChange = { onEvent(SettingsEvent.OnInAppNotifications) }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_publications),
-                enabled = serverState.publicationsEnabled,
+                enabled = switchesState.serverSettingsState.publicationsEnabled,
                 onEnabledChange = { onEvent(SettingsEvent.OnPublicationsEnabled) }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_reactions),
-                enabled = serverState.reactionsEnabled,
+                enabled = switchesState.serverSettingsState.reactionsEnabled,
                 onEnabledChange = { onEvent(SettingsEvent.OnReactionsEnabled) }
             )
 
@@ -123,13 +123,13 @@ fun TemplateSettingsMain(
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_recommend_to_contacts),
-                enabled = serverState.recommendToContacts,
+                enabled = switchesState.serverSettingsState.recommendToContacts,
                 onEnabledChange = { onEvent(SettingsEvent.OnRecommendToContacts) }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_allow_add_from_anyone),
-                enabled = serverState.allowAddFromAnyone,
+                enabled = switchesState.serverSettingsState.allowAddFromAnyone,
                 onEnabledChange = { onEvent(SettingsEvent.OnAllowAddFromAnyone) }
             )
 
@@ -144,7 +144,7 @@ fun TemplateSettingsMain(
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_confirm_before_posting),
-                enabled = state.localSettingsState.confirmBeforePosting,
+                enabled = switchesState.localSettingsState.confirmBeforePosting,
                 onEnabledChange = { onEvent(SettingsEvent.OnConfirmBeforePosting) }
             )
 

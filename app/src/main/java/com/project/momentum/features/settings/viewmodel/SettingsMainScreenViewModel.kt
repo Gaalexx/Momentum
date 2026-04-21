@@ -21,12 +21,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class SettingsState (
-    //val serverSettingsState: ServerSettingsStateDTO = ServerSettingsStateDTO(),
-    val localSettingsState: LocalSettingsStateDTO = LocalSettingsStateDTO(),
-    val isLoading: Boolean = false,
-    /*val isError: Boolean = false,
-    val error: SettingsError = SettingsError.Unknown(),
-    val errorMessage: String? = null*/
+    val isLoading: Boolean = false
 )
 
 sealed class SettingsEffect {
@@ -50,103 +45,60 @@ class SettingsMainScreenViewModel @Inject constructor(
     private val appSettings: AppSettingsHolder
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<SettingsState?>(null)
+    private val _state = MutableStateFlow<SettingsState>(SettingsState())
     val state = _state.asStateFlow()
 
     private val _effects = MutableSharedFlow<SettingsEffect>(replay = 0)
     val effects = _effects.asSharedFlow()
 
 
-    init {
-        viewModelScope.launch {
-            try {
-                getLocalSettingsInfo()
-            } catch (e: Exception) {
-                _effects.emit(SettingsEffect.ShowError("Ошибка инициализации"))
-            }
-        }
-    }
-
-
     fun onEvent(event: SettingsEvent, appStartViewModel: AppStartViewModel) {
-        val server = appStartViewModel.getServerSettings() ?: return
+        val server = appStartViewModel.getSettings().serverSettingsState
 
         when (event) {
             SettingsEvent.OnInAppNotifications ->
-                onSettingChange(appStartViewModel) {
+                onServerSettingChange(appStartViewModel) {
                     serverRep.changeInAppNotifications(!server.inAppNotifications)
                 }
 
             SettingsEvent.OnPublicationsEnabled ->
-                onSettingChange(appStartViewModel) {
+                onServerSettingChange(appStartViewModel) {
                     serverRep.changePublicationsEnabled(!server.publicationsEnabled)
                 }
 
             SettingsEvent.OnReactionsEnabled ->
-                onSettingChange(appStartViewModel) {
+                onServerSettingChange(appStartViewModel) {
                     serverRep.changeReactionsEnabled(!server.reactionsEnabled)
                 }
 
             SettingsEvent.OnRecommendToContacts ->
-                onSettingChange(appStartViewModel) {
+                onServerSettingChange(appStartViewModel) {
                     serverRep.changeRecommendToContacts(!server.recommendToContacts)
                 }
 
             SettingsEvent.OnAllowAddFromAnyone ->
-                onSettingChange(appStartViewModel) {
+                onServerSettingChange(appStartViewModel) {
                     serverRep.changeAllowAddFromAnyone(!server.allowAddFromAnyone)
                 }
 
             SettingsEvent.OnConfirmBeforePosting ->
-                onConfirmBeforePosting()
+                onLocalSettingChange(appStartViewModel)
         }
     }
 
-    fun bind(appStartViewModel: AppStartViewModel) {
+    private fun onLocalSettingChange(appStartViewModel: AppStartViewModel) {
         viewModelScope.launch {
-            appSettings.confirmBeforePost.collect { local ->
-                _state.value = SettingsState(
-                    localSettingsState = LocalSettingsStateDTO(local),
-                    isLoading = false
-                )
-            }
-        }
-    }
-
-
-    private fun getLocalSettingsInfo() {
-        _state.update { it?.copy(isLoading = true) }
-
-        viewModelScope.launch {
-            val initialLocal = appSettings.confirmBeforePost.first()
-
-            _state.value = SettingsState(
-                isLoading = false,
-                localSettingsState = LocalSettingsStateDTO(
-                    confirmBeforePosting = initialLocal
-                )
-            )
-        }
-    }
-    private fun onConfirmBeforePosting() {
-        viewModelScope.launch {
-            val current = appSettings.confirmBeforePost.value
+            val current = appStartViewModel.getSettings().localSettingsState.confirmBeforePosting
             localRep.setConfirmBeforePost(!current)
                 .onSuccess { newValue ->
-                    _state.update {
-                        it?.copy(
-                            localSettingsState = it.localSettingsState.copy(
-                                confirmBeforePosting = newValue
-                            )
-                        )
-                    }
+                    appStartViewModel.updateLocalSettings(newValue)
                 }
                 .onFailure { e -> onError(e) }
 
         }
     }
 
-    private fun onSettingChange(
+    private fun onServerSettingChange(
         appStartViewModel: AppStartViewModel,
         changeFun: suspend () -> Result<ServerSettingsStateDTO>
     ){
