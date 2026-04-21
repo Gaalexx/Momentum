@@ -343,7 +343,8 @@ fun WatchPhotoScreen(
                                 .combinedClickable(
                                     onClick = {},
                                     onLongClick = { isEditable = !isEditable }
-                                ),
+                                )
+                                .clickable { onShowReactionDialog() },
                             contentAlignment = Alignment.Center
                         ) {
                             VideoView(
@@ -375,7 +376,8 @@ fun WatchPhotoScreen(
                                 .combinedClickable(
                                     onClick = {},
                                     onLongClick = { isEditable = !isEditable }
-                                ),
+                                )
+                                .clickable { onShowReactionDialog() },
                             contentAlignment = Alignment.Center
                         ) {
                             AudioView(
