@@ -540,32 +540,26 @@ private fun WatchPhotoScreenPreview() {
                     reactions = listOf(
                         ReactionData(
                             emoji = ReactionType.HEART,
-                            count = 1,
                             users = listOf("user1")
                         ),
                         ReactionData(
                             emoji = ReactionType.CLOWN,
-                            count = 3,
                             users = listOf("user1", "user2", "preview-user")
                         ),
 //                        ReactionData(
 //                            emoji = ReactionType.POOP,
-//                            count = 2,
 //                            users = listOf("preview-user", "user3")
 //                        ),
 //                        ReactionData(
 //                            emoji = ReactionType.LOUDLYCRYING,
-//                            count = 1,
 //                            users = listOf("user1")
 //                        ),
 //                        ReactionData(
 //                            emoji = ReactionType.CHECK_MARK,
-//                            count = 3,
 //                            users = listOf("user1", "user2", "user3")
 //                        ),
 //                        ReactionData(
 //                            emoji = ReactionType.SMILE,
-//                            count = 2,
 //                            users = listOf("user1", "user3")
 //                        )
                     ),

@@ -279,12 +279,12 @@ fun ReactionsGrid(
         modifier = modifier
     ) {
         items(
-            items = reactionsData.sortedByDescending(ReactionData::count),
+            items = reactionsData.sortedByDescending{ it.users.size },
             key = { it.emoji.serverKey }
         ) {
             ReactionButtonWithCounter(
                 emoji = it.emoji,
-                counter = it.count,
+                counter = it.users.size,
                 isActive = curUser in it.users,
                 onClick = { onReactionClick(it.emoji) }
             )

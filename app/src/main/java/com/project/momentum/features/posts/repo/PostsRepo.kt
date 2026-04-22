@@ -33,7 +33,6 @@ class PostsRepo @Inject constructor(
                         reactions = it.reactions.map {
                             ReactionData(
                                 emoji = ReactionType.valueOf(it.emoji),
-                                count = it.users.size,
                                 users = it.users
                             )
                         },

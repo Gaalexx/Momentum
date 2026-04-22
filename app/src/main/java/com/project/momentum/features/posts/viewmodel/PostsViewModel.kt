@@ -115,9 +115,8 @@ class PostsViewModel @Inject constructor(
                             post.copy(
                                 reactions = post.reactions.mapNotNull { reaction ->
                                     if (reaction.emoji == currentReaction) {
-                                        if (reaction.count > 1) {
+                                        if (reaction.users.size > 1) {
                                             reaction.copy(
-                                                count = reaction.count - 1,
                                                 users = reaction.users - userId
                                             )
                                         } else null
@@ -153,7 +152,6 @@ class PostsViewModel @Inject constructor(
                                 reactions = (post.reactions ?: listOf()).map { reaction ->
                                     if (reaction.emoji == currentReaction) {
                                         reaction.copy(
-                                            count = reaction.count + 1,
                                             users = reaction.users + listOf(userId)
                                         )
                                     } else reaction
@@ -164,7 +162,6 @@ class PostsViewModel @Inject constructor(
                                 reactions = (post.reactions ?: listOf()) + listOf(
                                     ReactionData(
                                         currentReaction,
-                                        count = 1,
                                         users = listOf(userId)
                                     )
                                 )

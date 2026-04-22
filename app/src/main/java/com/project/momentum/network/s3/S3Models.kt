@@ -1,7 +1,5 @@
 package com.project.momentum.network.s3
 
-import com.project.momentum.features.posts.features.reactions.models.ReactionData
-import com.project.momentum.features.posts.features.reactions.models.ReactionType
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -48,7 +46,6 @@ data class PresignedURLDTO(
 @Serializable
 data class ReactionsDTO(
     val emoji: String,
-    val count: Int,
     val users: List<String>
 )
 
