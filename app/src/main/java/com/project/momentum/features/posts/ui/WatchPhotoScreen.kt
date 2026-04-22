@@ -210,7 +210,7 @@ fun WatchPhotoScreenRoute(
             WatchPhotoEvent.OnShowReactionDialogEvent(!uiState.isShowingReactionsDialog)
         ) },
         onReactionClick = { postId, reaction -> postsViewModel.onWatchPhotoEvent(
-            WatchPhotoEvent.OnSendReaction(postId, reaction))
+            WatchPhotoEvent.OnReactionClick(postId, reaction))
         },
         onGoToTakePhoto = onGoToTakePhoto,
         onGoToGallery = onGoToGallery,
@@ -341,10 +341,9 @@ fun WatchPhotoScreen(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .combinedClickable(
-                                    onClick = {},
+                                    onClick = { onShowReactionDialog() },
                                     onLongClick = { isEditable = !isEditable }
-                                )
-                                .clickable { onShowReactionDialog() },
+                                ),
                             contentAlignment = Alignment.Center
                         ) {
                             VideoView(
@@ -374,10 +373,9 @@ fun WatchPhotoScreen(
                             modifier = Modifier
                                 .fillMaxSize()
                                 .combinedClickable(
-                                    onClick = {},
+                                    onClick = { onShowReactionDialog() },
                                     onLongClick = { isEditable = !isEditable }
-                                )
-                                .clickable { onShowReactionDialog() },
+                                ),
                             contentAlignment = Alignment.Center
                         ) {
                             AudioView(
@@ -423,6 +421,9 @@ fun WatchPhotoScreen(
                     ReactionsGrid(
                         curUser = currentUserId,
                         reactionsData = post.reactions,
+                        onReactionClick = { reaction ->
+                            onReactionClick(post.id, reaction)
+                        },
                         modifier = Modifier.padding(bottom = 16.dp, start = 8.dp, end = 8.dp)
                     )
                 }

@@ -36,7 +36,7 @@ sealed interface GalleryEvent {
 sealed interface WatchPhotoEvent {
     data class OnShowReactionDialogEvent(val isShowing: Boolean) : WatchPhotoEvent
 
-    data class OnSendReaction(
+    data class OnReactionClick(
         val postId: String,
         val reaction: ReactionType,
     ) : WatchPhotoEvent
@@ -69,7 +69,12 @@ class PostsViewModel @Inject constructor(
     fun onWatchPhotoEvent(event: WatchPhotoEvent) {
         when (event) {
             is WatchPhotoEvent.OnShowReactionDialogEvent -> showReactionDialogChange(event)
-            is WatchPhotoEvent.OnSendReaction -> sendReaction(event)
+            is WatchPhotoEvent.OnReactionClick -> try {
+                onReactionClick(event)
+            } catch (e: Exception) {
+                Log.e("PostsViewModel", "Error on reaction click ${e.message ?: ""}", e)
+                //TODO: notice user about error
+            }
         }
     }
 
@@ -79,26 +84,77 @@ class PostsViewModel @Inject constructor(
         }
     }
 
-    private fun sendReaction(event: WatchPhotoEvent.OnSendReaction) {
-        val currentUserId = sessionManager.getUserId() ?: return
+    private fun onReactionClick(event: WatchPhotoEvent.OnReactionClick) {
+        val currentUserId = sessionManager.getUserId() ?: throw Exception() // TODO: custom Exception
 
-        if (_state.value.posts.find { it.id == event.postId }
-                ?.reactions?.find { it.emoji == event.reaction }
-                ?.users?.any { it == currentUserId } ?: false) return //TODO deleteReaction()
+        val post = _state.value.posts.find { it.id == event.postId } ?: throw Exception() // no such post
 
+
+        //TODO: если часто добавлять или удалять реакции и проблемы с сетью
+        // то отображается некорректное состояние например:
+        // удалились реакции на клиенте но на сервере всё ещё ошибка
+        // и при обновлении постов будет несоответствие состояний
+        // (из ниоткуда появятся вроде как удаленные реакции)
+
+        if (post.reactions?.find { it.emoji == event.reaction }
+                ?.users?.any { it == currentUserId } ?: false) {
+            deleteReaction(currentUserId, event.postId, event.reaction)
+        } else {
+            sendReaction(currentUserId, event.postId, event.reaction)
+        }
+    }
+
+    private fun deleteReaction(userId: String, postId: String, currentReaction: ReactionType) {
         val oldState = _state.value
 
         _state.update { state ->
             state.copy(
                 posts = state.posts.map { post ->
-                    if (post.id == event.postId) {
-                        if ((post.reactions ?: listOf()).any { it.emoji == event.reaction }) {
+                    if (post.id == postId) {
+                        if (post.reactions?.any { it.emoji == currentReaction } ?: false) {
+                            post.copy(
+                                reactions = post.reactions.mapNotNull { reaction ->
+                                    if (reaction.emoji == currentReaction) {
+                                        if (reaction.count > 1) {
+                                            reaction.copy(
+                                                count = reaction.count - 1,
+                                                users = reaction.users - userId
+                                            )
+                                        } else null
+                                    } else reaction
+                                }
+                            )
+                        } else throw Exception() // no such reaction or reactions == null
+                    } else post
+                }
+            )
+        }
+        viewModelScope.launch {
+            try {
+                if (!repo.deleteReaction(postId, currentReaction)) {
+                    _state.update { oldState }
+                }
+            } catch (e: Exception) {
+                Log.e("PostsViewModel", "Error deleting reaction ${e.message ?: ""}", e)
+                _state.update { oldState }
+            }
+        }
+    }
+
+    private fun sendReaction(userId: String, postId: String, currentReaction: ReactionType) {
+        val oldState = _state.value
+
+        _state.update { state ->
+            state.copy(
+                posts = state.posts.map { post ->
+                    if (post.id == postId) {
+                        if ((post.reactions ?: listOf()).any { it.emoji == currentReaction }) {
                             post.copy(
                                 reactions = (post.reactions ?: listOf()).map { reaction ->
-                                    if (reaction.emoji == event.reaction) {
+                                    if (reaction.emoji == currentReaction) {
                                         reaction.copy(
                                             count = reaction.count + 1,
-                                            users = reaction.users + listOf(currentUserId)
+                                            users = reaction.users + listOf(userId)
                                         )
                                     } else reaction
                                 }
@@ -107,9 +163,9 @@ class PostsViewModel @Inject constructor(
                             post.copy(
                                 reactions = (post.reactions ?: listOf()) + listOf(
                                     ReactionData(
-                                        event.reaction,
+                                        currentReaction,
                                         count = 1,
-                                        users = listOf(currentUserId)
+                                        users = listOf(userId)
                                     )
                                 )
                             )
@@ -121,7 +177,7 @@ class PostsViewModel @Inject constructor(
         }
         viewModelScope.launch {
             try {
-                if (!repo.sendReaction(event.postId, event.reaction)) {
+                if (!repo.sendReaction(postId, currentReaction)) {
                     _state.update { oldState }
                 }
             } catch (e: Exception) {

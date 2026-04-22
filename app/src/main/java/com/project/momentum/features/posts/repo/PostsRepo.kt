@@ -33,7 +33,7 @@ class PostsRepo @Inject constructor(
                         reactions = it.reactions.map {
                             ReactionData(
                                 emoji = ReactionType.valueOf(it.emoji),
-                                count = it.count,
+                                count = it.users.size,
                                 users = it.users
                             )
                         },
@@ -50,4 +50,7 @@ class PostsRepo @Inject constructor(
 
     suspend fun sendReaction(postId: String, reaction: ReactionType) : Boolean =
         postsAPI.sendReaction(postId, reaction)
+
+    suspend fun deleteReaction(postId: String, reaction: ReactionType) : Boolean =
+        postsAPI.deleteReaction(postId, reaction)
 }

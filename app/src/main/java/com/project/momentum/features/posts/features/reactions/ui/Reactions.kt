@@ -262,6 +262,7 @@ fun EventButton(
 fun ReactionsGrid(
     curUser: String,
     reactionsData: List<ReactionData>,
+    onReactionClick: (ReactionType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid( //TODO: обработать вариант когда реакций больше чем 3 ряда
@@ -277,7 +278,8 @@ fun ReactionsGrid(
             ReactionButtonWithCounter(
                 emoji = it.emoji,
                 counter = it.count,
-                isActive = curUser in it.users
+                isActive = curUser in it.users,
+                onClick = { onReactionClick(it.emoji) }
             )
         }
     }
