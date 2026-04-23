@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -120,14 +121,13 @@ internal fun CameraBottomControls(
             enabled = captureEnabled,
             modifier = Modifier
                 .weight(1f)
-                .align(Alignment.CenterVertically)
-                .size(50.dp),
+                .align(Alignment.CenterVertically),
         ) {
             Icon(
                 imageVector = Icons.Outlined.WbSunny,
                 contentDescription = stringResource(R.string.icon_flash),
                 tint = if (torchEnabled) ConstColours.MAIN_BRAND_BLUE else iconTint,
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.fillMaxSize(0.8f),
             )
         }
 
@@ -151,14 +151,13 @@ internal fun CameraBottomControls(
             enabled = captureEnabled,
             modifier = Modifier
                 .weight(1f)
-                .align(Alignment.CenterVertically)
-                .size(50.dp),
+                .align(Alignment.CenterVertically),
         ) {
             Icon(
                 imageVector = Icons.Outlined.Cached,
                 contentDescription = stringResource(R.string.icon_flip_camera),
                 tint = iconTint,
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.fillMaxSize(0.8f),
             )
         }
     }
