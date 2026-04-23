@@ -24,11 +24,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.project.momentum.R
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
-import com.project.momentum.ui.assets.BigCircleForMainScreenAction
-import com.project.momentum.ui.assets.BigCircleForMainScreenActionHardCoded
-import com.project.momentum.ui.assets.BigCircleMicroButton
-import com.project.momentum.ui.assets.BigCircleMicroButtonHardCoded
-import com.project.momentum.ui.assets.CircleButtonHardCoded
+import com.project.momentum.ui.assets.BigCircleForMainScreenActionAdaptive
+import com.project.momentum.ui.assets.BigCircleMicroButtonAdaptive
+import com.project.momentum.ui.assets.CircleButton
 import com.project.momentum.ui.theme.ConstColours
 
 @Composable
@@ -83,7 +81,7 @@ private fun ModeCircleButton(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
 ) {
     val activeAlpha = if (enabled) 1f else 0.45f
-    CircleButtonHardCoded(
+    CircleButton(
         size = 60.dp,
         onClick = onClick,
         icon = icon,
@@ -132,7 +130,7 @@ internal fun CameraBottomControls(
         }
 
         Box(modifier = Modifier.weight(1.5f), contentAlignment = Alignment.Center) {
-            BigCircleForMainScreenAction(
+            BigCircleForMainScreenActionAdaptive(
                 onClick = onTakePhoto,
                 onLongPressStart = onStartRecording,
                 onLongPressEnd = onStopRecording,
@@ -175,7 +173,7 @@ internal fun AudioBottomControls(
         modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
-        BigCircleMicroButton(
+        BigCircleMicroButtonAdaptive(
             onLongPress = onStartRecording,
             onLongPressEnd = onStopRecording,
             enabled = enabled,

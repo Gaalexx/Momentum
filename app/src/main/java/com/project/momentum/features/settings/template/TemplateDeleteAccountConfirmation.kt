@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.project.momentum.R
 import com.project.momentum.features.settings.viewmodel.DeleteEvent
-import com.project.momentum.ui.assets.ButtonForDeleteHardCoded
+import com.project.momentum.ui.assets.ButtonForDelete
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
 
@@ -63,13 +63,13 @@ fun TemplateDeleteAccountConfirmation(
                     .fillMaxWidth()
             ){
                 Spacer(modifier = Modifier.weight(1f))
-                ButtonForDeleteHardCoded(
+                ButtonForDelete(
                     onClick = {onEvent(DeleteEvent.onConfirmDelete)},
                     text = stringResource(R.string.button_delete_account_yes),
                     color =  ConstColours.ERROR_RED,
                 )
                 Spacer(modifier = Modifier.weight(2f))
-                ButtonForDeleteHardCoded(
+                ButtonForDelete(
                     onClick = {onEvent(DeleteEvent.onCancelDelete)},
                     text = stringResource(R.string.button_delete_account_no),
                     color =  ConstColours.BLACK,

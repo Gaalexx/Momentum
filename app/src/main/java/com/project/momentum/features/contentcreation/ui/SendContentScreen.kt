@@ -68,7 +68,7 @@ import com.project.momentum.features.contentcreation.viewmodel.UploadState
 import com.project.momentum.network.s3.MediaType
 import com.project.momentum.network.s3.PostInformation
 import com.project.momentum.ui.assets.AudioPreview
-import com.project.momentum.ui.assets.BigCircleSendPhotoAction
+import com.project.momentum.ui.assets.BigCircleSendPhotoActionAdaptive
 import com.project.momentum.ui.assets.CaptionBasicInput
 import com.project.momentum.ui.assets.VideoPreview
 import com.project.momentum.ui.theme.ConstColours
@@ -333,7 +333,7 @@ private fun SendContentBottomControls(
             modifier = Modifier.weight(1.5f),
             contentAlignment = Alignment.Center
         ) {
-            BigCircleSendPhotoAction(
+            BigCircleSendPhotoActionAdaptive(
                 onClick = onSend,
                 modifier = Modifier.aspectRatio(1f)
             )

@@ -97,7 +97,7 @@ fun PhotoGrid(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            PlusButton(
+                            PlusButtonAdaptive(
                                 onClick = onAddPhotoClick,
                                 modifier = Modifier.size(48.dp),
                                 backgroundColor = ConstColours.MAIN_BRAND_BLUE,
@@ -252,7 +252,7 @@ fun S3PhotoGrid(
                             .background(ConstColours.MAIN_BACK_GRAY),
                         contentAlignment = Alignment.Center
                     ) {
-                        PlusButton(
+                        PlusButtonAdaptive(
                             onClick = onAddPhotoClick,
                             modifier = Modifier.size(48.dp),
                             backgroundColor = ConstColours.MAIN_BRAND_BLUE,

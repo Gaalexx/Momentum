@@ -20,10 +20,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.R
 import com.project.momentum.features.account.models.PostData
-import com.project.momentum.ui.assets.BackCircleButtonHardCoded
-import com.project.momentum.ui.assets.FriendsPillButtonHardCoded
-import com.project.momentum.ui.assets.ProfileCircleButtonHardCoded
-import com.project.momentum.ui.assets.SettingsCircleButtonHardCoded
+import com.project.momentum.ui.assets.BackCircleButton
+import com.project.momentum.ui.assets.FriendsPillButton
+import com.project.momentum.ui.assets.ProfileCircleButton
+import com.project.momentum.ui.assets.SettingsCircleButton
 import com.project.momentum.features.posts.viewmodel.GalleryEvent
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.ui.assets.S3PhotoGrid
@@ -90,19 +90,19 @@ private fun GalleryScreenContent(
                     .padding(horizontal = 14.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                BackCircleButtonHardCoded(onClick = onBackClick)
+                BackCircleButton(onClick = onBackClick)
 
                 Spacer(Modifier.width(12.dp))
 
-                ProfileCircleButtonHardCoded(onClick = onProfileClick)
+                ProfileCircleButton(onClick = onProfileClick)
 
                 Spacer(Modifier.weight(1f))
 
-                FriendsPillButtonHardCoded(onClick = onGoToFriends)
+                FriendsPillButton(onClick = onGoToFriends)
 
                 Spacer(Modifier.weight(1f))
 
-                SettingsCircleButtonHardCoded(onClick = onGoToSettings)
+                SettingsCircleButton(onClick = onGoToSettings)
             }
 
             Spacer(Modifier.height(12.dp))

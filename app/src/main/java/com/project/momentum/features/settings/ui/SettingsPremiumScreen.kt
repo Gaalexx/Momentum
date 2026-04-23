@@ -12,8 +12,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import com.project.momentum.R
-import com.project.momentum.ui.assets.BackCircleButtonHardCoded
-import com.project.momentum.ui.assets.BuyButtonHardCoded
+import com.project.momentum.ui.assets.BackCircleButton
+import com.project.momentum.ui.assets.BuyButton
 import com.project.momentum.ui.assets.PremiumFeatureItem
 import com.project.momentum.ui.assets.SubscriptionOptionCard
 import com.project.momentum.ui.theme.AppTextStyles
@@ -63,7 +63,7 @@ fun SettingsPremiumScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 14.dp, vertical = 10.dp)
         ) {
-            BackCircleButtonHardCoded(
+            BackCircleButton(
                 onClick = onBackClick
             )
 
@@ -189,7 +189,7 @@ fun SettingsPremiumScreen(
             Spacer(modifier = Modifier.height(20.dp))
 
 
-            BuyButtonHardCoded(
+            BuyButton(
                 modifier = Modifier,
                 onBuyClick
             )

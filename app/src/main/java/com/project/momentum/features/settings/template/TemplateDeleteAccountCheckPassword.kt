@@ -22,7 +22,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import com.project.momentum.ui.assets.ContinueButtonHardCoded
+import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.R
 import com.project.momentum.features.settings.models.DeleteAccountState
 import com.project.momentum.features.settings.viewmodel.DeleteEvent
@@ -97,7 +97,7 @@ fun TemplateDeleteAccountCheckPassword(
                     ),
                 )
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
-                ContinueButtonHardCoded(
+                ContinueButton(
                     onClick = {onEvent(DeleteEvent.nextStep)},
                     modifier = Modifier.height(dimensionResource(R.dimen.button_size))
                 )

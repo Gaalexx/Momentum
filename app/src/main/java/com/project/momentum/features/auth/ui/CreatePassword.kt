@@ -26,7 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.project.momentum.ui.theme.ConstColours
-import com.project.momentum.ui.assets.ContinueButtonHardCoded
+import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.R
 import com.project.momentum.features.auth.models.LoginState
 import com.project.momentum.features.auth.models.LoginStep
@@ -158,7 +158,7 @@ fun CreatePasswordScreen(
                     )
                     Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
 
-                    ContinueButtonHardCoded(
+                    ContinueButton(
                         onClick = onContinueClick,
                         modifier = Modifier.height(dimensionResource(R.dimen.button_size))
                     )

@@ -42,10 +42,10 @@ import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.network.s3.MediaType
 import com.project.momentum.ui.assets.AudioView
 import com.project.momentum.ui.assets.CaptionBasicLabel
-import com.project.momentum.ui.assets.ContinueButtonHardCoded
-import com.project.momentum.ui.assets.FriendsPillButtonHardCoded
-import com.project.momentum.ui.assets.ProfileCircleButtonHardCoded
-import com.project.momentum.ui.assets.SettingsCircleButtonHardCoded
+import com.project.momentum.ui.assets.ContinueButton
+import com.project.momentum.ui.assets.FriendsPillButton
+import com.project.momentum.ui.assets.ProfileCircleButton
+import com.project.momentum.ui.assets.SettingsCircleButton
 import androidx.compose.ui.draw.blur
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
@@ -241,13 +241,13 @@ fun WatchPhotoScreen(
                 .padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ProfileCircleButtonHardCoded(onClick = onProfileClick)
+            ProfileCircleButton(onClick = onProfileClick)
 
             Spacer(Modifier.weight(1f))
-            FriendsPillButtonHardCoded(onClick = onGoToFriends)
+            FriendsPillButton(onClick = onGoToFriends)
             Spacer(Modifier.weight(1f))
 
-            SettingsCircleButtonHardCoded(onClick = onGoToSettings)
+            SettingsCircleButton(onClick = onGoToSettings)
         }
 
         Spacer(Modifier.height(12.dp))
@@ -417,7 +417,7 @@ fun WatchPhotoScreen(
                     )
                 }
 
-                ContinueButtonHardCoded(
+                ContinueButton(
                     onClick = onGoToTakePhoto,
                     modifier = Modifier
                         .width(200.dp)

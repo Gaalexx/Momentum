@@ -29,8 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.project.momentum.R
-import com.project.momentum.ui.assets.CancelButtonHardCoded
-import com.project.momentum.ui.assets.ContinueButtonHardCoded
+import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
@@ -94,7 +93,7 @@ fun NoInternetScreen(
 
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.medium_padding)))
 
-                    ContinueButtonHardCoded(
+                    ContinueButton(
                         onClick = onRetryClick,
                         text = stringResource(R.string.offline_retry)
                     )

@@ -46,8 +46,8 @@ import com.project.momentum.features.editingAccount.viewmodel.AccountInfo
 import com.project.momentum.features.editingAccount.viewmodel.EditAccountFields
 import com.project.momentum.features.editingAccount.viewmodel.EditAccountState
 import com.project.momentum.features.editingAccount.viewmodel.EditAccountViewModel
-import com.project.momentum.ui.assets.CancelButtonHardCoded
-import com.project.momentum.ui.assets.ContinueButtonHardCoded
+import com.project.momentum.ui.assets.CancelButton
+import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.ui.assets.GlassTextField
 import com.project.momentum.ui.assets.TopBarTemplate
 import com.project.momentum.ui.common.LoadingOverlay
@@ -278,13 +278,13 @@ fun EditingAccountScreen(
                         dimensionResource(R.dimen.medium_padding)
                     )
                 ) {
-                    CancelButtonHardCoded(
+                    CancelButton(
                         onClick = onBackClick,
                         modifier = Modifier
                             .height(dimensionResource(R.dimen.sub_button_size))
                             .weight(1f),
                     )
-                    ContinueButtonHardCoded(
+                    ContinueButton(
                         text = "Сохранить",
                         onClick = onContinueClick,
                         modifier = Modifier

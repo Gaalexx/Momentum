@@ -52,9 +52,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.project.momentum.R
 import com.project.momentum.features.friends.viewmodel.FriendsScreenEvent
 import com.project.momentum.features.friends.viewmodel.FriendsViewModel
-import com.project.momentum.ui.assets.BackCircleButtonHardCoded
+import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.FriendSearchField
-import com.project.momentum.ui.assets.AddFriendCircleButtonHardCoded
+import com.project.momentum.ui.assets.AddFriendCircleButton
 import com.project.momentum.features.friends.ui.assets.AddFriendDialog
 import com.project.momentum.features.friends.ui.assets.FriendRequestCarousel
 import com.project.momentum.features.friends.viewmodel.FriendsScreenState
@@ -168,11 +168,11 @@ fun FriendsScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Start
             ) {
-                BackCircleButtonHardCoded(
+                BackCircleButton(
                     onClick = onBackClick
                 )
                 Spacer(modifier = Modifier.weight(1f))
-                AddFriendCircleButtonHardCoded(
+                AddFriendCircleButton(
                     onClick = { addFriend() }
                 )
 

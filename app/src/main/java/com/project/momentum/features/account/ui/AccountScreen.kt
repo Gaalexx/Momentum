@@ -26,7 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import com.project.momentum.R
 import com.project.momentum.ui.assets.S3PhotoGrid
-import com.project.momentum.ui.assets.BackCircleButtonHardCoded
+import com.project.momentum.ui.assets.BackCircleButton
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
@@ -39,7 +39,7 @@ import com.project.momentum.features.account.viewmodel.AccountInfoViewModel
 import com.project.momentum.features.account.viewmodel.AccountMediaViewModel
 import com.project.momentum.features.account.viewmodel.MediaState
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
-import com.project.momentum.ui.assets.EditCircleButtonHardCoded
+import com.project.momentum.ui.assets.EditCircleButton
 import com.project.momentum.ui.theme.AppTextStyles
 
 
@@ -108,13 +108,13 @@ fun AccountScreen(
                 .padding(dimensionResource(R.dimen.medium_padding)),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            BackCircleButtonHardCoded(
+            BackCircleButton(
                 onClick = onBackClick
             )
             Spacer(Modifier.weight(1f))
 
             if (onEditClick != null) {
-                EditCircleButtonHardCoded(
+                EditCircleButton(
                     onClick = onEditClick,
                 )
             }

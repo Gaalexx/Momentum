@@ -58,7 +58,7 @@ import com.project.momentum.ui.theme.ConstColours
 
 
 @Composable
-fun BackCircleButton(
+fun BackCircleButtonAdaptive(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
@@ -66,7 +66,7 @@ fun BackCircleButton(
     shadowElevation: Dp = 6.dp,
     enabled: Boolean = true,
 ) {
-    CircleButton(
+    CircleButtonAdaptive(
         onClick = onClick,
         icon = Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
         contentDescription = "Back",
@@ -80,7 +80,7 @@ fun BackCircleButton(
 }
 
 @Composable
-fun BackCircleButtonHardCoded(
+fun BackCircleButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 50.dp,
@@ -89,12 +89,34 @@ fun BackCircleButtonHardCoded(
     shadowElevation: Dp = 6.dp,
     enabled: Boolean = true,
 ) {
-    CircleButtonHardCoded(
+    CircleButton(
         onClick = onClick,
         icon = Icons.AutoMirrored.Rounded.KeyboardArrowLeft,
         contentDescription = "Back",
         size = size,
         iconSize = size * 0.55f,
+        backgroundColor = backgroundColor,
+        iconColor = iconColor,
+        shadowElevation = shadowElevation,
+        enabled = enabled,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun AddFriendCircleButtonAdaptive(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
+    iconColor: Color = ConstColours.WHITE,
+    shadowElevation: Dp = 6.dp,
+    enabled: Boolean = true,
+) {
+    CircleButtonAdaptive(
+        onClick = onClick,
+        icon = Icons.Outlined.PersonAdd,
+        contentDescription = "Add friend",
+        iconScale = 0.55f,
         backgroundColor = backgroundColor,
         iconColor = iconColor,
         shadowElevation = shadowElevation,
@@ -107,35 +129,13 @@ fun BackCircleButtonHardCoded(
 fun AddFriendCircleButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
-    iconColor: Color = ConstColours.WHITE,
-    shadowElevation: Dp = 6.dp,
-    enabled: Boolean = true,
-) {
-    CircleButton(
-        onClick = onClick,
-        icon = Icons.Outlined.PersonAdd,
-        contentDescription = "Add friend",
-        iconScale = 0.55f,
-        backgroundColor = backgroundColor,
-        iconColor = iconColor,
-        shadowElevation = shadowElevation,
-        enabled = enabled,
-        modifier = modifier
-    )
-}
-
-@Composable
-fun AddFriendCircleButtonHardCoded(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
     size: Dp = 50.dp,
     backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
     iconColor: Color = ConstColours.WHITE,
     shadowElevation: Dp = 6.dp,
     enabled: Boolean = true,
 ) {
-    CircleButtonHardCoded(
+    CircleButton(
         onClick = onClick,
         icon = Icons.Outlined.PersonAdd,
         contentDescription = "Add friend",
@@ -150,7 +150,7 @@ fun AddFriendCircleButtonHardCoded(
 }
 
 @Composable
-fun ProfileCircleButton(
+fun ProfileCircleButtonAdaptive(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
@@ -158,7 +158,7 @@ fun ProfileCircleButton(
     shadowElevation: Dp = 6.dp,
     enabled: Boolean = true,
 ) {
-    CircleButton(
+    CircleButtonAdaptive(
         onClick = onClick,
         icon = Icons.Outlined.AccountCircle,
         contentDescription = "Profile",
@@ -171,7 +171,7 @@ fun ProfileCircleButton(
 }
 
 @Composable
-fun ProfileCircleButtonHardCoded(
+fun ProfileCircleButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 50.dp,
@@ -180,7 +180,7 @@ fun ProfileCircleButtonHardCoded(
     shadowElevation: Dp = 6.dp,
     enabled: Boolean = true,
 ) {
-    CircleButtonHardCoded(
+    CircleButton(
         onClick = onClick,
         icon = Icons.Outlined.AccountCircle,
         contentDescription = "Profile",
@@ -194,7 +194,7 @@ fun ProfileCircleButtonHardCoded(
 }
 
 @Composable
-fun EditCircleButton(
+fun EditCircleButtonAdaptive(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
@@ -202,7 +202,7 @@ fun EditCircleButton(
     shadowElevation: Dp = 6.dp,
     enabled: Boolean = true,
 ) {
-    CircleButton(
+    CircleButtonAdaptive(
         onClick = onClick,
         icon = Icons.Outlined.Edit,
         contentDescription = "Edit profile",
@@ -216,7 +216,7 @@ fun EditCircleButton(
 }
 
 @Composable
-fun EditCircleButtonHardCoded(
+fun EditCircleButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 50.dp,
@@ -225,7 +225,7 @@ fun EditCircleButtonHardCoded(
     shadowElevation: Dp = 6.dp,
     enabled: Boolean = true,
 ) {
-    CircleButtonHardCoded(
+    CircleButton(
         onClick = onClick,
         icon = Icons.Outlined.Edit,
         contentDescription = "Edit profile",
@@ -240,7 +240,7 @@ fun EditCircleButtonHardCoded(
 }
 
 @Composable
-fun SettingsCircleButton(
+fun SettingsCircleButtonAdaptive(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
@@ -251,7 +251,7 @@ fun SettingsCircleButton(
 ) {
     val icon = if (filledIcon) Icons.Filled.Settings else Icons.Outlined.Settings
 
-    CircleButton(
+    CircleButtonAdaptive(
         modifier = modifier,
         onClick = onClick,
         icon = icon,
@@ -264,7 +264,7 @@ fun SettingsCircleButton(
 }
 
 @Composable
-fun SettingsCircleButtonHardCoded(
+fun SettingsCircleButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 50.dp,
@@ -276,7 +276,7 @@ fun SettingsCircleButtonHardCoded(
 ) {
     val icon = if (filledIcon) Icons.Filled.Settings else Icons.Outlined.Settings
 
-    CircleButtonHardCoded(
+    CircleButton(
         onClick = onClick,
         icon = icon,
         contentDescription = "Settings",
@@ -290,7 +290,7 @@ fun SettingsCircleButtonHardCoded(
 }
 
 @Composable
-fun CircleButtonHardCoded(
+fun CircleButton(
     onClick: () -> Unit,
     icon: ImageVector,
     modifier: Modifier = Modifier,
@@ -326,7 +326,7 @@ fun CircleButtonHardCoded(
 }
 
 @Composable
-fun CircleButton(
+fun CircleButtonAdaptive(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     icon: ImageVector,
@@ -361,7 +361,7 @@ fun CircleButton(
 }
 
 @Composable
-fun SettingsButton(
+fun SettingsButtonAdaptive(
     onClick: () -> Unit,
     icon: ImageVector,
     text: String,
@@ -399,7 +399,7 @@ fun SettingsButton(
 }
 
 @Composable
-fun SettingsButtonHardCoded(
+fun SettingsButton(
     onClick: () -> Unit,
     icon: ImageVector,
     text: String,
@@ -439,7 +439,7 @@ fun SettingsButtonHardCoded(
 }
 
 @Composable
-fun FriendsPillButton(
+fun FriendsPillButtonAdaptive(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     text: String = stringResource(R.string.button_friends),
@@ -477,7 +477,7 @@ fun FriendsPillButton(
 }
 
 @Composable
-fun FriendsPillButtonHardCoded(
+fun FriendsPillButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     text: String = stringResource(R.string.button_friends),
@@ -517,7 +517,7 @@ fun FriendsPillButtonHardCoded(
 }
 
 @Composable
-fun BigCircleForMainScreenAction(
+fun BigCircleForMainScreenActionAdaptive(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     onLongPressStart: () -> Unit,
@@ -612,7 +612,7 @@ fun BigCircleForMainScreenAction(
 }
 
 @Composable
-fun BigCircleForMainScreenActionHardCoded(
+fun BigCircleForMainScreenAction(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     onLongPressStart: () -> Unit,
@@ -624,7 +624,7 @@ fun BigCircleForMainScreenActionHardCoded(
     enabled: Boolean = true,
     progressStarted: MutableState<Boolean> = mutableStateOf(false)
 ) {
-    BigCircleForMainScreenAction(
+    BigCircleForMainScreenActionAdaptive(
         modifier = modifier.size(size),
         onClick = onClick,
         onLongPressStart = onLongPressStart,
@@ -639,7 +639,7 @@ fun BigCircleForMainScreenActionHardCoded(
 
 
 @Composable
-fun BigCircleSendPhotoAction(
+fun BigCircleSendPhotoActionAdaptive(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     outerColor: Color = ConstColours.MAIN_BACK_GRAY,
@@ -673,7 +673,7 @@ fun BigCircleSendPhotoAction(
 }
 
 @Composable
-fun BigCircleSendPhotoActionHardCoded(
+fun BigCircleSendPhotoAction(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 132.dp,
@@ -682,7 +682,7 @@ fun BigCircleSendPhotoActionHardCoded(
     ring: Dp = 14.dp,
     enabled: Boolean = true,
 ) {
-    BigCircleSendPhotoAction(
+    BigCircleSendPhotoActionAdaptive(
         onClick = onClick,
         modifier = modifier.size(size),
         outerColor = outerColor,
@@ -693,7 +693,7 @@ fun BigCircleSendPhotoActionHardCoded(
 }
 
 @Composable
-fun BigCircleMicroButton(
+fun BigCircleMicroButtonAdaptive(
     onClick: () -> Unit = {},
     onLongPress: () -> Unit = {},
     onLongPressEnd: () -> Unit = {},
@@ -804,7 +804,7 @@ fun BigCircleMicroButton(
 }
 
 @Composable
-fun BigCircleMicroButtonHardCoded(
+fun BigCircleMicroButton(
     onClick: () -> Unit = {},
     onLongPress: () -> Unit = {},
     onLongPressEnd: () -> Unit = {},
@@ -819,7 +819,7 @@ fun BigCircleMicroButtonHardCoded(
     isRecording: Boolean = false,
     progressStarted: MutableState<Boolean> = mutableStateOf(false)
 ) {
-    BigCircleMicroButton(
+    BigCircleMicroButtonAdaptive(
         onClick = onClick,
         onLongPress = onLongPress,
         onLongPressEnd = onLongPressEnd,
@@ -837,7 +837,7 @@ fun BigCircleMicroButtonHardCoded(
 
 
 @Composable
-fun EditButton(
+fun EditButtonAdaptive(
     onEditProfile: () -> Unit,
     modifier: Modifier = Modifier,
     colors: ButtonColors = ButtonDefaults.buttonColors(
@@ -872,7 +872,7 @@ fun EditButton(
 }
 
 @Composable
-fun EditButtonHardCoded(
+fun EditButton(
     onEditProfile: () -> Unit,
     modifier: Modifier = Modifier,
     iconSize: Dp = 18.dp,
@@ -909,7 +909,7 @@ fun EditButtonHardCoded(
 }
 
 @Composable
-fun PlusButton(
+fun PlusButtonAdaptive(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     backgroundColor: Color = ConstColours.MAIN_BACK_GRAY,
@@ -917,7 +917,7 @@ fun PlusButton(
     shadowElevation: Dp = 6.dp,
     enabled: Boolean = true,
 ) {
-    CircleButton(
+    CircleButtonAdaptive(
         onClick = onClick,
         icon = Icons.Filled.Add,
         contentDescription = stringResource(R.string.add_photo),
@@ -930,7 +930,7 @@ fun PlusButton(
 }
 
 @Composable
-fun PlusButtonHardCoded(
+fun PlusButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 50.dp,
@@ -939,7 +939,7 @@ fun PlusButtonHardCoded(
     shadowElevation: Dp = 6.dp,
     enabled: Boolean = true,
 ) {
-    CircleButtonHardCoded(
+    CircleButton(
         onClick = onClick,
         icon = Icons.Filled.Add,
         contentDescription = stringResource(R.string.add_photo),
@@ -954,7 +954,7 @@ fun PlusButtonHardCoded(
 }
 
 @Composable
-fun ContinueButton(
+fun ContinueButtonAdaptive(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     text: String = stringResource(R.string.button_continue),
@@ -995,7 +995,7 @@ fun ContinueButton(
 }
 
 @Composable
-fun ContinueButtonHardCoded(
+fun ContinueButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     text: String = stringResource(R.string.button_continue),
@@ -1005,7 +1005,7 @@ fun ContinueButtonHardCoded(
         contentColor = ConstColours.WHITE
     )
 ) {
-    ContinueButton(
+    ContinueButtonAdaptive(
         onClick = onClick,
         modifier = modifier.height(height),
         text = text,
@@ -1014,7 +1014,7 @@ fun ContinueButtonHardCoded(
 }
 
 @Composable
-fun CancelButton(
+fun CancelButtonAdaptive(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     text: String = stringResource(R.string.button_cancel),
@@ -1049,7 +1049,7 @@ fun CancelButton(
 }
 
 @Composable
-fun CancelButtonHardCoded(
+fun CancelButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     text: String = stringResource(R.string.button_cancel),
@@ -1059,7 +1059,7 @@ fun CancelButtonHardCoded(
         contentColor = ConstColours.MAIN_BRAND_BLUE,
     )
 ) {
-    CancelButton(
+    CancelButtonAdaptive(
         onClick = onClick,
         modifier = modifier.height(height),
         text = text,
@@ -1068,7 +1068,7 @@ fun CancelButtonHardCoded(
 }
 
 @Composable
-fun BuyButton(
+fun BuyButtonAdaptive(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     text: String = stringResource(R.string.settings_premium_buy),
@@ -1096,7 +1096,7 @@ fun BuyButton(
 }
 
 @Composable
-fun BuyButtonHardCoded(
+fun BuyButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     text: String = stringResource(R.string.settings_premium_buy),
@@ -1106,7 +1106,7 @@ fun BuyButtonHardCoded(
         contentColor = ConstColours.WHITE
     )
 ) {
-    BuyButton(
+    BuyButtonAdaptive(
         modifier = modifier.height(height),
         onClick = onClick,
         text = text,
@@ -1278,7 +1278,7 @@ fun SubscriptionOptionCard(
 }
 
 @Composable
-fun ButtonForDelete(
+fun ButtonForDeleteAdaptive(
     onClick: () -> Unit,
     text: String,
     color: Color
@@ -1301,7 +1301,7 @@ fun ButtonForDelete(
 }
 
 @Composable
-fun ButtonForDeleteHardCoded(
+fun ButtonForDelete(
     onClick: () -> Unit,
     text: String,
     color: Color,
@@ -1346,11 +1346,11 @@ fun BuyButtonPreview() {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        BuyButton(
+        BuyButtonAdaptive(
             modifier = Modifier,
             {}
         )
-        BuyButtonHardCoded(
+        BuyButton(
             modifier = Modifier,
             onClick = {}
         )
@@ -1363,16 +1363,16 @@ fun ContinueButtonPreview() {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        ContinueButtonAdaptive(
+            {}
+        )
+        CancelButtonAdaptive(
+            {}
+        )
         ContinueButton(
             {}
         )
         CancelButton(
-            {}
-        )
-        ContinueButtonHardCoded(
-            {}
-        )
-        CancelButtonHardCoded(
             {}
         )
     }
@@ -1394,12 +1394,12 @@ fun PreviewCircleButtonsHardCoded() {
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        BackCircleButtonHardCoded(onClick = {})
-        ProfileCircleButtonHardCoded(onClick = {})
-        SettingsCircleButtonHardCoded(onClick = {})
-        AddFriendCircleButtonHardCoded(onClick = {})
-        EditCircleButtonHardCoded(onClick = {})
-        PlusButtonHardCoded(onClick = {})
+        BackCircleButton(onClick = {})
+        ProfileCircleButton(onClick = {})
+        SettingsCircleButton(onClick = {})
+        AddFriendCircleButton(onClick = {})
+        EditCircleButton(onClick = {})
+        PlusButton(onClick = {})
     }
 }
 
@@ -1418,12 +1418,12 @@ fun PreviewCircleButtonsAdaptive() {
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        BackCircleButton(onClick = {}, modifier = Modifier.size(50.dp))
-        ProfileCircleButton(onClick = {}, modifier = Modifier.size(50.dp))
-        SettingsCircleButton(onClick = {}, modifier = Modifier.size(50.dp))
-        AddFriendCircleButton(onClick = {}, modifier = Modifier.size(50.dp))
-        EditCircleButton(onClick = {}, modifier = Modifier.size(50.dp))
-        PlusButton(onClick = {}, modifier = Modifier.size(50.dp))
+        BackCircleButtonAdaptive(onClick = {}, modifier = Modifier.size(50.dp))
+        ProfileCircleButtonAdaptive(onClick = {}, modifier = Modifier.size(50.dp))
+        SettingsCircleButtonAdaptive(onClick = {}, modifier = Modifier.size(50.dp))
+        AddFriendCircleButtonAdaptive(onClick = {}, modifier = Modifier.size(50.dp))
+        EditCircleButtonAdaptive(onClick = {}, modifier = Modifier.size(50.dp))
+        PlusButtonAdaptive(onClick = {}, modifier = Modifier.size(50.dp))
     }
 }
 
@@ -1446,28 +1446,28 @@ fun PreviewAdaptiveButtonsOverview() {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            BackCircleButton(onClick = {}, modifier = Modifier.size(48.dp))
-            ProfileCircleButton(onClick = {}, modifier = Modifier.size(48.dp))
-            SettingsCircleButton(onClick = {}, modifier = Modifier.size(48.dp))
-            AddFriendCircleButton(onClick = {}, modifier = Modifier.size(48.dp))
-            EditCircleButton(onClick = {}, modifier = Modifier.size(48.dp))
-            PlusButton(onClick = {}, modifier = Modifier.size(48.dp))
+            BackCircleButtonAdaptive(onClick = {}, modifier = Modifier.size(48.dp))
+            ProfileCircleButtonAdaptive(onClick = {}, modifier = Modifier.size(48.dp))
+            SettingsCircleButtonAdaptive(onClick = {}, modifier = Modifier.size(48.dp))
+            AddFriendCircleButtonAdaptive(onClick = {}, modifier = Modifier.size(48.dp))
+            EditCircleButtonAdaptive(onClick = {}, modifier = Modifier.size(48.dp))
+            PlusButtonAdaptive(onClick = {}, modifier = Modifier.size(48.dp))
         }
 
-        FriendsPillButton(onClick = {})
+        FriendsPillButtonAdaptive(onClick = {})
 
-        SettingsButton(
+        SettingsButtonAdaptive(
             onClick = {},
             icon = Icons.Filled.Settings,
             text = "Конфиденциальность",
             textColor = ConstColours.GOLD
         )
 
-        ContinueButton(onClick = {})
-        CancelButton(onClick = {})
-        BuyButton(onClick = {})
-        EditButton(onEditProfile = {})
-        ButtonForDelete(onClick = {}, text = "Удалить", color = ConstColours.ERROR_RED)
+        ContinueButtonAdaptive(onClick = {})
+        CancelButtonAdaptive(onClick = {})
+        BuyButtonAdaptive(onClick = {})
+        EditButtonAdaptive(onEditProfile = {})
+        ButtonForDeleteAdaptive(onClick = {}, text = "Удалить", color = ConstColours.ERROR_RED)
     }
 }
 
@@ -1479,8 +1479,8 @@ private fun PreviewFriendsPill() {
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        FriendsPillButtonAdaptive(onClick = {})
         FriendsPillButton(onClick = {})
-        FriendsPillButtonHardCoded(onClick = {})
     }
 }
 
@@ -1491,13 +1491,13 @@ private fun PreviewSettingsButton() {
         Modifier.padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        SettingsButton(
+        SettingsButtonAdaptive(
             onClick = {},
             icon = Icons.Filled.Settings,
             text = "Конфиденциальность",
             textColor = ConstColours.GOLD
         )
-        SettingsButtonHardCoded(
+        SettingsButton(
             onClick = {},
             icon = Icons.Filled.Settings,
             text = "Конфиденциальность",
@@ -1522,17 +1522,17 @@ fun PreviewBigCircleAdaptive() {
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BigCircleForMainScreenAction(
+        BigCircleForMainScreenActionAdaptive(
             onClick = {},
             onLongPressStart = {},
             onLongPressEnd = {},
             modifier = Modifier.size(132.dp)
         )
-        BigCircleSendPhotoAction(
+        BigCircleSendPhotoActionAdaptive(
             onClick = {},
             modifier = Modifier.size(132.dp)
         )
-        BigCircleMicroButton(
+        BigCircleMicroButtonAdaptive(
             modifier = Modifier.size(132.dp)
         )
     }
@@ -1553,13 +1553,13 @@ fun PreviewBigCircleHardCoded() {
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BigCircleForMainScreenActionHardCoded(
+        BigCircleForMainScreenAction(
             onClick = {},
             onLongPressStart = {},
             onLongPressEnd = {}
         )
-        BigCircleSendPhotoActionHardCoded(onClick = {})
-        BigCircleMicroButtonHardCoded()
+        BigCircleSendPhotoAction(onClick = {})
+        BigCircleMicroButton()
     }
 }
 
@@ -1571,8 +1571,8 @@ private fun PreviewEdit() {
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        EditButtonAdaptive({})
         EditButton({})
-        EditButtonHardCoded({})
     }
 }
 
@@ -1584,8 +1584,8 @@ private fun PreviewDeleteButtons() {
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        ButtonForDelete(onClick = {}, text = "Удалить", color = ConstColours.MAIN_BRAND_BLUE)
-        ButtonForDeleteHardCoded(
+        ButtonForDeleteAdaptive(onClick = {}, text = "Удалить", color = ConstColours.MAIN_BRAND_BLUE)
+        ButtonForDelete(
             onClick = {},
             text = "Удалить",
             color = ConstColours.MAIN_BRAND_BLUE
