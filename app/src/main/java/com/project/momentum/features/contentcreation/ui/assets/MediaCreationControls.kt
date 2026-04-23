@@ -3,6 +3,8 @@ package com.project.momentum.features.contentcreation.ui.assets
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
@@ -22,8 +24,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.project.momentum.R
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
-import com.project.momentum.ui.assets.BigCircleForMainScreenAction
-import com.project.momentum.ui.assets.BigCircleMicroButton
+import com.project.momentum.ui.assets.BigCircleForMainScreenActionAdaptive
+import com.project.momentum.ui.assets.BigCircleMicroButtonAdaptive
 import com.project.momentum.ui.assets.CircleButton
 import com.project.momentum.ui.theme.ConstColours
 
@@ -107,48 +109,53 @@ internal fun CameraBottomControls(
         ConstColours.WHITE.copy(alpha = 0.4f)
     }
 
-    Box(
+
+    Row(
         modifier = modifier,
-        contentAlignment = Alignment.Center,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(
             onClick = onToggleTorch,
             enabled = captureEnabled,
             modifier = Modifier
-                .align(Alignment.CenterStart)
-                .size(50.dp),
+                .weight(1f)
+                .align(Alignment.CenterVertically),
         ) {
             Icon(
                 imageVector = Icons.Outlined.WbSunny,
                 contentDescription = stringResource(R.string.icon_flash),
                 tint = if (torchEnabled) ConstColours.MAIN_BRAND_BLUE else iconTint,
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.fillMaxSize(0.8f),
             )
         }
 
-        BigCircleForMainScreenAction(
-            onClick = onTakePhoto,
-            onLongPressStart = onStartRecording,
-            onLongPressEnd = onStopRecording,
-            onStartProgress = {},
-            onEndProgress = {},
-            enabled = captureEnabled,
-            progressStarted = captureButtonState,
-            modifier = Modifier.align(Alignment.Center),
-        )
+        Box(modifier = Modifier.weight(1.5f), contentAlignment = Alignment.Center) {
+            BigCircleForMainScreenActionAdaptive(
+                onClick = onTakePhoto,
+                onLongPressStart = onStartRecording,
+                onLongPressEnd = onStopRecording,
+                onStartProgress = {},
+                onEndProgress = {},
+                enabled = captureEnabled,
+                progressStarted = captureButtonState,
+                modifier = Modifier
+                    .aspectRatio(1f)//.align(Alignment.Center),
+            )
+        }
+
 
         IconButton(
             onClick = onFlipCamera,
             enabled = captureEnabled,
             modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .size(50.dp),
+                .weight(1f)
+                .align(Alignment.CenterVertically),
         ) {
             Icon(
                 imageVector = Icons.Outlined.Cached,
                 contentDescription = stringResource(R.string.icon_flip_camera),
                 tint = iconTint,
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.fillMaxSize(0.8f),
             )
         }
     }
@@ -166,7 +173,7 @@ internal fun AudioBottomControls(
         modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
-        BigCircleMicroButton(
+        BigCircleMicroButtonAdaptive(
             onLongPress = onStartRecording,
             onLongPressEnd = onStopRecording,
             enabled = enabled,
@@ -181,7 +188,9 @@ internal fun AudioBottomControls(
             } else {
                 Color.White.copy(alpha = 0.55f)
             },
-            modifier = Modifier.align(Alignment.Center),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .aspectRatio(1f),
         )
     }
 }

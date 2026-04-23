@@ -20,6 +20,7 @@ import com.project.momentum.features.contentcreation.permissions.rememberCameraP
 import com.project.momentum.features.contentcreation.permissions.rememberMicrophonePermissionState
 import com.project.momentum.features.contentcreation.state.rememberCameraScreenState
 import com.project.momentum.features.contentcreation.ui.assets.MediaCreationContent
+import com.project.momentum.features.contentcreation.ui.assets.MediaCreationContentCompact
 
 private const val DefaultMaxRecordMs = 10_000
 
@@ -62,7 +63,7 @@ fun MediaCreationScreen(
 
     val isCaptureActive = cameraState.hasActiveRecording || audioRecordingController.isRecording
 
-    MediaCreationContent(
+    MediaCreationContentCompact(
         modifier = modifier,
         mode = mode,
         hasCameraPermission = hasCameraPermission,

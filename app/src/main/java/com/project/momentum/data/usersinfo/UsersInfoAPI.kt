@@ -12,7 +12,7 @@ import javax.inject.Singleton
 
 @Singleton
 class UsersInfoAPI @Inject constructor(
-    @Backend private val client: HttpClient
+    @Backend private val client: HttpClient     // TODO: и на сервере, и тут сделать эти эндпоинты закрытыми
 ) {
 
     suspend fun userByIdExists(id: String): Boolean {

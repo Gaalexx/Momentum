@@ -16,7 +16,7 @@ import com.project.momentum.R
 import com.project.momentum.features.settings.viewmodel.SettingsEvent
 import com.project.momentum.features.settings.viewmodel.SettingsState
 import com.project.momentum.ui.assets.BackCircleButton
-import com.project.momentum.ui.assets.SettingsButton
+import com.project.momentum.ui.assets.SettingsButtonAdaptive
 import com.project.momentum.ui.assets.SwitchRow
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
@@ -149,7 +149,7 @@ fun TemplateSettingsMain(
 
 
 
-            SettingsButton(
+            SettingsButtonAdaptive(
                 onClick = onPremiumClick,
                 icon = Icons.Default.Star,
                 text = stringResource(R.string.settings_section_premium),
@@ -159,7 +159,7 @@ fun TemplateSettingsMain(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            SettingsButton(
+            SettingsButtonAdaptive(
                 onClick = onLogoutClick,
                 icon = Icons.AutoMirrored.Filled.Logout,
                 text = stringResource(R.string.settings_section_quit),
@@ -168,7 +168,7 @@ fun TemplateSettingsMain(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            SettingsButton(
+            SettingsButtonAdaptive(
                 onClick = onDeleteAccountClick,
                 icon = Icons.Default.Delete,
                 text = stringResource(R.string.settings_section_delete),

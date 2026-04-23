@@ -1,12 +1,15 @@
 package com.project.momentum.features.contentcreation.ui.assets
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.project.momentum.ui.assets.FriendsPillButton
-import com.project.momentum.ui.assets.ProfileCircleButton
-import com.project.momentum.ui.assets.SettingsCircleButton
+import com.project.momentum.ui.assets.FriendsPillButtonAdaptive
+import com.project.momentum.ui.assets.ProfileCircleButtonAdaptive
+import com.project.momentum.ui.assets.SettingsCircleButtonAdaptive
 
 @Composable
 internal fun CameraTopBar(
@@ -19,17 +22,26 @@ internal fun CameraTopBar(
         modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
-        ProfileCircleButton(
+        ProfileCircleButtonAdaptive(
+            modifier = Modifier
+                .fillMaxHeight(0.97f)
+                .aspectRatio(1f)
+                .align(Alignment.CenterStart),
             onClick = onProfileClick,
-            modifier = Modifier.align(Alignment.CenterStart),
         )
-        FriendsPillButton(
+        FriendsPillButtonAdaptive(
             onClick = onGoToFriends,
-            modifier = Modifier.align(Alignment.Center),
+            modifier = Modifier
+                .fillMaxHeight(0.97f)
+                .fillMaxWidth(0.45f)
+                .align(Alignment.Center),
         )
-        SettingsCircleButton(
+        SettingsCircleButtonAdaptive(
             onClick = onGoToSettings,
-            modifier = Modifier.align(Alignment.CenterEnd),
+            modifier = Modifier
+                .fillMaxHeight(0.97f)
+                .aspectRatio(1f)
+                .align(Alignment.CenterEnd),
         )
     }
 }

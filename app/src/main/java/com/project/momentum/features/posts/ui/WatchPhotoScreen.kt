@@ -75,6 +75,10 @@ import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.ui.assets.FriendsPillButton
 import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
+import androidx.compose.ui.draw.blur
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import com.project.momentum.ui.assets.VideoView
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
