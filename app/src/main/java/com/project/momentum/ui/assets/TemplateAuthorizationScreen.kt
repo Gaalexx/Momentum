@@ -71,7 +71,7 @@ fun TemplateAuthorizationScreen(
                         .padding(vertical = dimensionResource(R.dimen.medium_padding))
                 )
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
-                TextFieldRegistration(
+                GlassTextField(
                     value = value,
                     onValueChange = onValueChange,
 //                    modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
