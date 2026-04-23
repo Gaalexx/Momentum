@@ -135,6 +135,7 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.datastore.preferences.core)
     implementation(libs.androidx.ui.text)
+    implementation(libs.androidx.foundation)
     ksp(libs.hilt.compiler)
 
     // Tests

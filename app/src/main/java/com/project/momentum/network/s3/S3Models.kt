@@ -44,6 +44,12 @@ data class PresignedURLDTO(
 )
 
 @Serializable
+data class ReactionsDTO(
+    val emoji: String,
+    val users: List<String>
+)
+
+@Serializable
 data class PostDTO(
     val id: String,
     val userId: String,
@@ -52,6 +58,7 @@ data class PostDTO(
     val inUse: Boolean,
     val presignedURL: String,
     val mediaType: MediaType,
+    val reactions: List<ReactionsDTO>,
     val avatarPresignedURL: String? = null,
     val createdAt: String? = null
 )

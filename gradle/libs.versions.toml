@@ -45,6 +45,7 @@ runtime = "1.10.5"
 datastorePreferencesCore = "1.2.1"
 uiText = "1.10.5"
 material3 = "1.4.0"
+foundation = "1.10.6"
 
 [libraries]
 # Core Android
@@ -117,6 +118,7 @@ androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime
 androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastorePreferencesCore" }
 androidx-ui-text = { group = "androidx.compose.ui", name = "ui-text", version.ref = "uiText" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
