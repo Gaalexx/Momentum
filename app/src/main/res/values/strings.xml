@@ -19,6 +19,14 @@
     <string name="button_cancel">Отменить</string>
     <string name="button_plus">Добавить</string>
     <string name="button_send">Отправить</string>
+    <string name="button_ok">OK</string>
+    <string name="button_no_thanks">Нет, спасибо</string>
+
+    <!-- Notification permission -->
+    <string name="notification_permission_title">Разрешить уведомления?</string>
+    <string name="notification_permission_message">Momentum использует уведомления, чтобы показывать важные обновления.</string>
+    <string name="notifications_disabled_title">Уведомления выключены</string>
+    <string name="notifications_disabled_message">Приложение не сможет показывать уведомления, пока разрешение не будет включено в настройках.</string>
 
     <!-- Offline screen -->
     <string name="offline_title">Нет интернета</string>

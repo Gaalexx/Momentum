@@ -112,6 +112,7 @@ class RegistrationViewModel @Inject constructor(
                         repository.apply {
                             saveToken(refreshToken)
                             authorize() // TODO сохранять куда-нибудь
+                            syncPushToken()
                         }
                         _state.update {
                             it.copy(

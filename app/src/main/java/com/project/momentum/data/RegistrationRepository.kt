@@ -5,6 +5,7 @@ import com.project.momentum.data.auth.SessionManager
 import com.project.momentum.data.auth.datastore.AuthStorageImpl
 import com.project.momentum.data.auth.deviceinfo.DeviceInfo
 import com.project.momentum.data.auth.keystore.KeystoreManager
+import com.project.momentum.data.auth.pushtoken.FirebasePushTokenProvider
 import com.project.momentum.data.remote.RegistrationAPI
 import com.project.momentum.features.auth.models.LoginState
 import com.project.momentum.features.auth.models.LoginType
@@ -25,7 +26,8 @@ class RegistrationRepository @Inject constructor(
     private val authStorage: AuthStorageImpl,
     private val keyStoreManager: KeystoreManager,
     private val sessionManager: SessionManager,
-    private val deviceInfo: DeviceInfo
+    private val deviceInfo: DeviceInfo,
+    private val pushTokenProvider: FirebasePushTokenProvider
 ) {
     suspend fun checkRegistrationLoginDB(user: LoginState): Boolean {
         val response = when (user.loginType) {
@@ -110,6 +112,17 @@ class RegistrationRepository @Inject constructor(
             sessionManager.setToken(response.token)
         }
         return response.token
+    }
+
+
+    suspend fun syncPushToken(): String? {
+        val token = pushTokenProvider.getToken()
+
+        return if (token != null) {
+            authAPI.trySyncToken(token).token
+        } else {
+            null
+        }
     }
 
     suspend fun saveToken(token: String) {
