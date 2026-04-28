@@ -1,16 +1,25 @@
 package com.project.momentum.features.friends.ui.assets
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Card
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.PersonRemove
+import androidx.compose.material.icons.outlined.RestoreFromTrash
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.Icon
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
@@ -22,7 +31,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import com.project.momentum.R
+import com.project.momentum.features.friends.ui.User
 import com.project.momentum.features.friends.viewmodel.FriendsScreenEvent
 import com.project.momentum.features.friends.viewmodel.SelectedIndex
 import com.project.momentum.ui.assets.TextFieldRegistration
@@ -58,7 +69,15 @@ fun SingleChoiceSegmentedButton(
                     activeBorderColor = ConstColours.WHITE,
                     inactiveBorderColor = ConstColours.WHITE
                 ),
-                onClick = { onEvent(FriendsScreenEvent.ChangeSelectedIndex(SelectedIndex.fromIndex(index))) },
+                onClick = {
+                    onEvent(
+                        FriendsScreenEvent.ChangeSelectedIndex(
+                            SelectedIndex.fromIndex(
+                                index
+                            )
+                        )
+                    )
+                },
                 selected = index == selectedIndex.index,
                 label = {
                     Text(
@@ -150,9 +169,19 @@ fun AddFriendDialog(
             ) {
                 Button(
                     onClick = {
-                        when(selectedIndex){
-                            SelectedIndex.EMAIL -> onEvent(FriendsScreenEvent.CreateFriendRequest.EmailRequest(value))
-                            SelectedIndex.LOGIN -> onEvent(FriendsScreenEvent.CreateFriendRequest.LoginRequest(value))
+                        when (selectedIndex) {
+                            SelectedIndex.EMAIL -> onEvent(
+                                FriendsScreenEvent.CreateFriendRequest.EmailRequest(
+                                    value
+                                )
+                            )
+
+                            SelectedIndex.LOGIN -> onEvent(
+                                FriendsScreenEvent.CreateFriendRequest.LoginRequest(
+                                    value
+                                )
+                            )
+
                             else -> Unit
                         }
                     },
@@ -180,6 +209,38 @@ fun AddFriendDialog(
 
 }
 
+@Composable
+fun DeleteFriendDialog(
+    onClick: () -> Unit = {}
+) {
+        Card(
+            modifier = Modifier
+                .size(width = 150.dp, height = 50.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .clickable {
+                    onClick()
+                },
+            backgroundColor = ConstColours.RED
+        ) {
+            Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    modifier = Modifier.weight(1f),
+                    imageVector = Icons.Outlined.PersonRemove,
+                    contentDescription = "Корзина",
+                    tint = ConstColours.WHITE
+                )
+                Text(
+                    modifier = Modifier.weight(3f),
+                    text = stringResource(R.string.delete),
+                    color = ConstColours.WHITE,
+                    style = AppTextStyles.SupportingText
+                )
+            }
+
+        }
+
+}
+
 @Preview(showBackground = true, backgroundColor = 0xFF000000)
 @Composable
 private fun PreviewPager() {
@@ -195,6 +256,17 @@ private fun PreviewPager() {
             onValueChange = {},
             isError = true,
             errorText = "Ошибочка вышла"
-            )
+        )
+    }
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Composable
+private fun PreviewDeleteFriendDialog() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        DeleteFriendDialog()
     }
 }

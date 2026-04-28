@@ -35,7 +35,8 @@ import coil.compose.AsyncImage
 import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.ui.theme.AppTextStyles
 import android.content.res.Configuration
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -43,10 +44,17 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInWindow
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.project.momentum.R
@@ -56,10 +64,11 @@ import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.FriendSearchField
 import com.project.momentum.ui.assets.AddFriendCircleButton
 import com.project.momentum.features.friends.ui.assets.AddFriendDialog
+import com.project.momentum.features.friends.ui.assets.DeleteFriendDialog
 import com.project.momentum.features.friends.ui.assets.FriendRequestCarousel
 import com.project.momentum.features.friends.viewmodel.FriendsScreenState
 import kotlinx.serialization.Serializable
-import java.time.LocalDateTime
+import kotlin.math.roundToInt
 
 
 data class Friend(
@@ -94,7 +103,8 @@ fun FriendsScreenRoute(
     viewModel: FriendsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
-    val addFriend: () -> Unit = { viewModel.onEvent(FriendsScreenEvent.ShowPageEvent(true)) }
+    val addFriend: () -> Unit =
+        { viewModel.onEvent(FriendsScreenEvent.ShowAddFriendDialogEvent(true)) }
     val onEvent = viewModel::onEvent
     val errorState = uiState.errorState
     val errorTextId = uiState.errorText
@@ -127,10 +137,14 @@ fun FriendsScreen(
 
     val userFriends = uiState.friends
     val isLoading = uiState.isLoading
-    val showPage = uiState.showPage
+    val showAddFriendDialog = uiState.showAddFriendDialog
+    val showDeleteFriendDialog = uiState.showDeleteFriendDialog
     val addFriendQuery = uiState.addFriendQuery
     val searchQuery = uiState.searchQuery
     val selectedIndex = uiState.selectedIndex
+
+    var popupItem by remember { mutableStateOf<User?>(User("", "", "")) }
+    var popupOffset by remember { mutableStateOf(IntOffset.Zero) }
 
     val filteredFriends = remember(userFriends, searchQuery) {
         if (searchQuery.isEmpty()) {
@@ -356,19 +370,77 @@ fun FriendsScreen(
                         items = filteredFriends,
                         key = { it.id }
                     ) { friend ->
+
+                        var itemPositionInWindow by remember {
+                            mutableStateOf(IntOffset.Zero)
+                        }
+
                         FriendItem(
+                            modifier = Modifier
+                                .onGloballyPositioned { coordinates ->
+
+                                    val position = coordinates.positionInWindow()
+
+                                    itemPositionInWindow = IntOffset(
+                                        x = position.x.roundToInt(),
+                                        y = position.y.roundToInt()
+                                    )
+
+                                }
+                                .pointerInput(
+                                    friend,
+                                    itemPositionInWindow
+                                ) {
+                                    detectTapGestures { tapOffset ->
+
+                                        popupItem = friend
+
+                                        val tapX =
+                                            itemPositionInWindow.x +
+                                                    tapOffset.x.roundToInt()
+
+                                        val tapY =
+                                            itemPositionInWindow.y +
+                                                    tapOffset.y.roundToInt()
+
+                                        popupOffset = IntOffset(
+                                            x = tapX,
+                                            y = tapY - 160
+                                        )
+
+                                    }
+                                },
                             friend = friend,
                             onFriendClick = onFriendClick
                         )
                     }
                 }
+
+                popupItem?.let { item ->
+
+                    Popup(
+                        offset = popupOffset,
+                        onDismissRequest = {
+                            popupItem = null
+                            //onEvent(FriendsScreenEvent.ShowDeleteFriendDialogEvent(!showDeleteFriendDialog))
+                        },
+                        properties = PopupProperties(
+                            focusable = true,
+                            dismissOnBackPress = true,
+                            dismissOnClickOutside = true
+                        )
+                    ) {
+                        DeleteFriendDialog()
+                    }
+
+                }
             }
         }
     }
 
-    if (showPage) {
+    if (showAddFriendDialog) {
         Dialog(
-            onDismissRequest = { onEvent(FriendsScreenEvent.ShowPageEvent(false)) }
+            onDismissRequest = { onEvent(FriendsScreenEvent.ShowAddFriendDialogEvent(false)) }
         ) {
             AddFriendDialog(
                 value = addFriendQuery,
@@ -376,7 +448,7 @@ fun FriendsScreen(
                 onEvent = onEvent,
                 onValueChange = { onEvent(FriendsScreenEvent.AddFriendQueryChange(it)) },
                 isError = errorState,
-                errorText = if(errorTextId != null && errorState) stringResource(errorTextId) else ""
+                errorText = if (errorTextId != null && errorState) stringResource(errorTextId) else ""
             )
         }
     }
@@ -421,17 +493,22 @@ fun FriendButton(
 
 @Composable
 fun FriendItem(
+    modifier: Modifier = Modifier,
     friend: User,
-    onFriendClick: (User) -> Unit
+    onFriendClick: (User) -> Unit,
+    onFriendLongTap: () -> Unit = {}
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        modifier = modifier
             .padding(vertical = 3.dp, horizontal = 10.dp)
             .fillMaxWidth()
             .clip(RoundedCornerShape(15.dp))
             .background(ConstColours.MAIN_BACK_GRAY)
-            .clickable(onClick = { onFriendClick(friend) })
+            .combinedClickable(
+                onClick = { onFriendClick(friend) },
+                onLongClick = { onFriendLongTap() }
+            )
     ) {
         Box(
             modifier = Modifier.padding(end = 12.dp)

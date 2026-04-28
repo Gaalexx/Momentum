@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import androidx.lifecycle.ViewModel
 import com.project.momentum.R
-import com.project.momentum.data.usersinfo.UsersInfoAPI
 import com.project.momentum.features.friends.repo.FriendsRepository
 import com.project.momentum.features.friends.ui.FriendRequest
 import com.project.momentum.features.friends.ui.User
@@ -32,7 +31,8 @@ data class FriendsScreenState(
     val friends: List<User>,
     val friendRequests: List<FriendRequest>,
     val isLoading: Boolean = false,
-    val showPage: Boolean = false,
+    val showAddFriendDialog: Boolean = false,
+    val showDeleteFriendDialog: Boolean = false,
     val addFriendQuery: String = "",
     val searchQuery: String = "",
     val selectedIndex: SelectedIndex = SelectedIndex.EMAIL,
@@ -54,7 +54,8 @@ sealed interface FriendsScreenEvent {
     data object GetFriends : FriendsScreenEvent
     data object GetRequests : FriendsScreenEvent
 
-    data class ShowPageEvent(val newValue: Boolean) : FriendsScreenEvent
+    data class ShowAddFriendDialogEvent(val newValue: Boolean) : FriendsScreenEvent
+    data class ShowDeleteFriendDialogEvent(val newValue: Boolean) : FriendsScreenEvent
 
     data class SearchQueryChange(val newValue: String) : FriendsScreenEvent
 
@@ -74,6 +75,7 @@ class FriendsViewModel @Inject constructor(
                 listOf(),
                 false,
                 false,
+                false,
                 "",
                 ""
             )
@@ -91,10 +93,13 @@ class FriendsViewModel @Inject constructor(
             is FriendsScreenEvent.GetFriends -> getFriends()
             is FriendsScreenEvent.GetRequests -> getRequests()
             is FriendsScreenEvent.CreateFriendRequest -> createFriendRequest(event)
-            is FriendsScreenEvent.ShowPageEvent -> onShowPageChange(event)
+            is FriendsScreenEvent.ShowAddFriendDialogEvent -> onShowAddFriendDialogChange(event)
             is FriendsScreenEvent.AddFriendQueryChange -> onAddFriendQueryChange(event)
             is FriendsScreenEvent.SearchQueryChange -> onSearchQueryChange(event)
             is FriendsScreenEvent.ChangeSelectedIndex -> onChangeSelectedIndex(event)
+            is FriendsScreenEvent.ShowDeleteFriendDialogEvent -> onShowDeleteFriendDialogChange(
+                event
+            )
         }
     }
 
@@ -106,12 +111,20 @@ class FriendsViewModel @Inject constructor(
         _state.update { it.copy(selectedIndex = value) }
     }
 
-    private fun onShowPageChange(value: FriendsScreenEvent.ShowPageEvent) {
-        _state.update { it.copy(showPage = value.newValue) }
+    private fun onShowDeleteFriendDialogChange(value: FriendsScreenEvent.ShowDeleteFriendDialogEvent) {
+        _state.update { it.copy(showDeleteFriendDialog = value.newValue) }
     }
 
-    private suspend fun onShowPageChangeValue(value: Boolean) {
-        _state.update { it.copy(showPage = value) }
+    private suspend fun onShowDeleteFriendDialogChangeValue(value: Boolean) {
+        _state.update { it.copy(showDeleteFriendDialog = value) }
+    }
+
+    private fun onShowAddFriendDialogChange(value: FriendsScreenEvent.ShowAddFriendDialogEvent) {
+        _state.update { it.copy(showAddFriendDialog = value.newValue) }
+    }
+
+    private suspend fun onShowAddFriendDialogChangeValue(value: Boolean) {
+        _state.update { it.copy(showAddFriendDialog = value) }
     }
 
 
@@ -225,7 +238,7 @@ class FriendsViewModel @Inject constructor(
                 clearError()
             } else {
                 onAddFriendQueryChangeValue("")
-                onShowPageChangeValue(false)
+                onShowAddFriendDialogChangeValue(false)
             }
         }
     }
