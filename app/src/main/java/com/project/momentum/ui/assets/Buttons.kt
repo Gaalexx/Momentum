@@ -961,23 +961,24 @@ fun ContinueButtonAdaptive(
     colors: ButtonColors = ButtonDefaults.buttonColors(
         containerColor = ConstColours.TRANSPARENT_WHITE_ALPHA0,
         contentColor = ConstColours.WHITE
-    )
+    ),
+    backGroundColor: Color = ConstColours.MAIN_BRAND_BLUE
 ) {
     Button(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(50.dp))
             .background(
                 brush = Brush.linearGradient(
                     colors = listOf(
-                        ConstColours.MAIN_BRAND_BLUE,
-                        ConstColours.MAIN_BRAND_BLUE.copy(alpha = 0.5f)
+                        backGroundColor,
+                        backGroundColor.copy(alpha = 0.5f)
                     )
                 ),
                 shape = RoundedCornerShape(50.dp)
 
-            ),
+            )
+            .clip(RoundedCornerShape(50.dp)),
         shape = RoundedCornerShape(50.dp),
         colors = colors,
         contentPadding = PaddingValues()
@@ -1026,7 +1027,8 @@ fun CancelButtonAdaptive(
     OutlinedButton(
         onClick = onClick,
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(50.dp)),
         shape = RoundedCornerShape(50.dp),
         colors = colors,
         border = BorderStroke(

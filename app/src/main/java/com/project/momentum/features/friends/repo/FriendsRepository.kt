@@ -22,6 +22,10 @@ class FriendsRepository @Inject constructor(
         data class ByLogin(override val identifier: String) : RequestBy
     }
 
+    suspend fun deleteFriend(friend: User): Boolean {
+        return friendsInfoAPI.deleteFriendshipWith(friend.id)
+    }
+
     suspend fun getAllFriends(): List<User> {
         val friendsDTO = friendsInfoAPI.getFriends()
 
@@ -101,6 +105,7 @@ class FriendsRepository @Inject constructor(
                 friendsInfoAPI.createRequestWithLogin(requestBy.identifier)
                 return true
             }
+
             is RequestBy.ByNumber -> println("Not implemented")
         }
         return false

@@ -82,6 +82,8 @@
     <string name="friends_screen_no_friends">У вас пока нет друзей</string>
     <string name="friends_screen_no_friends_support_mess">Попробуйте изменить запрос</string>
 
+    <string name="do_you_want_to_delete_a_friend">Вы точно хотите удалить %s из друзей?</string>
+
     <!-- Templates -->
     <string name="template_label">Заголовок экрана</string>
     <string name="template_page_title">Название действия</string>

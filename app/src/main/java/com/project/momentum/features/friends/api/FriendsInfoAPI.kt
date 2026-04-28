@@ -15,6 +15,7 @@ import io.ktor.client.request.header
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import javax.inject.Inject
@@ -25,6 +26,21 @@ class FriendsInfoAPI @Inject constructor(
     @Backend private val client: HttpClient,
     private val sessionManager: SessionManager
 ) {
+
+    suspend fun deleteFriendshipWith(
+        id: String
+    ): Boolean {
+        val result = client.delete("friends/${id}") {
+            header(HttpHeaders.Authorization, sessionManager.getHeader())
+        }
+
+        println("ABOBA      ${result.body<FriendRequestActionDTO>()}")
+
+        return when (result.status) {
+            HttpStatusCode.OK -> true
+            else -> false
+        }
+    }
 
     suspend fun createRequestWithEmail(
         email: String

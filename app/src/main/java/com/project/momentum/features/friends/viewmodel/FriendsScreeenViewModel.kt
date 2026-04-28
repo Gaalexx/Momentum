@@ -37,6 +37,7 @@ data class FriendsScreenState(
     val searchQuery: String = "",
     val selectedIndex: SelectedIndex = SelectedIndex.EMAIL,
     val errorState: Boolean = false,
+    val friendToDelete: User = User("1", "1", "1"),
     @StringRes val errorText: Int? = null
 )
 
@@ -55,12 +56,15 @@ sealed interface FriendsScreenEvent {
     data object GetRequests : FriendsScreenEvent
 
     data class ShowAddFriendDialogEvent(val newValue: Boolean) : FriendsScreenEvent
-    data class ShowDeleteFriendDialogEvent(val newValue: Boolean) : FriendsScreenEvent
+    data class ShowDeleteFriendDialogEvent(val newValue: Boolean, val friend: User) :
+        FriendsScreenEvent
 
     data class SearchQueryChange(val newValue: String) : FriendsScreenEvent
 
     data class AddFriendQueryChange(val newValue: String) : FriendsScreenEvent
     data class ChangeSelectedIndex(val newIndex: SelectedIndex) : FriendsScreenEvent
+
+    data object DeleteFriendEvent : FriendsScreenEvent
 }
 
 @HiltViewModel
@@ -100,6 +104,21 @@ class FriendsViewModel @Inject constructor(
             is FriendsScreenEvent.ShowDeleteFriendDialogEvent -> onShowDeleteFriendDialogChange(
                 event
             )
+
+            is FriendsScreenEvent.DeleteFriendEvent -> deleteFriend()
+        }
+    }
+
+    private fun deleteFriend() {
+        viewModelScope.launch {
+            val res = repo.deleteFriend(_state.value.friendToDelete)
+            if (res) {
+                _state.update { it ->
+                    it.copy(
+                        friends = _state.value.friends.filter { itFilter -> itFilter != _state.value.friendToDelete }
+                    )
+                }
+            }
         }
     }
 
@@ -112,7 +131,12 @@ class FriendsViewModel @Inject constructor(
     }
 
     private fun onShowDeleteFriendDialogChange(value: FriendsScreenEvent.ShowDeleteFriendDialogEvent) {
-        _state.update { it.copy(showDeleteFriendDialog = value.newValue) }
+        _state.update {
+            it.copy(
+                showDeleteFriendDialog = value.newValue,
+                friendToDelete = value.friend
+            )
+        }
     }
 
     private suspend fun onShowDeleteFriendDialogChangeValue(value: Boolean) {

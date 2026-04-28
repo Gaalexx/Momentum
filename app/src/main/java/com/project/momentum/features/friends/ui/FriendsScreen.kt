@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,12 +39,18 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInWindow
@@ -67,6 +72,7 @@ import com.project.momentum.features.friends.ui.assets.AddFriendDialog
 import com.project.momentum.features.friends.ui.assets.DeleteFriendDialog
 import com.project.momentum.features.friends.ui.assets.FriendRequestCarousel
 import com.project.momentum.features.friends.viewmodel.FriendsScreenState
+import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlin.math.roundToInt
 
@@ -143,8 +149,6 @@ fun FriendsScreen(
     val searchQuery = uiState.searchQuery
     val selectedIndex = uiState.selectedIndex
 
-    var popupItem by remember { mutableStateOf<User?>(User("", "", "")) }
-    var popupOffset by remember { mutableStateOf(IntOffset.Zero) }
 
     val filteredFriends = remember(userFriends, searchQuery) {
         if (searchQuery.isEmpty()) {
@@ -370,71 +374,57 @@ fun FriendsScreen(
                         items = filteredFriends,
                         key = { it.id }
                     ) { friend ->
-
-                        var itemPositionInWindow by remember {
-                            mutableStateOf(IntOffset.Zero)
-                        }
-
                         FriendItem(
-                            modifier = Modifier
-                                .onGloballyPositioned { coordinates ->
-
-                                    val position = coordinates.positionInWindow()
-
-                                    itemPositionInWindow = IntOffset(
-                                        x = position.x.roundToInt(),
-                                        y = position.y.roundToInt()
-                                    )
-
-                                }
-                                .pointerInput(
-                                    friend,
-                                    itemPositionInWindow
-                                ) {
-                                    detectTapGestures { tapOffset ->
-
-                                        popupItem = friend
-
-                                        val tapX =
-                                            itemPositionInWindow.x +
-                                                    tapOffset.x.roundToInt()
-
-                                        val tapY =
-                                            itemPositionInWindow.y +
-                                                    tapOffset.y.roundToInt()
-
-                                        popupOffset = IntOffset(
-                                            x = tapX,
-                                            y = tapY - 160
-                                        )
-
-                                    }
-                                },
+                            modifier = Modifier,
                             friend = friend,
-                            onFriendClick = onFriendClick
+                            onFriendClick = onFriendClick,
+                            onItemSwipe = {
+                                onEvent(
+                                    FriendsScreenEvent.ShowDeleteFriendDialogEvent(
+                                        true,
+                                        friend
+                                    )
+                                )
+                            }
                         )
                     }
-                }
-
-                popupItem?.let { item ->
-
-                    Popup(
-                        offset = popupOffset,
-                        onDismissRequest = {
-                            popupItem = null
-                            //onEvent(FriendsScreenEvent.ShowDeleteFriendDialogEvent(!showDeleteFriendDialog))
-                        },
-                        properties = PopupProperties(
-                            focusable = true,
-                            dismissOnBackPress = true,
-                            dismissOnClickOutside = true
-                        )
-                    ) {
-                        DeleteFriendDialog()
-                    }
-
                 }
             }
+        }
+    }
+    if (showDeleteFriendDialog) {
+        Dialog(
+            onDismissRequest = {
+                onEvent(
+                    FriendsScreenEvent.ShowDeleteFriendDialogEvent(
+                        false,
+                        uiState.friendToDelete
+                    )
+                )
+            }
+        ) {
+            DeleteFriendDialog(
+                friendToDelete = uiState.friendToDelete,
+                onAccept = {
+                    onEvent(
+                        FriendsScreenEvent.DeleteFriendEvent
+                    )
+                    onEvent(
+                        FriendsScreenEvent.ShowDeleteFriendDialogEvent(
+                            false,
+                            uiState.friendToDelete
+                        )
+                    )
+                },
+                onDismiss = {
+                    onEvent(
+                        FriendsScreenEvent.ShowDeleteFriendDialogEvent(
+                            false,
+                            uiState.friendToDelete
+                        )
+                    )
+                }
+            )
         }
     }
 
@@ -496,70 +486,107 @@ fun FriendItem(
     modifier: Modifier = Modifier,
     friend: User,
     onFriendClick: (User) -> Unit,
-    onFriendLongTap: () -> Unit = {}
+    onFriendLongTap: () -> Unit = {},
+    onItemSwipe: () -> Unit = {}
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .padding(vertical = 3.dp, horizontal = 10.dp)
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(15.dp))
-            .background(ConstColours.MAIN_BACK_GRAY)
-            .combinedClickable(
-                onClick = { onFriendClick(friend) },
-                onLongClick = { onFriendLongTap() }
-            )
-    ) {
-        Box(
-            modifier = Modifier.padding(end = 12.dp)
-        ) {
-            FriendButton(
-                imageUrl = friend.avatarUrl,
-                modifier = Modifier
-                    .width(67.dp)
-                    .height(67.dp)
-                    .padding(3.dp)
-            )
 
-            if (friend.isOnline) {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .size(16.dp)
-                        .clip(CircleShape)
-                        .background(ConstColours.MAIN_BRAND_BLUE)
-                        .border(
-                            width = 2.dp,
-                            color = ConstColours.BLACK,
-                            shape = CircleShape
-                        )
+    val swipeState = rememberSwipeToDismissBoxState()
+    val scope = rememberCoroutineScope()
+    SwipeToDismissBox(
+        state = swipeState,
+        backgroundContent = {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        color = ConstColours.RED,
+                        shape = RoundedCornerShape(15.dp)
+                    )
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = null,
+                    modifier = Modifier.align(Alignment.CenterEnd),
+                    tint = ConstColours.WHITE
                 )
             }
+        },
+        enableDismissFromStartToEnd = false,
+        onDismiss = { it ->
+            if (it == SwipeToDismissBoxValue.EndToStart) {
+                onItemSwipe()
+                scope.launch {
+                    swipeState.reset()
+                }
+            }
         }
+    ) {
 
-        if (friend.description != null) {
-            Column {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(15.dp))
+                .background(ConstColours.MAIN_BACK_GRAY)
+                .combinedClickable(
+                    onClick = { onFriendClick(friend) },
+                    onLongClick = { onFriendLongTap() }
+                )
+        ) {
+            Box(
+                modifier = Modifier.padding(end = 12.dp)
+            ) {
+                FriendButton(
+                    imageUrl = friend.avatarUrl,
+                    modifier = Modifier
+                        .width(67.dp)
+                        .height(67.dp)
+                        .padding(3.dp)
+                )
+
+                if (friend.isOnline) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .size(16.dp)
+                            .clip(CircleShape)
+                            .background(ConstColours.MAIN_BRAND_BLUE)
+                            .border(
+                                width = 2.dp,
+                                color = ConstColours.BLACK,
+                                shape = CircleShape
+                            )
+                    )
+                }
+            }
+
+            if (friend.description != null) {
+                Column {
+                    Text(
+                        friend.name,
+                        color = ConstColours.WHITE,
+                        style = AppTextStyles.MainText
+                    )
+                    if (friend.description.isNotEmpty()) {
+                        Text(
+                            friend.description,
+                            color = ConstColours.WHITE,
+                            style = AppTextStyles.SupportingText
+                        )
+                    }
+                }
+            } else {
                 Text(
                     friend.name,
                     color = ConstColours.WHITE,
                     style = AppTextStyles.MainText
                 )
-                if (friend.description.isNotEmpty()) {
-                    Text(
-                        friend.description,
-                        color = ConstColours.WHITE,
-                        style = AppTextStyles.SupportingText
-                    )
-                }
             }
-        } else {
-            Text(
-                friend.name,
-                color = ConstColours.WHITE,
-                style = AppTextStyles.MainText
-            )
         }
+
     }
+
+
 }
 
 @Preview(
