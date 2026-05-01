@@ -104,6 +104,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
     implementation(libs.lottie.compose)
+    implementation(libs.androidx.compose.constraintlayout)
 
     // Material
     implementation(libs.androidx.compose.material3)
@@ -137,6 +138,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences.core)
     implementation(libs.androidx.ui.text)
     implementation(libs.androidx.foundation)
+
     ksp(libs.hilt.compiler)
 
     // Tests

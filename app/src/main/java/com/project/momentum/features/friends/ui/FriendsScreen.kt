@@ -34,6 +34,8 @@ import coil.compose.AsyncImage
 import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.ui.theme.AppTextStyles
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.aspectRatio
@@ -105,6 +107,8 @@ data class User(
 
 @Composable
 fun FriendsScreenRoute(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     onBackClick: () -> Unit,
     onFriendClick: (User) -> Unit,
     viewModel: FriendsViewModel = hiltViewModel()
@@ -123,7 +127,9 @@ fun FriendsScreenRoute(
         addFriend,
         onEvent,
         errorState,
-        errorTextId
+        errorTextId,
+        sharedTransitionScope,
+        animatedVisibilityScope
     )
 
 }
@@ -136,7 +142,9 @@ fun FriendsScreen(
     addFriend: () -> Unit,
     onEvent: (FriendsScreenEvent) -> Unit,
     errorState: Boolean = false,
-    errorTextId: Int?
+    errorTextId: Int?,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val bg = ConstColours.BLACK
     val textColor = ConstColours.WHITE
@@ -385,6 +393,8 @@ fun FriendsScreen(
                                 FriendItem(
                                     modifier = Modifier.animateItem(),
                                     friend = friend,
+                                    sharedTransitionScope = sharedTransitionScope,
+                                    animatedVisibilityScope = animatedVisibilityScope,
                                     onFriendClick = onFriendClick,
                                     onItemSwipe = {
                                         onEvent(
@@ -458,17 +468,34 @@ fun FriendsScreen(
 
 @Composable
 fun FriendButton(
-    imageUrl: String?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    friend: User,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
 
+    val avatarModifier = if (
+        sharedTransitionScope != null && animatedVisibilityScope != null
+    ) {
+        with(sharedTransitionScope) {
+            modifier.sharedElement(
+                sharedContentState = rememberSharedContentState(
+                    key = "person-avatar-${friend.id}"
+                ),
+                animatedVisibilityScope = animatedVisibilityScope
+            )
+        }
+    } else {
+        modifier
+    }
+
     Box(
-        modifier = modifier
+        modifier = avatarModifier
             .aspectRatio(1.0f)
             .clip(CircleShape)
             .border(2.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
     ) {
-        if (imageUrl.isNullOrBlank()) {
+        if (friend.avatarUrl.isNullOrBlank()) {
             Icon(
                 imageVector = Icons.Outlined.AccountCircle,
                 contentDescription = stringResource(R.string.account_avatar),
@@ -479,7 +506,7 @@ fun FriendButton(
             )
         } else {
             AsyncImage(
-                model = imageUrl,
+                model = friend.avatarUrl,
                 contentDescription = stringResource(R.string.account_avatar),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -488,6 +515,7 @@ fun FriendButton(
                     .clip(CircleShape)
             )
         }
+
     }
 }
 
@@ -498,11 +526,16 @@ fun FriendItem(
     friend: User,
     onFriendClick: (User) -> Unit,
     onFriendLongTap: () -> Unit = {},
-    onItemSwipe: () -> Unit = {}
+    onItemSwipe: () -> Unit = {},
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
 
     val swipeState = rememberSwipeToDismissBoxState()
     val scope = rememberCoroutineScope()
+
+
+
     SwipeToDismissBox(
         state = swipeState,
         backgroundContent = {
@@ -548,11 +581,13 @@ fun FriendItem(
                 modifier = Modifier.padding(end = 12.dp)
             ) {
                 FriendButton(
-                    imageUrl = friend.avatarUrl,
+                    friend = friend,
                     modifier = Modifier
                         .width(67.dp)
                         .height(67.dp)
-                        .padding(3.dp)
+                        .padding(3.dp),
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope,
                 )
 
                 if (friend.isOnline) {
@@ -570,29 +605,73 @@ fun FriendItem(
                     )
                 }
             }
+            if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                with(sharedTransitionScope) {
+                    if (friend.description != null) {
 
-            if (friend.description != null) {
-                Column {
-                    Text(
-                        friend.name,
-                        color = ConstColours.WHITE,
-                        style = AppTextStyles.MainText
-                    )
-                    if (friend.description.isNotEmpty()) {
+                        Column {
+                            Text(
+                                modifier = Modifier.sharedBounds(
+                                    sharedContentState = rememberSharedContentState(
+                                        key = "person-name-${friend.id}"
+                                    ),
+                                    animatedVisibilityScope = animatedVisibilityScope,
+                                    resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
+                                ),
+                                text = friend.name,
+                                color = ConstColours.WHITE,
+                                style = AppTextStyles.MainText
+                            )
+                            if (friend.description.isNotEmpty()) {
+                                Text(
+                                    friend.description,
+                                    color = ConstColours.WHITE,
+                                    style = AppTextStyles.SupportingText
+                                )
+                            }
+                        }
+                    } else {
                         Text(
-                            friend.description,
+                            modifier = Modifier.sharedBounds(
+                                sharedContentState = rememberSharedContentState(
+                                    key = "person-name-${friend.id}"
+                                ),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
+                            ),
+                            text = friend.name,
                             color = ConstColours.WHITE,
-                            style = AppTextStyles.SupportingText
+                            style = AppTextStyles.MainText
                         )
                     }
                 }
             } else {
-                Text(
-                    friend.name,
-                    color = ConstColours.WHITE,
-                    style = AppTextStyles.MainText
-                )
+                if (friend.description != null) {
+                    Column {
+                        Text(
+                            modifier = Modifier,
+                            text = friend.name,
+                            color = ConstColours.WHITE,
+                            style = AppTextStyles.MainText
+                        )
+                        if (friend.description.isNotEmpty()) {
+                            Text(
+                                friend.description,
+                                color = ConstColours.WHITE,
+                                style = AppTextStyles.SupportingText
+                            )
+                        }
+                    }
+                } else {
+                    Text(
+                        modifier = Modifier,
+                        text = friend.name,
+                        color = ConstColours.WHITE,
+                        style = AppTextStyles.MainText
+                    )
+                }
             }
+
         }
 
     }
