@@ -148,7 +148,6 @@ internal fun MediaCreationContentCompact(
     onStartAudioRecording: () -> Unit,
     onStopAudioRecording: () -> Unit,
     onProfileClick: () -> Unit,
-    onGoToGallery: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
     modifier: Modifier = Modifier,
@@ -159,17 +158,7 @@ internal fun MediaCreationContentCompact(
             .background(ConstColours.BLACK)
             .windowInsetsPadding(WindowInsets.systemBars),
     ) {
-        CameraTopBar(
-            onProfileClick = onProfileClick,
-            onGoToSettings = onGoToSettings,
-            onGoToFriends = onGoToFriends,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .padding(horizontal = 14.dp),
-        )
 
-        Spacer(Modifier.height(5.dp))
 
         MediaCreationPreviewCard(
             mode = mode,
@@ -231,7 +220,7 @@ internal fun MediaCreationContentCompact(
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
-            GalleryButton(modifier = Modifier, onClick = onGoToGallery)
+            GalleryButton(modifier = Modifier, onClick = {})
         }
     }
 }

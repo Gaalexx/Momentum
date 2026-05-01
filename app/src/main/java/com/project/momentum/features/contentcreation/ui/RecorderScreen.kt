@@ -14,7 +14,6 @@ fun RecorderScreen(
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToPreview: (Uri, MediaTypeToSend) -> Unit,
-    onGoToGallery: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     MediaCreationScreen(
@@ -22,7 +21,6 @@ fun RecorderScreen(
         initialMode = ContentCreationMode.Audio,
         onGoToPreview = onGoToPreview,
         onProfileClick = onProfileClick,
-        onGoToGallery = onGoToGallery,
         onGoToSettings = onGoToSettings,
         onGoToFriends = onGoToFriends,
     )
@@ -37,6 +35,5 @@ private fun RecorderScreenPreview() {
         onProfileClick = {},
         onGoToSettings = {},
         onGoToPreview = { _, _ -> },
-        onGoToGallery = {},
     )
 }

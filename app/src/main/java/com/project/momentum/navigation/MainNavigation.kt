@@ -34,6 +34,7 @@ import com.project.momentum.features.auth.ui.CreateAccountRoot
 import com.project.momentum.features.auth.ui.CreatePasswordRoot
 import com.project.momentum.features.auth.ui.InsertCodeRoot
 import com.project.momentum.features.auth.ui.PasswordRecoveryRoot
+import com.project.momentum.features.cameracontentpager.ui.CameraContentPager
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.ui.MediaCreationScreen
 import com.project.momentum.features.contentcreation.ui.SendContentScreen
@@ -214,8 +215,9 @@ fun MainScreen() {
                 }
 
                 // Экраны создания контента
+
                 entry<NavRoutes.Camera> {
-                    MediaCreationScreen(
+                    CameraContentPager(
                         initialMode = ContentCreationMode.Camera,
                         onGoToPreview = { uri, mediaType ->
                             openOverlay(NavRoutes.SendPhoto(uri.toString(), mediaType))
@@ -231,28 +233,36 @@ fun MainScreen() {
                         },
                         onGoToGallery = {
                             openOverlay(NavRoutes.Gallery)
-                        }
+                        },
+                        onGoToTakePhoto = {},
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current
                     )
                 }
 
+
+
                 entry<NavRoutes.Recorder> {
-                    MediaCreationScreen(
+                    CameraContentPager(
                         initialMode = ContentCreationMode.Audio,
                         onGoToPreview = { uri, mediaType ->
                             openOverlay(NavRoutes.SendPhoto(uri.toString(), mediaType))
                         },
+                        onProfileClick = {
+                            openOverlay(NavRoutes.Account("camera"))
+                        },
+                        onGoToSettings = {
+                            openOverlay(NavRoutes.Settings("camera"))
+                        },
                         onGoToFriends = {
                             openOverlay(NavRoutes.Friends)
                         },
-                        onProfileClick = {
-                            openOverlay(NavRoutes.Account("recorder"))
-                        },
-                        onGoToSettings = {
-                            openOverlay(NavRoutes.Settings("recorder"))
-                        },
                         onGoToGallery = {
                             openOverlay(NavRoutes.Gallery)
-                        }
+                        },
+                        onGoToTakePhoto = {},
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current
                     )
                 }
 
