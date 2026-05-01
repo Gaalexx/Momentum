@@ -56,6 +56,8 @@ fun AccountRoot(
     onProfileClick: () -> Unit = {},
     userStatus: String = stringResource(R.string.account_online_status),
     postsViewModel: PostsViewModel = hiltViewModel(),
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
     accountInfoViewModel: AccountInfoViewModel = hiltViewModel()
 ) {
     LaunchedEffect(Unit) {
@@ -75,6 +77,8 @@ fun AccountRoot(
         onAddPostClick = onAddPostClick,
         onPostClick = { postId -> onPostClick(postId, uiInfoState.userId) },
         onEditClick = { onEditClick(uiInfoState) },
+        sharedTransitionScope = sharedTransitionScope,
+        animatedVisibilityScope = animatedVisibilityScope
     )
 }
 
@@ -260,7 +264,9 @@ fun AccountScreen(
                     .fillMaxWidth()
                     .weight(1f),
                 showPlusButton = onAddPostClick != null,
-                columns = 3
+                columns = 3,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope
             )
         }
     }

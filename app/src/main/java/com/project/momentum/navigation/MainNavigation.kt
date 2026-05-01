@@ -280,6 +280,8 @@ fun MainScreen() {
                         onGoToFriends = {
                             openOverlay(NavRoutes.Friends)
                         },
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
                     )
                 }
 
@@ -332,7 +334,9 @@ fun MainScreen() {
                         onBackClick = {
                             closeOverlay()
                         },
-                        onAddPostClick = { openOverlay(NavRoutes.Camera) }
+                        onAddPostClick = { openOverlay(NavRoutes.Camera) },
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
                     )
                 }
 
@@ -421,7 +425,9 @@ fun MainScreen() {
                             openOverlay(NavRoutes.Friends)
                         },
                         postIndex = route.post,
-                        userId = route.userId
+                        userId = route.userId,
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
                     )
 
                 }

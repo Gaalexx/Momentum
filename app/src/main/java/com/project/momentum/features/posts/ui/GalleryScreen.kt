@@ -2,6 +2,8 @@
 
 package com.project.momentum.features.posts.ui
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -38,6 +40,8 @@ fun GalleryScreen(
     onBackClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
     viewModel: PostsViewModel = hiltViewModel()
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
@@ -54,7 +58,9 @@ fun GalleryScreen(
         onProfileClick = onProfileClick,
         onBackClick = onBackClick,
         onGoToSettings = onGoToSettings,
-        onGoToFriends = onGoToFriends
+        onGoToFriends = onGoToFriends,
+        sharedTransitionScope = sharedTransitionScope,
+        animatedVisibilityScope = animatedVisibilityScope
     )
 }
 
@@ -70,6 +76,8 @@ private fun GalleryScreenContent(
     onBackClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val bg = ConstColours.BLACK
     val textColor = Color.White
@@ -129,7 +137,9 @@ private fun GalleryScreenContent(
                     modifier = Modifier
                         .fillMaxSize(),
                     showPlusButton = false,
-                    columns = 3
+                    columns = 3,
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope
                 )
             }
 

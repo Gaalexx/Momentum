@@ -138,6 +138,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences.core)
     implementation(libs.androidx.ui.text)
     implementation(libs.androidx.foundation)
+    implementation(libs.androidx.compose.animation.core)
 
     ksp(libs.hilt.compiler)
 

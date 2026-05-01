@@ -1,5 +1,7 @@
 package com.project.momentum.features.posts.ui
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -76,6 +78,7 @@ import com.project.momentum.ui.assets.ProfileCircleButton
 import com.project.momentum.ui.assets.SettingsCircleButton
 import androidx.compose.ui.draw.blur
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import com.project.momentum.ui.assets.VideoView
@@ -192,6 +195,8 @@ fun WatchPhotoScreenRoute(
     onGoToFriends: () -> Unit,
     postIndex: Int,
     userId: String? = null,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
     postsViewModel: PostsViewModel = hiltViewModel()
 ) {
 
@@ -227,7 +232,9 @@ fun WatchPhotoScreenRoute(
         postIndex = postIndex,
         posts = posts,
         currentUserId = uiState.currentUserId,
-        isShowingReactionsDialog = uiState.isShowingReactionsDialog
+        isShowingReactionsDialog = uiState.isShowingReactionsDialog,
+        sharedTransitionScope = sharedTransitionScope,
+        animatedVisibilityScope = animatedVisibilityScope
     )
 }
 
@@ -244,6 +251,8 @@ fun WatchPhotoScreen(
     currentUserId: String,
     posts: List<PostData>,
     isShowingReactionsDialog: Boolean,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val bg = ConstColours.BLACK
     val iconTint = ConstColours.WHITE
@@ -309,10 +318,27 @@ fun WatchPhotoScreen(
             ) { pageIndex ->
                 val post = posts[pageIndex]
 
+                val postModifier =
+                    if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                        with(sharedTransitionScope) {
+                            Modifier.sharedElement(
+                                sharedContentState = rememberSharedContentState(
+                                    key = "person-post-${post.id}"
+                                ),
+                                animatedVisibilityScope = animatedVisibilityScope,
+                                boundsTransform = { _, _ ->
+                                    tween(750)
+                                }
+                            )
+                        }
+                    } else {
+                        Modifier
+                    }
+
                 when (post.mediaType) {
                     MediaType.IMAGE -> {
                         Box(
-                            modifier = Modifier
+                            modifier = postModifier
                                 .fillMaxWidth(0.95f)
                                 .aspectRatio(1f)
                                 .clip(RoundedCornerShape(60.dp))
@@ -345,7 +371,7 @@ fun WatchPhotoScreen(
 
                     MediaType.VIDEO -> {
                         Box(
-                            modifier = Modifier
+                            modifier = postModifier
                                 .fillMaxSize()
                                 .combinedClickable(
                                     onClick = { onShowReactionDialog() },
@@ -377,7 +403,7 @@ fun WatchPhotoScreen(
 
                     MediaType.AUDIO -> {
                         Box(
-                            modifier = Modifier
+                            modifier = postModifier
                                 .fillMaxSize()
                                 .combinedClickable(
                                     onClick = { onShowReactionDialog() },
