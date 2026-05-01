@@ -155,8 +155,7 @@ internal fun MediaCreationContentCompact(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(ConstColours.BLACK)
-            .windowInsetsPadding(WindowInsets.systemBars),
+            .background(ConstColours.BLACK),
     ) {
 
 

@@ -5,10 +5,14 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.Surface
@@ -56,6 +60,7 @@ fun CameraContentPager(
                 onGoToSettings = onGoToSettings,
                 onGoToFriends = onGoToFriends,
                 modifier = Modifier
+                    .windowInsetsPadding(WindowInsets.statusBars)
                     .fillMaxWidth()
                     .height(50.dp)
                     .padding(horizontal = 14.dp),

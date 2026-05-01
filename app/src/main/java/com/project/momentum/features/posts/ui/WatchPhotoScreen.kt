@@ -277,8 +277,7 @@ fun WatchPhotoScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(bg)
-            .windowInsetsPadding(WindowInsets.systemBars),
+            .background(bg),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (posts.isEmpty()) {
@@ -512,14 +511,6 @@ fun WatchPhotoScreen(
                     )
                 }
             }
-
-            Icon(
-                imageVector = Icons.Outlined.KeyboardArrowDown,
-                contentDescription = stringResource(R.string.icon_more),
-                tint = iconTint.copy(alpha = 0.9f),
-                modifier = Modifier
-                    .size(34.dp)
-            )
         }
     }
 }
@@ -528,7 +519,7 @@ fun WatchPhotoScreen(
 @Composable
 private fun WatchPhotoScreenPreview() {
     MaterialTheme {
-        Column{
+        Column {
             CameraTopBar(
                 onProfileClick = {},
                 onGoToSettings = {},
