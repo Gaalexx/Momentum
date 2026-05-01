@@ -1,5 +1,7 @@
 package com.project.momentum.features.friends.ui
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -14,6 +16,8 @@ import com.project.momentum.features.posts.viewmodel.PostsViewModel
 
 @Composable
 fun FriendAccountRoot(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     friend: User,
     modifier: Modifier = Modifier,
     onPostClick: (Int, String) -> Unit,
@@ -39,5 +43,7 @@ fun FriendAccountRoot(
         userStatus =
             if (friend.isOnline) stringResource(R.string.account_online_status)
             else stringResource(R.string.account_offline_status),
+        sharedTransitionScope = sharedTransitionScope,
+        animatedVisibilityScope = animatedVisibilityScope
     )
 }

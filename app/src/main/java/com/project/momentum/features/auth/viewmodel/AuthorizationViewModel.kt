@@ -58,6 +58,7 @@ class AuthorizationViewModel @Inject constructor(
                         repository.apply {
                             saveToken(refreshToken)
                             authorize() // TODO сохранять куда-нибудь
+                            syncPushToken()
                         }
                         _state.update {
                             it.copy(
@@ -86,6 +87,7 @@ class AuthorizationViewModel @Inject constructor(
                         repository.apply {
                             saveToken(token)
                             authorize()         // TODO сохранять куда-нибудь
+                            syncPushToken()
                         }
                         _state.update {
                             it.copy(

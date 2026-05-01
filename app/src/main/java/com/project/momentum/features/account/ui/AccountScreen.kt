@@ -21,6 +21,8 @@ import com.project.momentum.ui.theme.ConstColours
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import android.content.Context
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
@@ -85,13 +87,43 @@ fun AccountScreen(
     modifier: Modifier = Modifier,
     onAddPostClick: (() -> Unit)? = null,
     onEditClick: (() -> Unit)? = null,
-    userStatus: String = stringResource(R.string.account_online_status)
+    userStatus: String = stringResource(R.string.account_online_status),
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
     val iconTint = Color(0xFFEDEEF2) // TODO: fa fa fa what a faaa
     val textColor = ConstColours.WHITE
     val context: Context = LocalContext.current
+
+
+    val avatarModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+        with(sharedTransitionScope) {
+            Modifier.sharedElement(
+                sharedContentState = rememberSharedContentState(
+                    key = "person-avatar-${uiInfoState.userId}"
+                ),
+                animatedVisibilityScope = animatedVisibilityScope
+            )
+        }
+    } else {
+        Modifier
+    }
+
+    val nameModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+        with(sharedTransitionScope) {
+            Modifier.sharedBounds(
+                sharedContentState = rememberSharedContentState(
+                    key = "person-name-${uiInfoState.userId}"
+                ),
+                animatedVisibilityScope = animatedVisibilityScope,
+                resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
+            )
+        }
+    } else {
+        Modifier
+    }
 
     //TODO: экран загрузки (ну и состояние)
 
@@ -127,7 +159,7 @@ fun AccountScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Box(
-                modifier = Modifier
+                modifier = avatarModifier
                     .size(120.dp)
                     .clip(CircleShape)
                     .background(chrome2)
@@ -162,6 +194,7 @@ fun AccountScreen(
                     fontWeight = FontWeight.Bold,
                     color = textColor
                 ),
+                modifier = nameModifier
             )
 
             Spacer(Modifier.height(dimensionResource(R.dimen.extra_small_padding)))

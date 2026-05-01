@@ -34,6 +34,10 @@ class AuthUseCase @Inject constructor(
             Log.e("Authorization", ex.message ?: "unknown")
             AuthResult.Error(AuthError.NoInternetConnectionError)
         }
+
+    suspend fun syncPushToken() {
+        registrationRepository.syncPushToken()
+    }
 }
 
 sealed interface AppStartState {
@@ -58,7 +62,6 @@ class AppStartViewModel @Inject constructor(
         viewModelScope.launch {
             val res = auth.authorize()
 
-
             state = when (res) {
                 is AuthResult.Success -> {
                     if (res.token != null) {
@@ -73,6 +76,9 @@ class AppStartViewModel @Inject constructor(
                         is AuthError.NoInternetConnectionError -> AppStartState.NoInternetConnection
                     }
                 }
+            }
+            if (state is AppStartState.Authorized) {
+                auth.syncPushToken()
             }
         }
     }

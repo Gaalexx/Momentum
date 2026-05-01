@@ -55,6 +55,12 @@ data class GetJWTDTO(
     val token: String?,
 )
 
+@Serializable
+data class GetJWTPushDTO(
+    val token: String?,
+    val pushToken: String?
+)
+
 // Response DTO
 @Serializable
 data class CheckResponseDTO(
