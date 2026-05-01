@@ -1,5 +1,8 @@
 package com.project.momentum.ui.assets
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -124,7 +127,9 @@ fun S3PhotoGrid(
     onAddPhotoClick: () -> Unit,
     modifier: Modifier = Modifier,
     showPlusButton: Boolean = true,
-    columns: Int = 3
+    columns: Int = 3,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val displayItems = buildList<S3GridItem> {
         if (showPlusButton) add(S3GridItem.PlusButton)
@@ -157,11 +162,35 @@ fun S3PhotoGrid(
             }
         ) { index, item ->
 
+            val post = when (item) {
+                is S3GridItem.Post -> item.post
+                is S3GridItem.AudioPost -> item.post
+                is S3GridItem.VideoPost -> item.post
+                else -> PostData("", "", "", "", "", MediaType.IMAGE, "")
+            }
+
+
+            val modifierForGridItem =
+                if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                    with(sharedTransitionScope) {
+                        Modifier.sharedElement(
+                            sharedContentState = rememberSharedContentState(
+                                key = "person-post-${post.id}"
+                            ),
+                            animatedVisibilityScope = animatedVisibilityScope,
+                            boundsTransform = { _, _ ->
+                                tween(750)
+                            }
+                        )
+                    }
+                } else {
+                    Modifier
+                }
+
             when (item) {
                 is S3GridItem.Post -> {
-                    val post = item.post
                     Box(
-                        modifier = Modifier
+                        modifier = modifierForGridItem
                             .aspectRatio(1f)
                             .clip(RoundedCornerShape(8.dp))
                             .background(ConstColours.MAIN_BACK_GRAY)
@@ -196,9 +225,8 @@ fun S3PhotoGrid(
                 }
 
                 is S3GridItem.AudioPost -> {
-                    val post = item.post
                     Box(
-                        modifier = modifier
+                        modifier = modifierForGridItem
                             .fillMaxSize()
                             .aspectRatio(1f)
                             .clip(ScallopedShape())
@@ -221,9 +249,8 @@ fun S3PhotoGrid(
                 }
 
                 is S3GridItem.VideoPost -> {
-                    val post = item.post
                     Box(
-                        modifier = Modifier
+                        modifier = modifierForGridItem
                             .aspectRatio(1f)
                             .clip(RoundedCornerShape(8.dp))
                             .background(ConstColours.MAIN_BACK_GRAY)

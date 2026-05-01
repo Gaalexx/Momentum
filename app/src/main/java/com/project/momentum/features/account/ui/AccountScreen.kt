@@ -23,6 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
@@ -55,6 +56,8 @@ fun AccountRoot(
     onProfileClick: () -> Unit = {},
     userStatus: String = stringResource(R.string.account_online_status),
     postsViewModel: PostsViewModel = hiltViewModel(),
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
     accountInfoViewModel: AccountInfoViewModel = hiltViewModel()
 ) {
     LaunchedEffect(Unit) {
@@ -74,6 +77,8 @@ fun AccountRoot(
         onAddPostClick = onAddPostClick,
         onPostClick = { postId -> onPostClick(postId, uiInfoState.userId) },
         onEditClick = { onEditClick(uiInfoState) },
+        sharedTransitionScope = sharedTransitionScope,
+        animatedVisibilityScope = animatedVisibilityScope
     )
 }
 
@@ -104,7 +109,10 @@ fun AccountScreen(
                 sharedContentState = rememberSharedContentState(
                     key = "person-avatar-${uiInfoState.userId}"
                 ),
-                animatedVisibilityScope = animatedVisibilityScope
+                animatedVisibilityScope = animatedVisibilityScope,
+                boundsTransform = { _, _ ->
+                    tween(750)
+                }
             )
         }
     } else {
@@ -118,6 +126,9 @@ fun AccountScreen(
                     key = "person-name-${uiInfoState.userId}"
                 ),
                 animatedVisibilityScope = animatedVisibilityScope,
+                boundsTransform = { _, _ ->
+                    tween(750)
+                },
                 resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
             )
         }
@@ -253,7 +264,9 @@ fun AccountScreen(
                     .fillMaxWidth()
                     .weight(1f),
                 showPlusButton = onAddPostClick != null,
-                columns = 3
+                columns = 3,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope
             )
         }
     }

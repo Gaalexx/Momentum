@@ -9,6 +9,8 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.togetherWith
@@ -278,6 +280,8 @@ fun MainScreen() {
                         onGoToFriends = {
                             openOverlay(NavRoutes.Friends)
                         },
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
                     )
                 }
 
@@ -330,17 +334,13 @@ fun MainScreen() {
                         onBackClick = {
                             closeOverlay()
                         },
-                        onAddPostClick = { openOverlay(NavRoutes.Camera) }
+                        onAddPostClick = { openOverlay(NavRoutes.Camera) },
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
                     )
                 }
 
-                entry<NavRoutes.Friends>(
-                    metadata = NavDisplay.transitionSpec {
-                        unveilIn(
-                            animationSpec = tween(1500)
-                        ) togetherWith ExitTransition.KeepUntilTransitionsFinished
-                    }
-                ) {
+                entry<NavRoutes.Friends> {
                     FriendsScreenRoute(
                         sharedTransitionScope = sharedTransitionScope,
                         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
@@ -353,13 +353,7 @@ fun MainScreen() {
                     )
                 }
 
-                entry<NavRoutes.FriendAccount>(
-                    metadata = NavDisplay.transitionSpec {
-                        unveilIn(
-                            animationSpec = tween(1500)
-                        ) togetherWith ExitTransition.KeepUntilTransitionsFinished
-                    }
-                ) { route ->
+                entry<NavRoutes.FriendAccount> { route ->
                     FriendAccountRoot(
                         friend = route.friend,
                         sharedTransitionScope = sharedTransitionScope,
@@ -431,7 +425,9 @@ fun MainScreen() {
                             openOverlay(NavRoutes.Friends)
                         },
                         postIndex = route.post,
-                        userId = route.userId
+                        userId = route.userId,
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
                     )
 
                 }
@@ -488,9 +484,15 @@ fun MainScreen() {
 
             NavDisplay(
                 entries = entries,
-                transitionSpec = { noAnimation() },
-                popTransitionSpec = { noAnimation() },
-                predictivePopTransitionSpec = { _ -> noAnimation() },
+                transitionSpec = { fadeIn(animationSpec = tween(750)) togetherWith ExitTransition.KeepUntilTransitionsFinished },
+                popTransitionSpec = {
+                    EnterTransition.None togetherWith
+                            fadeOut(animationSpec = tween(750))
+                },
+                predictivePopTransitionSpec = { _ ->
+                    EnterTransition.None togetherWith
+                            fadeOut(animationSpec = tween(750))
+                },
                 onBack = {
                     if (backStack.size > 1) {
                         backStack.removeAt(backStack.lastIndex)

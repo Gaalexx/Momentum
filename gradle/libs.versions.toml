@@ -48,6 +48,7 @@ datastorePreferencesCore = "1.2.1"
 uiText = "1.10.5"
 material3 = "1.4.0"
 foundation = "1.10.6"
+animationCore = "1.11.0"
 
 [libraries]
 # Core Android
@@ -122,6 +123,7 @@ androidx-datastore-preferences-core = { group = "androidx.datastore", name = "da
 androidx-ui-text = { group = "androidx.compose.ui", name = "ui-text", version.ref = "uiText" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
+androidx-compose-animation-core = { group = "androidx.compose.animation", name = "animation-core", version.ref = "animationCore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

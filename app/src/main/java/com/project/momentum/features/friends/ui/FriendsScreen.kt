@@ -36,6 +36,7 @@ import com.project.momentum.ui.theme.AppTextStyles
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.aspectRatio
@@ -482,7 +483,10 @@ fun FriendButton(
                 sharedContentState = rememberSharedContentState(
                     key = "person-avatar-${friend.id}"
                 ),
-                animatedVisibilityScope = animatedVisibilityScope
+                animatedVisibilityScope = animatedVisibilityScope,
+                boundsTransform = { _, _ ->
+                    tween(750)
+                }
             )
         }
     } else {
@@ -616,7 +620,10 @@ fun FriendItem(
                                         key = "person-name-${friend.id}"
                                     ),
                                     animatedVisibilityScope = animatedVisibilityScope,
-                                    resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
+                                    resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds(),
+                                    boundsTransform = { _, _ ->
+                                        tween(750)
+                                    }
                                 ),
                                 text = friend.name,
                                 color = ConstColours.WHITE,
@@ -637,7 +644,10 @@ fun FriendItem(
                                     key = "person-name-${friend.id}"
                                 ),
                                 animatedVisibilityScope = animatedVisibilityScope,
-                                resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
+                                resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds(),
+                                boundsTransform = { _, _ ->
+                                    tween(750)
+                                }
                             ),
                             text = friend.name,
                             color = ConstColours.WHITE,
