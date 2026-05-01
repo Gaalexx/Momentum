@@ -12,16 +12,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -29,7 +26,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -73,15 +69,14 @@ import com.project.momentum.network.s3.MediaType
 import com.project.momentum.ui.assets.AudioView
 import com.project.momentum.ui.assets.CaptionBasicLabel
 import com.project.momentum.ui.assets.ContinueButton
-import com.project.momentum.ui.assets.FriendsPillButton
-import com.project.momentum.ui.assets.ProfileCircleButton
-import com.project.momentum.ui.assets.SettingsCircleButton
-import androidx.compose.ui.draw.blur
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.Surface
 import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
+import com.project.momentum.features.posts.viewmodel.PostsState
 import com.project.momentum.ui.assets.VideoView
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
@@ -189,6 +184,113 @@ fun ReactToPhoto(
 
 @Composable
 fun WatchPhotoScreenRoute(
+    onGoToTakePhoto: () -> Unit,
+    onGoToGallery: () -> Unit,
+    onProfileClick: () -> Unit,
+    onGoToSettings: () -> Unit,
+    onGoToFriends: () -> Unit,
+    postIndex: Int,
+    userId: String? = null,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    postsViewModel: PostsViewModel = hiltViewModel()
+) {
+
+    val uiState by postsViewModel.state.collectAsStateWithLifecycle()
+
+    val userPosts by remember(userId) {
+        if (userId != null) {
+            postsViewModel.getUserPostsFlow(userId)
+        } else {
+            MutableStateFlow(null)
+        }
+    }.collectAsStateWithLifecycle()
+    val posts = if (userId == null) uiState.posts else (userPosts ?: listOf())
+
+    val onShowReactionDialog = {
+        postsViewModel.onWatchPhotoEvent(
+            WatchPhotoEvent.OnShowReactionDialogEvent(!uiState.isShowingReactionsDialog)
+        )
+    }
+
+    val onReactionClick: (String, ReactionType) -> Unit = { postId, reaction ->
+        postsViewModel.onWatchPhotoEvent(
+            WatchPhotoEvent.OnReactionClick(postId, reaction)
+        )
+    }
+
+    WatchPhotoScreenFull(
+        onGoToTakePhoto = onGoToTakePhoto,
+        onGoToGallery = onGoToGallery,
+        onProfileClick = onProfileClick,
+        onGoToSettings = onGoToSettings,
+        onGoToFriends = onGoToFriends,
+        onShowReactionDialog = onShowReactionDialog,
+        onReactionClick = onReactionClick,
+        postIndex = postIndex,
+        posts = posts,
+        uiState = uiState,
+        sharedTransitionScope = sharedTransitionScope,
+        animatedVisibilityScope = animatedVisibilityScope
+    )
+}
+
+@Composable
+fun WatchPhotoScreenFull(
+    onGoToTakePhoto: () -> Unit,
+    onGoToGallery: () -> Unit,
+    onProfileClick: () -> Unit,
+    onGoToSettings: () -> Unit,
+    onGoToFriends: () -> Unit,
+    onShowReactionDialog: () -> Unit,
+    onReactionClick: (String, ReactionType) -> Unit,
+    postIndex: Int,
+    userId: String? = null,
+    uiState: PostsState,
+    posts: List<PostData>,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null
+) {
+
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = ConstColours.BLACK
+    ) {
+        Column {
+            CameraTopBar(
+                onProfileClick = {},
+                onGoToSettings = {},
+                onGoToFriends = {},
+                modifier = Modifier
+                    .windowInsetsPadding(WindowInsets.statusBars)
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .padding(horizontal = 14.dp),
+            )
+
+            Spacer(Modifier.height(5.dp))
+            WatchPhotoScreen(
+                onShowReactionDialog = onShowReactionDialog,
+                onReactionClick = onReactionClick,
+                onGoToTakePhoto = onGoToTakePhoto,
+                onGoToGallery = onGoToGallery,
+                onProfileClick = onProfileClick,
+                onGoToSettings = onGoToSettings,
+                onGoToFriends = onGoToFriends,
+                postIndex = postIndex,
+                posts = posts,
+                currentUserId = uiState.currentUserId,
+                isShowingReactionsDialog = uiState.isShowingReactionsDialog,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope
+            )
+        }
+    }
+}
+
+
+@Composable
+fun WatchPhotoScreenRouteForMain(
     onGoToTakePhoto: () -> Unit,
     onGoToGallery: () -> Unit,
     onProfileClick: () -> Unit,
@@ -519,77 +621,78 @@ fun WatchPhotoScreen(
 @Composable
 private fun WatchPhotoScreenPreview() {
     MaterialTheme {
-        Column {
-            CameraTopBar(
-                onProfileClick = {},
-                onGoToSettings = {},
-                onGoToFriends = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .padding(horizontal = 14.dp),
-            )
-
-            Spacer(Modifier.height(5.dp))
-            WatchPhotoScreen(
-                onShowReactionDialog = {},
-                onReactionClick = { _, _ -> },
-                onGoToTakePhoto = {},
-                onGoToGallery = {},
-                onGoToSettings = {},
-                onProfileClick = {},
-                onGoToFriends = {},
-                postIndex = 0,
-                posts = listOf(
-                    PostData(
-                        id = "1",
-                        userId = "preview-user",
-                        userName = "PreviewName",
-                        title = "Description",
-                        presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-                        mediaType = MediaType.IMAGE,
-                        reactions = listOf(
-                            ReactionData(
-                                emoji = ReactionType.HEART,
-                                users = listOf("user1")
-                            ),
-                            ReactionData(
-                                emoji = ReactionType.CLOWN,
-                                users = listOf("user1", "user2", "preview-user")
-                            ),
-//                        ReactionData(
-//                            emoji = ReactionType.POOP,
-//                            users = listOf("preview-user", "user3")
-//                        ),
-//                        ReactionData(
-//                            emoji = ReactionType.LOUDLYCRYING,
-//                            users = listOf("user1")
-//                        ),
-//                        ReactionData(
-//                            emoji = ReactionType.CHECK_MARK,
-//                            users = listOf("user1", "user2", "user3")
-//                        ),
-//                        ReactionData(
-//                            emoji = ReactionType.SMILE,
-//                            users = listOf("user1", "user3")
-//                        )
+        WatchPhotoScreenFull(
+            onShowReactionDialog = {},
+            onReactionClick = { _, _ -> },
+            onGoToTakePhoto = {},
+            onGoToGallery = {},
+            onGoToSettings = {},
+            onProfileClick = {},
+            onGoToFriends = {},
+            postIndex = 0,
+            posts = listOf(
+                PostData(
+                    id = "1",
+                    userId = "preview-user",
+                    userName = "PreviewName",
+                    title = "Description",
+                    presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+                    mediaType = MediaType.IMAGE,
+                    reactions = listOf(
+                        ReactionData(
+                            emoji = ReactionType.HEART,
+                            users = listOf("user1")
                         ),
-                        createdAt = "2026-03-12T14:38:50.690942Z"
+                        ReactionData(
+                            emoji = ReactionType.CLOWN,
+                            users = listOf("user1", "user2", "preview-user")
+                        ),
                     ),
-                    PostData(
-                        id = "2",
-                        userId = "preview-user",
-                        userName = "PreviewName2",
-                        title = "Description2",
-                        presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-                        mediaType = MediaType.IMAGE,
-                        createdAt = "2026-03-12T14:38:50.690942Z"
-                    )
+                    createdAt = "2026-03-12T14:38:50.690942Z"
                 ),
-                currentUserId = "preview-user",
-                isShowingReactionsDialog = false
-            )
+                PostData(
+                    id = "2",
+                    userId = "preview-user",
+                    userName = "PreviewName2",
+                    title = "Description2",
+                    presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+                    mediaType = MediaType.IMAGE,
+                    createdAt = "2026-03-12T14:38:50.690942Z"
+                )
+            ),
+            uiState = PostsState(listOf(
+                PostData(
+                    id = "1",
+                    userId = "preview-user",
+                    userName = "PreviewName",
+                    title = "Description",
+                    presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+                    mediaType = MediaType.IMAGE,
+                    reactions = listOf(
+                        ReactionData(
+                            emoji = ReactionType.HEART,
+                            users = listOf("user1")
+                        ),
+                        ReactionData(
+                            emoji = ReactionType.CLOWN,
+                            users = listOf("user1", "user2", "preview-user")
+                        ),
+                    ),
+                    createdAt = "2026-03-12T14:38:50.690942Z"
+                ),
+                PostData(
+                    id = "2",
+                    userId = "preview-user",
+                    userName = "PreviewName2",
+                    title = "Description2",
+                    presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+                    mediaType = MediaType.IMAGE,
+                    createdAt = "2026-03-12T14:38:50.690942Z"
+                )
+            ), isRefreshing = false, currentUserId = "123")
+        )
+
         }
 
-    }
+
 }

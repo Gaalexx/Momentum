@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.Surface
@@ -27,12 +26,20 @@ import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.contentcreation.ui.DefaultMaxRecordMs
 import com.project.momentum.features.contentcreation.ui.MediaCreationScreen
 import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
-import com.project.momentum.features.posts.ui.WatchPhotoScreenRoute
+import com.project.momentum.features.posts.ui.WatchPhotoScreenRouteForMain
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.ui.theme.ConstColours
 
+
+enum class MainScreenPage(val curPage: Int) {
+    CONTENT_CREATION(0),
+    MEDIA_VIEW(1)
+}
+
+
 @Composable
 fun CameraContentPager(
+    mainScreenPage: MainScreenPage = MainScreenPage.CONTENT_CREATION,
     initialMode: ContentCreationMode = ContentCreationMode.Camera,
     onGoToPreview: (Uri, MediaTypeToSend) -> Unit,
     onProfileClick: () -> Unit,
@@ -43,10 +50,11 @@ fun CameraContentPager(
     onGoToTakePhoto: () -> Unit,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    currentPost: Int = 0,
     postsViewModel: PostsViewModel = hiltViewModel()
 ) {
     val pagerState = rememberPagerState(
-        initialPage = 0,
+        initialPage = mainScreenPage.ordinal,
         pageCount = { 2 }
     )
 
@@ -82,14 +90,14 @@ fun CameraContentPager(
                     )
 
                     1 -> if (postsState.value.posts.isNotEmpty()) {
-                        WatchPhotoScreenRoute(
+                        WatchPhotoScreenRouteForMain(
                             onGoToTakePhoto = {},
                             onGoToGallery = onGoToGallery,
                             onProfileClick = onProfileClick,
                             onGoToSettings = onGoToSettings,
                             onGoToFriends = onGoToFriends,
-                            postIndex = 0,
-                            postsState.value.posts[0].userId,
+                            postIndex = currentPost,
+                            postsState.value.posts[currentPost].userId,
                             sharedTransitionScope = sharedTransitionScope,
                             animatedVisibilityScope = animatedVisibilityScope
                         )

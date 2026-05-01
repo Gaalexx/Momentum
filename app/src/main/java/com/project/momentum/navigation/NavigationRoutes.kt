@@ -22,6 +22,9 @@ NavRoutes : NavKey {
     data object Recorder : NavRoutes()
 
     @Serializable
+    data class ContentWatch(val post: Int) : NavRoutes()
+
+    @Serializable
     data object Gallery : NavRoutes()
 
     @Serializable
