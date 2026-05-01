@@ -46,6 +46,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -218,178 +219,188 @@ fun FriendsScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (isLoading) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    CircularProgressIndicator(
-                        color = ConstColours.MAIN_BRAND_BLUE,
-                        strokeWidth = 3.dp
-                    )
-                    Text(
-                        text = stringResource(R.string.friends_screen_search_loading),
-                        color = textColor,
-                        style = AppTextStyles.MainText
-                    )
-                }
-            }
-        } else {
-
-            if (uiState.friendRequests.isNotEmpty()) {
-
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = if (isPortrait) 28.dp else 32.dp,
-                            vertical = 8.dp
-                        ),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(R.string.friend_requests),
-                        color = textColor,
-                        style = AppTextStyles.Headlines,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = uiState.friendRequests.size.toString(),
-                        color = ConstColours.MAIN_BRAND_BLUE,
-                        style = AppTextStyles.Headlines,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                FriendRequestCarousel(
-                    uiState.friendRequests,
-                    onEvent
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = if (isPortrait) 28.dp else 32.dp,
-                        vertical = 8.dp
-                    ),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(R.string.friends_screen_sub_headliner),
-                    color = textColor,
-                    style = AppTextStyles.Headlines,
-                    fontWeight = FontWeight.Medium
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = userFriends.size.toString(),
-                    color = ConstColours.MAIN_BRAND_BLUE,
-                    style = AppTextStyles.Headlines,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            if (filteredFriends.isEmpty()) {
-                if (searchQuery.isNotEmpty()) {
-                    Column(
+        PullToRefreshBox(
+            modifier = Modifier
+                .fillMaxSize(),
+            onRefresh = { onEvent(FriendsScreenEvent.RefreshPageEvent) },
+            isRefreshing = uiState.isRefreshing
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                if (isLoading) {
+                    Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .weight(1f)
-                            .padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                            .weight(1f),
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(
-                            text = "😕",
-                            fontSize = 48.sp,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-                        Text(
-                            text = stringResource(R.string.friends_screen_search_nothing),
-                            color = ConstColours.SUPPORTING_TEXT,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = stringResource(R.string.friends_screen_search_support_mess),
-                            color = ConstColours.SUPPORTING_SUB_TEXT,
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            CircularProgressIndicator(
+                                color = ConstColours.MAIN_BRAND_BLUE,
+                                strokeWidth = 3.dp
+                            )
+                            Text(
+                                text = stringResource(R.string.friends_screen_search_loading),
+                                color = textColor,
+                                style = AppTextStyles.MainText
+                            )
+                        }
                     }
                 } else {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .weight(1f)
-                            .padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "👥",
-                            fontSize = 48.sp,
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-                        Text(
-                            text = stringResource(R.string.friends_screen_no_friends),
-                            color = ConstColours.SUPPORTING_TEXT,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Text(
-                            text = stringResource(R.string.friends_screen_no_friends_support_mess),
-                            color = ConstColours.SUPPORTING_SUB_TEXT,
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(top = 8.dp)
+
+                    if (uiState.friendRequests.isNotEmpty()) {
+
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    horizontal = if (isPortrait) 28.dp else 32.dp,
+                                    vertical = 8.dp
+                                ),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = stringResource(R.string.friend_requests),
+                                color = textColor,
+                                style = AppTextStyles.Headlines,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = uiState.friendRequests.size.toString(),
+                                color = ConstColours.MAIN_BRAND_BLUE,
+                                style = AppTextStyles.Headlines,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        FriendRequestCarousel(
+                            uiState.friendRequests,
+                            onEvent
                         )
                     }
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f)
-                        .padding(
-                            horizontal = if (isPortrait) 16.dp else 24.dp,
-                            vertical = 8.dp
-                        ),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(
-                        items = filteredFriends,
-                        key = { it.id }
-                    ) { friend ->
-                        FriendItem(
-                            modifier = Modifier,
-                            friend = friend,
-                            onFriendClick = onFriendClick,
-                            onItemSwipe = {
-                                onEvent(
-                                    FriendsScreenEvent.ShowDeleteFriendDialogEvent(
-                                        true,
-                                        friend
-                                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = if (isPortrait) 28.dp else 32.dp,
+                                vertical = 8.dp
+                            ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.friends_screen_sub_headliner),
+                            color = textColor,
+                            style = AppTextStyles.Headlines,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = userFriends.size.toString(),
+                            color = ConstColours.MAIN_BRAND_BLUE,
+                            style = AppTextStyles.Headlines,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    if (filteredFriends.isEmpty()) {
+                        if (searchQuery.isNotEmpty()) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .weight(1f)
+                                    .padding(32.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = "😕",
+                                    fontSize = 48.sp,
+                                    modifier = Modifier.padding(bottom = 16.dp)
+                                )
+                                Text(
+                                    text = stringResource(R.string.friends_screen_search_nothing),
+                                    color = ConstColours.SUPPORTING_TEXT,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Text(
+                                    text = stringResource(R.string.friends_screen_search_support_mess),
+                                    color = ConstColours.SUPPORTING_SUB_TEXT,
+                                    fontSize = 14.sp,
+                                    modifier = Modifier.padding(top = 8.dp)
                                 )
                             }
-                        )
+                        } else {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .weight(1f)
+                                    .padding(32.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    text = "👥",
+                                    fontSize = 48.sp,
+                                    modifier = Modifier.padding(bottom = 16.dp)
+                                )
+                                Text(
+                                    text = stringResource(R.string.friends_screen_no_friends),
+                                    color = ConstColours.SUPPORTING_TEXT,
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Text(
+                                    text = stringResource(R.string.friends_screen_no_friends_support_mess),
+                                    color = ConstColours.SUPPORTING_SUB_TEXT,
+                                    fontSize = 14.sp,
+                                    modifier = Modifier.padding(top = 8.dp)
+                                )
+                            }
+                        }
+                    } else {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                                .padding(
+                                    horizontal = if (isPortrait) 16.dp else 24.dp,
+                                    vertical = 8.dp
+                                ),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            items(
+                                items = filteredFriends,
+                                key = { it.id }
+                            ) { friend ->
+                                FriendItem(
+                                    modifier = Modifier.animateItem(),
+                                    friend = friend,
+                                    onFriendClick = onFriendClick,
+                                    onItemSwipe = {
+                                        onEvent(
+                                            FriendsScreenEvent.ShowDeleteFriendDialogEvent(
+                                                true,
+                                                friend
+                                            )
+                                        )
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }
+
         }
     }
     if (showDeleteFriendDialog) {

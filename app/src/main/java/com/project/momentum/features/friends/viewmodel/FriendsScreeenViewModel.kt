@@ -31,6 +31,7 @@ data class FriendsScreenState(
     val friends: List<User>,
     val friendRequests: List<FriendRequest>,
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val showAddFriendDialog: Boolean = false,
     val showDeleteFriendDialog: Boolean = false,
     val addFriendQuery: String = "",
@@ -65,6 +66,8 @@ sealed interface FriendsScreenEvent {
     data class ChangeSelectedIndex(val newIndex: SelectedIndex) : FriendsScreenEvent
 
     data object DeleteFriendEvent : FriendsScreenEvent
+
+    data object RefreshPageEvent : FriendsScreenEvent
 }
 
 @HiltViewModel
@@ -77,6 +80,7 @@ class FriendsViewModel @Inject constructor(
             FriendsScreenState(
                 listOf(),
                 listOf(),
+                false,
                 false,
                 false,
                 false,
@@ -106,6 +110,7 @@ class FriendsViewModel @Inject constructor(
             )
 
             is FriendsScreenEvent.DeleteFriendEvent -> deleteFriend()
+            is FriendsScreenEvent.RefreshPageEvent -> refreshScreen()
         }
     }
 
@@ -119,6 +124,22 @@ class FriendsViewModel @Inject constructor(
                     )
                 }
             }
+        }
+    }
+
+    private fun refreshScreen() {
+        viewModelScope.launch {
+            _state.update { it.copy(isRefreshing = true) }
+            val friends = repo.getAllFriends()
+            val requests = repo.getAllRequests()
+            _state.update {
+                it.copy(
+                    friendRequests = requests,
+                    friends = friends,
+                    isRefreshing = false
+                )
+            }
+
         }
     }
 
