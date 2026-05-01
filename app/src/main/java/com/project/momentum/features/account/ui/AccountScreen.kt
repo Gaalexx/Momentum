@@ -23,6 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
@@ -104,7 +105,10 @@ fun AccountScreen(
                 sharedContentState = rememberSharedContentState(
                     key = "person-avatar-${uiInfoState.userId}"
                 ),
-                animatedVisibilityScope = animatedVisibilityScope
+                animatedVisibilityScope = animatedVisibilityScope,
+                boundsTransform = { _, _ ->
+                    tween(750)
+                }
             )
         }
     } else {
@@ -118,6 +122,9 @@ fun AccountScreen(
                     key = "person-name-${uiInfoState.userId}"
                 ),
                 animatedVisibilityScope = animatedVisibilityScope,
+                boundsTransform = { _, _ ->
+                    tween(750)
+                },
                 resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
             )
         }
