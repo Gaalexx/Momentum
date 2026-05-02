@@ -6,9 +6,9 @@ import com.project.momentum.features.account.models.AccountInformationDTO
 import com.project.momentum.features.account.models.CheckUserInfoIsFreeRequestDTO
 import com.project.momentum.features.account.models.EditAccountDTO
 import com.project.momentum.features.account.models.PostData
-import com.project.momentum.features.editingAccount.EditAccountErrorFields
-import com.project.momentum.features.editingAccount.EditAccountFields
-import com.project.momentum.features.editingAccount.ErrorType
+import com.project.momentum.features.editingAccount.viewmodel.EditAccountErrorFields
+import com.project.momentum.features.editingAccount.viewmodel.EditAccountFields
+import com.project.momentum.features.editingAccount.viewmodel.ErrorType
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,6 +30,7 @@ class AccountRepository @Inject constructor(
                     title = post.title,
                     presignedURL = post.presignedURL,
                     avatarPresignedURL = post.avatarPresignedURL,
+                    mediaType = post.mediaType,
                     createdAt = post.createdAt
                 )
             )
@@ -70,11 +71,11 @@ class AccountRepository @Inject constructor(
 
     suspend fun updateUserInfo(userInfo: EditAccountFields): EditAccountDTO {
         val response = accountInfoAPI.sendNewUserInfo(
-            EditAccountDTO(
+            EditAccountDTO (
                 username = userInfo.username,
                 email = userInfo.email,
                 phone = userInfo.phone,
-                profilePhotoURL = userInfo.profilePhotoURL
+                profilePhotoURL = null
             )
         )
         return response

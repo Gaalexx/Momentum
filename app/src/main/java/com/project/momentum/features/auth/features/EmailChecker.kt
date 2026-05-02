@@ -14,6 +14,6 @@ class EmailChecker @Inject constructor(
     suspend fun checkEmail(email: String): Boolean {
         val response = client.checkEmail(email)
         Log.d("EmailChecker", response.toString())
-        return response.validations.isValid
+        return response.status == "VALID"
     }
 }

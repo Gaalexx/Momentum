@@ -5,6 +5,7 @@ import com.project.momentum.data.auth.SessionManager
 import com.project.momentum.data.auth.datastore.AuthStorageImpl
 import com.project.momentum.data.auth.deviceinfo.DeviceInfo
 import com.project.momentum.data.auth.keystore.KeystoreManager
+import com.project.momentum.data.auth.pushtoken.FirebasePushTokenProvider
 import com.project.momentum.data.remote.RegistrationAPI
 import com.project.momentum.features.auth.models.LoginState
 import com.project.momentum.features.auth.models.LoginType
@@ -12,10 +13,8 @@ import com.project.momentum.features.auth.models.dto.CheckCodeLoginRequestDTO
 import com.project.momentum.features.auth.models.dto.CheckCodeRequestDTO
 import com.project.momentum.features.auth.models.dto.CheckEmailRequestDTO
 import com.project.momentum.features.auth.models.dto.CheckPhoneNumberRequestDTO
-import com.project.momentum.features.auth.models.dto.GetJWTDTO
 import com.project.momentum.features.auth.models.dto.LoginUserRequestDTO
 import com.project.momentum.features.auth.models.dto.RegisterUserRequestDTO
-import java.net.ConnectException
 import java.security.GeneralSecurityException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -27,7 +26,8 @@ class RegistrationRepository @Inject constructor(
     private val authStorage: AuthStorageImpl,
     private val keyStoreManager: KeystoreManager,
     private val sessionManager: SessionManager,
-    private val deviceInfo: DeviceInfo
+    private val deviceInfo: DeviceInfo,
+    private val pushTokenProvider: FirebasePushTokenProvider
 ) {
     suspend fun checkRegistrationLoginDB(user: LoginState): Boolean {
         val response = when (user.loginType) {
@@ -73,8 +73,8 @@ class RegistrationRepository @Inject constructor(
         return response.token
     }
 
-    suspend fun sendUserData(user: LoginState): String? {
-        val response = client.sendData(
+    suspend fun register(user: LoginState): String? {
+        val response = client.register(
             RegisterUserRequestDTO(
                 email = user.userData.email,
                 phone = user.userData.phone,
@@ -112,6 +112,17 @@ class RegistrationRepository @Inject constructor(
             sessionManager.setToken(response.token)
         }
         return response.token
+    }
+
+
+    suspend fun syncPushToken(): String? {
+        val token = pushTokenProvider.getToken()
+
+        return if (token != null) {
+            authAPI.trySyncToken(token).token
+        } else {
+            null
+        }
     }
 
     suspend fun saveToken(token: String) {

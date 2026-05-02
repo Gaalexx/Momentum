@@ -1,4 +1,4 @@
-package com.project.momentum.features.contentcreation.ui
+package com.project.momentum.features.contentcreation.media
 
 import android.net.Uri
 import androidx.camera.video.VideoRecordEvent
@@ -10,8 +10,8 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import com.project.momentum.features.contentcreation.data.CameraScreenState
-import com.project.momentum.features.contentcreation.data.MediaTypeToSend
+import com.project.momentum.features.contentcreation.state.CameraScreenState
+import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch

@@ -21,6 +21,10 @@ import com.project.momentum.ui.theme.ConstColours
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import android.content.Context
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import com.project.momentum.R
@@ -32,6 +36,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.project.momentum.features.account.viewmodel.AccountInfoEvent
 import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.account.viewmodel.AccountInfoViewModel
 import com.project.momentum.features.account.viewmodel.AccountMediaViewModel
@@ -46,15 +51,21 @@ fun AccountRoot(
     onBackClick: () -> Unit,
     onAddPostClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onEditClick: () -> Unit = {},
+    onEditClick: (AccountInfoState) -> Unit = {},
     onPostClick: (Int, String) -> Unit,
     onProfileClick: () -> Unit = {},
     userStatus: String = stringResource(R.string.account_online_status),
     postsViewModel: PostsViewModel = hiltViewModel(),
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
     accountInfoViewModel: AccountInfoViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(Unit) {
+        accountInfoViewModel.onEvent(AccountInfoEvent.GetInfo)
+    }
+
     val uiInfoState by accountInfoViewModel.state.collectAsStateWithLifecycle()
-    val posts by postsViewModel.getUserPostsFlow(uiInfoState.name)
+    val posts by postsViewModel.getUserPostsFlow(uiInfoState.userId) // TODO: брать посты по id пользователя
         .collectAsStateWithLifecycle()
 
     AccountScreen(
@@ -64,8 +75,10 @@ fun AccountRoot(
         userStatus = userStatus,
         onBackClick = onBackClick,
         onAddPostClick = onAddPostClick,
-        onPostClick = { postId -> onPostClick(postId, uiInfoState.name) },
-        onEditClick = onEditClick,
+        onPostClick = { postId -> onPostClick(postId, uiInfoState.userId) },
+        onEditClick = { onEditClick(uiInfoState) },
+        sharedTransitionScope = sharedTransitionScope,
+        animatedVisibilityScope = animatedVisibilityScope
     )
 }
 
@@ -80,6 +93,8 @@ fun AccountScreen(
     onAddPostClick: (() -> Unit)? = null,
     onEditClick: (() -> Unit)? = null,
     userStatus: String = stringResource(R.string.account_online_status),
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
     val bg = ConstColours.BLACK
     val chrome2 = ConstColours.MAIN_BACK_GRAY
@@ -87,6 +102,41 @@ fun AccountScreen(
     val textColor = ConstColours.WHITE
     val context: Context = LocalContext.current
 
+
+    val avatarModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+        with(sharedTransitionScope) {
+            Modifier.sharedElement(
+                sharedContentState = rememberSharedContentState(
+                    key = "person-avatar-${uiInfoState.userId}"
+                ),
+                animatedVisibilityScope = animatedVisibilityScope,
+                boundsTransform = { _, _ ->
+                    tween(750)
+                }
+            )
+        }
+    } else {
+        Modifier
+    }
+
+    val nameModifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+        with(sharedTransitionScope) {
+            Modifier.sharedBounds(
+                sharedContentState = rememberSharedContentState(
+                    key = "person-name-${uiInfoState.userId}"
+                ),
+                animatedVisibilityScope = animatedVisibilityScope,
+                boundsTransform = { _, _ ->
+                    tween(750)
+                },
+                resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
+            )
+        }
+    } else {
+        Modifier
+    }
+
+    //TODO: экран загрузки (ну и состояние)
 
     Column(
         modifier = modifier
@@ -120,21 +170,13 @@ fun AccountScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Box(
-                modifier = Modifier
+                modifier = avatarModifier
                     .size(120.dp)
                     .clip(CircleShape)
                     .background(chrome2)
                     .border(2.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
             ) {
                 if (uiInfoState.profilePhotoURL == null) {
-//                    Image(
-//                        painter = painterResource(R.drawable.profile_image_small),
-//                        contentDescription = null,
-//                        modifier = Modifier
-//                            .height(80.dp)
-//                            .aspectRatio(1f)
-//                            .align(Alignment.Center),
-//                    )
                     Icon(
                         imageVector = Icons.Outlined.AccountCircle,
                         contentDescription = stringResource(R.string.account_avatar),
@@ -163,6 +205,7 @@ fun AccountScreen(
                     fontWeight = FontWeight.Bold,
                     color = textColor
                 ),
+                modifier = nameModifier
             )
 
             Spacer(Modifier.height(dimensionResource(R.dimen.extra_small_padding)))
@@ -171,12 +214,22 @@ fun AccountScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(8.dp)
-                        .clip(CircleShape)
-                        .background(Color.Green)
-                )
+                if (userStatus == stringResource(R.string.account_online_status)) {
+                    Box(                         // пока у нас не определяется статус онлайн на бэке, будет такое :)
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(Color.Green)
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(Color.Gray)
+                    )
+                }
+
                 Spacer(Modifier.width(dimensionResource(R.dimen.small_padding)))
                 Text(
                     text = userStatus,
@@ -211,7 +264,9 @@ fun AccountScreen(
                     .fillMaxWidth()
                     .weight(1f),
                 showPlusButton = onAddPostClick != null,
-                columns = 3
+                columns = 3,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope
             )
         }
     }
@@ -226,7 +281,14 @@ private fun AccountScreenPreview() {
             onEditClick = {},
             onBackClick = {},
             onAddPostClick = {},
-            uiInfoState = AccountInfoState("Preview", null),
+            uiInfoState = AccountInfoState(
+                "52",
+                "Preview",
+                "Preview",
+                null,
+                null,
+                false
+            ),
             uiMediaState = MediaState(listOf())
         )
     }

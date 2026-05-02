@@ -11,8 +11,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class AccountInfoState(
+    val userId: String,
     val name: String,
-    val profilePhotoURL: String?
+    val email: String,
+    val phone: String? = null,
+    val profilePhotoURL: String? = null,
+    val hasPremium: Boolean = false,
 )
 
 
@@ -25,7 +29,8 @@ class AccountInfoViewModel @Inject constructor(
     private val infoUseCase: GetInfoUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<AccountInfoState>(AccountInfoState("", null))
+    private val _state = MutableStateFlow<AccountInfoState>(AccountInfoState(
+        "", "", "")) //TODO: isLoading
     val state = _state.asStateFlow()
 
     init {
@@ -42,7 +47,14 @@ class AccountInfoViewModel @Inject constructor(
         viewModelScope.launch {
             val info = infoUseCase.getMyInfo()
             if (info != null) {
-                _state.value = AccountInfoState(info.name, info.accountPhotoURL)
+                _state.value = AccountInfoState(
+                    userId = info.userId,
+                    email = info.email,
+                    name = info.name,
+                    phone = info.phone,
+                    profilePhotoURL = info.profilePhotoURL,
+                    hasPremium = info.hasPremium
+                )
             }
         }
     }

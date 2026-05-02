@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
+    id("com.google.gms.google-services")
 }
 
 val compileSdkApi = libs.versions.compileSdk.get().toInt()
@@ -44,6 +45,11 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
+//        buildConfigField(
+//            "String",
+//            "BACKEND_BUILD_URL",
+//            "\"http://192.168.1.122/api/momentum/\""
+//        )
         buildConfigField(
             "String",
             "BACKEND_BUILD_URL",
@@ -98,6 +104,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.bundles.compose)
     implementation(libs.lottie.compose)
+    implementation(libs.androidx.compose.constraintlayout)
 
     // Material
     implementation(libs.androidx.compose.material3)
@@ -110,6 +117,7 @@ dependencies {
     // Media
     implementation(libs.bundles.camerax)
     implementation(libs.coil.compose)
+    implementation(libs.coil.video)
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.ui)
     implementation(libs.media3.session)
@@ -129,6 +137,9 @@ dependencies {
     implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.datastore.preferences.core)
     implementation(libs.androidx.ui.text)
+    implementation(libs.androidx.foundation)
+    implementation(libs.androidx.compose.animation.core)
+
     ksp(libs.hilt.compiler)
 
     // Tests
@@ -138,4 +149,10 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+
+    //gms
+    implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-messaging")
 }

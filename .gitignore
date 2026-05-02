@@ -18,6 +18,7 @@ build/
 
 # Local machine files
 local.properties
+/app/google-services.json
 .DS_Store
 *.log
 *.tmp

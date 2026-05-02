@@ -1,5 +1,6 @@
 package com.project.momentum.features.friends.api
 
+import android.util.Log
 import com.example.Models.FriendRequestActionDTO
 import com.example.Models.FriendRequestCreateByEmailDTO
 import com.example.Models.FriendRequestWithUserDetailsDTO
@@ -14,6 +15,7 @@ import io.ktor.client.request.header
 import io.ktor.client.request.patch
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import javax.inject.Inject
@@ -25,11 +27,35 @@ class FriendsInfoAPI @Inject constructor(
     private val sessionManager: SessionManager
 ) {
 
+    suspend fun deleteFriendshipWith(
+        id: String
+    ): Boolean {
+        val result = client.delete("friends/${id}") {
+            header(HttpHeaders.Authorization, sessionManager.getHeader())
+        }
+
+        println("ABOBA      ${result.body<FriendRequestActionDTO>()}")
+
+        return when (result.status) {
+            HttpStatusCode.OK -> true
+            else -> false
+        }
+    }
+
     suspend fun createRequestWithEmail(
         email: String
     ) {
         val result = client.post("friends/request/by-email") {
             setBody(FriendRequestCreateByEmailDTO(email))
+            header(HttpHeaders.Authorization, sessionManager.getHeader())
+        }.body<FriendRequestActionDTO>()
+    }
+
+    suspend fun createRequestWithLogin(
+        login: String
+    ) {
+        val result = client.post("friends/request/by-name") {
+            setBody(FriendRequestCreateByEmailDTO(login))
             header(HttpHeaders.Authorization, sessionManager.getHeader())
         }.body<FriendRequestActionDTO>()
     }
@@ -80,8 +106,10 @@ class FriendsInfoAPI @Inject constructor(
         }
 
         return if (result.status == HttpStatusCode.OK) {
+            Log.d("Friends", "${result.body<FriendshipListDTO>()}")
             result.body<FriendshipListDTO>()
         } else {
+            Log.e("Friends", result.body())
             FriendshipListDTO(listOf())
         }
     }

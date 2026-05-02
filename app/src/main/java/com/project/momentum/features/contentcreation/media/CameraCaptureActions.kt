@@ -1,4 +1,4 @@
-package com.project.momentum.features.contentcreation.ui
+package com.project.momentum.features.contentcreation.media
 
 import android.Manifest
 import android.content.ContentValues
@@ -21,7 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import com.project.momentum.R
-import com.project.momentum.features.contentcreation.data.MediaTypeToSend
+import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import java.text.SimpleDateFormat
 import java.util.Locale
 

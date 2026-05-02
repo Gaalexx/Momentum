@@ -15,14 +15,19 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import javax.inject.Singleton
 import com.project.momentum.BuildConfig
+import io.ktor.client.plugins.BodyProgress
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.plugins.HttpCallValidator
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.ServerResponseException
 import io.ktor.client.plugins.RedirectResponseException
 import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.Logger
+import okhttp3.Protocol
+import java.util.concurrent.TimeUnit
+
 //import java.util.logging.Logger
 
 @Module
@@ -67,13 +72,18 @@ object NetworkModule {
                     when (response.status.value) {
                         in 300..399 -> throw RedirectResponseException(
                             response,
-                            "Redirect error: ${response.status}")
+                            "Redirect error: ${response.status}"
+                        )
+
                         in 400..499 -> throw ClientRequestException(
                             response,
-                            "Client error: ${response.status}")
+                            "Client error: ${response.status}"
+                        )
+
                         in 500..599 -> throw ServerResponseException(
                             response,
-                            "Server error: ${response.status}")
+                            "Server error: ${response.status}"
+                        )
                     }
                 }
             }
@@ -85,8 +95,31 @@ object NetworkModule {
     }
 
 
+//    @Provides
+//    @Singleton
+//    @S3
+//    fun provideS3Client(): HttpClient = HttpClient(OkHttp)
+
     @Provides
     @Singleton
     @S3
-    fun provideS3Client(): HttpClient = HttpClient(OkHttp)
+    fun provideS3Client(): HttpClient = HttpClient(OkHttp) {
+        engine {
+            config {
+                protocols(listOf(Protocol.HTTP_1_1))
+                connectTimeout(30, TimeUnit.SECONDS)
+                readTimeout(60, TimeUnit.SECONDS)
+                writeTimeout(60, TimeUnit.SECONDS)
+            }
+        }
+
+        install(BodyProgress)
+
+        install(HttpTimeout) {
+            connectTimeoutMillis = 30_000
+            socketTimeoutMillis = 60_000
+            requestTimeoutMillis = 120_000
+        }
+    }
+
 }
