@@ -22,7 +22,7 @@ import com.project.momentum.features.contentcreation.state.rememberCameraScreenS
 import com.project.momentum.features.contentcreation.ui.assets.MediaCreationContent
 import com.project.momentum.features.contentcreation.ui.assets.MediaCreationContentCompact
 
-private const val DefaultMaxRecordMs = 10_000
+const val DefaultMaxRecordMs = 60_000
 
 @Composable
 fun MediaCreationScreen(
@@ -30,7 +30,6 @@ fun MediaCreationScreen(
     initialMode: ContentCreationMode = ContentCreationMode.Camera,
     onGoToPreview: (Uri, MediaTypeToSend) -> Unit,
     onProfileClick: () -> Unit,
-    onGoToGallery: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
     maxRecordMs: Int = DefaultMaxRecordMs,
@@ -102,7 +101,6 @@ fun MediaCreationScreen(
             audioRecordingController.stop(onSaved = onGoToPreview)
         },
         onProfileClick = onProfileClick,
-        onGoToGallery = onGoToGallery,
         onGoToSettings = onGoToSettings,
         onGoToFriends = onGoToFriends,
     )
@@ -124,7 +122,6 @@ fun CameraLikeScreen(
         initialMode = ContentCreationMode.Camera,
         onGoToPreview = onGoToPreview,
         onProfileClick = onProfileClick,
-        onGoToGallery = onGoToGallery,
         onGoToSettings = onGoToSettings,
         onGoToFriends = onGoToFriends,
         maxRecordMs = maxRecordMs,

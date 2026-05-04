@@ -199,4 +199,8 @@
 
     <string name="delete">Удалить</string>
 
+
+    <!-- Posts-->
+    <string name="no_posts_yet">Здесь пока нет постов</string>
+
 </resources>
