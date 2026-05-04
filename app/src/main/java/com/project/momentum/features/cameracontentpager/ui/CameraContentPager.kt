@@ -26,6 +26,7 @@ import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.contentcreation.ui.DefaultMaxRecordMs
 import com.project.momentum.features.contentcreation.ui.MediaCreationScreen
 import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
+import com.project.momentum.features.posts.ui.NoPostsYet
 import com.project.momentum.features.posts.ui.WatchPhotoScreenRouteForMain
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.ui.theme.ConstColours
@@ -102,7 +103,7 @@ fun CameraContentPager(
                             animatedVisibilityScope = animatedVisibilityScope
                         )
                     } else {
-                        Text("No posts yes") // TODO: сделать экран с No posts yes
+                        NoPostsYet()
                     }
                 }
             }

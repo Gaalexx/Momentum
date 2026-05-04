@@ -118,6 +118,12 @@ fun MainScreen() {
                 }
             }
 
+            fun closeAllUntilUpperElement() {
+                while (backStack.size != 1) {
+                    backStack.removeAt(0)
+                }
+            }
+
 
             val noAnimation: () -> ContentTransform = {
                 ContentTransform(EnterTransition.None, ExitTransition.None)
@@ -296,6 +302,7 @@ fun MainScreen() {
                     GalleryScreen(
                         onPostClick = { post ->
                             openOverlay(NavRoutes.ContentWatch(post = post))
+                            closeAllUntilUpperElement()
                         },
                         onProfileClick = {
                             openOverlay(NavRoutes.Account("gallery"))

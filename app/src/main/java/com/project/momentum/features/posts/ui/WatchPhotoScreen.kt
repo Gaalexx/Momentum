@@ -371,7 +371,6 @@ fun WatchPhotoScreen(
     )
     val blurClickInteractionSource = remember { MutableInteractionSource() }
 
-
     val currentPost by remember(posts, pagerState.currentPage) {
         derivedStateOf { posts.getOrNull(pagerState.currentPage) }
     }
