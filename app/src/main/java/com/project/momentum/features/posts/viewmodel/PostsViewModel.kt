@@ -24,19 +24,19 @@ data class PostsState(
     val posts: List<PostData>,
     val isRefreshing: Boolean,
     val currentUserId: String,
-    val isShowingReactionsDialog: Boolean = false
+    val selectedPost: Int? = null,
+    val isShowingActionsDialog: Boolean = false,
+    val isShowingReactionsDialog: Boolean = false,
 )
 
 sealed interface GalleryEvent {
     data object OnLoadPosts : GalleryEvent
     data object OnRefreshPosts : GalleryEvent
     data class OnLocalLoadPosts(val posts: List<PostData>) : GalleryEvent
-
     data class OnShowActionsDialog(val isShowing: Boolean) : GalleryEvent
-
-    data class OnDeletePost(val postId: String) : GalleryEvent
-
-    data class OnHidePost(val postId: String) : GalleryEvent
+    data object OnDeletePost : GalleryEvent
+    data object OnHidePost : GalleryEvent
+    data class SelectPost(val post: Int?) : GalleryEvent
 }
 
 sealed interface WatchPhotoEvent {
@@ -68,9 +68,10 @@ class PostsViewModel @Inject constructor(
             is GalleryEvent.OnLoadPosts -> loadAllPosts()
             is GalleryEvent.OnRefreshPosts -> refreshPosts()
             is GalleryEvent.OnLocalLoadPosts -> loadLocalPosts(event)
-            is GalleryEvent.OnShowActionsDialog -> {}
-            is GalleryEvent.OnDeletePost -> {}
+            is GalleryEvent.OnShowActionsDialog -> showActionsDialogChange(event)
+            is GalleryEvent.OnDeletePost -> deletePost()
             is GalleryEvent.OnHidePost -> {}
+            is GalleryEvent.SelectPost -> selectPost(event)
             else -> println()
         }
     }
@@ -87,6 +88,39 @@ class PostsViewModel @Inject constructor(
         }
     }
 
+    private fun deletePost() {
+        val oldState = state.value
+
+        val post = _state.value.selectedPost ?: throw Exception("PostsViewModel:deletePost: Impossible to delete post with null index")
+
+        _state.update {
+            it.copy(posts = it.posts.filterIndexed { index, _ -> index != post })
+        }
+
+        viewModelScope.launch {
+            try {
+                if (!repo.deletePost(oldState.posts[post].id)) {
+                    _state.update { oldState }
+                }
+            } catch (e: Exception) {
+                Log.e("PostsViewModel", "Error deleting post ${e.message ?: ""}", e)
+                _state.update { oldState }
+            }
+        }
+    }
+
+    private fun selectPost(event: GalleryEvent.SelectPost) {
+        _state.update {
+            it.copy(selectedPost = event.post)
+        }
+    }
+
+    private fun showActionsDialogChange(event: GalleryEvent.OnShowActionsDialog) {
+        _state.update {
+            it.copy(isShowingActionsDialog = event.isShowing)
+        }
+    }
+
     private fun showReactionDialogChange(event: WatchPhotoEvent.OnShowReactionDialogEvent) {
         _state.update {
             it.copy(isShowingReactionsDialog = event.isShowing)
@@ -94,9 +128,9 @@ class PostsViewModel @Inject constructor(
     }
 
     private fun onReactionClick(event: WatchPhotoEvent.OnReactionClick) {
-        val currentUserId = sessionManager.getUserId() ?: throw Exception() // TODO: custom Exception
+        val currentUserId = sessionManager.getUserId() ?: throw Exception("PostsViewModel:onReactionClick: Unauthorized user cant see reactions") // TODO: custom Exception
 
-        val post = _state.value.posts.find { it.id == event.postId } ?: throw Exception() // no such post
+        val post = _state.value.posts.find { it.id == event.postId } ?: throw Exception("PostsViewModel:onReactionClick: no such post to react") // no such post
 
 
         //TODO: если часто добавлять или удалять реакции и проблемы с сетью
@@ -132,7 +166,7 @@ class PostsViewModel @Inject constructor(
                                     } else reaction
                                 }
                             )
-                        } else throw Exception() // no such reaction or reactions == null
+                        } else throw Exception("PostsViewModel:deleteReaction: no such reaction or reactions == null")
                     } else post
                 }
             )

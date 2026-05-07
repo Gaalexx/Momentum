@@ -59,6 +59,23 @@ class PostsAPI @Inject constructor(
         }
     }
 
+    suspend fun deletePost(postId: String) : Boolean =
+        try {
+            val response = client.delete("post/${postId}") {
+                header(HttpHeaders.Authorization, sessionManager.getHeader())
+            }
+            if (response.status == HttpStatusCode.OK) {
+                Log.d("PostsAPI", "Post deleted: ${response.status}")
+                true
+            } else {
+                Log.e("PostsAPI", "Error deleting post: ${response.status}")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("PostsAPI", "Network error in deletePost ${e.message ?: ""}", e)
+            false
+        }
+
     suspend fun sendReaction(postId: String, reaction: ReactionType) : Boolean =
         try {
             val response = client.post("react/${postId}/${reaction}") {

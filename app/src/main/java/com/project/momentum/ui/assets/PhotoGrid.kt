@@ -32,6 +32,7 @@ import androidx.compose.ui.window.Dialog
 import coil.compose.SubcomposeAsyncImage
 import com.project.momentum.R
 import com.project.momentum.features.account.models.PostData
+import com.project.momentum.features.posts.ui.PostActions
 import com.project.momentum.network.s3.MediaType
 import com.project.momentum.ui.custom.gradientpicker.GradientPicker
 import com.project.momentum.ui.custom.shapes.ScallopedShape
@@ -129,8 +130,8 @@ sealed class GridItem {
 @Composable
 fun S3PhotoGrid(
     posts: List<PostData>,
-    onPostClick: (Int) -> Unit = { },
-    onLongPostClick: () -> Unit = {},
+    onPostClick: (Int) -> Unit,
+    onLongPostClick: (Int?) -> Unit,
     onAddPhotoClick: () -> Unit,
     modifier: Modifier = Modifier,
     showPlusButton: Boolean = true,
@@ -173,7 +174,7 @@ fun S3PhotoGrid(
                 is S3GridItem.Post -> item.post
                 is S3GridItem.AudioPost -> item.post
                 is S3GridItem.VideoPost -> item.post
-                else -> PostData("", "", "", "", "", MediaType.IMAGE, "")
+                else -> PostData("", "", "", "", "", MediaType.IMAGE, false,"")
             }
 
 
@@ -217,7 +218,8 @@ fun S3PhotoGrid(
                                         onPostClick(postIndex)
                                     },
                                     onLongClick = {
-                                        //TODO
+                                        val postIndex = if (showPlusButton) index - 1 else index
+                                        onLongPostClick(postIndex)
                                     }
                                 ),
                             loading = {
@@ -300,29 +302,6 @@ fun S3PhotoGrid(
                     }
                 }
 
-            }
-        }
-    }
-    if (true) {
-        Dialog(
-            onDismissRequest = {}
-        ) {
-            Column(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10))
-                    .background(ConstColours.MAIN_BACK_GRAY)
-            ) {
-                DialogEventButton(
-                    text = R.string.button_hide_post_for_me,
-                    icon = Icons.Outlined.HideImage,
-                    onClick = {}
-                )
-                DialogEventButton(
-                    text = R.string.button_delete_post,
-                    icon = Icons.Outlined.Delete,
-                    onClick = {},
-                    textColor = ConstColours.DELETE
-                )
             }
         }
     }

@@ -637,6 +637,7 @@ private fun WatchPhotoScreenPreview() {
                     title = "Description",
                     presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
                     mediaType = MediaType.IMAGE,
+                    isOwner = false,
                     reactions = listOf(
                         ReactionData(
                             emoji = ReactionType.HEART,
@@ -656,6 +657,7 @@ private fun WatchPhotoScreenPreview() {
                     title = "Description2",
                     presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
                     mediaType = MediaType.IMAGE,
+                    isOwner = false,
                     createdAt = "2026-03-12T14:38:50.690942Z"
                 )
             ),
@@ -667,6 +669,7 @@ private fun WatchPhotoScreenPreview() {
                     title = "Description",
                     presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
                     mediaType = MediaType.IMAGE,
+                    isOwner = false,
                     reactions = listOf(
                         ReactionData(
                             emoji = ReactionType.HEART,
@@ -686,6 +689,7 @@ private fun WatchPhotoScreenPreview() {
                     title = "Description2",
                     presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
                     mediaType = MediaType.IMAGE,
+                    isOwner = true,
                     createdAt = "2026-03-12T14:38:50.690942Z"
                 )
             ), isRefreshing = false, currentUserId = "123")
