@@ -202,5 +202,7 @@
 
     <!-- Posts-->
     <string name="no_posts_yet">Здесь пока нет постов</string>
+    <string name="button_delete_post">Удалить пост</string>
+    <string name="button_hide_post_for_me">Скрыть пост для меня</string>
 
 </resources>

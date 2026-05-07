@@ -49,6 +49,7 @@ import coil.compose.AsyncImage
 import com.project.momentum.R
 import com.project.momentum.features.posts.features.reactions.models.ReactionData
 import com.project.momentum.features.posts.features.reactions.models.ReactionType
+import com.project.momentum.ui.assets.DialogEventButton
 import com.project.momentum.ui.assets.SubButton
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
@@ -218,20 +219,18 @@ fun ReactionsDialog(
                     .clip(RoundedCornerShape(10))
                     .background(ConstColours.MAIN_BACK_GRAY)
             ) {
-                Column(
-                    modifier = Modifier.padding(horizontal = 12.dp)
-                ) {
-                    EventButton(
+                Column {
+                    DialogEventButton(
                         text = R.string.template_sub_button,
                         icon = Icons.Outlined.Reply,
                         onClick = {}
                     )
-                    EventButton(
+                    DialogEventButton(
                         text = R.string.template_sub_button,
                         icon = Icons.Outlined.ContentCopy,
                         onClick = {}
                     )
-                    EventButton(
+                    DialogEventButton(
                         text = R.string.template_sub_button,
                         icon = Icons.Outlined.Delete,
                         onClick = {}
@@ -242,28 +241,7 @@ fun ReactionsDialog(
     }
 }
 
-@Composable
-fun EventButton(
-    @StringRes text: Int,
-    icon: ImageVector,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier.clickable(onClick = onClick),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = ConstColours.WHITE
-        )
-        SubButton(
-            text = text,
-            onClick = {}
-        )
-    }
-}
+
 
 @Composable
 fun ReactionsGrid(

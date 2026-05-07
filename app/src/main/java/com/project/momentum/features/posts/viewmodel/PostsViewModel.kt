@@ -31,6 +31,12 @@ sealed interface GalleryEvent {
     data object OnLoadPosts : GalleryEvent
     data object OnRefreshPosts : GalleryEvent
     data class OnLocalLoadPosts(val posts: List<PostData>) : GalleryEvent
+
+    data class OnShowActionsDialog(val isShowing: Boolean) : GalleryEvent
+
+    data class OnDeletePost(val postId: String) : GalleryEvent
+
+    data class OnHidePost(val postId: String) : GalleryEvent
 }
 
 sealed interface WatchPhotoEvent {
@@ -62,6 +68,9 @@ class PostsViewModel @Inject constructor(
             is GalleryEvent.OnLoadPosts -> loadAllPosts()
             is GalleryEvent.OnRefreshPosts -> refreshPosts()
             is GalleryEvent.OnLocalLoadPosts -> loadLocalPosts(event)
+            is GalleryEvent.OnShowActionsDialog -> {}
+            is GalleryEvent.OnDeletePost -> {}
+            is GalleryEvent.OnHidePost -> {}
             else -> println()
         }
     }
