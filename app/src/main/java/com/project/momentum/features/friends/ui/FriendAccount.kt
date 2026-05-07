@@ -11,7 +11,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.project.momentum.R
 import com.project.momentum.features.account.ui.AccountScreen
 import com.project.momentum.features.account.viewmodel.AccountInfoState
-import com.project.momentum.features.account.viewmodel.MediaState
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
 
 @Composable
@@ -36,7 +35,7 @@ fun FriendAccountRoot(
             profilePhotoURL = friend.avatarUrl,
             hasPremium = friend.hasPremium
         ),
-        uiMediaState = MediaState(friendPosts),
+        posts = friendPosts,
         onPostClick = { postIndex -> onPostClick(postIndex, friend.id) },
         onBackClick = onBackClick,
         modifier = modifier,

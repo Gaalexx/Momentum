@@ -25,7 +25,6 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import com.project.momentum.R
 import com.project.momentum.ui.assets.S3PhotoGrid
@@ -36,11 +35,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.dimensionResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.project.momentum.features.account.models.PostData
 import com.project.momentum.features.account.viewmodel.AccountInfoEvent
 import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.account.viewmodel.AccountInfoViewModel
-import com.project.momentum.features.account.viewmodel.AccountMediaViewModel
-import com.project.momentum.features.account.viewmodel.MediaState
+//import com.project.momentum.features.account.viewmodel.MediaState
+import com.project.momentum.features.posts.ui.PostActions
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.ui.assets.EditCircleButton
 import com.project.momentum.ui.theme.AppTextStyles
@@ -70,7 +70,7 @@ fun AccountRoot(
 
     AccountScreen(
         uiInfoState = uiInfoState,
-        uiMediaState = MediaState(posts),
+        posts = posts,
         modifier = modifier,
         userStatus = userStatus,
         onBackClick = onBackClick,
@@ -85,7 +85,7 @@ fun AccountRoot(
 @Composable
 fun AccountScreen(
     uiInfoState: AccountInfoState,
-    uiMediaState: MediaState,
+    posts: List<PostData>,
     onPostClick: (Int) -> Unit,
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
@@ -257,8 +257,9 @@ fun AccountScreen(
             )
 
             S3PhotoGrid(
-                posts = uiMediaState.posts,
+                posts = posts,
                 onPostClick = onPostClick,
+                onLongPostClick = {},
                 onAddPhotoClick = onAddPostClick ?: {},
                 modifier = Modifier
                     .fillMaxWidth()
@@ -289,7 +290,7 @@ private fun AccountScreenPreview() {
                 null,
                 false
             ),
-            uiMediaState = MediaState(listOf())
+            posts = listOf()
         )
     }
 }
