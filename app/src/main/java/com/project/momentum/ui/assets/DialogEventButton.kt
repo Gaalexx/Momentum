@@ -39,7 +39,7 @@ fun DialogEventButton(
         )
         SubButton(
             text = text,
-            onClick = {},
+            onClick = onClick,
             textColor = textColor
         )
     }
