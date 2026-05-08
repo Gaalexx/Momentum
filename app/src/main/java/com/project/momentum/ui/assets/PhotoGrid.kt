@@ -6,18 +6,22 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.HideImage
 import androidx.compose.material.icons.outlined.PlayArrow
-import androidx.compose.material.icons.outlined.Reply
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -32,7 +36,6 @@ import androidx.compose.ui.window.Dialog
 import coil.compose.SubcomposeAsyncImage
 import com.project.momentum.R
 import com.project.momentum.features.account.models.PostData
-import com.project.momentum.features.posts.ui.PostActions
 import com.project.momentum.network.s3.MediaType
 import com.project.momentum.ui.custom.gradientpicker.GradientPicker
 import com.project.momentum.ui.custom.shapes.ScallopedShape
@@ -126,12 +129,20 @@ sealed class GridItem {
     data object PlusButton : GridItem()
 }
 
+data class PostDialogInfo(
+    val onHidePost: () -> Unit = {},
+    val onDeletePost: () -> Unit = {},
+    val isShowingActionsDialog: Boolean = false,
+    val selectedPost: String? = null,
+)
+
 
 @Composable
 fun S3PhotoGrid(
     posts: List<PostData>,
     onPostClick: (Int) -> Unit,
-    onLongPostClick: (Int?) -> Unit,
+    onLongPostClick: (String?) -> Unit,
+    postDialogInfo: PostDialogInfo,
     onAddPhotoClick: () -> Unit,
     modifier: Modifier = Modifier,
     showPlusButton: Boolean = true,
@@ -218,8 +229,7 @@ fun S3PhotoGrid(
                                         onPostClick(postIndex)
                                     },
                                     onLongClick = {
-                                        val postIndex = if (showPlusButton) index - 1 else index
-                                        onLongPostClick(postIndex)
+                                        onLongPostClick(post.id)
                                     }
                                 ),
                             loading = {
@@ -247,10 +257,15 @@ fun S3PhotoGrid(
                             .background(
                                 brush = item.brush
                             )
-                            .clickable {
-                                val postIndex = if (showPlusButton) index - 1 else index
-                                onPostClick(postIndex)
-                            },
+                            .combinedClickable(
+                                onClick = {
+                                    val postIndex = if (showPlusButton) index - 1 else index
+                                    onPostClick(postIndex)
+                                },
+                                onLongClick = {
+                                    onLongPostClick(post.id)
+                                }
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -268,10 +283,15 @@ fun S3PhotoGrid(
                             .aspectRatio(1f)
                             .clip(RoundedCornerShape(8.dp))
                             .background(ConstColours.MAIN_BACK_GRAY)
-                            .clickable {
-                                val postIndex = if (showPlusButton) index - 1 else index
-                                onPostClick(postIndex)
-                            },
+                            .combinedClickable(
+                                onClick = {
+                                    val postIndex = if (showPlusButton) index - 1 else index
+                                    onPostClick(postIndex)
+                                },
+                                onLongClick = {
+                                    onLongPostClick(post.id)
+                                }
+                            ),
                         contentAlignment = Alignment.Center
                     ) {
                         VideoThumbnail(post.presignedURL)
@@ -302,6 +322,31 @@ fun S3PhotoGrid(
                     }
                 }
 
+            }
+        }
+    }
+    if (postDialogInfo.isShowingActionsDialog) {
+        Dialog(
+            onDismissRequest = { onLongPostClick(null) }
+        ) {
+            Column(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(10))
+                    .background(ConstColours.MAIN_BACK_GRAY)
+            ) {
+                DialogEventButton(
+                    text = R.string.button_hide_post_for_me,
+                    icon = Icons.Outlined.HideImage,
+                    onClick = postDialogInfo.onHidePost
+                )
+                if (posts.first{ post -> post.id == postDialogInfo.selectedPost}.isOwner) {
+                    DialogEventButton(
+                        text = R.string.button_delete_post,
+                        icon = Icons.Outlined.Delete,
+                        onClick = postDialogInfo.onDeletePost,
+                        textColor = ConstColours.DELETE
+                    )
+                }
             }
         }
     }

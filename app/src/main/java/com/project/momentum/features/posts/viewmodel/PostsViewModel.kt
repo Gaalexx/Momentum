@@ -24,7 +24,7 @@ data class PostsState(
     val posts: List<PostData>,
     val isRefreshing: Boolean,
     val currentUserId: String,
-    val selectedPost: Int? = null,
+    val selectedPost: String? = null,
     val isShowingActionsDialog: Boolean = false,
     val isShowingReactionsDialog: Boolean = false,
 )
@@ -36,7 +36,7 @@ sealed interface GalleryEvent {
     data class OnShowActionsDialog(val isShowing: Boolean) : GalleryEvent
     data object OnDeletePost : GalleryEvent
     data object OnHidePost : GalleryEvent
-    data class SelectPost(val post: Int?) : GalleryEvent
+    data class SelectPost(val post: String?) : GalleryEvent
 }
 
 sealed interface WatchPhotoEvent {
@@ -91,15 +91,15 @@ class PostsViewModel @Inject constructor(
     private fun deletePost() {
         val oldState = state.value
 
-        val post = _state.value.selectedPost ?: throw Exception("PostsViewModel:deletePost: Impossible to delete post with null index")
+        val postId = _state.value.selectedPost ?: throw Exception("PostsViewModel:deletePost: Impossible to delete post with null Id")
 
         _state.update {
-            it.copy(posts = it.posts.filterIndexed { index, _ -> index != post })
+            it.copy(posts = it.posts.filter { post -> post.id != postId })
         }
 
         viewModelScope.launch {
             try {
-                if (!repo.deletePost(oldState.posts[post].id)) {
+                if (!repo.deletePost(postId)) {
                     _state.update { oldState }
                 }
             } catch (e: Exception) {

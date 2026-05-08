@@ -37,12 +37,8 @@ import com.project.momentum.features.posts.viewmodel.GalleryEvent
 import com.project.momentum.features.posts.viewmodel.PostsState
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.ui.assets.DialogEventButton
+import com.project.momentum.ui.assets.PostDialogInfo
 import com.project.momentum.ui.assets.S3PhotoGrid
-
-data class PostActions(
-    val onHidePost: () -> Unit = {},
-    val onDeletePost: () -> Unit = {},
-)
 
 @Composable
 fun GalleryScreen(
@@ -68,7 +64,7 @@ fun GalleryScreen(
             viewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
             viewModel.onEvent(GalleryEvent.SelectPost(post))
         },
-        postActions = PostActions(
+        postDialogInfo = PostDialogInfo(
             onHidePost = {
                 viewModel.onEvent(GalleryEvent.OnHidePost)
                 viewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
@@ -78,7 +74,9 @@ fun GalleryScreen(
                 viewModel.onEvent(GalleryEvent.OnDeletePost)
                 viewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
                 viewModel.onEvent(GalleryEvent.SelectPost(null))
-            }
+            },
+            isShowingActionsDialog = uiState.isShowingActionsDialog,
+            selectedPost = uiState.selectedPost
         ),
         onAddPhoto = onAddPhoto,
         onProfileClick = onProfileClick,
@@ -96,8 +94,8 @@ private fun GalleryScreenContent(
     uiState: PostsState,
     onRefresh: () -> Unit,
     onPostClick: (Int) -> Unit,
-    onLongPostClick: (Int?) -> Unit,
-    postActions: PostActions,
+    onLongPostClick: (String?) -> Unit,
+    postDialogInfo: PostDialogInfo,
     onAddPhoto: () -> Unit = {},
     onProfileClick: () -> Unit = {},
     onBackClick: () -> Unit,
@@ -161,6 +159,7 @@ private fun GalleryScreenContent(
                     posts = uiState.posts,
                     onPostClick = onPostClick,
                     onLongPostClick = onLongPostClick,
+                    postDialogInfo = postDialogInfo,
                     onAddPhotoClick = {},
                     modifier = Modifier
                         .fillMaxSize(),
@@ -169,32 +168,6 @@ private fun GalleryScreenContent(
                     sharedTransitionScope = sharedTransitionScope,
                     animatedVisibilityScope = animatedVisibilityScope
                 )
-            }
-        }
-    }
-
-    if (uiState.isShowingActionsDialog) {
-        Dialog(
-            onDismissRequest = { onLongPostClick(null) }
-        ) {
-            Column(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10))
-                    .background(ConstColours.MAIN_BACK_GRAY)
-            ) {
-                DialogEventButton(
-                    text = R.string.button_hide_post_for_me,
-                    icon = Icons.Outlined.HideImage,
-                    onClick = postActions.onHidePost
-                )
-                if (uiState.posts[uiState.selectedPost ?: throw Exception("post not selected")].isOwner) {
-                    DialogEventButton(
-                        text = R.string.button_delete_post,
-                        icon = Icons.Outlined.Delete,
-                        onClick = postActions.onDeletePost,
-                        textColor = ConstColours.DELETE
-                    )
-                }
             }
         }
     }
@@ -209,7 +182,7 @@ private fun GalleryScreenPreview() {
             onRefresh = {},
             onPostClick = {},
             onLongPostClick = {},
-            postActions = PostActions(),
+            postDialogInfo = PostDialogInfo(),
             onProfileClick = {},
             onBackClick = {},
             onGoToSettings = {},

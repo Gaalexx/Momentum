@@ -2,48 +2,64 @@
 
 package com.project.momentum.features.account.ui
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.project.momentum.ui.theme.ConstColours
-import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import android.content.Context
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalContext
-import com.project.momentum.R
-import com.project.momentum.ui.assets.S3PhotoGrid
-import com.project.momentum.ui.assets.BackCircleButton
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.project.momentum.R
 import com.project.momentum.features.account.models.PostData
 import com.project.momentum.features.account.viewmodel.AccountInfoEvent
 import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.account.viewmodel.AccountInfoViewModel
-//import com.project.momentum.features.account.viewmodel.MediaState
-import com.project.momentum.features.posts.ui.PostActions
+import com.project.momentum.features.posts.viewmodel.GalleryEvent
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
+import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.EditCircleButton
+import com.project.momentum.ui.assets.PostDialogInfo
+import com.project.momentum.ui.assets.S3PhotoGrid
 import com.project.momentum.ui.theme.AppTextStyles
+import com.project.momentum.ui.theme.ConstColours
 
 
 @Composable
@@ -65,7 +81,8 @@ fun AccountRoot(
     }
 
     val uiInfoState by accountInfoViewModel.state.collectAsStateWithLifecycle()
-    val posts by postsViewModel.getUserPostsFlow(uiInfoState.userId) // TODO: брать посты по id пользователя
+    val uiState by postsViewModel.state.collectAsStateWithLifecycle()
+    val posts by postsViewModel.getUserPostsFlow(uiInfoState.userId)
         .collectAsStateWithLifecycle()
 
     AccountScreen(
@@ -76,6 +93,24 @@ fun AccountRoot(
         onBackClick = onBackClick,
         onAddPostClick = onAddPostClick,
         onPostClick = { postId -> onPostClick(postId, uiInfoState.userId) },
+        onLongPostClick = { post ->
+            postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
+            postsViewModel.onEvent(GalleryEvent.SelectPost(post))
+        },
+        postDialogInfo = PostDialogInfo(
+            onHidePost = {
+                postsViewModel.onEvent(GalleryEvent.OnHidePost)
+                postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
+                postsViewModel.onEvent(GalleryEvent.SelectPost(null))
+            },
+            onDeletePost = {
+                postsViewModel.onEvent(GalleryEvent.OnDeletePost)
+                postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
+                postsViewModel.onEvent(GalleryEvent.SelectPost(null))
+            },
+            isShowingActionsDialog = uiState.isShowingActionsDialog,
+            selectedPost = uiState.selectedPost
+        ),
         onEditClick = { onEditClick(uiInfoState) },
         sharedTransitionScope = sharedTransitionScope,
         animatedVisibilityScope = animatedVisibilityScope
@@ -87,9 +122,11 @@ fun AccountScreen(
     uiInfoState: AccountInfoState,
     posts: List<PostData>,
     onPostClick: (Int) -> Unit,
-    onProfileClick: () -> Unit = {},
+    onLongPostClick: (String?) -> Unit,
+    postDialogInfo: PostDialogInfo,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onProfileClick: () -> Unit = {},
     onAddPostClick: (() -> Unit)? = null,
     onEditClick: (() -> Unit)? = null,
     userStatus: String = stringResource(R.string.account_online_status),
@@ -259,7 +296,8 @@ fun AccountScreen(
             S3PhotoGrid(
                 posts = posts,
                 onPostClick = onPostClick,
-                onLongPostClick = {},
+                onLongPostClick = onLongPostClick,
+                postDialogInfo = postDialogInfo,
                 onAddPhotoClick = onAddPostClick ?: {},
                 modifier = Modifier
                     .fillMaxWidth()
@@ -279,6 +317,8 @@ private fun AccountScreenPreview() {
     MaterialTheme {
         AccountScreen(
             onPostClick = {},
+            onLongPostClick = {},
+            postDialogInfo = PostDialogInfo(),
             onEditClick = {},
             onBackClick = {},
             onAddPostClick = {},
