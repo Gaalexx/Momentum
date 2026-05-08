@@ -47,3 +47,13 @@ data class ChangeAllowAddFromAnyoneDTO(
 data class LocalSettingsStateDTO (
     val confirmBeforePosting: Boolean = false
 )
+
+@Serializable
+data class SettingsBooleanDTO(
+    val success: Boolean,
+    val message: String,
+)
+@Serializable
+data class SettingsCheckPasswordDTO(
+    val password: String
+)

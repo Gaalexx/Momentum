@@ -30,5 +30,6 @@ fun DeleteAccountCheckCodeScreen(
         state = uiState,
         onBackClick = onBackClick,
         onEvent = viewModel::onEvent,
+        onContinueClick = onContinueClick
     )
 }

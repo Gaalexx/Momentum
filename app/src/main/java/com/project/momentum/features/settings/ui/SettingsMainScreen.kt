@@ -46,7 +46,7 @@ fun SettingsMainScreen(
             onBackClick = onBackClick,
             onEvent = { event -> viewModel.onEvent(event, appStartViewModel) },
             state = uiState,
-            switchesState = switchesState ?: SwitchesState(),
+            switchesState = switchesState,
             onPremiumClick = onPremiumClick,
             onLogoutClick = onLogoutClick,
             onDeleteAccountClick = onDeleteAccountClick

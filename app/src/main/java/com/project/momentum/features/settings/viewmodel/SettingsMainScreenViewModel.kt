@@ -42,10 +42,9 @@ sealed interface SettingsEvent {
 class SettingsMainScreenViewModel @Inject constructor(
     private val serverRep: ServerSettingsRepository,
     private val localRep: SettingsLocalRepository,
-    private val appSettings: AppSettingsHolder
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<SettingsState>(SettingsState())
+    private val _state = MutableStateFlow(SettingsState())
     val state = _state.asStateFlow()
 
     private val _effects = MutableSharedFlow<SettingsEffect>(replay = 0)
@@ -118,19 +117,7 @@ class SettingsMainScreenViewModel @Inject constructor(
             is SettingsError.Server -> error.serverMessage ?: "Ошибка сервера"
             else -> "Неизвестная ошибка: $error"
         }
-        print("Неизвестная ошибка: $error")
 
         _effects.emit(SettingsEffect.ShowError(message))
     }
-
-
-    /*private fun getErrorHandler(){
-        _state.update {
-            it?.copy(
-                isError = true,
-                isLoading = false,
-                errorMessage = "Ошибка при получении свича"//TODO изменить ошибки
-            )
-        }
-    }*/
 }

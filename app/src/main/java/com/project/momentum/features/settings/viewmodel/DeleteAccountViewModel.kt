@@ -1,10 +1,18 @@
 package com.project.momentum.features.settings.viewmodel
 
+import android.util.Patterns
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.project.momentum.features.auth.models.LoginStep
+import com.project.momentum.features.auth.models.LoginType
 import com.project.momentum.features.settings.models.DeleteAccountState
 import com.project.momentum.features.settings.models.DeleteAccountStep
 import com.project.momentum.features.auth.models.NavEvent
+import com.project.momentum.features.auth.viewmodel.ErrorLogin
+import com.project.momentum.features.settings.models.SettingsError
 import com.project.momentum.features.settings.repo.DeleteAccountRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -22,7 +30,7 @@ sealed interface DeleteEvent {
     data object previousStep : DeleteEvent
     data object onConfirmDelete : DeleteEvent
     data object onCancelDelete : DeleteEvent
-    //data class updateUserPassword(val password: String) : DeleteEvent
+    data object sendCodeAgain : DeleteEvent
     data class updatePasswordFstTextField(val password: String) : DeleteEvent
     data class updatePasswordScdTextField(val password: String) : DeleteEvent
     data class updateUserCode(val code: String) : DeleteEvent
@@ -34,8 +42,14 @@ class DeleteAccountViewModel @Inject constructor(
 ) : ViewModel() {
     private var _state = MutableStateFlow(DeleteAccountState())
     val state: StateFlow<DeleteAccountState> = _state.asStateFlow()
+
+    private val _effects = MutableSharedFlow<SettingsEffect>(replay = 0)
+    val effects = _effects.asSharedFlow()
     private val _navigationEvents = MutableSharedFlow<NavEvent>()
     val navigationEvents: SharedFlow<NavEvent> = _navigationEvents.asSharedFlow()
+
+    var passwordRepetition by mutableStateOf("")
+        private set
 
     fun onEvent(event: DeleteEvent) {
         when (event) {
@@ -43,64 +57,122 @@ class DeleteAccountViewModel @Inject constructor(
             is DeleteEvent.previousStep -> previousStep()
             is DeleteEvent.onConfirmDelete -> onConfirmDelete()
             is DeleteEvent.onCancelDelete -> onCancelDelete()
-            is DeleteEvent.updatePasswordFstTextField -> {updatePasswordFstTextField(event.password)}
-            is DeleteEvent.updatePasswordScdTextField -> {updatePasswordScdTextField(event.password)}
+            is DeleteEvent.updatePasswordFstTextField -> {updateUserPassword(event.password)}
+            is DeleteEvent.updatePasswordScdTextField -> {updateUserPasswordRepetition(event.password)}
             is DeleteEvent.updateUserCode -> {updateUserCode(event.code)}
+            is DeleteEvent.sendCodeAgain -> sendCodeAgain()
+        }
+    }
+
+    private fun isValidPassword(): ErrorLogin {
+        if (_state.value.userData.password != passwordRepetition) {
+            return ErrorLogin.PasswordError.NOT_MATCH
+        }
+        return ErrorLogin.None
+    }
+
+    fun isValidEmail(): ErrorLogin =
+        if (Patterns.EMAIL_ADDRESS.matcher(_state.value.userData.email).matches())
+            ErrorLogin.None
+        else ErrorLogin.LoginError.INVALID_FORMAT
+
+    fun isValidCode(): ErrorLogin {
+        return ErrorLogin.None
+    }
+
+    fun validateCurrentStep() {
+        val isValid: ErrorLogin = when (_state.value.currentStep) {
+            DeleteAccountStep.PASSWORD -> isValidPassword()
+            DeleteAccountStep.PASSWORD_RECOVERY -> isValidEmail()
+            DeleteAccountStep.VERIFICATION -> isValidCode()
+            else -> ErrorLogin.None
+        }
+
+        _state.update {
+            it.copy(
+                isError = isValid !is ErrorLogin.None,
+                errorMessage = isValid,
+                canGoNext = isValid !is ErrorLogin.None && !it.isLoading,
+                canGoBack = true
+            )
+        }
+    }
+
+    fun updateUserPasswordRepetition(password: String) {
+        passwordRepetition = password
+    }
+
+    private fun updateUserPassword(password: String) {
+        _state.update { currentState ->
+            currentState.copy (
+                userData = currentState.userData.copy(password = password)
+            )
+        }
+    }
+    fun updateUserCode(code: String) {
+        _state.update { currentState ->
+            currentState.copy(
+                userData = currentState.userData.copy(verificationCode = code)
+            )
         }
     }
 
     private fun nextStep() {
-        if (!_state.value.isStepValid) return
+        validateCurrentStep()
+        if (_state.value.isError && _state.value.errorMessage != ErrorLogin.None) return
 
         when (_state.value.currentStep) {
             DeleteAccountStep.PASSWORD -> {
                 _state.update { it.copy(isLoading = true) }
 
                 viewModelScope.launch {
-                    val refreshToken = repository.login(_state.value)
-                    if (refreshToken != null) {
-                        //TODO: куда-то сохранить или что-то сделать
-                        _state.update {
-                            it.copy(
-                                currentStep = DeleteAccountStep.VERIFICATION
-                            )
+                    repository.checkPassword(_state.value)
+                        .onSuccess { success ->
+                            _state.update {
+                                it.copy(
+                                    currentStep = DeleteAccountStep.VERIFICATION
+                                )
+                            }
+                            _navigationEvents.emit(NavEvent.NavigateToNextScreen)
                         }
-                        _navigationEvents.emit(NavEvent.NavigateToNextScreen)
-                    } else {
-                        _state.update {
-                            it.copy(
-                                isError = true,
-                                isLoading = false,
-                                errorMessage = "Неверный пароль"
-                            )
+                        .onFailure { e ->
+                            _state.update {
+                                it.copy(
+                                    isError = true,
+                                    isLoading = false,
+                                    errorMessage = ErrorLogin.PasswordError.INVALID
+                                )
+                            }
                         }
-                    }
                 }
             }
 
             DeleteAccountStep.VERIFICATION -> {
                 _state.update { it.copy(isLoading = true) }
-
                 viewModelScope.launch {
-                    if (repository.checkUserCode(_state.value)) {
-                        _state.update {
-                            it.copy(
-                                currentStep = DeleteAccountStep.DELETE_ACCOUNT,
-                                isError = false,
-                                isLoading = false
-                            )
-                        }
-                        _navigationEvents.emit(NavEvent.NavigateToNextScreen)
-                    } else {
-                        _state.update {
-                            it.copy(
-                                isError = true,
-                                isLoading = false,
-                                //TODO: завести класс для ошибок enum или что-то поумнее
-                                errorMessage = "Неверный код"
-                            )
-                        }
+                    while (true) {
+                        if (repository.sendCode()) break
                     }
+                    repository.checkUserCode(_state.value.userData.verificationCode)
+                        .onSuccess { success ->
+                            _state.update {
+                                it.copy(
+                                    currentStep = DeleteAccountStep.DELETE_ACCOUNT,
+                                    isError = false,
+                                    isLoading = false
+                                )
+                            }
+                            _navigationEvents.emit(NavEvent.NavigateToNextScreen)
+                        }
+                        .onFailure { e ->
+                            _state.update {
+                                it.copy(
+                                    isError = true,
+                                    isLoading = false,
+                                    errorMessage = ErrorLogin.CodeError.INVALID
+                                )
+                            }
+                        }
                 }
             }
 
@@ -140,26 +212,26 @@ class DeleteAccountViewModel @Inject constructor(
         _state.update { it.copy(isLoading = true, showConfirmationDialog = false) }
 
         viewModelScope.launch {
-            val success = repository.deleteAccount(_state.value)
-
-            if (success) {
-                _state.update {
-                    it.copy(
-                        currentStep = DeleteAccountStep.COMPLETED,
-                        isError = false,
-                        isLoading = false
-                    )
+            repository.deleteAccount(_state.value)
+                .onSuccess { success ->
+                    _state.update {
+                        it.copy(
+                            currentStep = DeleteAccountStep.COMPLETED,
+                            isError = false,
+                            isLoading = false
+                        )
+                    }
+                    _navigationEvents.emit(NavEvent.NavigateToNextScreen)
                 }
-                _navigationEvents.emit(NavEvent.NavigateToNextScreen)
-            } else {
-                _state.update {
-                    it.copy(
-                        isError = true,
-                        isLoading = false,
-                        errorMessage = "Не удалось удалить аккаунт"
-                    )
+                .onFailure { e ->
+                    _state.update {
+                        it.copy(
+                            isError = true,
+                            isLoading = false,
+                            errorMessage = ErrorLogin.DeleteError.NOT_EXISTS
+                        )
+                    }
                 }
-            }
         }
     }
 
@@ -167,26 +239,20 @@ class DeleteAccountViewModel @Inject constructor(
         _state.update { it.copy(showConfirmationDialog = false) }
     }
 
-    private fun updatePasswordFstTextField(password: String) {
-        _state.update { currentState ->
-            currentState.copy (
-                userData = currentState.userData.copy(passwordFstTextField = password)
-            )
-        }
-    }
+    fun sendCodeAgain() {
+        _state.update { it.copy(isLoading = true) }
 
-    private fun updatePasswordScdTextField(password: String) {
-        _state.update { currentState ->
-            currentState.copy (
-                userData = currentState.userData.copy(passwordScdTextField = password)
-            )
-        }
-    }
-    fun updateUserCode(code: String) {
-        _state.update { currentState ->
-            currentState.copy(
-                userData = currentState.userData.copy(verificationCode = code)
-            )
+        viewModelScope.launch {
+            while (true) {
+                if (repository.sendCode()) break
+            }
+            _state.update {
+                it.copy(
+                    isError = false,
+                    isLoading = false
+                )
+            }
+            //_navigationEvents.emit(NavEvent.NavigateToNextSubScreen)
         }
     }
 }
