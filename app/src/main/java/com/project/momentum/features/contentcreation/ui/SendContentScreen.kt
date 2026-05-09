@@ -73,6 +73,24 @@ import com.project.momentum.ui.assets.CaptionBasicInput
 import com.project.momentum.ui.assets.VideoPreview
 import com.project.momentum.ui.theme.ConstColours
 
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.width
+import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.Image
+import coil.request.ImageRequest
+import coil.compose.rememberAsyncImagePainter
+import androidx.compose.foundation.shape.CircleShape
+import com.project.momentum.features.friends.viewmodel.FriendsViewModel
+import com.example.Models.FriendshipResponseDTO
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.ui.unit.sp
+import com.project.momentum.features.friends.ui.User
+import com.project.momentum.features.friends.viewmodel.FriendsScreenEvent
+
 
 fun deleteByUri(context: Context, uri: Uri): Boolean {
     return try {
@@ -96,7 +114,8 @@ fun SendContentScreen(
     onError: () -> Unit,
     uri: Uri,
     mediaType: MediaTypeToSend,
-    vm: ContentCreationViewModel = hiltViewModel()
+    vm: ContentCreationViewModel = hiltViewModel(),
+    friendsViewModel: FriendsViewModel = hiltViewModel()
 ) {
 
     val uploadState by vm.state.collectAsStateWithLifecycle()
@@ -115,6 +134,13 @@ fun SendContentScreen(
             else -> Unit
         }
 
+    }
+
+    val friendsScreenState by friendsViewModel.state.collectAsStateWithLifecycle()
+    val friendsList = friendsScreenState.friends
+
+    LaunchedEffect(Unit) {
+        friendsViewModel.onEvent(FriendsScreenEvent.GetFriends)
     }
 
 
@@ -184,14 +210,24 @@ fun SendContentScreen(
             uploadProgress = progress,
         )
 
-        UploadProgress(
-            modifier = Modifier
-                .weight(1.3f)
-                .fillMaxSize(),
-            uploadingState = uploadingState
-        )
+        if (uploadingState != null) {
+            UploadProgress(
+                modifier = Modifier.fillMaxWidth(),
+                uploadingState = uploadingState
+            )
+        } else {
+            Spacer(modifier = Modifier.weight(0.3f))
+        }
 
         //Spacer(Modifier.weight(0.7f))
+
+
+        if (friendsList.isNotEmpty()) {
+            FriendsToShareRow(
+                friends = friendsList
+            )
+        }
+        Spacer(modifier = Modifier.weight(0.2f))
 
         SendContentBottomControls(
             onDelete = {
@@ -206,12 +242,86 @@ fun SendContentScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 25.dp)
-                .weight(2f),
         )
 
 
         Spacer(modifier = Modifier.weight(1f))
 
+    }
+}
+
+@Composable
+private fun FriendsToShareRow(
+    friends: List<User>,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = "Share with friends",
+            color = ConstColours.WHITE,
+            fontSize = 12.sp,
+            modifier = Modifier.padding(bottom = 12.dp)
+        )
+
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(friends) { friend ->
+                FriendAvatarItem(
+                    friend = friend,
+                    onClick = { /* Handle friend selection */ }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun FriendAvatarItem(
+    friend: User,
+    onClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .width(64.dp)
+            .clickable { onClick() }
+    ) {
+        Box(
+            modifier = Modifier
+                .size(56.dp)
+                .clip(CircleShape)
+                .background(ConstColours.MAIN_BACK_GRAY)
+        ) {
+            if (friend.avatarUrl != null) {
+                AsyncImage(
+                    model = friend.avatarUrl,
+                    contentDescription = friend.name,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = 0.5f),
+                    modifier = Modifier.size(28.dp).align(Alignment.Center)
+                )
+            }
+        }
+
+        Text(
+            text = friend.name ?: friend.email.take(8),
+            color = Color.White,
+            fontSize = 10.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(top = 4.dp)
+        )
     }
 }
 
