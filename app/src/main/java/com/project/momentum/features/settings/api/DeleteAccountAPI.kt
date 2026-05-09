@@ -30,7 +30,7 @@ interface IDeleteAccountAPI {
     suspend fun checkPassword(userData: SettingsCheckPasswordDTO): SettingsBooleanDTO
     suspend fun sendCodeToChecker(code: CheckCodeRequestDTO): SettingsBooleanDTO
     suspend fun sendCode(): SettingsBooleanDTO
-    suspend fun deleteAccount(email: CheckEmailRequestDTO): SettingsBooleanDTO
+    suspend fun deleteAccount(): SettingsBooleanDTO
 }
 
 @Singleton
@@ -81,9 +81,9 @@ class DeleteAccountAPI @Inject constructor(
         }
     }
 
-    override suspend fun deleteAccount(email: CheckEmailRequestDTO): SettingsBooleanDTO {
-        val response = client.post("delete-account") {
-            setBody(email)
+    override suspend fun deleteAccount(): SettingsBooleanDTO {
+        val response = client.post("settings/delete-account") {
+            header(HttpHeaders.Authorization, "Bearer ${sessionManager.getToken()}")
         }
 
         return try {

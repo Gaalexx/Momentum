@@ -451,17 +451,17 @@ fun MainScreen() {
                             closeOverlay()
                         },
                         onContinueClick = {
-                            openOverlay(NavRoutes.DeleteAccountConfirmation)
-                        }
-                    )
-                }
-                entry<NavRoutes.DeleteAccountConfirmation> {
-                    DeleteAccountConfirmationScreen(
-                        onCancel = {
-                            closeOverlay()
-                        },
-                        onConfirm = {
-                            openOverlay(NavRoutes.RegistrationLogin)
+                            val toRemove = backStack.filter {
+                                it is NavRoutes.DeleteAccountCheckPassword ||
+                                        it is NavRoutes.DeleteAccountCheckCode
+                            }
+                            toRemove.forEach { backStack.remove(it) }
+
+                            appStartViewModel.logout()
+
+                            backStack.clear()
+
+                            setBase(NavRoutes.RegistrationLogin)
                         }
                     )
                 }
@@ -511,7 +511,8 @@ private fun NavKey.isOverlayRoute(): Boolean {
         is NavRoutes.NoInternetConnection,
         is NavRoutes.Camera,
         is NavRoutes.Recorder,
-        is NavRoutes.Gallery -> false
+        is NavRoutes.Gallery,
+        is NavRoutes.DeleteAccountConfirmation -> false
 
         else -> true
     }

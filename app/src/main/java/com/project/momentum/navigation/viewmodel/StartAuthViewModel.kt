@@ -66,7 +66,8 @@ data class SwitchesState (
 class AppStartViewModel @Inject constructor(
     private val auth: AuthUseCase,
     private val serverRep: ServerSettingsRepository,
-    private val appSettings: AppSettingsHolder
+    private val appSettings: AppSettingsHolder,
+    private val regRep: RegistrationRepository
 ) : ViewModel() {
     var state by mutableStateOf<AppStartState>(AppStartState.Loading)
         private set
@@ -150,4 +151,27 @@ class AppStartViewModel @Inject constructor(
         restoreSession()
     }
 
+    fun setUnauthorized() {
+        state = AppStartState.Unauthorized
+    }
+
+    fun logout() {
+        viewModelScope.launch {
+            try {
+                regRep.clearSession()
+
+                regRep.clearLocalAuthData()
+
+                _settingsState.update {
+                    SwitchesState()
+                }
+
+                state = AppStartState.Unauthorized
+
+            } catch (e: Exception) {
+                Log.e("AppStartViewModel", "Error during logout: ${e.message}")
+                state = AppStartState.Unauthorized
+            }
+        }
+    }
 }

@@ -47,13 +47,9 @@ class DeleteAccountRepository @Inject constructor(
         }
 
 
-    suspend fun deleteAccount(user: DeleteAccountState): Result<Boolean> =
+    suspend fun deleteAccount(): Result<Boolean> =
         runCatching {
-            val response = client.deleteAccount(
-                CheckEmailRequestDTO(
-                    email = user.userData.email
-                )
-            )
+            val response = client.deleteAccount()
             if (!response.success) throw Exception(response.message)
             true
         }

@@ -63,23 +63,19 @@ class DeleteAccountViewModel @Inject constructor(
             is DeleteEvent.sendCodeAgain -> sendCodeAgain()
         }
     }
-
     private fun isValidPassword(): ErrorLogin {
         if (_state.value.userData.password != passwordRepetition) {
             return ErrorLogin.PasswordError.NOT_MATCH
         }
         return ErrorLogin.None
     }
-
     fun isValidEmail(): ErrorLogin =
         if (Patterns.EMAIL_ADDRESS.matcher(_state.value.userData.email).matches())
             ErrorLogin.None
         else ErrorLogin.LoginError.INVALID_FORMAT
-
     fun isValidCode(): ErrorLogin {
         return ErrorLogin.None
     }
-
     fun validateCurrentStep() {
         val isValid: ErrorLogin = when (_state.value.currentStep) {
             DeleteAccountStep.PASSWORD -> isValidPassword()
@@ -97,11 +93,9 @@ class DeleteAccountViewModel @Inject constructor(
             )
         }
     }
-
-    fun updateUserPasswordRepetition(password: String) {
+    private fun updateUserPasswordRepetition(password: String) {
         passwordRepetition = password
     }
-
     private fun updateUserPassword(password: String) {
         _state.update { currentState ->
             currentState.copy (
@@ -109,14 +103,13 @@ class DeleteAccountViewModel @Inject constructor(
             )
         }
     }
-    fun updateUserCode(code: String) {
+    private fun updateUserCode(code: String) {
         _state.update { currentState ->
             currentState.copy(
                 userData = currentState.userData.copy(verificationCode = code)
             )
         }
     }
-
     private fun nextStep() {
         validateCurrentStep()
         if (_state.value.isError && _state.value.errorMessage != ErrorLogin.None) return
@@ -130,10 +123,15 @@ class DeleteAccountViewModel @Inject constructor(
                         .onSuccess { success ->
                             _state.update {
                                 it.copy(
+                                    isError = false,
+                                    isLoading = false,
                                     currentStep = DeleteAccountStep.VERIFICATION
                                 )
                             }
                             _navigationEvents.emit(NavEvent.NavigateToNextScreen)
+                            while (true) {
+                                if (repository.sendCode()) break
+                            }
                         }
                         .onFailure { e ->
                             _state.update {
@@ -150,19 +148,17 @@ class DeleteAccountViewModel @Inject constructor(
             DeleteAccountStep.VERIFICATION -> {
                 _state.update { it.copy(isLoading = true) }
                 viewModelScope.launch {
-                    while (true) {
-                        if (repository.sendCode()) break
-                    }
                     repository.checkUserCode(_state.value.userData.verificationCode)
                         .onSuccess { success ->
                             _state.update {
                                 it.copy(
-                                    currentStep = DeleteAccountStep.DELETE_ACCOUNT,
+                                    currentStep = DeleteAccountStep.DELETE_ACCOUNT_CONFIRMATION,
                                     isError = false,
-                                    isLoading = false
+                                    isLoading = false,
+                                    showConfirmationDialog = true,
                                 )
                             }
-                            _navigationEvents.emit(NavEvent.NavigateToNextScreen)
+                            //_navigationEvents.emit(NavEvent.NavigateToNextScreen)
                         }
                         .onFailure { e ->
                             _state.update {
@@ -183,7 +179,6 @@ class DeleteAccountViewModel @Inject constructor(
                     _state.update {
                         it.copy(
                             currentStep = DeleteAccountStep.DELETE_ACCOUNT,
-                            showConfirmationDialog = true,
                             isError = false,
                             isLoading = false
                         )
@@ -194,7 +189,6 @@ class DeleteAccountViewModel @Inject constructor(
             else -> {}
         }
     }
-
     private fun previousStep() {
         if (!_state.value.canGoBack) return
 
@@ -202,25 +196,19 @@ class DeleteAccountViewModel @Inject constructor(
             it.copy(
                 currentStep = when (it.currentStep) {
                     DeleteAccountStep.VERIFICATION -> DeleteAccountStep.PASSWORD
+                    DeleteAccountStep.DELETE_ACCOUNT_CONFIRMATION -> DeleteAccountStep.VERIFICATION
                     else -> it.currentStep
                 }
             )
         }
     }
-    
     private fun onConfirmDelete() {
         _state.update { it.copy(isLoading = true, showConfirmationDialog = false) }
 
         viewModelScope.launch {
-            repository.deleteAccount(_state.value)
+            repository.deleteAccount()
                 .onSuccess { success ->
-                    _state.update {
-                        it.copy(
-                            currentStep = DeleteAccountStep.COMPLETED,
-                            isError = false,
-                            isLoading = false
-                        )
-                    }
+                    resetState()
                     _navigationEvents.emit(NavEvent.NavigateToNextScreen)
                 }
                 .onFailure { e ->
@@ -234,11 +222,10 @@ class DeleteAccountViewModel @Inject constructor(
                 }
         }
     }
-
     private fun onCancelDelete() {
         _state.update { it.copy(showConfirmationDialog = false) }
+        previousStep()
     }
-
     fun sendCodeAgain() {
         _state.update { it.copy(isLoading = true) }
 
@@ -254,5 +241,10 @@ class DeleteAccountViewModel @Inject constructor(
             }
             //_navigationEvents.emit(NavEvent.NavigateToNextSubScreen)
         }
+    }
+
+    fun resetState() {
+        _state.update { DeleteAccountState() }
+        passwordRepetition = ""
     }
 }
