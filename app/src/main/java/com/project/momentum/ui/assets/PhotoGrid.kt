@@ -36,6 +36,7 @@ import androidx.compose.ui.window.Dialog
 import coil.compose.SubcomposeAsyncImage
 import com.project.momentum.R
 import com.project.momentum.features.account.models.PostData
+import com.project.momentum.features.posts.features.reactions.ui.PostDialogContent
 import com.project.momentum.network.s3.MediaType
 import com.project.momentum.ui.custom.gradientpicker.GradientPicker
 import com.project.momentum.ui.custom.shapes.ScallopedShape
@@ -329,25 +330,11 @@ fun S3PhotoGrid(
         Dialog(
             onDismissRequest = { onLongPostClick(null) }
         ) {
-            Column(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10))
-                    .background(ConstColours.MAIN_BACK_GRAY)
-            ) {
-                DialogEventButton(
-                    text = R.string.button_hide_post_for_me,
-                    icon = Icons.Outlined.HideImage,
-                    onClick = postDialogInfo.onHidePost
-                )
-                if (posts.first{ post -> post.id == postDialogInfo.selectedPost}.isOwner) {
-                    DialogEventButton(
-                        text = R.string.button_delete_post,
-                        icon = Icons.Outlined.Delete,
-                        onClick = postDialogInfo.onDeletePost,
-                        textColor = ConstColours.DELETE
-                    )
-                }
-            }
+            PostDialogContent(
+                isOwner = posts.first{ post -> post.id == postDialogInfo.selectedPost}.isOwner,
+                onHidePost = postDialogInfo.onHidePost,
+                onDeletePost = postDialogInfo.onDeletePost,
+            )
         }
     }
 }

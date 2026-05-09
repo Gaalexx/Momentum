@@ -27,7 +27,6 @@ data class PostsState(
     val currentUserId: String,
     val selectedPost: String? = null,
     val isShowingActionsDialog: Boolean = false,
-    val isShowingReactionsDialog: Boolean = false,
 )
 
 sealed interface GalleryEvent {
@@ -35,8 +34,8 @@ sealed interface GalleryEvent {
     data object OnRefreshPosts : GalleryEvent
     data class OnLocalLoadPosts(val posts: List<PostData>) : GalleryEvent
     data class OnShowActionsDialog(val isShowing: Boolean) : GalleryEvent
-    data object OnDeletePost : GalleryEvent
-    data object OnHidePost : GalleryEvent
+    data class OnDeletePost(val postId: String) : GalleryEvent
+    data class OnHidePost(val postId: String) : GalleryEvent
     data class SelectPost(val post: String?) : GalleryEvent
 }
 
@@ -70,8 +69,8 @@ class PostsViewModel @Inject constructor(
             is GalleryEvent.OnRefreshPosts -> refreshPosts()
             is GalleryEvent.OnLocalLoadPosts -> loadLocalPosts(event)
             is GalleryEvent.OnShowActionsDialog -> showActionsDialogChange(event)
-            is GalleryEvent.OnDeletePost -> deletePost()
-            is GalleryEvent.OnHidePost -> hidePost()
+            is GalleryEvent.OnDeletePost -> deletePost(event)
+            is GalleryEvent.OnHidePost -> hidePost(event)
             is GalleryEvent.SelectPost -> selectPost(event)
             else -> println()
         }
@@ -89,18 +88,16 @@ class PostsViewModel @Inject constructor(
         }
     }
 
-    private fun deletePost() {
+    private fun deletePost(event: GalleryEvent.OnDeletePost) {
         val oldState = state.value
 
-        val postId = _state.value.selectedPost ?: throw Exception("PostsViewModel:deletePost: Impossible to delete post with null Id")
-
         _state.update {
-            it.copy(posts = it.posts.filter { post -> post.id != postId })
+            it.copy(posts = it.posts.filter { post -> post.id != event.postId })
         }
 
         viewModelScope.launch {
             try {
-                if (!repo.deletePost(postId)) {
+                if (!repo.deletePost(event.postId)) {
                     _state.update { oldState }
                 }
             } catch (e: Exception) {
@@ -110,18 +107,16 @@ class PostsViewModel @Inject constructor(
         }
     }
 
-    private fun hidePost() {
+    private fun hidePost(event: GalleryEvent.OnHidePost) {
         val oldState = state.value
 
-        val postId = _state.value.selectedPost ?: throw Exception("PostsViewModel:deletePost: Impossible to hide post with null Id")
-
         _state.update {
-            it.copy(hiddenPosts = it.hiddenPosts + listOf(postId))
+            it.copy(hiddenPosts = it.hiddenPosts + listOf(event.postId))
         }
 
         viewModelScope.launch {
             try {
-                if (!repo.hidePost(postId)) {
+                if (!repo.hidePost(event.postId)) {
                     _state.update { oldState }
                 }
             } catch (e: Exception) {
@@ -145,7 +140,7 @@ class PostsViewModel @Inject constructor(
 
     private fun showReactionDialogChange(event: WatchPhotoEvent.OnShowReactionDialogEvent) {
         _state.update {
-            it.copy(isShowingReactionsDialog = event.isShowing)
+            it.copy(isShowingActionsDialog = event.isShowing)
         }
     }
 

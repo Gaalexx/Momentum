@@ -46,12 +46,12 @@ fun FriendAccountRoot(
         },
         postDialogInfo = PostDialogInfo(
             onHidePost = {
-                postsViewModel.onEvent(GalleryEvent.OnHidePost)
+                postsViewModel.onEvent(GalleryEvent.OnHidePost(uiState.selectedPost ?: throw Exception("FriendsAccountScreen:OnHidePost: Selected post is null")))
                 postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
                 postsViewModel.onEvent(GalleryEvent.SelectPost(null))
             },
             onDeletePost = {
-                postsViewModel.onEvent(GalleryEvent.OnDeletePost)
+                postsViewModel.onEvent(GalleryEvent.OnDeletePost(uiState.selectedPost ?: throw Exception("FriendsAccountScreen:OnHidePost: Selected post is null")))
                 postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
                 postsViewModel.onEvent(GalleryEvent.SelectPost(null))
             },

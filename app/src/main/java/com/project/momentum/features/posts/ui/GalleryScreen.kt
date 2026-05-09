@@ -68,12 +68,12 @@ fun GalleryScreen(
         },
         postDialogInfo = PostDialogInfo(
             onHidePost = {
-                viewModel.onEvent(GalleryEvent.OnHidePost)
+                viewModel.onEvent(GalleryEvent.OnHidePost(uiState.selectedPost ?: throw Exception("GalleryScreenContent:OnHidePost: Selected post is null")))
                 viewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
                 viewModel.onEvent(GalleryEvent.SelectPost(null))
             },
             onDeletePost = {
-                viewModel.onEvent(GalleryEvent.OnDeletePost)
+                viewModel.onEvent(GalleryEvent.OnDeletePost(uiState.selectedPost ?: throw Exception("GalleryScreenContent:OnDeletePost: Selected post is null")))
                 viewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
                 viewModel.onEvent(GalleryEvent.SelectPost(null))
             },

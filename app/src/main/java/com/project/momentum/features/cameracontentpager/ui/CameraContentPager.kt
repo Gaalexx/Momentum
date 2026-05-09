@@ -101,9 +101,6 @@ fun CameraContentPager(
                         WatchPhotoScreenRouteForMain(
                             onGoToTakePhoto = {},
                             onGoToGallery = onGoToGallery,
-                            onProfileClick = onProfileClick,
-                            onGoToSettings = onGoToSettings,
-                            onGoToFriends = onGoToFriends,
                             postIndex = currentPost,
                             postsState.value.posts[currentPost].userId,
                             sharedTransitionScope = sharedTransitionScope,

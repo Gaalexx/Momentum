@@ -50,6 +50,7 @@ import com.project.momentum.R
 import com.project.momentum.features.posts.features.reactions.models.ReactionData
 import com.project.momentum.features.posts.features.reactions.models.ReactionType
 import com.project.momentum.ui.assets.DialogEventButton
+import com.project.momentum.ui.assets.PostDialogInfo
 import com.project.momentum.ui.assets.SubButton
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
@@ -132,7 +133,11 @@ fun ReactionButtonWithCounter(
 
 @Composable
 fun ReactionsDialog(
+    isOwner: Boolean,
+    onHidePost: () -> Unit,
+    onDeletePost: () -> Unit,
     onReactionClick: (ReactionType) -> Unit,
+
 ) {
     var isExpanded by rememberSaveable { mutableStateOf(false) }
 
@@ -214,29 +219,34 @@ fun ReactionsDialog(
         }
 
         if (!isExpanded) {
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10))
-                    .background(ConstColours.MAIN_BACK_GRAY)
-            ) {
-                Column {
-                    DialogEventButton(
-                        text = R.string.template_sub_button,
-                        icon = Icons.Outlined.Reply,
-                        onClick = {}
-                    )
-                    DialogEventButton(
-                        text = R.string.template_sub_button,
-                        icon = Icons.Outlined.ContentCopy,
-                        onClick = {}
-                    )
-                    DialogEventButton(
-                        text = R.string.template_sub_button,
-                        icon = Icons.Outlined.Delete,
-                        onClick = {}
-                    )
-                }
-            }
+            PostDialogContent(
+                onHidePost = onHidePost,
+                onDeletePost = onDeletePost,
+                isOwner = isOwner
+            )
+//            Box(
+//                modifier = Modifier
+//                    .clip(RoundedCornerShape(10))
+//                    .background(ConstColours.MAIN_BACK_GRAY)
+//            ) {
+//                Column {
+//                    DialogEventButton(
+//                        text = R.string.template_sub_button,
+//                        icon = Icons.Outlined.Reply,
+//                        onClick = {}
+//                    )
+//                    DialogEventButton(
+//                        text = R.string.template_sub_button,
+//                        icon = Icons.Outlined.ContentCopy,
+//                        onClick = {}
+//                    )
+//                    DialogEventButton(
+//                        text = R.string.template_sub_button,
+//                        icon = Icons.Outlined.Delete,
+//                        onClick = {}
+//                    )
+//                }
+//            }
         }
     }
 }
@@ -274,7 +284,12 @@ fun ReactionsGrid(
 @Composable
 private fun ReactionsDialogPreview() {
     MaterialTheme {
-        ReactionsDialog({ _ -> })
+        ReactionsDialog(
+            isOwner = true,
+            onReactionClick = { _ -> },
+            onHidePost = {},
+            onDeletePost = {},
+        )
     }
 }
 
