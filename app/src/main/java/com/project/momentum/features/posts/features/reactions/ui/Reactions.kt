@@ -27,7 +27,6 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Reply
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -52,6 +51,7 @@ import com.project.momentum.features.posts.features.reactions.models.ReactionTyp
 import com.project.momentum.ui.assets.SubButton
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
+import com.project.momentum.ui.theme.MomentumTheme
 
 @Composable
 fun ReactionButton(
@@ -295,7 +295,7 @@ fun ReactionsGrid(
 @Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
 @Composable
 private fun ReactionsDialogPreview() {
-    MaterialTheme {
+    MomentumTheme {
         ReactionsDialog({ _ -> })
     }
 }
@@ -303,7 +303,7 @@ private fun ReactionsDialogPreview() {
 @Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
 @Composable
 private fun ReactionButtonPreview() {
-    MaterialTheme {
+    MomentumTheme {
         Row {
             ReactionButton(
                 emoji = ReactionType.LIKE.emoji,

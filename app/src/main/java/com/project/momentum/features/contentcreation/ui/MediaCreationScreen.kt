@@ -1,7 +1,6 @@
 package com.project.momentum.features.contentcreation.ui
 
 import android.net.Uri
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -9,8 +8,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.project.momentum.features.contentcreation.media.rememberAudioRecordingController
 import com.project.momentum.features.contentcreation.media.rememberCameraCaptureActions
 import com.project.momentum.features.contentcreation.media.rememberCameraRecordingController
@@ -18,11 +20,43 @@ import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.contentcreation.permissions.rememberCameraPermissionState
 import com.project.momentum.features.contentcreation.permissions.rememberMicrophonePermissionState
+import com.project.momentum.features.contentcreation.state.CameraScreenState
 import com.project.momentum.features.contentcreation.state.rememberCameraScreenState
 import com.project.momentum.features.contentcreation.ui.assets.MediaCreationContent
 import com.project.momentum.features.contentcreation.ui.assets.MediaCreationContentCompact
+import com.project.momentum.features.contentcreation.viewmodel.CameraViewModel
+import com.project.momentum.ui.theme.MomentumTheme
 
 const val DefaultMaxRecordMs = 60_000
+
+
+@Composable
+fun MediaCreationRoot(
+    modifier: Modifier = Modifier,
+    initialMode: ContentCreationMode = ContentCreationMode.Camera,
+    onGoToPreview: (Uri, MediaTypeToSend) -> Unit,
+    onProfileClick: () -> Unit,
+    onGoToSettings: () -> Unit,
+    onGoToFriends: () -> Unit,
+    maxRecordMs: Int = DefaultMaxRecordMs,
+    cameraPreviewEnabled: Boolean = true,
+    cameraViewModel: CameraViewModel = hiltViewModel()
+) {
+    val vmState = cameraViewModel.state.collectAsStateWithLifecycle()
+
+    MediaCreationScreen(
+        modifier = modifier,
+        initialMode = initialMode,
+        onGoToPreview = onGoToPreview,
+        onProfileClick = onProfileClick,
+        onGoToSettings = onGoToSettings,
+        onGoToFriends = onGoToFriends,
+        maxRecordMs = maxRecordMs,
+        cameraState = vmState.value,
+        cameraPreviewEnabled = cameraPreviewEnabled
+    )
+}
+
 
 @Composable
 fun MediaCreationScreen(
@@ -33,6 +67,8 @@ fun MediaCreationScreen(
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
     maxRecordMs: Int = DefaultMaxRecordMs,
+    cameraState: CameraScreenState,
+    cameraPreviewEnabled: Boolean = true,
 ) {
     var mode by rememberSaveable { mutableStateOf(initialMode) }
     val hasCameraPermission by rememberCameraPermissionState(
@@ -42,7 +78,17 @@ fun MediaCreationScreen(
         shouldRequest = mode == ContentCreationMode.Audio,
     )
 
-    val cameraState = rememberCameraScreenState()
+    val isCameraActive =
+        mode == ContentCreationMode.Camera && hasCameraPermission && cameraPreviewEnabled
+
+    LaunchedEffect(isCameraActive) {
+        if (isCameraActive) {
+            cameraState.startCameraSession()
+        } else {
+            cameraState.pauseCameraSession()
+        }
+    }
+
     val captureActions = rememberCameraCaptureActions()
     val cameraRecordingController = rememberCameraRecordingController(
         state = cameraState,
@@ -74,6 +120,7 @@ fun MediaCreationScreen(
         audioLevel = audioRecordingController.amplitudeLevel,
         isAudioRecording = audioRecordingController.isRecording,
         modeSwitchEnabled = !isCaptureActive,
+        cameraPreviewEnabled = isCameraActive,
         onModeChange = { nextMode ->
             if (!isCaptureActive) {
                 mode = nextMode
@@ -117,21 +164,21 @@ fun CameraLikeScreen(
     onGoToFriends: () -> Unit,
     maxRecordMs: Int = DefaultMaxRecordMs,
 ) {
-    MediaCreationScreen(
+    MediaCreationRoot(
         modifier = modifier,
         initialMode = ContentCreationMode.Camera,
         onGoToPreview = onGoToPreview,
         onProfileClick = onProfileClick,
         onGoToSettings = onGoToSettings,
         onGoToFriends = onGoToFriends,
-        maxRecordMs = maxRecordMs,
+        maxRecordMs = maxRecordMs
     )
 }
 
 @Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
 @Composable
 private fun MediaCreationScreenPreview() {
-    MaterialTheme {
+    MomentumTheme {
         MediaCreationContent(
             mode = ContentCreationMode.Camera,
             hasCameraPermission = false,

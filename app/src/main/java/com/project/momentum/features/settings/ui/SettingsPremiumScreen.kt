@@ -18,6 +18,7 @@ import com.project.momentum.ui.assets.PremiumFeatureItem
 import com.project.momentum.ui.assets.SubscriptionOptionCard
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
+import com.project.momentum.ui.theme.MomentumTheme
 
 data class SubscriptionOption(
     val title: String,
@@ -201,7 +202,7 @@ fun SettingsPremiumScreen(
 @Preview(showBackground = true)
 @Composable
 fun SettingsPremiumScreenPreview() {
-    MaterialTheme {
+    MomentumTheme {
         SettingsPremiumScreen(
             onBackClick = {},
             onBuyClick = {}

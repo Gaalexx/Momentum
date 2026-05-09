@@ -11,6 +11,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.project.momentum.navigation.MainScreen
+import com.project.momentum.ui.theme.MomentumAndroidSettingsTheme
 import com.project.momentum.ui.theme.MomentumTheme
 import dagger.hilt.android.AndroidEntryPoint
 

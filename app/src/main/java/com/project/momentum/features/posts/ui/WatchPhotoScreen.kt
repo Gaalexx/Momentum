@@ -30,7 +30,6 @@ import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -81,6 +80,7 @@ import com.project.momentum.ui.assets.VideoView
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
+import com.project.momentum.ui.theme.MomentumTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 
 
@@ -619,7 +619,7 @@ fun WatchPhotoScreen(
 @Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
 @Composable
 private fun WatchPhotoScreenPreview() {
-    MaterialTheme {
+    MomentumTheme {
         WatchPhotoScreenFull(
             onShowReactionDialog = {},
             onReactionClick = { _, _ -> },
