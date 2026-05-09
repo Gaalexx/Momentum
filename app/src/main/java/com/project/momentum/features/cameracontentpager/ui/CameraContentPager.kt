@@ -18,9 +18,12 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,6 +38,7 @@ import com.project.momentum.features.posts.ui.NoPostsYet
 import com.project.momentum.features.posts.ui.WatchPhotoScreenRouteForMain
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.ui.theme.ConstColours
+import kotlinx.coroutines.delay
 
 
 enum class MainScreenPage(val curPage: Int) {
@@ -59,6 +63,17 @@ fun CameraContentPager(
     currentPost: Int = 0,
     postsViewModel: PostsViewModel = hiltViewModel()
 ) {
+
+    var enterAnimationFinished by remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(Unit) {
+        enterAnimationFinished = false
+        delay(500)
+        enterAnimationFinished = true
+    }
+
     val pagerState = rememberPagerState(
         initialPage = mainScreenPage.ordinal,
         pageCount = { 2 }
@@ -71,7 +86,7 @@ fun CameraContentPager(
 
     val isCameraPageActive by remember {
         derivedStateOf {
-            pagerState.settledPage == MainScreenPage.CONTENT_CREATION.curPage
+            enterAnimationFinished && pagerState.settledPage == MainScreenPage.CONTENT_CREATION.curPage
         }
     }
 
@@ -94,7 +109,6 @@ fun CameraContentPager(
             Spacer(Modifier.height(5.dp))
             VerticalPager(
                 state = pagerState,
-//                beyondViewportPageCount = 1,
                 flingBehavior = flingBehavior,
                 modifier = Modifier.fillMaxSize()
             ) { page ->
