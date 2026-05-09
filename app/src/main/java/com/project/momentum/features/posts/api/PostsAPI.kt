@@ -8,6 +8,7 @@ import com.project.momentum.network.s3.PostDTO
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
+import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.http.HttpHeaders
@@ -107,6 +108,57 @@ class PostsAPI @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e("PostsAPI", "Network error in deleteReaction ${e.message ?: ""}", e)
+            false
+        }
+
+    suspend fun getHiddenPosts() : List<String> =
+        try {
+            val response = client.get("hidden") {
+                header(HttpHeaders.Authorization, sessionManager.getHeader())
+            }
+            if (response.status == HttpStatusCode.OK) {
+                Log.d("PostsAPI", "Get hidden posts: ${response.body<List<String>>()}")
+                response.body<List<String>>()
+            } else {
+                Log.e("PostsAPI", "Error getting hidden posts: ${response.status}")
+                listOf()
+            }
+        } catch (e: Exception) {
+            Log.e("PostsAPI", "Network error in getHiddenPosts ${e.message ?: ""}", e)
+            listOf()
+        }
+
+    suspend fun hidePost(postId: String) : Boolean =
+        try {
+            val response = client.post("hide/${postId}") {
+                header(HttpHeaders.Authorization, sessionManager.getHeader())
+            }
+            if (response.status == HttpStatusCode.OK) {
+                Log.d("PostsAPI", "Post hidden: ${response.status}")
+                true
+            } else {
+                Log.e("PostsAPI", "Error hiding post: ${response.status}")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("PostsAPI", "Network error in hidePost ${e.message ?: ""}", e)
+            false
+        }
+
+    suspend fun showPost(postId: String) :Boolean =
+        try {
+            val response = client.delete("show/${postId}") {
+                header(HttpHeaders.Authorization, sessionManager.getHeader())
+            }
+            if (response.status == HttpStatusCode.OK) {
+                Log.d("PostsAPI", "Post is showing: ${response.status}")
+                true
+            } else {
+                Log.e("PostsAPI", "Error showing post: ${response.status}")
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("PostsAPI", "Network error in showPost ${e.message ?: ""}", e)
             false
         }
 }

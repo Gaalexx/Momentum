@@ -59,4 +59,13 @@ class PostsRepo @Inject constructor(
 
     suspend fun deleteReaction(postId: String, reaction: ReactionType) : Boolean =
         postsAPI.deleteReaction(postId, reaction)
+
+    suspend fun getHiddenPosts() : List<String> =
+        postsAPI.getHiddenPosts()
+
+    suspend fun hidePost(postId: String) : Boolean =
+        postsAPI.hidePost(postId)
+
+    suspend fun showPost(postId: String) : Boolean =
+        postsAPI.showPost(postId)
 }

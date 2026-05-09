@@ -661,41 +661,43 @@ private fun WatchPhotoScreenPreview() {
                     createdAt = "2026-03-12T14:38:50.690942Z"
                 )
             ),
-            uiState = PostsState(listOf(
-                PostData(
-                    id = "1",
-                    userId = "preview-user",
-                    userName = "PreviewName",
-                    title = "Description",
-                    presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-                    mediaType = MediaType.IMAGE,
-                    isOwner = false,
-                    reactions = listOf(
-                        ReactionData(
-                            emoji = ReactionType.HEART,
-                            users = listOf("user1")
+            uiState = PostsState(
+                posts = listOf(
+                    PostData(
+                        id = "1",
+                        userId = "preview-user",
+                        userName = "PreviewName",
+                        title = "Description",
+                        presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+                        mediaType = MediaType.IMAGE,
+                        isOwner = false,
+                        reactions = listOf(
+                            ReactionData(
+                                emoji = ReactionType.HEART,
+                                users = listOf("user1")
+                            ),
+                            ReactionData(
+                                emoji = ReactionType.CLOWN,
+                                users = listOf("user1", "user2", "preview-user")
+                            ),
                         ),
-                        ReactionData(
-                            emoji = ReactionType.CLOWN,
-                            users = listOf("user1", "user2", "preview-user")
-                        ),
+                        createdAt = "2026-03-12T14:38:50.690942Z"
                     ),
-                    createdAt = "2026-03-12T14:38:50.690942Z"
+                    PostData(
+                        id = "2",
+                        userId = "preview-user",
+                        userName = "PreviewName2",
+                        title = "Description2",
+                        presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+                        mediaType = MediaType.IMAGE,
+                        isOwner = true,
+                        createdAt = "2026-03-12T14:38:50.690942Z"
+                    )
                 ),
-                PostData(
-                    id = "2",
-                    userId = "preview-user",
-                    userName = "PreviewName2",
-                    title = "Description2",
-                    presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-                    mediaType = MediaType.IMAGE,
-                    isOwner = true,
-                    createdAt = "2026-03-12T14:38:50.690942Z"
-                )
-            ), isRefreshing = false, currentUserId = "123")
+                hiddenPosts = listOf(),
+                isRefreshing = false,
+                currentUserId = "123"
+            )
         )
-
-        }
-
-
+    }
 }

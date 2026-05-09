@@ -54,10 +54,12 @@ fun GalleryScreen(
     viewModel: PostsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val posts by viewModel.getShownPostsFlow().collectAsStateWithLifecycle()
 
     GalleryScreenContent(
         modifier = modifier,
-        uiState = uiState,
+        posts = posts,
+        isRefreshing = uiState.isRefreshing,
         onRefresh = { viewModel.onEvent(GalleryEvent.OnRefreshPosts) },
         onPostClick = onPostClick,
         onLongPostClick = { post ->
@@ -91,7 +93,8 @@ fun GalleryScreen(
 @Composable
 private fun GalleryScreenContent(
     modifier: Modifier = Modifier,
-    uiState: PostsState,
+    posts: List<PostData>,
+    isRefreshing: Boolean,
     onRefresh: () -> Unit,
     onPostClick: (Int) -> Unit,
     onLongPostClick: (String?) -> Unit,
@@ -152,11 +155,11 @@ private fun GalleryScreenContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
-                isRefreshing = uiState.isRefreshing,
+                isRefreshing = isRefreshing,
                 onRefresh = onRefresh
             ) {
                 S3PhotoGrid(
-                    posts = uiState.posts,
+                    posts = posts,
                     onPostClick = onPostClick,
                     onLongPostClick = onLongPostClick,
                     postDialogInfo = postDialogInfo,
@@ -178,7 +181,8 @@ private fun GalleryScreenContent(
 private fun GalleryScreenPreview() {
     MaterialTheme {
         GalleryScreenContent(
-            uiState = PostsState(listOf(), false, "0", isShowingActionsDialog = true),
+            posts = listOf(),
+            isRefreshing = false,
             onRefresh = {},
             onPostClick = {},
             onLongPostClick = {},
