@@ -34,15 +34,29 @@ import com.project.momentum.ui.theme.ConstColours
 private val PreviewCardShape = RoundedCornerShape(60.dp)
 private const val RecordingProgressStartShiftFraction = 0.3425f
 
+
+@Composable
+private fun CameraInactivePlaceholder(
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(ConstColours.MAIN_BACK_GRAY),
+    )
+}
+
+
 @Composable
 internal fun MediaCreationPreviewCard(
+    modifier: Modifier = Modifier,
     mode: ContentCreationMode,
     hasCameraPermission: Boolean,
     hasMicrophonePermission: Boolean,
     cameraState: CameraScreenState,
     progress: Float,
     audioLevel: Float,
-    modifier: Modifier = Modifier,
+    cameraPreviewEnabled: Boolean = true,
 ) {
     Box(
         modifier = modifier
@@ -66,13 +80,21 @@ internal fun MediaCreationPreviewCard(
         ) {
             when (mode) {
                 ContentCreationMode.Camera -> {
-                    if (hasCameraPermission) {
-                        CameraPreviewContainer(
-                            state = cameraState,
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                    } else {
-                        PermissionPlaceholder(iconMode = ContentCreationMode.Camera)
+                    when {
+                        !hasCameraPermission -> {
+                            PermissionPlaceholder(iconMode = ContentCreationMode.Camera)
+                        }
+
+                        cameraPreviewEnabled -> {
+                            CameraPreviewContainer(
+                                state = cameraState,
+                                modifier = Modifier.fillMaxSize(),
+                            )
+                        }
+
+                        else -> {
+                            CameraInactivePlaceholder()
+                        }
                     }
                 }
 

@@ -39,6 +39,10 @@ class CameraViewModel @Inject constructor() : ViewModel() {
         VideoCapture.Builder(Recorder.Builder().build())
             .setMirrorMode(MirrorMode.MIRROR_MODE_ON_FRONT_ONLY)
             .build()
-
+    
+    override fun onCleared() {
+        state.value.destroyCameraSession()
+        super.onCleared()
+    }
 
 }

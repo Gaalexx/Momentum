@@ -12,11 +12,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -60,6 +64,17 @@ fun CameraContentPager(
         pageCount = { 2 }
     )
 
+    val flingBehavior = PagerDefaults.flingBehavior(
+        state = pagerState,
+        snapPositionalThreshold = 0.125f
+    )
+
+    val isCameraPageActive by remember {
+        derivedStateOf {
+            pagerState.settledPage == MainScreenPage.CONTENT_CREATION.curPage
+        }
+    }
+
     val postsState = postsViewModel.state.collectAsStateWithLifecycle()
     Surface(
         color = ConstColours.BLACK
@@ -80,6 +95,7 @@ fun CameraContentPager(
             VerticalPager(
                 state = pagerState,
 //                beyondViewportPageCount = 1,
+                flingBehavior = flingBehavior,
                 modifier = Modifier.fillMaxSize()
             ) { page ->
                 when (page) {
@@ -89,7 +105,8 @@ fun CameraContentPager(
                         onProfileClick = onProfileClick,
                         onGoToSettings = onGoToSettings,
                         onGoToFriends = onGoToFriends,
-                        maxRecordMs = maxRecordMs
+                        maxRecordMs = maxRecordMs,
+                        cameraPreviewEnabled = isCameraPageActive
                     )
 
                     1 -> if (postsState.value.posts.isNotEmpty()) {

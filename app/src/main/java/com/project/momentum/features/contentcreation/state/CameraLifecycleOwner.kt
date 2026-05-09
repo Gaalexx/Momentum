@@ -32,8 +32,12 @@ class CameraLifecycleOwner : LifecycleOwner {
     }
 
     fun destroy() {
-        if (registry.currentState != Lifecycle.State.DESTROYED) {
-            registry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        if (registry.currentState == Lifecycle.State.DESTROYED) return
+
+        if (registry.currentState >= Lifecycle.State.STARTED) {
+            registry.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
         }
+
+        registry.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     }
 }

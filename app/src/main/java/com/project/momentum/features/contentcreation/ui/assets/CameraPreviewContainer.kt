@@ -19,6 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
@@ -61,6 +62,9 @@ fun CameraPreviewContainer(
     }
 
     LaunchedEffect(state.lensFacing, state.imageCapture, state.videoCapture) {
+
+        withFrameNanos { }
+
         val cameraProvider = cameraProviderFuture.await(mainExecutor)
         camera = bindCameraUseCases(
             cameraProvider = cameraProvider,

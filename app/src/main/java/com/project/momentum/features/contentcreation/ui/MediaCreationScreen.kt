@@ -39,6 +39,7 @@ fun MediaCreationRoot(
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
     maxRecordMs: Int = DefaultMaxRecordMs,
+    cameraPreviewEnabled: Boolean = true,
     cameraViewModel: CameraViewModel = hiltViewModel()
 ) {
     val vmState = cameraViewModel.state.collectAsStateWithLifecycle()
@@ -51,7 +52,8 @@ fun MediaCreationRoot(
         onGoToSettings = onGoToSettings,
         onGoToFriends = onGoToFriends,
         maxRecordMs = maxRecordMs,
-        cameraState = vmState.value
+        cameraState = vmState.value,
+        cameraPreviewEnabled = cameraPreviewEnabled
     )
 }
 
@@ -65,7 +67,8 @@ fun MediaCreationScreen(
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
     maxRecordMs: Int = DefaultMaxRecordMs,
-    cameraState: CameraScreenState
+    cameraState: CameraScreenState,
+    cameraPreviewEnabled: Boolean = true,
 ) {
     var mode by rememberSaveable { mutableStateOf(initialMode) }
     val hasCameraPermission by rememberCameraPermissionState(
@@ -75,7 +78,8 @@ fun MediaCreationScreen(
         shouldRequest = mode == ContentCreationMode.Audio,
     )
 
-    val isCameraActive = mode == ContentCreationMode.Camera && hasCameraPermission
+    val isCameraActive =
+        mode == ContentCreationMode.Camera && hasCameraPermission && cameraPreviewEnabled
 
     LaunchedEffect(isCameraActive) {
         if (isCameraActive) {
@@ -116,6 +120,7 @@ fun MediaCreationScreen(
         audioLevel = audioRecordingController.amplitudeLevel,
         isAudioRecording = audioRecordingController.isRecording,
         modeSwitchEnabled = !isCaptureActive,
+        cameraPreviewEnabled = isCameraActive,
         onModeChange = { nextMode ->
             if (!isCaptureActive) {
                 mode = nextMode
