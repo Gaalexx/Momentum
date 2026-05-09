@@ -8,13 +8,11 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.animation.unveilIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
@@ -34,8 +32,9 @@ import com.project.momentum.features.auth.ui.CreateAccountRoot
 import com.project.momentum.features.auth.ui.CreatePasswordRoot
 import com.project.momentum.features.auth.ui.InsertCodeRoot
 import com.project.momentum.features.auth.ui.PasswordRecoveryRoot
+import com.project.momentum.features.cameracontentpager.ui.CameraContentPager
+import com.project.momentum.features.cameracontentpager.ui.MainScreenPage
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
-import com.project.momentum.features.contentcreation.ui.MediaCreationScreen
 import com.project.momentum.features.contentcreation.ui.SendContentScreen
 import com.project.momentum.features.editingAccount.ui.EditingAccountRoot
 import com.project.momentum.features.editingAccount.viewmodel.AccountInfo
@@ -44,6 +43,7 @@ import com.project.momentum.features.friends.ui.FriendsScreenRoute
 import com.project.momentum.features.offline.ui.NoInternetScreen
 import com.project.momentum.features.posts.ui.GalleryScreen
 import com.project.momentum.features.posts.ui.WatchPhotoScreenRoute
+import com.project.momentum.features.posts.ui.WatchPhotoScreenRouteForMain
 import com.project.momentum.features.settings.ui.DeleteAccountCheckCodeScreen
 import com.project.momentum.features.settings.ui.DeleteAccountCheckPasswordScreen
 import com.project.momentum.features.settings.ui.DeleteAccountConfirmationScreen
@@ -116,6 +116,12 @@ fun MainScreen() {
                     is NavRoutes.Gallery -> "gallery"
                     is NavRoutes.Recorder -> "recorder"
                     else -> "camera"
+                }
+            }
+
+            fun closeAllUntilUpperElement() {
+                while (backStack.size != 1) {
+                    backStack.removeAt(0)
                 }
             }
 
@@ -215,8 +221,9 @@ fun MainScreen() {
                 }
 
                 // Экраны создания контента
+
                 entry<NavRoutes.Camera> {
-                    MediaCreationScreen(
+                    CameraContentPager(
                         initialMode = ContentCreationMode.Camera,
                         onGoToPreview = { uri, mediaType ->
                             openOverlay(NavRoutes.SendPhoto(uri.toString(), mediaType))
@@ -232,42 +239,71 @@ fun MainScreen() {
                         },
                         onGoToGallery = {
                             openOverlay(NavRoutes.Gallery)
-                        }
+                        },
+                        onGoToTakePhoto = {},
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current
                     )
                 }
 
-                entry<NavRoutes.Recorder> {
-                    MediaCreationScreen(
-                        initialMode = ContentCreationMode.Audio,
+                entry<NavRoutes.ContentWatch> { post ->
+
+                    CameraContentPager(
+                        mainScreenPage = MainScreenPage.MEDIA_VIEW,
+                        initialMode = ContentCreationMode.Camera,
                         onGoToPreview = { uri, mediaType ->
                             openOverlay(NavRoutes.SendPhoto(uri.toString(), mediaType))
+                        },
+                        onProfileClick = {
+                            openOverlay(NavRoutes.Account("camera"))
+                        },
+                        onGoToSettings = {
+                            openOverlay(NavRoutes.Settings("camera"))
                         },
                         onGoToFriends = {
                             openOverlay(NavRoutes.Friends)
                         },
-                        onProfileClick = {
-                            openOverlay(NavRoutes.Account("recorder"))
-                        },
-                        onGoToSettings = {
-                            openOverlay(NavRoutes.Settings("recorder"))
-                        },
                         onGoToGallery = {
                             openOverlay(NavRoutes.Gallery)
-                        }
+                        },
+                        onGoToTakePhoto = {},
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+                        currentPost = post.post
                     )
                 }
 
-                entry<NavRoutes.Gallery>(
-                    metadata = NavDisplay.transitionSpec {
-                        slideInVertically(
-                            initialOffsetY = { it },
-                            animationSpec = tween(1000)
-                        ) togetherWith ExitTransition.KeepUntilTransitionsFinished
-                    }
-                ) {
+
+
+                entry<NavRoutes.Recorder> {
+                    CameraContentPager(
+                        initialMode = ContentCreationMode.Audio,
+                        onGoToPreview = { uri, mediaType ->
+                            openOverlay(NavRoutes.SendPhoto(uri.toString(), mediaType))
+                        },
+                        onProfileClick = {
+                            openOverlay(NavRoutes.Account("camera"))
+                        },
+                        onGoToSettings = {
+                            openOverlay(NavRoutes.Settings("camera"))
+                        },
+                        onGoToFriends = {
+                            openOverlay(NavRoutes.Friends)
+                        },
+                        onGoToGallery = {
+                            openOverlay(NavRoutes.Gallery)
+                        },
+                        onGoToTakePhoto = {},
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current
+                    )
+                }
+
+                entry<NavRoutes.Gallery> {
                     GalleryScreen(
                         onPostClick = { post ->
-                            openOverlay(NavRoutes.PreviewPhoto(post = post))
+                            openOverlay(NavRoutes.ContentWatch(post = post))
+                            closeAllUntilUpperElement()
                         },
                         onProfileClick = {
                             openOverlay(NavRoutes.Account("gallery"))
@@ -304,14 +340,7 @@ fun MainScreen() {
                 )
             }
 
-                entry<NavRoutes.Account>(
-                    metadata = NavDisplay.transitionSpec {
-                        slideInHorizontally(
-                            initialOffsetX = { -it },
-                            animationSpec = tween(500)
-                        ) togetherWith ExitTransition.KeepUntilTransitionsFinished
-                    }
-                ) {
+                entry<NavRoutes.Account> {
                     AccountRoot(
                         onPostClick = { post, userId ->
                             openOverlay(

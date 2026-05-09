@@ -14,6 +14,7 @@ data class PostData(
     val title: String,
     val presignedURL: String,
     val mediaType: MediaType,
+    val isOwner: Boolean,
     val avatarPresignedURL: String? = null,
     val reactions: List<ReactionData>? = null,
     val createdAt: String? = null

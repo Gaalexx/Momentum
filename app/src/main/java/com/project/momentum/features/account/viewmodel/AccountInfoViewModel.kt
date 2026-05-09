@@ -1,5 +1,9 @@
 package com.project.momentum.features.account.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.momentum.features.account.ui.AccountScreen
@@ -7,6 +11,7 @@ import com.project.momentum.features.account.usecases.GetInfoUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,11 +22,15 @@ data class AccountInfoState(
     val phone: String? = null,
     val profilePhotoURL: String? = null,
     val hasPremium: Boolean = false,
+    val isShowingActionsDialog: Boolean = false,
+    val selectedPost: String? = null
 )
 
 
 sealed interface AccountInfoEvent {
     data object GetInfo : AccountInfoEvent
+    data class OnShowActionsDialog(val isShowing: Boolean) : AccountInfoEvent
+    data class SelectPost(val post: String?) : AccountInfoEvent
 }
 
 @HiltViewModel
@@ -40,6 +49,20 @@ class AccountInfoViewModel @Inject constructor(
     fun onEvent(event: AccountInfoEvent) {
         when (event) {
             is AccountInfoEvent.GetInfo -> getAccountInfo()
+            is AccountInfoEvent.OnShowActionsDialog -> showActionsDialog(event)
+            is AccountInfoEvent.SelectPost -> selectPost(event)
+        }
+    }
+
+    private fun selectPost(event: AccountInfoEvent.SelectPost) {
+        _state.update {
+            it.copy(selectedPost = event.post)
+        }
+    }
+
+    private fun showActionsDialog(event: AccountInfoEvent.OnShowActionsDialog) {
+        _state.update {
+            it.copy(isShowingActionsDialog = event.isShowing)
         }
     }
 

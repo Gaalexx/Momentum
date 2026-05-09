@@ -22,11 +22,12 @@ import com.project.momentum.ui.assets.SwitchRow
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
+import com.project.momentum.ui.theme.MomentumTheme
 
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
 fun SettingsMainScreenPreview() {
-    MaterialTheme {
+    MomentumTheme {
         TemplateSettingsMain(
             onBackClick = {},
             onEvent = {},

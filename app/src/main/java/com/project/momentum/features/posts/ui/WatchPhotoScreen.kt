@@ -12,16 +12,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -29,12 +26,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -73,18 +68,20 @@ import com.project.momentum.network.s3.MediaType
 import com.project.momentum.ui.assets.AudioView
 import com.project.momentum.ui.assets.CaptionBasicLabel
 import com.project.momentum.ui.assets.ContinueButton
-import com.project.momentum.ui.assets.FriendsPillButton
-import com.project.momentum.ui.assets.ProfileCircleButton
-import com.project.momentum.ui.assets.SettingsCircleButton
-import androidx.compose.ui.draw.blur
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.Surface
+import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
+import com.project.momentum.features.posts.viewmodel.GalleryEvent
+import com.project.momentum.features.posts.viewmodel.PostsState
 import com.project.momentum.ui.assets.VideoView
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
+import com.project.momentum.ui.theme.MomentumTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 
 
@@ -209,14 +206,124 @@ fun WatchPhotoScreenRoute(
             MutableStateFlow(null)
         }
     }.collectAsStateWithLifecycle()
-
     val posts = if (userId == null) uiState.posts else (userPosts ?: listOf())
 
+    WatchPhotoScreenFull(
+        onGoToTakePhoto = onGoToTakePhoto,
+        onGoToGallery = onGoToGallery,
+        onProfileClick = onProfileClick,
+        onGoToSettings = onGoToSettings,
+        onGoToFriends = onGoToFriends,
+
+        onHidePost = { postId ->
+            postsViewModel.onEvent(GalleryEvent.OnHidePost(postId))
+            postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
+            postsViewModel.onEvent(GalleryEvent.SelectPost(null))
+        },
+        onDeletePost = { postId ->
+            postsViewModel.onEvent(GalleryEvent.OnDeletePost(postId))
+            postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
+            postsViewModel.onEvent(GalleryEvent.SelectPost(null))
+        },
+
+        onShowReactionDialog = {
+            postsViewModel.onWatchPhotoEvent(
+                WatchPhotoEvent.OnShowReactionDialogEvent(!uiState.isShowingActionsDialog)
+            )
+        },
+        onReactionClick = { postId, reaction ->
+            postsViewModel.onWatchPhotoEvent(
+                WatchPhotoEvent.OnReactionClick(postId, reaction)
+            )
+        },
+        postIndex = postIndex,
+        posts = posts,
+        uiState = uiState,
+        sharedTransitionScope = sharedTransitionScope,
+        animatedVisibilityScope = animatedVisibilityScope
+    )
+}
+
+@Composable
+fun WatchPhotoScreenFull(
+    onGoToTakePhoto: () -> Unit,
+    onGoToGallery: () -> Unit,
+    onProfileClick: () -> Unit,
+    onGoToSettings: () -> Unit,
+    onGoToFriends: () -> Unit,
+
+    onHidePost: (String) -> Unit,
+    onDeletePost: (String) -> Unit,
+
+    onShowReactionDialog: () -> Unit,
+    onReactionClick: (String, ReactionType) -> Unit,
+    postIndex: Int,
+    userId: String? = null,
+    uiState: PostsState,
+    posts: List<PostData>,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null
+) {
+
+    Surface(
+        modifier = Modifier
+            .background(ConstColours.BLACK)
+            .windowInsetsPadding(WindowInsets.systemBars)
+            .fillMaxSize(),
+        color = ConstColours.BLACK
+    ) {
+        Column {
+            CameraTopBar(
+                onProfileClick = onProfileClick,
+                onGoToSettings = onGoToSettings,
+                onGoToFriends = onGoToFriends,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .padding(horizontal = 14.dp),
+            )
+
+            Spacer(Modifier.height(5.dp))
+            WatchPhotoScreen(
+                onShowReactionDialog = onShowReactionDialog,
+                onReactionClick = onReactionClick,
+                onGoToTakePhoto = onGoToTakePhoto,
+                onGoToGallery = onGoToGallery,
+
+                onHidePost = onHidePost,
+                onDeletePost = onDeletePost,
+
+                postIndex = postIndex,
+                posts = posts,
+                currentUserId = uiState.currentUserId,
+                isShowingReactionsDialog = uiState.isShowingActionsDialog,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedVisibilityScope = animatedVisibilityScope
+            )
+        }
+    }
+}
+
+
+@Composable
+fun WatchPhotoScreenRouteForMain(
+    onGoToTakePhoto: () -> Unit,
+    onGoToGallery: () -> Unit,
+    postIndex: Int,
+    userId: String? = null,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
+    postsViewModel: PostsViewModel = hiltViewModel()
+) {
+
+    val uiState by postsViewModel.state.collectAsStateWithLifecycle()
+
+    val posts by postsViewModel.getShownPostsFlow().collectAsStateWithLifecycle()
 
     WatchPhotoScreen(
         onShowReactionDialog = {
             postsViewModel.onWatchPhotoEvent(
-                WatchPhotoEvent.OnShowReactionDialogEvent(!uiState.isShowingReactionsDialog)
+                WatchPhotoEvent.OnShowReactionDialogEvent(!uiState.isShowingActionsDialog)
             )
         },
         onReactionClick = { postId, reaction ->
@@ -226,13 +333,22 @@ fun WatchPhotoScreenRoute(
         },
         onGoToTakePhoto = onGoToTakePhoto,
         onGoToGallery = onGoToGallery,
-        onProfileClick = onProfileClick,
-        onGoToSettings = onGoToSettings,
-        onGoToFriends = onGoToFriends,
+
+        onHidePost = { postId ->
+            postsViewModel.onEvent(GalleryEvent.OnHidePost(postId))
+            postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
+            postsViewModel.onEvent(GalleryEvent.SelectPost(null))
+        },
+        onDeletePost = { postId ->
+            postsViewModel.onEvent(GalleryEvent.OnDeletePost(postId))
+            postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
+            postsViewModel.onEvent(GalleryEvent.SelectPost(null))
+        },
+
         postIndex = postIndex,
         posts = posts,
         currentUserId = uiState.currentUserId,
-        isShowingReactionsDialog = uiState.isShowingReactionsDialog,
+        isShowingReactionsDialog = uiState.isShowingActionsDialog,
         sharedTransitionScope = sharedTransitionScope,
         animatedVisibilityScope = animatedVisibilityScope
     )
@@ -244,9 +360,8 @@ fun WatchPhotoScreen(
     onReactionClick: (String, ReactionType) -> Unit,
     onGoToTakePhoto: () -> Unit,
     onGoToGallery: () -> Unit,
-    onProfileClick: () -> Unit,
-    onGoToSettings: () -> Unit,
-    onGoToFriends: () -> Unit,
+    onHidePost: (String) -> Unit,
+    onDeletePost: (String) -> Unit,
     postIndex: Int,
     currentUserId: String,
     posts: List<PostData>,
@@ -268,7 +383,6 @@ fun WatchPhotoScreen(
     )
     val blurClickInteractionSource = remember { MutableInteractionSource() }
 
-
     val currentPost by remember(posts, pagerState.currentPage) {
         derivedStateOf { posts.getOrNull(pagerState.currentPage) }
     }
@@ -276,36 +390,9 @@ fun WatchPhotoScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(bg)
-            .windowInsetsPadding(WindowInsets.systemBars),
+            .background(bg),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .blur(backgroundBlur)
-                .clickable(
-                    enabled = isEditable,
-                    interactionSource = blurClickInteractionSource,
-                    indication = null
-                ) {
-                    isEditable = false
-                }
-                .padding(horizontal = 14.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            ProfileCircleButton(onClick = onProfileClick)
-
-            Spacer(Modifier.weight(1f))
-            FriendsPillButton(onClick = onGoToFriends)
-            Spacer(Modifier.weight(1f))
-
-            SettingsCircleButton(onClick = onGoToSettings)
-        }
-
-        Spacer(Modifier.height(12.dp))
-
-
         if (posts.isEmpty()) {
             LoadingOverlay()
         } else {
@@ -475,7 +562,10 @@ fun WatchPhotoScreen(
                             onReactionClick = { reaction ->
                                 onReactionClick(post.id, reaction)
                                 onShowReactionDialog()
-                            }
+                            },
+                            onHidePost = { onHidePost(post.id) },
+                            onDeletePost = { onDeletePost(post.id) },
+                            isOwner = post.isOwner,
                         )
                     }
                 }
@@ -537,14 +627,6 @@ fun WatchPhotoScreen(
                     )
                 }
             }
-
-            Icon(
-                imageVector = Icons.Outlined.KeyboardArrowDown,
-                contentDescription = stringResource(R.string.icon_more),
-                tint = iconTint.copy(alpha = 0.9f),
-                modifier = Modifier
-                    .size(34.dp)
-            )
         }
     }
 }
@@ -552,8 +634,8 @@ fun WatchPhotoScreen(
 @Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
 @Composable
 private fun WatchPhotoScreenPreview() {
-    MaterialTheme {
-        WatchPhotoScreen(
+    MomentumTheme {
+        WatchPhotoScreenFull(
             onShowReactionDialog = {},
             onReactionClick = { _, _ -> },
             onGoToTakePhoto = {},
@@ -561,6 +643,8 @@ private fun WatchPhotoScreenPreview() {
             onGoToSettings = {},
             onProfileClick = {},
             onGoToFriends = {},
+            onHidePost = {},
+            onDeletePost = {},
             postIndex = 0,
             posts = listOf(
                 PostData(
@@ -570,6 +654,7 @@ private fun WatchPhotoScreenPreview() {
                     title = "Description",
                     presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
                     mediaType = MediaType.IMAGE,
+                    isOwner = false,
                     reactions = listOf(
                         ReactionData(
                             emoji = ReactionType.HEART,
@@ -579,22 +664,6 @@ private fun WatchPhotoScreenPreview() {
                             emoji = ReactionType.CLOWN,
                             users = listOf("user1", "user2", "preview-user")
                         ),
-//                        ReactionData(
-//                            emoji = ReactionType.POOP,
-//                            users = listOf("preview-user", "user3")
-//                        ),
-//                        ReactionData(
-//                            emoji = ReactionType.LOUDLYCRYING,
-//                            users = listOf("user1")
-//                        ),
-//                        ReactionData(
-//                            emoji = ReactionType.CHECK_MARK,
-//                            users = listOf("user1", "user2", "user3")
-//                        ),
-//                        ReactionData(
-//                            emoji = ReactionType.SMILE,
-//                            users = listOf("user1", "user3")
-//                        )
                     ),
                     createdAt = "2026-03-12T14:38:50.690942Z"
                 ),
@@ -605,11 +674,47 @@ private fun WatchPhotoScreenPreview() {
                     title = "Description2",
                     presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
                     mediaType = MediaType.IMAGE,
+                    isOwner = false,
                     createdAt = "2026-03-12T14:38:50.690942Z"
                 )
             ),
-            currentUserId = "preview-user",
-            isShowingReactionsDialog = false
+            uiState = PostsState(
+                posts = listOf(
+                    PostData(
+                        id = "1",
+                        userId = "preview-user",
+                        userName = "PreviewName",
+                        title = "Description",
+                        presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+                        mediaType = MediaType.IMAGE,
+                        isOwner = false,
+                        reactions = listOf(
+                            ReactionData(
+                                emoji = ReactionType.HEART,
+                                users = listOf("user1")
+                            ),
+                            ReactionData(
+                                emoji = ReactionType.CLOWN,
+                                users = listOf("user1", "user2", "preview-user")
+                            ),
+                        ),
+                        createdAt = "2026-03-12T14:38:50.690942Z"
+                    ),
+                    PostData(
+                        id = "2",
+                        userId = "preview-user",
+                        userName = "PreviewName2",
+                        title = "Description2",
+                        presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+                        mediaType = MediaType.IMAGE,
+                        isOwner = true,
+                        createdAt = "2026-03-12T14:38:50.690942Z"
+                    )
+                ),
+                hiddenPosts = listOf(),
+                isRefreshing = false,
+                currentUserId = "123"
+            )
         )
     }
 }
