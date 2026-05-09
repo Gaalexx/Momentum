@@ -143,6 +143,7 @@
     <string name="label_delete_account_confirmation">Вы действительно хотите удалить аккаунт?</string>
     <string name="button_delete_account_yes">Да</string>
     <string name="button_delete_account_no">Нет</string>
+    <string name="error_text_account_not_exists">Аккаунт уже был удалён</string>
 
     <!-- Settings Privacy Screen -->
     <string name="settings_privacy_title">Конфиденциальность</string>

@@ -1,34 +1,23 @@
-package com.project.momentum.features.auth.ui
+package com.project.momentum.features.settings.ui
 
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.project.momentum.R
-import com.project.momentum.features.auth.models.LoginState
 import com.project.momentum.features.auth.models.LoginType
 import com.project.momentum.features.auth.viewmodel.ErrorLogin
+import com.project.momentum.features.settings.models.DeleteAccountState
 
 @Composable
-fun handlingErrorLogin(state: LoginState): String? =
+fun handlingErrorDelete(state: DeleteAccountState): String? =
     when (state.errorMessage) {
         is ErrorLogin.LoginError ->
-            when (state.loginType) {
-                LoginType.EMAIL ->
-                    when (state.errorMessage) {
-                        ErrorLogin.LoginError.ALREADY_EXISTS_IN_DB -> stringResource(R.string.error_text_email_already_exists_in_db)
-                        ErrorLogin.LoginError.NOT_EXISTS -> stringResource(R.string.error_text_email_not_exists)
-                        ErrorLogin.LoginError.NOT_EXISTS_IN_DB -> stringResource(R.string.error_text_email_not_exists_in_db)
-                        ErrorLogin.LoginError.INVALID_FORMAT -> stringResource(R.string.error_text_email_not_exists)
-                        ErrorLogin.LoginError.EMPTY -> stringResource(R.string.error_text_email_empty)
-                    }
-                else ->
-                    when (state.errorMessage) {
-                        ErrorLogin.LoginError.ALREADY_EXISTS_IN_DB -> stringResource(R.string.error_text_phone_already_exists_in_db)
-                        ErrorLogin.LoginError.NOT_EXISTS -> stringResource(R.string.error_text_phone_not_exists)
-                        ErrorLogin.LoginError.NOT_EXISTS_IN_DB -> stringResource(R.string.error_text_phone_not_exists_in_db)
-                        ErrorLogin.LoginError.INVALID_FORMAT -> stringResource(R.string.error_text_phone_not_exists)
-                        ErrorLogin.LoginError.EMPTY -> stringResource(R.string.error_text_phone_empty)
-                    }
+            when (state.errorMessage) {
+                ErrorLogin.LoginError.ALREADY_EXISTS_IN_DB -> stringResource(R.string.error_text_email_already_exists_in_db)
+                ErrorLogin.LoginError.NOT_EXISTS -> stringResource(R.string.error_text_email_not_exists)
+                ErrorLogin.LoginError.NOT_EXISTS_IN_DB -> stringResource(R.string.error_text_email_not_exists_in_db)
+                ErrorLogin.LoginError.INVALID_FORMAT -> stringResource(R.string.error_text_email_not_exists)
+                ErrorLogin.LoginError.EMPTY -> stringResource(R.string.error_text_email_empty)
             }
         is ErrorLogin.PasswordError ->
             when(state.errorMessage) {
@@ -50,7 +39,8 @@ fun handlingErrorLogin(state: LoginState): String? =
                 ErrorLogin.DeleteError.NOT_EXISTS -> stringResource(R.string.error_text_account_not_exists)
             }
         is ErrorLogin.None -> {
-            Log.e("Momentum", "isError = true && errorMessage = ErrorLogin.None, in HandlingErrorLogin")
+            Log.e("Momentum", "isError = true && errorMessage = ErrorLogin.None, in HandlingErrorDelete")
             null
         }
+
     }

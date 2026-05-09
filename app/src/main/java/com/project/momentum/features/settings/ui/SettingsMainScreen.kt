@@ -13,6 +13,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.project.momentum.features.settings.template.TemplateSettingsMain
 import com.project.momentum.features.settings.viewmodel.SettingsEffect
 import com.project.momentum.features.settings.viewmodel.SettingsMainScreenViewModel
+import com.project.momentum.navigation.viewmodel.AppStartViewModel
+import com.project.momentum.navigation.viewmodel.SwitchesState
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -21,9 +23,11 @@ fun SettingsMainScreen(
     onPremiumClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     onDeleteAccountClick: () -> Unit = {},
-    viewModel: SettingsMainScreenViewModel = hiltViewModel()
+    viewModel: SettingsMainScreenViewModel = hiltViewModel(),
+    appStartViewModel: AppStartViewModel
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val switchesState by appStartViewModel.settingsState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
@@ -40,8 +44,9 @@ fun SettingsMainScreen(
     ) {
         TemplateSettingsMain(
             onBackClick = onBackClick,
-            onEvent = viewModel::onEvent,
+            onEvent = { event -> viewModel.onEvent(event, appStartViewModel) },
             state = uiState,
+            switchesState = switchesState,
             onPremiumClick = onPremiumClick,
             onLogoutClick = onLogoutClick,
             onDeleteAccountClick = onDeleteAccountClick

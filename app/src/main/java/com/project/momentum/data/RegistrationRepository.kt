@@ -1,5 +1,6 @@
 package com.project.momentum.data
 
+import android.util.Log
 import com.project.momentum.data.remote.AuthAPI
 import com.project.momentum.data.auth.SessionManager
 import com.project.momentum.data.auth.datastore.AuthStorageImpl
@@ -128,5 +129,18 @@ class RegistrationRepository @Inject constructor(
     suspend fun saveToken(token: String) {
         val encrypted = keyStoreManager.encrypt(token)
         authStorage.saveEncryptedData(encrypted)
+    }
+
+    suspend fun clearSession() {
+        sessionManager.clear()
+    }
+
+    suspend fun clearLocalAuthData() {
+        try {
+            authStorage.clear()
+            keyStoreManager.clearKey()
+        } catch (e: Exception) {
+            Log.e("RegistrationRepository", "Error clearing auth data: ${e.message}")
+        }
     }
 }

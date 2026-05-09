@@ -45,12 +45,13 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        
         buildConfigField(
             "String",
             "BACKEND_BUILD_URL",
             "\"http://193.233.20.47/api/momentum/\""
         )
+
+      
 
         buildConfigField(
             "String",

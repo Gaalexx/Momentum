@@ -52,6 +52,7 @@ import com.project.momentum.features.settings.ui.SettingsPremiumScreen
 import com.project.momentum.navigation.viewmodel.AppStartState
 import com.project.momentum.navigation.viewmodel.AppStartViewModel
 import com.project.momentum.ui.common.LoadingOverlay
+import com.project.momentum.features.offline.ui.NoInternetScreen
 
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalAnimationApi::class)
@@ -321,22 +322,23 @@ fun MainScreen() {
                     )
                 }
 
-                entry<NavRoutes.Settings> {
-                    SettingsMainScreen(
-                        onBackClick = {
-                            closeOverlay()
-                        },
-                        onPremiumClick = {
-                            openOverlay(NavRoutes.Premium)
-                        },
-                        onLogoutClick = {
-                            closeOverlay()
-                        },
-                        onDeleteAccountClick = {
-                            openOverlay(NavRoutes.DeleteAccountCheckPassword)
-                        }
-                    )
-                }
+            entry<NavRoutes.Settings> {
+                SettingsMainScreen(
+                    onBackClick = {
+                        closeOverlay()
+                    },
+                    onPremiumClick = {
+                        openOverlay(NavRoutes.Premium)
+                    },
+                    onLogoutClick = {
+                        closeOverlay()
+                    },
+                    onDeleteAccountClick = {
+                        openOverlay(NavRoutes.DeleteAccountCheckPassword)
+                    },
+                    appStartViewModel = appStartViewModel
+                )
+            }
 
                 entry<NavRoutes.Account> {
                     AccountRoot(
@@ -478,17 +480,17 @@ fun MainScreen() {
                             closeOverlay()
                         },
                         onContinueClick = {
-                            openOverlay(NavRoutes.DeleteAccountConfirmation)
-                        }
-                    )
-                }
-                entry<NavRoutes.DeleteAccountConfirmation> {
-                    DeleteAccountConfirmationScreen(
-                        onCancel = {
-                            closeOverlay()
-                        },
-                        onConfirm = {
-                            openOverlay(NavRoutes.RegistrationLogin)
+                            val toRemove = backStack.filter {
+                                it is NavRoutes.DeleteAccountCheckPassword ||
+                                        it is NavRoutes.DeleteAccountCheckCode
+                            }
+                            toRemove.forEach { backStack.remove(it) }
+
+                            appStartViewModel.logout()
+
+                            backStack.clear()
+
+                            setBase(NavRoutes.RegistrationLogin)
                         }
                     )
                 }
@@ -538,7 +540,8 @@ private fun NavKey.isOverlayRoute(): Boolean {
         is NavRoutes.NoInternetConnection,
         is NavRoutes.Camera,
         is NavRoutes.Recorder,
-        is NavRoutes.Gallery -> false
+        is NavRoutes.Gallery,
+        is NavRoutes.DeleteAccountConfirmation -> false
 
         else -> true
     }
