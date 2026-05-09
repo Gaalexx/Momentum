@@ -44,6 +44,7 @@ import com.project.momentum.features.account.viewmodel.MediaState
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.ui.assets.EditCircleButton
 import com.project.momentum.ui.theme.AppTextStyles
+import com.project.momentum.ui.theme.MomentumTheme
 
 
 @Composable
@@ -275,7 +276,7 @@ fun AccountScreen(
 @Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
 @Composable
 private fun AccountScreenPreview() {
-    MaterialTheme {
+    MomentumTheme {
         AccountScreen(
             onPostClick = {},
             onEditClick = {},

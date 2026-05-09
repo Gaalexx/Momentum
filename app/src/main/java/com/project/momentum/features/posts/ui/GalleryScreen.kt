@@ -29,6 +29,7 @@ import com.project.momentum.ui.assets.SettingsCircleButton
 import com.project.momentum.features.posts.viewmodel.GalleryEvent
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.ui.assets.S3PhotoGrid
+import com.project.momentum.ui.theme.MomentumTheme
 
 
 @Composable
@@ -150,7 +151,7 @@ private fun GalleryScreenContent(
 @Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
 @Composable
 private fun GalleryScreenPreview() {
-    MaterialTheme {
+    MomentumTheme {
         GalleryScreenContent(
             posts = listOf(),
             isLoading = false,

@@ -1,7 +1,6 @@
 package com.project.momentum.features.contentcreation.ui
 
 import android.net.Uri
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -26,6 +25,7 @@ import com.project.momentum.features.contentcreation.state.rememberCameraScreenS
 import com.project.momentum.features.contentcreation.ui.assets.MediaCreationContent
 import com.project.momentum.features.contentcreation.ui.assets.MediaCreationContentCompact
 import com.project.momentum.features.contentcreation.viewmodel.CameraViewModel
+import com.project.momentum.ui.theme.MomentumTheme
 
 const val DefaultMaxRecordMs = 60_000
 
@@ -178,7 +178,7 @@ fun CameraLikeScreen(
 @Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
 @Composable
 private fun MediaCreationScreenPreview() {
-    MaterialTheme {
+    MomentumTheme {
         MediaCreationContent(
             mode = ContentCreationMode.Camera,
             hasCameraPermission = false,

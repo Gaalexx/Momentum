@@ -1,8 +1,9 @@
 package com.project.momentum.ui.theme
 
-import android.app.Activity
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -10,47 +11,135 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.Constraints
-import com.project.momentum.ui.theme.ConstColours
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+enum class MomentumThemeVariant {
+    Momentum,
+    AndroidSettings
+}
+
+private val MomentumStaticColours = MomentumColourDefaults.Static
+
+private val MomentumDarkColorScheme = darkColorScheme(
+    primary = MomentumStaticColours.mainBrandBlue,
+    onPrimary = MomentumStaticColours.white,
+    primaryContainer = MomentumStaticColours.mainBrandBlueAlpha40,
+    onPrimaryContainer = MomentumStaticColours.white,
+    secondary = MomentumStaticColours.mainBackGray,
+    onSecondary = MomentumStaticColours.white,
+    secondaryContainer = MomentumStaticColours.mainGlassGrayAlpha62,
+    onSecondaryContainer = MomentumStaticColours.white,
+    tertiary = MomentumStaticColours.gold,
+    onTertiary = MomentumStaticColours.black,
+    error = MomentumStaticColours.errorRed,
+    onError = MomentumStaticColours.white,
+    background = MomentumStaticColours.black,
+    onBackground = MomentumStaticColours.white,
+    surface = MomentumStaticColours.black,
+    onSurface = MomentumStaticColours.white,
+    surfaceVariant = MomentumStaticColours.mainBackGray,
+    onSurfaceVariant = MomentumStaticColours.supportingText,
+    outline = MomentumStaticColours.supportingSubText,
+    inverseSurface = MomentumStaticColours.white,
+    inverseOnSurface = MomentumStaticColours.black,
+    inversePrimary = MomentumStaticColours.mainBrandBlue,
+    scrim = MomentumStaticColours.black
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = ConstColours.BLACK,
-    secondary = ConstColours.MAIN_BACK_GRAY,
-    tertiary = ConstColours.MAIN_BRAND_BLUE
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+private val MomentumLightColorScheme = lightColorScheme(
+    primary = MomentumStaticColours.mainBrandBlue,
+    onPrimary = MomentumStaticColours.white,
+    primaryContainer = MomentumStaticColours.mainBrandBlue.copy(alpha = 0.12f),
+    onPrimaryContainer = MomentumStaticColours.mainBrandBlue,
+    secondary = MomentumStaticColours.mainBackGray,
+    onSecondary = MomentumStaticColours.white,
+    secondaryContainer = MomentumStaticColours.accountLogoTint,
+    onSecondaryContainer = MomentumStaticColours.black,
+    tertiary = MomentumStaticColours.gold,
+    onTertiary = MomentumStaticColours.black,
+    error = MomentumStaticColours.errorRed,
+    onError = MomentumStaticColours.white,
+    background = MomentumStaticColours.white,
+    onBackground = MomentumStaticColours.black,
+    surface = MomentumStaticColours.white,
+    onSurface = MomentumStaticColours.black,
+    surfaceVariant = MomentumStaticColours.accountLogoTint,
+    onSurfaceVariant = MomentumStaticColours.supportingSubText,
+    outline = MomentumStaticColours.supportingText,
+    inverseSurface = MomentumStaticColours.black,
+    inverseOnSurface = MomentumStaticColours.white,
+    inversePrimary = MomentumStaticColours.mainBrandBlue,
+    scrim = MomentumStaticColours.black
 )
+
+private fun momentumColorScheme(darkTheme: Boolean): ColorScheme =
+    if (darkTheme) MomentumDarkColorScheme else MomentumLightColorScheme
+
+@RequiresApi(Build.VERSION_CODES.S)
+@Composable
+private fun androidSettingsColorScheme(darkTheme: Boolean): ColorScheme {
+    val context = LocalContext.current
+    return if (darkTheme) {
+        dynamicDarkColorScheme(context)
+    } else {
+        dynamicLightColorScheme(context)
+    }
+}
+
+@Composable
+private fun resolveMomentumColorScheme(
+    darkTheme: Boolean,
+    dynamicColor: Boolean,
+    themeVariant: MomentumThemeVariant
+): ColorScheme = when {
+    (dynamicColor || themeVariant == MomentumThemeVariant.AndroidSettings) &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> androidSettingsColorScheme(darkTheme)
+
+    else -> momentumColorScheme(darkTheme)
+}
+
+private fun ColorScheme.toConstColours(
+    dynamicColor: Boolean,
+    themeVariant: MomentumThemeVariant
+): MomentumColours =
+    if (
+        (dynamicColor || themeVariant == MomentumThemeVariant.AndroidSettings) &&
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+    ) {
+        MomentumColourDefaults.fromColorScheme(this)
+    } else {
+        MomentumColourDefaults.Static
+    }
+
+@Composable
+fun MomentumAndroidSettingsTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
+    MomentumTheme(
+        darkTheme = darkTheme,
+        themeVariant = MomentumThemeVariant.AndroidSettings,
+        content = content
+    )
+}
 
 @Composable
 fun MomentumTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
+    themeVariant: MomentumThemeVariant = MomentumThemeVariant.Momentum,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    val colorScheme = resolveMomentumColorScheme(
+        darkTheme = darkTheme,
+        dynamicColor = dynamicColor,
+        themeVariant = themeVariant
+    )
+    ConstColours.use(
+        colorScheme.toConstColours(
+            dynamicColor = dynamicColor,
+            themeVariant = themeVariant
+        )
+    )
 
     MaterialTheme(
         colorScheme = colorScheme,
