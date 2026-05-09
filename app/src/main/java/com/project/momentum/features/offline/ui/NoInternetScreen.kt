@@ -158,5 +158,7 @@ private fun OfflineIllustration(
 @Preview(showBackground = true, backgroundColor = 0xFF181818)
 @Composable
 private fun NoInternetScreenPreview() {
+    MomentumTheme {
         NoInternetScreen()
+    }
 }

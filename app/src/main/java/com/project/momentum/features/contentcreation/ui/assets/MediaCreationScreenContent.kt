@@ -151,6 +151,7 @@ internal fun MediaCreationContentCompact(
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
     modifier: Modifier = Modifier,
+    cameraPreviewEnabled: Boolean = true,
 ) {
     Column(
         modifier = modifier
@@ -169,6 +170,7 @@ internal fun MediaCreationContentCompact(
                 ContentCreationMode.Audio -> audioRecordingProgress
             },
             audioLevel = audioLevel,
+            cameraPreviewEnabled = cameraPreviewEnabled
         )
 
         MediaCreationModeSwitcher(

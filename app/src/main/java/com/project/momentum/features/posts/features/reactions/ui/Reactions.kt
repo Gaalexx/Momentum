@@ -1,6 +1,5 @@
 package com.project.momentum.features.posts.features.reactions.ui
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,47 +12,33 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.Reply
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.ContentCopy
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Reply
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.project.momentum.R
 import com.project.momentum.features.posts.features.reactions.models.ReactionData
 import com.project.momentum.features.posts.features.reactions.models.ReactionType
-import com.project.momentum.ui.assets.DialogEventButton
-import com.project.momentum.ui.assets.PostDialogInfo
-import com.project.momentum.ui.assets.SubButton
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
+import com.project.momentum.ui.theme.MomentumTheme
 
 @Composable
 fun ReactionButton(
@@ -224,29 +209,6 @@ fun ReactionsDialog(
                 onDeletePost = onDeletePost,
                 isOwner = isOwner
             )
-//            Box(
-//                modifier = Modifier
-//                    .clip(RoundedCornerShape(10))
-//                    .background(ConstColours.MAIN_BACK_GRAY)
-//            ) {
-//                Column {
-//                    DialogEventButton(
-//                        text = R.string.template_sub_button,
-//                        icon = Icons.Outlined.Reply,
-//                        onClick = {}
-//                    )
-//                    DialogEventButton(
-//                        text = R.string.template_sub_button,
-//                        icon = Icons.Outlined.ContentCopy,
-//                        onClick = {}
-//                    )
-//                    DialogEventButton(
-//                        text = R.string.template_sub_button,
-//                        icon = Icons.Outlined.Delete,
-//                        onClick = {}
-//                    )
-//                }
-//            }
         }
     }
 }
@@ -283,7 +245,7 @@ fun ReactionsGrid(
 @Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
 @Composable
 private fun ReactionsDialogPreview() {
-    MaterialTheme {
+    MomentumTheme {
         ReactionsDialog(
             isOwner = true,
             onReactionClick = { _ -> },
@@ -296,7 +258,7 @@ private fun ReactionsDialogPreview() {
 @Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
 @Composable
 private fun ReactionButtonPreview() {
-    MaterialTheme {
+    MomentumTheme {
         Row {
             ReactionButton(
                 emoji = ReactionType.LIKE.emoji,

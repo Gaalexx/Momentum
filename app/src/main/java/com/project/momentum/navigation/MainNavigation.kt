@@ -338,14 +338,7 @@ fun MainScreen() {
                     )
                 }
 
-                entry<NavRoutes.Account>(
-                    metadata = NavDisplay.transitionSpec {
-                        slideInHorizontally(
-                            initialOffsetX = { -it },
-                            animationSpec = tween(500)
-                        ) togetherWith ExitTransition.KeepUntilTransitionsFinished
-                    }
-                ) {
+                entry<NavRoutes.Account> {
                     AccountRoot(
                         onPostClick = { post, userId ->
                             openOverlay(

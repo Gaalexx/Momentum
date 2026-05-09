@@ -39,6 +39,7 @@ import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.ui.assets.DialogEventButton
 import com.project.momentum.ui.assets.PostDialogInfo
 import com.project.momentum.ui.assets.S3PhotoGrid
+import com.project.momentum.ui.theme.MomentumTheme
 
 @Composable
 fun GalleryScreen(
@@ -179,7 +180,7 @@ private fun GalleryScreenContent(
 @Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
 @Composable
 private fun GalleryScreenPreview() {
-    MaterialTheme {
+    MomentumTheme {
         GalleryScreenContent(
             posts = listOf(),
             isRefreshing = false,

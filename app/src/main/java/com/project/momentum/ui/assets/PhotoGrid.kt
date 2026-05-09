@@ -25,6 +25,7 @@ import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -151,15 +152,17 @@ fun S3PhotoGrid(
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
-    val displayItems = buildList<S3GridItem> {
-        if (showPlusButton) add(S3GridItem.PlusButton)
-        posts.forEach { post ->
-            when (post.mediaType) {
-                MediaType.IMAGE -> add(S3GridItem.Post(post))
-                MediaType.AUDIO -> add(S3GridItem.AudioPost(post, GradientPicker.pick()))
-                MediaType.VIDEO -> add(S3GridItem.VideoPost(post))
-            }
+    val displayItems = remember(posts, showPlusButton) {
+        buildList<S3GridItem> {
+            if (showPlusButton) add(S3GridItem.PlusButton)
+            posts.forEach { post ->
+                when (post.mediaType) {
+                    MediaType.IMAGE -> add(S3GridItem.Post(post))
+                    MediaType.AUDIO -> add(S3GridItem.AudioPost(post, GradientPicker.pick()))
+                    MediaType.VIDEO -> add(S3GridItem.VideoPost(post))
+                }
 
+            }
         }
     }
 

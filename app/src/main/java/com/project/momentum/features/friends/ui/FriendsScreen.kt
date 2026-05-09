@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -33,6 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import coil.compose.AsyncImage
 import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.ui.theme.AppTextStyles
+import com.project.momentum.ui.theme.MomentumTheme
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
@@ -720,7 +720,7 @@ fun FriendsScreenPreview() {
 )
 @Composable
 fun FriendItemPreview() {
-    MaterialTheme {
+    MomentumTheme {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
