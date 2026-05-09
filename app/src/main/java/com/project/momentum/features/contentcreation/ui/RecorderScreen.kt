@@ -16,7 +16,7 @@ fun RecorderScreen(
     onGoToPreview: (Uri, MediaTypeToSend) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    MediaCreationScreen(
+    MediaCreationRoot(
         modifier = modifier,
         initialMode = ContentCreationMode.Audio,
         onGoToPreview = onGoToPreview,

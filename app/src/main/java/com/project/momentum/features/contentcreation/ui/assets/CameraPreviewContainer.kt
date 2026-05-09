@@ -5,7 +5,7 @@ import android.view.Surface
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
-import androidx.camera.core.Preview as CameraXPreview
+import androidx.camera.core.Preview
 import androidx.camera.core.UseCaseGroup
 import androidx.camera.core.ViewPort
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -24,7 +24,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.google.common.util.concurrent.ListenableFuture
 import com.project.momentum.features.contentcreation.state.CameraScreenState
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -37,7 +36,7 @@ fun CameraPreviewContainer(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycleOwner = state.cameraLifecycleOwner
     val previewView = remember(context) {
         PreviewView(context).apply {
             scaleType = PreviewView.ScaleType.FILL_CENTER
@@ -54,6 +53,13 @@ fun CameraPreviewContainer(
         factory = { previewView },
     )
 
+    DisposableEffect(previewView, state.preview) {
+        state.preview.setSurfaceProvider(previewView.surfaceProvider)
+        onDispose {
+            state.preview.setSurfaceProvider(null)
+        }
+    }
+
     LaunchedEffect(state.lensFacing, state.imageCapture, state.videoCapture) {
         val cameraProvider = cameraProviderFuture.await(mainExecutor)
         camera = bindCameraUseCases(
@@ -63,6 +69,7 @@ fun CameraPreviewContainer(
             lensFacing = state.lensFacing,
             imageCapture = state.imageCapture,
             videoCapture = state.videoCapture,
+            preview = state.preview
         )
         updateTorch(camera = camera, torchEnabled = state.torchEnabled)
     }
@@ -71,13 +78,7 @@ fun CameraPreviewContainer(
         updateTorch(camera = camera, torchEnabled = state.torchEnabled)
     }
 
-    DisposableEffect(cameraProviderFuture) {
-        onDispose {
-            if (cameraProviderFuture.isDone) {
-                cameraProviderFuture.get().unbindAll()
-            }
-        }
-    }
+
 }
 
 private fun bindCameraUseCases(
@@ -87,11 +88,8 @@ private fun bindCameraUseCases(
     lensFacing: Int,
     imageCapture: ImageCapture,
     videoCapture: VideoCapture<Recorder>,
+    preview: Preview
 ): Camera {
-    val preview = CameraXPreview.Builder().build().also {
-        it.setSurfaceProvider(previewView.surfaceProvider)
-    }
-
     val selector = CameraSelector.Builder()
         .requireLensFacing(lensFacing)
         .build()

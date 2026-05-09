@@ -24,6 +24,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.contentcreation.ui.DefaultMaxRecordMs
+import com.project.momentum.features.contentcreation.ui.MediaCreationRoot
 import com.project.momentum.features.contentcreation.ui.MediaCreationScreen
 import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
 import com.project.momentum.features.posts.ui.NoPostsYet
@@ -78,10 +79,11 @@ fun CameraContentPager(
             Spacer(Modifier.height(5.dp))
             VerticalPager(
                 state = pagerState,
+//                beyondViewportPageCount = 1,
                 modifier = Modifier.fillMaxSize()
             ) { page ->
                 when (page) {
-                    0 -> MediaCreationScreen(
+                    0 -> MediaCreationRoot(
                         initialMode = initialMode,
                         onGoToPreview = onGoToPreview,
                         onProfileClick = onProfileClick,
