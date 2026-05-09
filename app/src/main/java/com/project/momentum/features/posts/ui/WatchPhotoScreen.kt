@@ -71,10 +71,11 @@ import com.project.momentum.ui.assets.ContinueButton
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Surface
 import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
+import com.project.momentum.features.posts.viewmodel.GalleryEvent
 import com.project.momentum.features.posts.viewmodel.PostsState
 import com.project.momentum.ui.assets.VideoView
 import com.project.momentum.ui.common.LoadingOverlay
@@ -207,26 +208,34 @@ fun WatchPhotoScreenRoute(
     }.collectAsStateWithLifecycle()
     val posts = if (userId == null) uiState.posts else (userPosts ?: listOf())
 
-    val onShowReactionDialog = {
-        postsViewModel.onWatchPhotoEvent(
-            WatchPhotoEvent.OnShowReactionDialogEvent(!uiState.isShowingReactionsDialog)
-        )
-    }
-
-    val onReactionClick: (String, ReactionType) -> Unit = { postId, reaction ->
-        postsViewModel.onWatchPhotoEvent(
-            WatchPhotoEvent.OnReactionClick(postId, reaction)
-        )
-    }
-
     WatchPhotoScreenFull(
         onGoToTakePhoto = onGoToTakePhoto,
         onGoToGallery = onGoToGallery,
         onProfileClick = onProfileClick,
         onGoToSettings = onGoToSettings,
         onGoToFriends = onGoToFriends,
-        onShowReactionDialog = onShowReactionDialog,
-        onReactionClick = onReactionClick,
+
+        onHidePost = { postId ->
+            postsViewModel.onEvent(GalleryEvent.OnHidePost(postId))
+            postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
+            postsViewModel.onEvent(GalleryEvent.SelectPost(null))
+        },
+        onDeletePost = { postId ->
+            postsViewModel.onEvent(GalleryEvent.OnDeletePost(postId))
+            postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
+            postsViewModel.onEvent(GalleryEvent.SelectPost(null))
+        },
+
+        onShowReactionDialog = {
+            postsViewModel.onWatchPhotoEvent(
+                WatchPhotoEvent.OnShowReactionDialogEvent(!uiState.isShowingActionsDialog)
+            )
+        },
+        onReactionClick = { postId, reaction ->
+            postsViewModel.onWatchPhotoEvent(
+                WatchPhotoEvent.OnReactionClick(postId, reaction)
+            )
+        },
         postIndex = postIndex,
         posts = posts,
         uiState = uiState,
@@ -242,6 +251,10 @@ fun WatchPhotoScreenFull(
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
+
+    onHidePost: (String) -> Unit,
+    onDeletePost: (String) -> Unit,
+
     onShowReactionDialog: () -> Unit,
     onReactionClick: (String, ReactionType) -> Unit,
     postIndex: Int,
@@ -253,16 +266,18 @@ fun WatchPhotoScreenFull(
 ) {
 
     Surface(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .background(ConstColours.BLACK)
+            .windowInsetsPadding(WindowInsets.systemBars)
+            .fillMaxSize(),
         color = ConstColours.BLACK
     ) {
         Column {
             CameraTopBar(
-                onProfileClick = {},
-                onGoToSettings = {},
-                onGoToFriends = {},
+                onProfileClick = onProfileClick,
+                onGoToSettings = onGoToSettings,
+                onGoToFriends = onGoToFriends,
                 modifier = Modifier
-                    .windowInsetsPadding(WindowInsets.statusBars)
                     .fillMaxWidth()
                     .height(50.dp)
                     .padding(horizontal = 14.dp),
@@ -274,13 +289,14 @@ fun WatchPhotoScreenFull(
                 onReactionClick = onReactionClick,
                 onGoToTakePhoto = onGoToTakePhoto,
                 onGoToGallery = onGoToGallery,
-                onProfileClick = onProfileClick,
-                onGoToSettings = onGoToSettings,
-                onGoToFriends = onGoToFriends,
+
+                onHidePost = onHidePost,
+                onDeletePost = onDeletePost,
+
                 postIndex = postIndex,
                 posts = posts,
                 currentUserId = uiState.currentUserId,
-                isShowingReactionsDialog = uiState.isShowingReactionsDialog,
+                isShowingReactionsDialog = uiState.isShowingActionsDialog,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope
             )
@@ -293,9 +309,6 @@ fun WatchPhotoScreenFull(
 fun WatchPhotoScreenRouteForMain(
     onGoToTakePhoto: () -> Unit,
     onGoToGallery: () -> Unit,
-    onProfileClick: () -> Unit,
-    onGoToSettings: () -> Unit,
-    onGoToFriends: () -> Unit,
     postIndex: Int,
     userId: String? = null,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -305,21 +318,12 @@ fun WatchPhotoScreenRouteForMain(
 
     val uiState by postsViewModel.state.collectAsStateWithLifecycle()
 
-    val userPosts by remember(userId) {
-        if (userId != null) {
-            postsViewModel.getUserPostsFlow(userId)
-        } else {
-            MutableStateFlow(null)
-        }
-    }.collectAsStateWithLifecycle()
-
-    val posts = if (userId == null) uiState.posts else (userPosts ?: listOf())
-
+    val posts by postsViewModel.getShownPostsFlow().collectAsStateWithLifecycle()
 
     WatchPhotoScreen(
         onShowReactionDialog = {
             postsViewModel.onWatchPhotoEvent(
-                WatchPhotoEvent.OnShowReactionDialogEvent(!uiState.isShowingReactionsDialog)
+                WatchPhotoEvent.OnShowReactionDialogEvent(!uiState.isShowingActionsDialog)
             )
         },
         onReactionClick = { postId, reaction ->
@@ -329,13 +333,22 @@ fun WatchPhotoScreenRouteForMain(
         },
         onGoToTakePhoto = onGoToTakePhoto,
         onGoToGallery = onGoToGallery,
-        onProfileClick = onProfileClick,
-        onGoToSettings = onGoToSettings,
-        onGoToFriends = onGoToFriends,
+
+        onHidePost = { postId ->
+            postsViewModel.onEvent(GalleryEvent.OnHidePost(postId))
+            postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
+            postsViewModel.onEvent(GalleryEvent.SelectPost(null))
+        },
+        onDeletePost = { postId ->
+            postsViewModel.onEvent(GalleryEvent.OnDeletePost(postId))
+            postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
+            postsViewModel.onEvent(GalleryEvent.SelectPost(null))
+        },
+
         postIndex = postIndex,
         posts = posts,
         currentUserId = uiState.currentUserId,
-        isShowingReactionsDialog = uiState.isShowingReactionsDialog,
+        isShowingReactionsDialog = uiState.isShowingActionsDialog,
         sharedTransitionScope = sharedTransitionScope,
         animatedVisibilityScope = animatedVisibilityScope
     )
@@ -347,9 +360,8 @@ fun WatchPhotoScreen(
     onReactionClick: (String, ReactionType) -> Unit,
     onGoToTakePhoto: () -> Unit,
     onGoToGallery: () -> Unit,
-    onProfileClick: () -> Unit,
-    onGoToSettings: () -> Unit,
-    onGoToFriends: () -> Unit,
+    onHidePost: (String) -> Unit,
+    onDeletePost: (String) -> Unit,
     postIndex: Int,
     currentUserId: String,
     posts: List<PostData>,
@@ -550,7 +562,10 @@ fun WatchPhotoScreen(
                             onReactionClick = { reaction ->
                                 onReactionClick(post.id, reaction)
                                 onShowReactionDialog()
-                            }
+                            },
+                            onHidePost = { onHidePost(post.id) },
+                            onDeletePost = { onDeletePost(post.id) },
+                            isOwner = post.isOwner,
                         )
                     }
                 }
@@ -628,6 +643,8 @@ private fun WatchPhotoScreenPreview() {
             onGoToSettings = {},
             onProfileClick = {},
             onGoToFriends = {},
+            onHidePost = {},
+            onDeletePost = {},
             postIndex = 0,
             posts = listOf(
                 PostData(
@@ -637,6 +654,7 @@ private fun WatchPhotoScreenPreview() {
                     title = "Description",
                     presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
                     mediaType = MediaType.IMAGE,
+                    isOwner = false,
                     reactions = listOf(
                         ReactionData(
                             emoji = ReactionType.HEART,
@@ -656,42 +674,47 @@ private fun WatchPhotoScreenPreview() {
                     title = "Description2",
                     presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
                     mediaType = MediaType.IMAGE,
+                    isOwner = false,
                     createdAt = "2026-03-12T14:38:50.690942Z"
                 )
             ),
-            uiState = PostsState(listOf(
-                PostData(
-                    id = "1",
-                    userId = "preview-user",
-                    userName = "PreviewName",
-                    title = "Description",
-                    presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-                    mediaType = MediaType.IMAGE,
-                    reactions = listOf(
-                        ReactionData(
-                            emoji = ReactionType.HEART,
-                            users = listOf("user1")
+            uiState = PostsState(
+                posts = listOf(
+                    PostData(
+                        id = "1",
+                        userId = "preview-user",
+                        userName = "PreviewName",
+                        title = "Description",
+                        presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+                        mediaType = MediaType.IMAGE,
+                        isOwner = false,
+                        reactions = listOf(
+                            ReactionData(
+                                emoji = ReactionType.HEART,
+                                users = listOf("user1")
+                            ),
+                            ReactionData(
+                                emoji = ReactionType.CLOWN,
+                                users = listOf("user1", "user2", "preview-user")
+                            ),
                         ),
-                        ReactionData(
-                            emoji = ReactionType.CLOWN,
-                            users = listOf("user1", "user2", "preview-user")
-                        ),
+                        createdAt = "2026-03-12T14:38:50.690942Z"
                     ),
-                    createdAt = "2026-03-12T14:38:50.690942Z"
+                    PostData(
+                        id = "2",
+                        userId = "preview-user",
+                        userName = "PreviewName2",
+                        title = "Description2",
+                        presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+                        mediaType = MediaType.IMAGE,
+                        isOwner = true,
+                        createdAt = "2026-03-12T14:38:50.690942Z"
+                    )
                 ),
-                PostData(
-                    id = "2",
-                    userId = "preview-user",
-                    userName = "PreviewName2",
-                    title = "Description2",
-                    presignedURL = "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
-                    mediaType = MediaType.IMAGE,
-                    createdAt = "2026-03-12T14:38:50.690942Z"
-                )
-            ), isRefreshing = false, currentUserId = "123")
+                hiddenPosts = listOf(),
+                isRefreshing = false,
+                currentUserId = "123"
+            )
         )
-
-        }
-
-
+    }
 }

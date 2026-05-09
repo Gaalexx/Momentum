@@ -22,15 +22,21 @@ import javax.inject.Inject
 
 data class PostsState(
     val posts: List<PostData>,
+    val hiddenPosts: List<String>,
     val isRefreshing: Boolean,
     val currentUserId: String,
-    val isShowingReactionsDialog: Boolean = false
+    val selectedPost: String? = null,
+    val isShowingActionsDialog: Boolean = false,
 )
 
 sealed interface GalleryEvent {
     data object OnLoadPosts : GalleryEvent
     data object OnRefreshPosts : GalleryEvent
     data class OnLocalLoadPosts(val posts: List<PostData>) : GalleryEvent
+    data class OnShowActionsDialog(val isShowing: Boolean) : GalleryEvent
+    data class OnDeletePost(val postId: String) : GalleryEvent
+    data class OnHidePost(val postId: String) : GalleryEvent
+    data class SelectPost(val post: String?) : GalleryEvent
 }
 
 sealed interface WatchPhotoEvent {
@@ -47,7 +53,7 @@ class PostsViewModel @Inject constructor(
     private val repo: PostsRepo,
     private val sessionManager: SessionManager
 ) : ViewModel() {
-    private val _state = MutableStateFlow<PostsState>(PostsState(listOf(), false, ""))
+    private val _state = MutableStateFlow<PostsState>(PostsState(listOf(), listOf(), false, ""))
     val state = _state.asStateFlow()
 
     init {
@@ -62,6 +68,10 @@ class PostsViewModel @Inject constructor(
             is GalleryEvent.OnLoadPosts -> loadAllPosts()
             is GalleryEvent.OnRefreshPosts -> refreshPosts()
             is GalleryEvent.OnLocalLoadPosts -> loadLocalPosts(event)
+            is GalleryEvent.OnShowActionsDialog -> showActionsDialogChange(event)
+            is GalleryEvent.OnDeletePost -> deletePost(event)
+            is GalleryEvent.OnHidePost -> hidePost(event)
+            is GalleryEvent.SelectPost -> selectPost(event)
             else -> println()
         }
     }
@@ -78,16 +88,66 @@ class PostsViewModel @Inject constructor(
         }
     }
 
+    private fun deletePost(event: GalleryEvent.OnDeletePost) {
+        val oldState = state.value
+
+        _state.update {
+            it.copy(posts = it.posts.filter { post -> post.id != event.postId })
+        }
+
+        viewModelScope.launch {
+            try {
+                if (!repo.deletePost(event.postId)) {
+                    _state.update { oldState }
+                }
+            } catch (e: Exception) {
+                Log.e("PostsViewModel", "Error deleting post ${e.message ?: ""}", e)
+                _state.update { oldState }
+            }
+        }
+    }
+
+    private fun hidePost(event: GalleryEvent.OnHidePost) {
+        val oldState = state.value
+
+        _state.update {
+            it.copy(hiddenPosts = it.hiddenPosts + listOf(event.postId))
+        }
+
+        viewModelScope.launch {
+            try {
+                if (!repo.hidePost(event.postId)) {
+                    _state.update { oldState }
+                }
+            } catch (e: Exception) {
+                Log.e("PostsViewModel", "Error hiding post ${e.message ?: ""}", e)
+                _state.update { oldState }
+            }
+        }
+    }
+
+    private fun selectPost(event: GalleryEvent.SelectPost) {
+        _state.update {
+            it.copy(selectedPost = event.post)
+        }
+    }
+
+    private fun showActionsDialogChange(event: GalleryEvent.OnShowActionsDialog) {
+        _state.update {
+            it.copy(isShowingActionsDialog = event.isShowing)
+        }
+    }
+
     private fun showReactionDialogChange(event: WatchPhotoEvent.OnShowReactionDialogEvent) {
         _state.update {
-            it.copy(isShowingReactionsDialog = event.isShowing)
+            it.copy(isShowingActionsDialog = event.isShowing)
         }
     }
 
     private fun onReactionClick(event: WatchPhotoEvent.OnReactionClick) {
-        val currentUserId = sessionManager.getUserId() ?: throw Exception() // TODO: custom Exception
+        val currentUserId = sessionManager.getUserId() ?: throw Exception("PostsViewModel:onReactionClick: Unauthorized user cant see reactions") // TODO: custom Exception
 
-        val post = _state.value.posts.find { it.id == event.postId } ?: throw Exception() // no such post
+        val post = _state.value.posts.find { it.id == event.postId } ?: throw Exception("PostsViewModel:onReactionClick: no such post to react")
 
 
         //TODO: если часто добавлять или удалять реакции и проблемы с сетью
@@ -123,7 +183,7 @@ class PostsViewModel @Inject constructor(
                                     } else reaction
                                 }
                             )
-                        } else throw Exception() // no such reaction or reactions == null
+                        } else throw Exception("PostsViewModel:deleteReaction: no such reaction or reactions == null")
                     } else post
                 }
             )
@@ -193,6 +253,13 @@ class PostsViewModel @Inject constructor(
         }
     }
 
+    private suspend fun hiddenPostsUpdate() {
+        val posts = repo.getHiddenPosts()
+        _state.update {
+            it.copy(hiddenPosts = posts)
+        }
+    }
+
     private fun loadLocalPosts(event: GalleryEvent.OnLocalLoadPosts){
         viewModelScope.launch {
             _state.update {
@@ -204,6 +271,7 @@ class PostsViewModel @Inject constructor(
     private fun loadAllPosts() {
         viewModelScope.launch {
             postsUpdate()
+            hiddenPostsUpdate()
         }
     }
 
@@ -213,6 +281,7 @@ class PostsViewModel @Inject constructor(
                 it.copy(isRefreshing = true)
             }
             postsUpdate()
+            hiddenPostsUpdate()
             _state.update {
                 it.copy(isRefreshing = false)
             }
@@ -222,7 +291,31 @@ class PostsViewModel @Inject constructor(
     fun getUserPostsFlow(userId: String): StateFlow<List<PostData>> {
         return state.map { s ->
             s.posts
-                .filter { it.userId == userId }
+                .filter { it.userId == userId && it.id !in s.hiddenPosts }
+                .sortedByDescending { it.createdAtInstantOrNull() ?: Instant.MIN }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = listOf()
+        )
+    }
+
+    fun getShownPostsFlow(): StateFlow<List<PostData>> {
+        return state.map { s ->
+            s.posts
+                .filter { it.id !in s.hiddenPosts }
+                .sortedByDescending { it.createdAtInstantOrNull() ?: Instant.MIN }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = listOf()
+        )
+    }
+
+    fun getHiddenPostsFlow(): StateFlow<List<PostData>> {
+        return state.map { s ->
+            s.posts
+                .filter { it.id in s.hiddenPosts }
                 .sortedByDescending { it.createdAtInstantOrNull() ?: Instant.MIN }
         }.stateIn(
             scope = viewModelScope,
