@@ -90,6 +90,12 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.unit.sp
 import com.project.momentum.features.friends.ui.User
 import com.project.momentum.features.friends.viewmodel.FriendsScreenEvent
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Scaffold
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
 
 
 fun deleteByUri(context: Context, uri: Uri): Boolean {
@@ -152,7 +158,35 @@ fun SendContentScreen(
         shouldRequest = mediaType != MediaTypeToSend.AUDIO
     )
 
+    var selectedFriendIds by rememberSaveable {
+        mutableStateOf<Set<String>>(emptySet())
+    }
+    LaunchedEffect(friendsList) {
+        selectedFriendIds = friendsList.map { it.id }.toSet()
+    }
+    LaunchedEffect(Unit) {
+        friendsViewModel.onEvent(FriendsScreenEvent.GetFriends)
+    }
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
+    fun toggleFriendSelection(friendId: String) {
+        selectedFriendIds = if (selectedFriendIds.contains(friendId)) {
+            selectedFriendIds.minus(friendId)
+        } else {
+            selectedFriendIds.plus(friendId)
+        }
+    }
+
     fun sendContent() {
+        if (selectedFriendIds.isEmpty()) {
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar("Select at least one friend to share with")
+            }
+            return
+        }
+
         val safeUri = uri
         val mimeType = context.contentResolver.getType(safeUri) ?: when (mediaType) {
             MediaTypeToSend.PHOTO -> context.contentResolver.getType(safeUri) ?: "image/jpeg"
@@ -180,79 +214,96 @@ fun SendContentScreen(
         )
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(ConstColours.BLACK)
-            .windowInsetsPadding(WindowInsets.systemBars),
-    ) {
-        CameraTopBar(
-            onProfileClick = onProfileClick,
-            onGoToSettings = onGoToSettings,
-            onGoToFriends = onGoToFriends,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(50.dp)
-                .padding(horizontal = 14.dp),
-        )
-
-        Spacer(Modifier.height(5.dp))
-
-        SendContentPreviewCard(
-            hasCameraPermission = hasCameraPermission,
-            mediaType = mediaType,
-            uri = uri,
-            caption = caption,
-            onCaptionChange = { caption = it },
-            captionFocusRequester = captionFocusRequester,
-            isUploading = uploadingState != null,
-            uploadComposition = composition,
-            uploadProgress = progress,
-        )
-
-        if (uploadingState != null) {
-            UploadProgress(
-                modifier = Modifier.fillMaxWidth(),
-                uploadingState = uploadingState
+    Scaffold(
+        modifier = modifier,
+        containerColor = ConstColours.BLACK,
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { innerPadding ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(ConstColours.BLACK)
+                .windowInsetsPadding(WindowInsets.systemBars),
+        ) {
+            CameraTopBar(
+                onProfileClick = onProfileClick,
+                onGoToSettings = onGoToSettings,
+                onGoToFriends = onGoToFriends,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .padding(horizontal = 14.dp),
             )
-        } else {
-            Spacer(modifier = Modifier.weight(0.3f))
-        }
 
-        //Spacer(Modifier.weight(0.7f))
+            Spacer(Modifier.height(5.dp))
 
-
-        if (friendsList.isNotEmpty()) {
-            FriendsToShareRow(
-                friends = friendsList
+            SendContentPreviewCard(
+                hasCameraPermission = hasCameraPermission,
+                mediaType = mediaType,
+                uri = uri,
+                caption = caption,
+                onCaptionChange = { caption = it },
+                captionFocusRequester = captionFocusRequester,
+                isUploading = uploadingState != null,
+                uploadComposition = composition,
+                uploadProgress = progress,
             )
+
+            if (uploadingState != null) {
+                UploadProgress(
+                    modifier = Modifier.fillMaxWidth(),
+                    uploadingState = uploadingState
+                )
+            } else {
+                Spacer(modifier = Modifier.weight(0.3f))
+            }
+
+            //Spacer(Modifier.weight(0.7f))
+
+
+            if (friendsList.isNotEmpty()) {
+                FriendsToShareRow(
+                    friends = friendsList,
+                    selectedFriendIds = selectedFriendIds,
+                    onToggleFriend = { friendId -> toggleFriendSelection(friendId) }
+                )
+            }
+            Spacer(modifier = Modifier.weight(0.2f))
+
+            SendContentBottomControls(
+                onDelete = {
+                    deleteByUri(context = context, uri = uri)
+                    onGoToTakePhoto()
+                },
+                onSend = ::sendContent,
+                onEditCaption = {
+                    captionFocusRequester.requestFocus()
+                    keyboardController?.show()
+                },
+                isSendEnabled = selectedFriendIds.isNotEmpty(),
+                onSendBlocked = {
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar("Select at least one friend to share with")
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 25.dp)
+            )
+
+
+            Spacer(modifier = Modifier.weight(1f))
+
         }
-        Spacer(modifier = Modifier.weight(0.2f))
-
-        SendContentBottomControls(
-            onDelete = {
-                deleteByUri(context = context, uri = uri)
-                onGoToTakePhoto()
-            },
-            onSend = ::sendContent,
-            onEditCaption = {
-                captionFocusRequester.requestFocus()
-                keyboardController?.show()
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 25.dp)
-        )
-
-
-        Spacer(modifier = Modifier.weight(1f))
-
     }
 }
 
 @Composable
 private fun FriendsToShareRow(
     friends: List<User>,
+    selectedFriendIds: Set<String>,
+    onToggleFriend: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -261,7 +312,7 @@ private fun FriendsToShareRow(
             .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(
-            text = "Share with friends",
+            text = "Поделиться с друзьями (${selectedFriendIds.size}/${friends.size})",
             color = ConstColours.WHITE,
             fontSize = 12.sp,
             modifier = Modifier.padding(bottom = 12.dp)
@@ -273,7 +324,8 @@ private fun FriendsToShareRow(
             items(friends) { friend ->
                 FriendAvatarItem(
                     friend = friend,
-                    onClick = { /* Handle friend selection */ }
+                    isSelected = selectedFriendIds.contains(friend.id),
+                    onClick = { onToggleFriend(friend.id) }
                 )
             }
         }
@@ -283,6 +335,7 @@ private fun FriendsToShareRow(
 @Composable
 private fun FriendAvatarItem(
     friend: User,
+    isSelected: Boolean,
     onClick: () -> Unit
 ) {
     Column(
@@ -295,7 +348,13 @@ private fun FriendAvatarItem(
             modifier = Modifier
                 .size(56.dp)
                 .clip(CircleShape)
-                .background(ConstColours.MAIN_BACK_GRAY)
+                .background(
+                    if (isSelected) {
+                        ConstColours.MAIN_BACK_GRAY
+                    } else {
+                        Color.Gray.copy(alpha = 0.3f)
+                    }
+                )
         ) {
             if (friend.avatarUrl != null) {
                 AsyncImage(
@@ -308,15 +367,36 @@ private fun FriendAvatarItem(
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = null,
-                    tint = Color.White.copy(alpha = 0.5f),
+                    tint = if (isSelected) {
+                        Color.White.copy(alpha = 0.5f)
+                    } else {
+                        Color.White.copy(alpha = 0.2f)
+                    },
                     modifier = Modifier.size(28.dp).align(Alignment.Center)
                 )
+            }
+
+            if (isSelected) {
+                Box(
+                    modifier = Modifier
+                        .size(20.dp)
+                        .align(Alignment.TopEnd)
+                        .background(Color.Green, CircleShape)
+                        .padding(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
         }
 
         Text(
             text = friend.name ?: friend.email.take(8),
-            color = Color.White,
+            color = if (isSelected) Color.White else Color.White.copy(alpha = 0.5f),
             fontSize = 10.sp,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -419,6 +499,8 @@ private fun SendContentBottomControls(
     onDelete: () -> Unit,
     onSend: () -> Unit,
     onEditCaption: () -> Unit,
+    isSendEnabled: Boolean,
+    onSendBlocked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -444,8 +526,9 @@ private fun SendContentBottomControls(
             contentAlignment = Alignment.Center
         ) {
             BigCircleSendPhotoActionAdaptive(
-                onClick = onSend,
-                modifier = Modifier.aspectRatio(1f)
+                onClick = if (isSendEnabled) onSend else onSendBlocked,
+                modifier = Modifier.aspectRatio(1f),
+                enabled = true
             )
         }
 
