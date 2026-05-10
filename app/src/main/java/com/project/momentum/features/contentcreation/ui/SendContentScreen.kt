@@ -171,6 +171,14 @@ fun SendContentScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
+    LaunchedEffect(friendsList) {
+        val validIds = friendsList.map { it.id }.toSet()
+        if (selectedFriendIds.any { it !in validIds }) {
+            selectedFriendIds = selectedFriendIds.filter { it in validIds }.toSet()
+            // todo: snackbar
+        }
+    }
+
     fun toggleFriendSelection(friendId: String) {
         selectedFriendIds = if (selectedFriendIds.contains(friendId)) {
             selectedFriendIds.minus(friendId)
@@ -182,7 +190,7 @@ fun SendContentScreen(
     fun sendContent() {
         if (selectedFriendIds.isEmpty()) {
             coroutineScope.launch {
-                snackbarHostState.showSnackbar("Select at least one friend to share with")
+                snackbarHostState.showSnackbar("Выберите хотя бы одного друга")
             }
             return
         }
@@ -209,6 +217,8 @@ fun SendContentScreen(
                     uploadMediaType,
                     size = size,
                     label = caption
+                    //server integration
+                    //,receiverIds = selectedFriendIds.toList()
                 )
             )
         )
@@ -284,7 +294,7 @@ fun SendContentScreen(
                 isSendEnabled = selectedFriendIds.isNotEmpty(),
                 onSendBlocked = {
                     coroutineScope.launch {
-                        snackbarHostState.showSnackbar("Select at least one friend to share with")
+                        snackbarHostState.showSnackbar("Выберите хотя бы одного друга")
                     }
                 },
                 modifier = Modifier
