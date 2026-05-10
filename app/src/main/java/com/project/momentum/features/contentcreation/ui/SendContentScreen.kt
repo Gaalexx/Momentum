@@ -58,6 +58,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.project.momentum.R
+import com.project.momentum.features.contentcreation.media.AudioRecordingFormat
 import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.contentcreation.permissions.rememberCameraPermissionState
 import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
@@ -128,10 +129,10 @@ fun SendContentScreen(
 
     fun sendContent() {
         val safeUri = uri
-        val mimeType = context.contentResolver.getType(safeUri) ?: when (mediaType) {
+        val mimeType = when (mediaType) {
             MediaTypeToSend.PHOTO -> context.contentResolver.getType(safeUri) ?: "image/jpeg"
             MediaTypeToSend.VIDEO -> context.contentResolver.getType(safeUri) ?: "video/mp4"
-            MediaTypeToSend.AUDIO -> "audio/3gpp"
+            MediaTypeToSend.AUDIO -> AudioRecordingFormat.UPLOAD_MIME_TYPE
         }
         val uploadMediaType = when (mediaType) {
             MediaTypeToSend.PHOTO -> MediaType.IMAGE

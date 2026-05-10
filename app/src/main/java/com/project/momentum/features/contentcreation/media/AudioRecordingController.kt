@@ -181,11 +181,12 @@ class AudioRecordingController(
     private fun createRecorder(file: File): MediaRecorder {
         return MediaRecorder().apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            setOutputFormat(MediaRecorder.OutputFormat.OGG)
             setOutputFile(file.absolutePath)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-            setAudioEncodingBitRate(AUDIO_BIT_RATE)
-            setAudioSamplingRate(AUDIO_SAMPLE_RATE)
+            setAudioEncoder(MediaRecorder.AudioEncoder.OPUS)
+            setAudioChannels(AudioRecordingFormat.CHANNELS)
+            setAudioEncodingBitRate(AudioRecordingFormat.BIT_RATE)
+            setAudioSamplingRate(AudioRecordingFormat.SAMPLE_RATE)
         }
     }
 
@@ -193,7 +194,7 @@ class AudioRecordingController(
         val fileName = "MOMENTUM_AUD_" + SimpleDateFormat(
             "yyyy-MM-dd-HH-mm-ss-SSS",
             Locale.US,
-        ).format(System.currentTimeMillis()) + ".m4a"
+        ).format(System.currentTimeMillis()) + ".${AudioRecordingFormat.FILE_EXTENSION}"
 
         return File(
             context.getExternalFilesDir(Environment.DIRECTORY_MUSIC),
@@ -204,7 +205,7 @@ class AudioRecordingController(
     private fun saveAudioToMediaStore(context: Context, audioFile: File): Uri? {
         val values = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, audioFile.name)
-            put(MediaStore.MediaColumns.MIME_TYPE, AUDIO_MIME_TYPE)
+            put(MediaStore.MediaColumns.MIME_TYPE, AudioRecordingFormat.STORAGE_MIME_TYPE)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 put(
                     MediaStore.Audio.Media.RELATIVE_PATH,
@@ -261,9 +262,6 @@ class AudioRecordingController(
 
     private companion object {
         const val TAG = "AudioRecording"
-        const val AUDIO_MIME_TYPE = "audio/mp4"
-        const val AUDIO_BIT_RATE = 128_000
-        const val AUDIO_SAMPLE_RATE = 44_100
         const val MAX_RECORDER_AMPLITUDE = 32767f
         const val PROGRESS_TICK_MS = 16L
         const val AMPLITUDE_TICK_MS = 45L
