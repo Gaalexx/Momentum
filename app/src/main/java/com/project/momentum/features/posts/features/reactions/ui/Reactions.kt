@@ -6,15 +6,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
@@ -84,22 +88,21 @@ fun ReactionButtonWithCounter(
     ) {
         Row(
             modifier = Modifier
-                .padding(vertical = 8.dp, horizontal = 4.dp)
+                .fillMaxWidth()
+                .padding(vertical = 8.dp, horizontal = 4.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Spacer(Modifier.weight(1f))
             Text(
                 text = emoji.emoji,
                 style = AppTextStyles.MainText,
                 color = ConstColours.WHITE,
             )
-//            Spacer(Modifier.width(4.dp))
-            Spacer(Modifier.weight(1f))
             if (counter == 1 && avatarURL != null) {
                 AsyncImage(
                     model = avatarURL,
                     contentDescription = null,
                     modifier = Modifier
-                        .height(20.dp)
                         .aspectRatio(1f)
                         .clip(RoundedCornerShape(50))
                 )
@@ -111,7 +114,6 @@ fun ReactionButtonWithCounter(
                     color = ConstColours.WHITE,
                 )
             }
-            Spacer(Modifier.weight(1f))
         }
     }
 }
@@ -216,17 +218,17 @@ fun ReactionsDialog(
 
 
 @Composable
-fun ReactionsGrid(
+fun ReactionsRow(
     curUser: String,
     reactionsData: List<ReactionData>,
     onReactionClick: (ReactionType) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyVerticalGrid( //TODO: обработать вариант когда реакций больше чем 3 ряда
-        columns = GridCells.Adaptive(60.dp),
+    LazyRow (
         horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = modifier
+        contentPadding = PaddingValues(4.dp),
+        userScrollEnabled = true,
+        modifier = modifier.fillMaxWidth()
     ) {
         items(
             items = reactionsData.sortedByDescending{ it.users.size },
@@ -235,6 +237,7 @@ fun ReactionsGrid(
             ReactionButtonWithCounter(
                 emoji = it.emoji,
                 counter = it.users.size,
+                modifier = Modifier.width(60.dp).fillMaxHeight(),
                 isActive = curUser in it.users,
                 onClick = { onReactionClick(it.emoji) }
             )
