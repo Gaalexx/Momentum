@@ -34,7 +34,7 @@ kotlin {
 
 android {
     namespace = "com.project.momentum"
-    compileSdk = compileSdkApi
+    compileSdkVersion(compileSdkApi)
 
     defaultConfig {
         applicationId = "com.project.momentum"
@@ -51,7 +51,11 @@ android {
             "\"http://193.233.20.47/api/momentum/\""
         )
 
-      
+//        buildConfigField(
+//            "String",
+//            "BACKEND_BUILD_URL",
+//            "\"http://192.168.1.122/api/momentum/\""
+//        )
 
         buildConfigField(
             "String",
