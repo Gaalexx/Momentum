@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -45,6 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -154,6 +157,9 @@ fun SendContentScreen(
         )
     }
 
+    val screenHeight = LocalWindowInfo.current.containerDpSize.height
+    val screenWidth = LocalWindowInfo.current.containerDpSize.width
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -172,17 +178,25 @@ fun SendContentScreen(
 
         Spacer(Modifier.height(5.dp))
 
-        SendContentPreviewCard(
-            hasCameraPermission = hasCameraPermission,
-            mediaType = mediaType,
-            uri = uri,
-            caption = caption,
-            onCaptionChange = { caption = it },
-            captionFocusRequester = captionFocusRequester,
-            isUploading = uploadingState != null,
-            uploadComposition = composition,
-            uploadProgress = progress,
-        )
+        Box(
+            modifier = modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            SendContentPreviewCard(
+                hasCameraPermission = hasCameraPermission,
+                mediaType = mediaType,
+                uri = uri,
+                caption = caption,
+                onCaptionChange = { caption = it },
+                captionFocusRequester = captionFocusRequester,
+                isUploading = uploadingState != null,
+                uploadComposition = composition,
+                uploadProgress = progress,
+                modifier = Modifier
+                    .heightIn(max = screenHeight * 0.5f)
+                    .aspectRatio(1f)
+            )
+        }
 
         UploadProgress(
             modifier = Modifier
@@ -288,8 +302,8 @@ private fun SendContentPreviewCard(
             onCaptionChange,
             placeholder = stringResource(R.string.label_write_comment),
             modifier = Modifier
-                .align(Alignment.BottomStart)
-                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth(0.9f)
                 .padding(16.dp)
                 .focusRequester(captionFocusRequester)
         )

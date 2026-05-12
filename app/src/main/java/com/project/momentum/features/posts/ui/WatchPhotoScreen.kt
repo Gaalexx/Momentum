@@ -411,7 +411,7 @@ fun WatchPhotoScreen(
                 userScrollEnabled = !isEditable,
                 modifier = Modifier
 //                    .fillMaxWidth()
-                    .heightIn(max = screenHeight * 0.45f)
+                    .heightIn(max = screenHeight * 0.5f)
                     .aspectRatio(1f)
             ) { pageIndex ->
                 val post = posts[pageIndex]
@@ -432,17 +432,13 @@ fun WatchPhotoScreen(
                     } else {
                         Modifier
                     }
-                        .widthIn(max = screenWidth * 0.95f)
-                        .heightIn(max = screenHeight * 0.45f)
-                        .aspectRatio(1f)
 
                 when (post.mediaType) {
                     MediaType.IMAGE -> {
                         Box(
                             modifier = postModifier
-//                                .fillMaxWidth(0.95f)
-//                                .heightIn(max = screenHeight * 0.45f)
-//                                .aspectRatio(1f)
+                                .fillMaxWidth(0.95f)
+                                .aspectRatio(1f)
                                 .clip(RoundedCornerShape(60.dp))
                                 .background(ConstColours.MAIN_BACK_GRAY)
                                 .clickable { onShowReactionDialog() }
@@ -461,7 +457,7 @@ fun WatchPhotoScreen(
                                         text = posts[pageIndex].title,
                                         modifier = Modifier
                                             .align(Alignment.BottomCenter)
-                                            .width(screenHeight * 0.4f)
+                                            .fillMaxWidth(0.9f)
                                             .padding(16.dp)
                                             .focusRequester(captionFocusRequester)
                                     )
@@ -474,7 +470,8 @@ fun WatchPhotoScreen(
                     MediaType.VIDEO -> {
                         Box(
                             modifier = postModifier
-//                                .fillMaxSize()
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
                                 .combinedClickable(
                                     onClick = { onShowReactionDialog() },
                                     onLongClick = { isEditable = !isEditable }
@@ -493,7 +490,7 @@ fun WatchPhotoScreen(
                                     text = posts[pageIndex].title,
                                     modifier = Modifier
                                         .align(Alignment.BottomCenter)
-                                        .width(screenHeight * 0.4f)
+                                        .fillMaxWidth(0.9f)
                                         .padding(16.dp)
                                         .focusRequester(captionFocusRequester)
                                 )
@@ -504,7 +501,8 @@ fun WatchPhotoScreen(
                     MediaType.AUDIO -> {
                         Box(
                             modifier = postModifier
-//                                .fillMaxSize()
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
                                 .combinedClickable(
                                     onClick = { onShowReactionDialog() },
                                     onLongClick = { isEditable = !isEditable }
@@ -523,7 +521,7 @@ fun WatchPhotoScreen(
                                     text = posts[pageIndex].title,
                                     modifier = Modifier
                                         .align(Alignment.BottomCenter)
-                                        .width(screenHeight * 0.4f)
+                                        .fillMaxWidth(0.9f)
                                         .padding(16.dp)
                                         .focusRequester(captionFocusRequester)
                                 )
@@ -552,7 +550,6 @@ fun WatchPhotoScreen(
             currentPost?.let { post ->
                 Text(
                     modifier = Modifier
-                        .padding(8.dp)
                         .align(Alignment.CenterHorizontally),
                     text = post.getDate() ?: "",
                     color = ConstColours.WHITE,
@@ -568,10 +565,12 @@ fun WatchPhotoScreen(
                         },
                         modifier = Modifier
                             .height(65.dp)
-                            .padding(bottom = 16.dp, start = 8.dp, end = 8.dp)
+                            .padding(8.dp)
                     )
                 } else {
-                    Spacer(modifier = Modifier.height(60.dp))
+                    Spacer(modifier = Modifier
+                        .height(65.dp)
+                        .padding(8.dp))
                 }
 
                 if (isShowingReactionsDialog) {
@@ -590,28 +589,31 @@ fun WatchPhotoScreen(
                     }
                 }
 
-                Spacer(Modifier.weight(1f))
-
-                ProfileLabel(
-                    name = post.userName,
-                    imageUrl = post.avatarPresignedURL,
-                    height = screenHeight * 0.1f
-                )
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ProfileLabel(
+                        name = post.userName,
+                        imageUrl = post.avatarPresignedURL,
+                        height = screenHeight * 0.1f
+                    )
+                }
             }
-            Spacer(Modifier.weight(1f))
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(3f)
-//                    .padding(horizontal = 28.dp)
-                    .padding(bottom = dimensionResource(R.dimen.medium_padding)),
+                    .padding(
+                        bottom = dimensionResource(R.dimen.medium_padding),
+                        top = dimensionResource(R.dimen.small_padding)
+                    ),
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 IconButton(
                     onClick = onGoToGallery,
-                    modifier = Modifier.size(dimensionResource(R.dimen.button_size))
+                    modifier = Modifier.size(dimensionResource(R.dimen.sub_button_size))
                 ) {
                     Icon(
                         Icons.Default.Photo,
@@ -625,7 +627,7 @@ fun WatchPhotoScreen(
                     onClick = onGoToTakePhoto,
                     modifier = Modifier
                         .width(screenWidth * 0.5f)
-                        .height(dimensionResource(R.dimen.button_size)),
+                        .height(dimensionResource(R.dimen.sub_button_size)),
                     stringResource(R.string.reply),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = ConstColours.MAIN_BRAND_BLUE,
@@ -638,7 +640,7 @@ fun WatchPhotoScreen(
                         captionFocusRequester.requestFocus()
                         keyboardController?.show()
                     },
-                    modifier = Modifier.size(dimensionResource(R.dimen.button_size))
+                    modifier = Modifier.size(dimensionResource(R.dimen.sub_button_size))
                 ) {
                     Icon(
                         Icons.Outlined.MoreHoriz,
