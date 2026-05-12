@@ -233,11 +233,10 @@ fun SendContentScreen(
         modifier = modifier,
         containerColor = ConstColours.BLACK,
         snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { innerPadding ->
+    ) { _ ->
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(innerPadding)
                 .background(ConstColours.BLACK)
                 .windowInsetsPadding(WindowInsets.systemBars),
         ) {
@@ -253,25 +252,25 @@ fun SendContentScreen(
 
             Spacer(Modifier.height(5.dp))
 
-        Box(
-            modifier = modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            SendContentPreviewCard(
-                hasCameraPermission = hasCameraPermission,
-                mediaType = mediaType,
-                uri = uri,
-                caption = caption,
-                onCaptionChange = { caption = it },
-                captionFocusRequester = captionFocusRequester,
-                isUploading = uploadingState != null,
-                uploadComposition = composition,
-                uploadProgress = progress,
-                modifier = Modifier
-                    .heightIn(max = screenHeight * 0.5f)
-                    .aspectRatio(1f)
-            )
-        }
+            Box(
+                modifier = modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                SendContentPreviewCard(
+                    hasCameraPermission = hasCameraPermission,
+                    mediaType = mediaType,
+                    uri = uri,
+                    caption = caption,
+                    onCaptionChange = { caption = it },
+                    captionFocusRequester = captionFocusRequester,
+                    isUploading = uploadingState != null,
+                    uploadComposition = composition,
+                    uploadProgress = progress,
+                    modifier = Modifier
+                        .heightIn(max = screenHeight * 0.5f)
+                        .aspectRatio(1f)
+                )
+            }
 
             if (uploadingState != null) {
                 UploadProgress(
@@ -282,7 +281,7 @@ fun SendContentScreen(
                 Spacer(modifier = Modifier.weight(0.3f))
             }
 
-        //Spacer(Modifier.weight(0.7f))
+            //Spacer(Modifier.weight(0.7f))
 
 
             if (friendsList.isNotEmpty()) {
@@ -395,7 +394,9 @@ private fun FriendAvatarItem(
                     } else {
                         Color.White.copy(alpha = 0.2f)
                     },
-                    modifier = Modifier.size(28.dp).align(Alignment.Center)
+                    modifier = Modifier
+                        .size(28.dp)
+                        .align(Alignment.Center)
                 )
             }
 

@@ -30,7 +30,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         askNotificationPermission()
         setContent {
-            MomentumTheme {
+            MomentumAndroidSettingsTheme() {
                 MainScreen()
             }
         }
