@@ -98,9 +98,9 @@ fun CameraContentPager(
     Surface(
         color = ConstColours.BLACK,
         modifier = Modifier
-            .fillMaxSize()
+//            .fillMaxSize()
             .background(ConstColours.BLACK)
-            .windowInsetsPadding(WindowInsets.safeContent)
+            .windowInsetsPadding(WindowInsets.systemBars)
     ) {
         Column {
             CameraTopBar(

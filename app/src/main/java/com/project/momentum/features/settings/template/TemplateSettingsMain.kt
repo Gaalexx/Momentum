@@ -2,6 +2,8 @@ package com.project.momentum.features.settings.template
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
@@ -11,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.project.momentum.R
 import com.project.momentum.features.settings.viewmodel.SettingsEvent
@@ -65,7 +68,6 @@ fun TemplateSettingsMain(
             .windowInsetsPadding(WindowInsets.systemBars)
 
     ) {
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -86,6 +88,8 @@ fun TemplateSettingsMain(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .weight(1f)
+                .verticalScroll(state = rememberScrollState())
                 .padding(horizontal = 20.dp)
         ) {
             Text(
@@ -158,7 +162,7 @@ fun TemplateSettingsMain(
                 icon = Icons.Default.Star,
                 text = stringResource(R.string.settings_section_premium),
                 textColor = ConstColours.GOLD,
-                modifier = Modifier
+                modifier = Modifier.padding(vertical = dimensionResource(R.dimen.medium_padding))
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -167,7 +171,7 @@ fun TemplateSettingsMain(
                 onClick = onLogoutClick,
                 icon = Icons.AutoMirrored.Filled.Logout,
                 text = stringResource(R.string.settings_section_quit),
-                modifier = Modifier
+                modifier = Modifier.padding(vertical = dimensionResource(R.dimen.medium_padding))
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -177,7 +181,7 @@ fun TemplateSettingsMain(
                 icon = Icons.Default.Delete,
                 text = stringResource(R.string.settings_section_delete),
                 textColor = ConstColours.DELETE,
-                modifier = Modifier
+                modifier = Modifier.padding(vertical = dimensionResource(R.dimen.medium_padding))
             )
 
             Spacer(modifier = Modifier.weight(1.5f))

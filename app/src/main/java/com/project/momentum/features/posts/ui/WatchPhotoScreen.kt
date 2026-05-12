@@ -7,7 +7,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,7 +36,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
@@ -61,7 +59,7 @@ import com.project.momentum.features.account.models.PostData
 import com.project.momentum.features.posts.features.reactions.models.ReactionData
 import com.project.momentum.features.posts.features.reactions.models.ReactionType
 import com.project.momentum.features.posts.features.reactions.ui.ReactionsDialog
-import com.project.momentum.features.posts.features.reactions.ui.ReactionsGrid
+import com.project.momentum.features.posts.features.reactions.ui.ReactionsRow
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.features.posts.viewmodel.WatchPhotoEvent
 import com.project.momentum.network.s3.MediaType
@@ -70,10 +68,16 @@ import com.project.momentum.ui.assets.CaptionBasicLabel
 import com.project.momentum.ui.assets.ContinueButton
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Surface
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.unit.Dp
 import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
 import com.project.momentum.features.posts.viewmodel.GalleryEvent
 import com.project.momentum.features.posts.viewmodel.PostsState
@@ -89,13 +93,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 fun ProfileLabel(
     modifier: Modifier = Modifier,
     name: String,
-    imageUrl: String?
+    imageUrl: String?,
+    height: Dp,
 ) {
 
     Box(
         modifier = Modifier
             .fillMaxWidth(0.95f)
-            .height(100.dp)
+            .height(height)
+//            .height(100.dp)
             .clip(RoundedCornerShape(60.dp))
             .background(ConstColours.MAIN_BACK_GRAY)
             .padding(start = 5.dp)
@@ -103,14 +109,15 @@ fun ProfileLabel(
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = modifier
-                .padding(start = 7.dp)
+                .padding(8.dp)
                 .fillMaxWidth()
-                .size(70.dp)
+                .height(height)
                 .align(Alignment.Center)
         ) {
             Box(
                 modifier = Modifier
-                    .size(65.dp)
+                    .height(height * 0.9f)
+                    .aspectRatio(1f)
                     .clip(CircleShape)
                     .border(1.dp, ConstColours.MAIN_BRAND_BLUE, CircleShape)
             ) {
@@ -267,8 +274,8 @@ fun WatchPhotoScreenFull(
 
     Surface(
         modifier = Modifier
-            .background(ConstColours.BLACK)
             .windowInsetsPadding(WindowInsets.systemBars)
+            .background(ConstColours.BLACK)
             .fillMaxSize(),
         color = ConstColours.BLACK
     ) {
@@ -387,6 +394,9 @@ fun WatchPhotoScreen(
         derivedStateOf { posts.getOrNull(pagerState.currentPage) }
     }
 
+    val screenHeight = LocalWindowInfo.current.containerDpSize.height
+    val screenWidth = LocalWindowInfo.current.containerDpSize.width
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -400,7 +410,8 @@ fun WatchPhotoScreen(
                 state = pagerState,
                 userScrollEnabled = !isEditable,
                 modifier = Modifier
-                    .fillMaxWidth()
+//                    .fillMaxWidth()
+                    .heightIn(max = screenHeight * 0.5f)
                     .aspectRatio(1f)
             ) { pageIndex ->
                 val post = posts[pageIndex]
@@ -445,8 +456,8 @@ fun WatchPhotoScreen(
                                     CaptionBasicLabel(
                                         text = posts[pageIndex].title,
                                         modifier = Modifier
-                                            .align(Alignment.BottomStart)
-                                            .fillMaxWidth()
+                                            .align(Alignment.BottomCenter)
+                                            .fillMaxWidth(0.9f)
                                             .padding(16.dp)
                                             .focusRequester(captionFocusRequester)
                                     )
@@ -459,7 +470,8 @@ fun WatchPhotoScreen(
                     MediaType.VIDEO -> {
                         Box(
                             modifier = postModifier
-                                .fillMaxSize()
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
                                 .combinedClickable(
                                     onClick = { onShowReactionDialog() },
                                     onLongClick = { isEditable = !isEditable }
@@ -472,26 +484,25 @@ fun WatchPhotoScreen(
                                 isEditable = isEditable,
                                 isPlaying = pageIndex == pagerState.currentPage
                             )
-                        }
 
-
-
-                        if (posts[pageIndex].title.isNotBlank()) {
-                            CaptionBasicLabel(
-                                text = posts[pageIndex].title,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
-                                    .focusRequester(captionFocusRequester)
-                                    .align(Alignment.End)
-                            )
+                            if (posts[pageIndex].title.isNotBlank()) {
+                                CaptionBasicLabel(
+                                    text = posts[pageIndex].title,
+                                    modifier = Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .fillMaxWidth(0.9f)
+                                        .padding(16.dp)
+                                        .focusRequester(captionFocusRequester)
+                                )
+                            }
                         }
                     }
 
                     MediaType.AUDIO -> {
                         Box(
                             modifier = postModifier
-                                .fillMaxSize()
+                                .fillMaxWidth()
+                                .aspectRatio(1f)
                                 .combinedClickable(
                                     onClick = { onShowReactionDialog() },
                                     onLongClick = { isEditable = !isEditable }
@@ -504,17 +515,17 @@ fun WatchPhotoScreen(
                                 isEditable = isEditable,
                                 isPlaying = pageIndex == pagerState.currentPage
                             )
-                        }
 
-                        if (posts[pageIndex].title.isNotBlank()) {
-                            CaptionBasicLabel(
-                                text = posts[pageIndex].title,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp)
-                                    .focusRequester(captionFocusRequester)
-                                    .align(Alignment.End)
-                            )
+                            if (posts[pageIndex].title.isNotBlank()) {
+                                CaptionBasicLabel(
+                                    text = posts[pageIndex].title,
+                                    modifier = Modifier
+                                        .align(Alignment.BottomCenter)
+                                        .fillMaxWidth(0.9f)
+                                        .padding(16.dp)
+                                        .focusRequester(captionFocusRequester)
+                                )
+                            }
                         }
                     }
                 }
@@ -524,7 +535,7 @@ fun WatchPhotoScreen(
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .blur(backgroundBlur)
                 .clickable(
                     enabled = isEditable,
@@ -537,23 +548,31 @@ fun WatchPhotoScreen(
 
         ) {
             currentPost?.let { post ->
+                Text(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally),
+                    text = post.getDate() ?: "",
+                    color = ConstColours.WHITE,
+                    style = AppTextStyles.SupportingText
+                )
+
                 if (post.reactions != null) {
-                    ReactionsGrid(
+                    ReactionsRow(
                         curUser = currentUserId,
                         reactionsData = post.reactions,
                         onReactionClick = { reaction ->
                             onReactionClick(post.id, reaction)
                         },
-                        modifier = Modifier.padding(bottom = 16.dp, start = 8.dp, end = 8.dp)
+                        modifier = Modifier
+                            .height(65.dp)
+                            .padding(8.dp)
                     )
+                } else {
+                    Spacer(modifier = Modifier
+                        .height(65.dp)
+                        .padding(8.dp))
                 }
 
-                Text(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    text = post.getDate() ?: "",
-                    color = ConstColours.WHITE,
-                    style = AppTextStyles.SupportingText
-                )
                 if (isShowingReactionsDialog) {
                     Dialog(
                         onDismissRequest = { onShowReactionDialog() }
@@ -570,27 +589,31 @@ fun WatchPhotoScreen(
                     }
                 }
 
-                Spacer(Modifier.weight(1f))
-
-                ProfileLabel(
-                    name = post.userName,
-                    imageUrl = post.avatarPresignedURL
-                )
+                Box(
+                    modifier = Modifier.weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ProfileLabel(
+                        name = post.userName,
+                        imageUrl = post.avatarPresignedURL,
+                        height = screenHeight * 0.1f
+                    )
+                }
             }
-            Spacer(Modifier.weight(1f))
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
-                    .padding(horizontal = 28.dp)
-                    .padding(bottom = dimensionResource(R.dimen.medium_padding)),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .padding(
+                        bottom = dimensionResource(R.dimen.medium_padding),
+                        top = dimensionResource(R.dimen.small_padding)
+                    ),
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 IconButton(
                     onClick = onGoToGallery,
-                    modifier = Modifier.size(50.dp)
+                    modifier = Modifier.size(dimensionResource(R.dimen.sub_button_size))
                 ) {
                     Icon(
                         Icons.Default.Photo,
@@ -603,8 +626,8 @@ fun WatchPhotoScreen(
                 ContinueButton(
                     onClick = onGoToTakePhoto,
                     modifier = Modifier
-                        .width(200.dp)
-                        .height(dimensionResource(R.dimen.button_size)),
+                        .width(screenWidth * 0.5f)
+                        .height(dimensionResource(R.dimen.sub_button_size)),
                     stringResource(R.string.reply),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = ConstColours.MAIN_BRAND_BLUE,
@@ -617,7 +640,7 @@ fun WatchPhotoScreen(
                         captionFocusRequester.requestFocus()
                         keyboardController?.show()
                     },
-                    modifier = Modifier.size(50.dp)
+                    modifier = Modifier.size(dimensionResource(R.dimen.sub_button_size))
                 ) {
                     Icon(
                         Icons.Outlined.MoreHoriz,

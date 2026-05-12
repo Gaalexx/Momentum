@@ -179,6 +179,7 @@ fun MainScreen() {
                         },
                         onContinueClick = {
                             openOverlay(NavRoutes.Camera)
+                            closeAllUntilUpperElement()
                         }
                     )
                 }
@@ -202,6 +203,7 @@ fun MainScreen() {
                         },
                         onContinueClick = {
                             openOverlay(NavRoutes.Camera)
+                            closeAllUntilUpperElement()
                         },
                         onPasswordRecoveryClick = {
                             openOverlay(NavRoutes.AuthorizationCode)

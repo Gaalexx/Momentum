@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Mic
@@ -25,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.state.CameraScreenState
@@ -58,53 +61,61 @@ internal fun MediaCreationPreviewCard(
     audioLevel: Float,
     cameraPreviewEnabled: Boolean = true,
 ) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .aspectRatio(1f)
-            .clip(PreviewCardShape)
-            .background(ConstColours.BLACK),
-    ) {
-        RecordingBorderProgress(
-            progress = progress,
-            modifier = Modifier.fillMaxSize(),
-        )
+    val screenHeight = LocalWindowInfo.current.containerDpSize.height
+    val screenWidth = LocalWindowInfo.current.containerDpSize.width
 
+    Box(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ){
         Box(
             modifier = Modifier
-                .fillMaxWidth(0.95f)
+                .heightIn(max = screenHeight * 0.5f)
                 .aspectRatio(1f)
                 .clip(PreviewCardShape)
-                .background(ConstColours.MAIN_BACK_GRAY)
-                .align(Alignment.Center),
+                .background(ConstColours.BLACK),
         ) {
-            when (mode) {
-                ContentCreationMode.Camera -> {
-                    when {
-                        !hasCameraPermission -> {
-                            PermissionPlaceholder(iconMode = ContentCreationMode.Camera)
-                        }
+            RecordingBorderProgress(
+                progress = progress,
+                modifier = Modifier.fillMaxSize(),
+            )
 
-                        cameraPreviewEnabled -> {
-                            CameraPreviewContainer(
-                                state = cameraState,
-                                modifier = Modifier.fillMaxSize(),
-                            )
-                        }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.95f)
+                    .aspectRatio(1f)
+                    .clip(PreviewCardShape)
+                    .background(ConstColours.MAIN_BACK_GRAY)
+                    .align(Alignment.Center),
+            ) {
+                when (mode) {
+                    ContentCreationMode.Camera -> {
+                        when {
+                            !hasCameraPermission -> {
+                                PermissionPlaceholder(iconMode = ContentCreationMode.Camera)
+                            }
 
-                        else -> {
-                            CameraInactivePlaceholder()
+                            cameraPreviewEnabled -> {
+                                CameraPreviewContainer(
+                                    state = cameraState,
+                                    modifier = Modifier.fillMaxSize(),
+                                )
+                            }
+
+                            else -> {
+                                CameraInactivePlaceholder()
+                            }
                         }
                     }
-                }
 
-                ContentCreationMode.Audio -> {
-                    AudioRadialVisualizer(
-                        level = audioLevel,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                    if (!hasMicrophonePermission) {
-                        PermissionPlaceholder(iconMode = ContentCreationMode.Audio)
+                    ContentCreationMode.Audio -> {
+                        AudioRadialVisualizer(
+                            level = audioLevel,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                        if (!hasMicrophonePermission) {
+                            PermissionPlaceholder(iconMode = ContentCreationMode.Audio)
+                        }
                     }
                 }
             }

@@ -1,8 +1,8 @@
 [versions]
 # Build tools
-agp = "9.0.1"
+agp = "9.2.1"
 kotlin = "2.2.10"
-ksp = "2.2.10-2.0.2"
+ksp = "2.3.2"
 gms = "4.4.4"
 
 # Android SDK
