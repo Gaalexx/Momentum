@@ -127,8 +127,9 @@ fun ProfileLabel(
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .padding(4.dp)
                             .fillMaxSize()
+                            .padding(2.dp)
+                            .clip(CircleShape)
                     )
                 } else {
                     val iconTint = Color(0xFFEDEEF2) // TODO ВЫНЕСТИ В ЦВЕТА КОГДА БУДЕТ НЕ В ПАДЛУ
