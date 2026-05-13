@@ -1,0 +1,209 @@
+<resources>
+    <string name="app_name">Momentum</string>
+    <string name="settings_main_screen_headliner">Настройки</string>
+    <string name="settings_section_privacy">Конфиденциальность</string>
+    <string name="settings_section_notifications">Уведомления и звуки</string>
+    <string name="settings_section_data">Данные и память</string>
+    <string name="settings_section_language">Язык</string>
+    <string name="settings_type_language">Рус</string>
+    <string name="settings_language_description">Выбрать язык</string>
+    <string name="settings_section_premium">Premium</string>
+    <string name="settings_section_quit">Выйти из аккаунта</string>
+    <string name="settings_section_delete">Удалить аккаунт</string>
+
+    <string name="button_back">Назад</string>
+    <string name="button_profile">Профиль</string>
+    <string name="button_settings">Настройки</string>
+    <string name="button_friends">Друзья</string>
+    <string name="button_edit">Изменить</string>
+    <string name="button_cancel">Отменить</string>
+    <string name="button_plus">Добавить</string>
+    <string name="button_send">Отправить</string>
+    <string name="button_ok">OK</string>
+    <string name="button_no_thanks">Нет, спасибо</string>
+
+    <!-- Notification permission -->
+    <string name="notification_permission_title">Разрешить уведомления?</string>
+    <string name="notification_permission_message">Momentum использует уведомления, чтобы показывать важные обновления.</string>
+    <string name="notifications_disabled_title">Уведомления выключены</string>
+    <string name="notifications_disabled_message">Приложение не сможет показывать уведомления, пока разрешение не будет включено в настройках.</string>
+
+    <!-- Offline screen -->
+    <string name="offline_title">Нет интернета</string>
+    <string name="offline_description">Проверьте подключение к Wi-Fi или мобильной сети и попробуйте снова.</string>
+    <string name="offline_retry">Повторить</string>
+    <string name="offline_open_settings">Открыть настройки</string>
+    <string name="offline_auto_refresh">Когда соединение восстановится, попробуйте повторить попытку.</string>
+
+    <string name="account_online_status">В сети</string>
+    <string name="account_offline_status">Не в сети</string>
+    <string name="account_my_publications">Мои публикации</string>
+    <string name="account_avatar">Аватар</string>
+    <string name="userName">userName</string>
+
+    <string name="gallery_title">Галерея</string>
+    <string name="gallery_photo">Фото</string>
+
+    <string name="photo_grid_photo">Фото %s</string>
+    <string name="photo_grid_error">Ошибка загрузки</string>
+    <string name="add_photo">Добавление фото</string>
+
+    <string name="rec_img_model_">https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/5b2573b6-2575-48f4-b8b4-8d7756ecd5b7</string>
+
+    <string name="icon_more">More</string>
+    <string name="icon_flash">Flash</string>
+    <string name="icon_flip_camera">Flip camera</string>
+
+    <string name="label_write_message">Написать сообщение...</string>
+    <string name="label_write_comment">Введите комментарий...</string>
+    <string name="find_or_add_friend">Найти друга</string>
+    <string name="person_wasnt_found">Пользователь не найден</string>
+    <string name="friend_search">Добавить друга</string>
+    <string name="send_request">Отправить запрос</string>
+
+    <string name="cats_url">"https://cataas.com/cat"</string>
+
+    <string name="recorder_main_image_content_description">Основное изображение</string>
+    <string name="recorder_reset_content_description">Сбросить</string>
+    <string name="recorder_show_keyboard_content_description">Показать клавиатуру</string>
+    <string name="recorder_more_content_description">Ещё</string>
+    <string name="recorder_duration_label">Длительность: %s</string>
+
+    <string name="recorder_video_error">Ошибка видео: %s</string>
+    <string name="recorder_video_error_unknown">Ошибка записи видео</string>
+    <string name="recorder_video_error_no_data">Нет данных (слишком короткое видео)</string>
+    <string name="recorder_video_saved">Видео сохранено</string>
+    <string name="friends_screen_headliner">Друзья</string>
+    <string name="friends_screen_sub_headliner">Мои друзья</string>
+    <string name="friend_requests">Заявки в друзья</string>
+    <string name="friends_screen_search_loading">Загрузка друзей…</string>
+    <string name="friends_screen_search_nothing">Друзья не найдены</string>
+    <string name="friends_screen_search_support_mess">Попробуйте изменить запрос</string>
+    <string name="friends_screen_no_friends">У вас пока нет друзей</string>
+    <string name="friends_screen_no_friends_support_mess">Попробуйте изменить запрос</string>
+
+    <string name="do_you_want_to_delete_a_friend">Вы точно хотите удалить %s из друзей?</string>
+
+    <!-- Templates -->
+    <string name="template_label">Заголовок экрана</string>
+    <string name="template_page_title">Название действия</string>
+    <string name="template_sub_button">Вспомогательное действие</string>
+
+    <!-- Registration -->
+    <string name="label_create_account">Создание аккаунта</string>
+    <string name="button_continue">Продолжить</string>
+    <string name="button_send_code_again">Отправить код повторно</string>
+    <string name="button_use_phone_number">Использовать номер телефона</string>
+    <string name="button_use_email">Использовать почту</string>
+    <string name="insert_password">Введите пароль</string>
+    <string name="insert_code_email">Введите код с почты</string>
+    <string name="insert_email">Введите почту</string>
+    <string name="insert_phone_number">Введите номер телефона</string>
+    <string name="insert_code_phone">Введите код с телефона</string>
+    <string name="placeholder_email">email@gmail.com</string>
+    <string name="placeholder_phone_number">+X (XXX) XXX XXXX</string>
+    <string name="placeholder_password">Пароль</string>
+    <string name="placeholder_password_repetition">Повторите пароль</string>
+
+    <!-- Authorization -->
+    <string name="label_authorization">Вход</string>
+    <string name="label_password_recovery">Восстановление пароля</string>
+    <string name="button_authorization_by_phone_number">Войти по номеру телефона</string>
+    <string name="button_authorization_by_email">Войти по почте</string>
+    <string name="button_use_code">Войти по коду</string>
+    <string name="button_password_recovery">Восстановить пароль</string>
+    <string name="button_already_have_account">У меня уже есть аккаунт</string>
+
+    <!-- Registration and Authorization errors -->
+    <string name="error_text_email_already_exists_in_db">Пользователь с такой почтой уже существует</string>
+    <string name="error_text_email_not_exists">Такой почты не существует</string>
+    <string name="error_text_email_not_exists_in_db">Пользователь с такой почтой не зарегистрирован</string>
+    <string name="error_text_email_empty">Введите почту :3</string>
+    <string name="error_text_phone_already_exists_in_db">Пользователь с таким номером телефона уже существует</string>
+    <string name="error_text_phone_not_exists">Такого номера телефона не существует</string>
+    <string name="error_text_phone_not_exists_in_db">Пользователь с таким номером телефона не зарегистрирован</string>
+    <string name="error_text_phone_empty">Введите номер телефона :3</string>
+    <string name="error_text_password_empty">Заполните поле :3</string>
+    <string name="error_text_password_too_short">Пароль должен содержать неменее 8 символов</string>
+    <string name="error_text_password_no_digits">Пароль должен содержать хотя бы одну цифру</string>
+    <string name="error_text_password_no_lowercase_letters">Пароль должен содержать хотя бы одну строчную букву</string>
+    <string name="error_text_password_no_uppercase_letters">Пароль должен содержать хотя бы одну заглавную букву</string>
+    <string name="error_text_password_not_match">Пароли не совпадают</string>
+    <string name="error_text_password_invalid">Неверный пароль</string>
+    <string name="error_text_code_empty">ВВедите код подтверждения :3</string>
+    <string name="error_text_code_invalid">Неверный код подтверждения</string>
+
+    <!-- Editing errors-->
+    <string name="error_text_username_already_exists_in_db">Пользователь с такой логином уже существует</string>
+    <string name="error_text_username_wrong_format">Неверный формат логина</string>
+
+    <!-- Settings -->
+    <string name="label_delete_account">Удаление аккаунта</string>
+    <string name="button_delete_account">Удалить аккаунт</string>
+    <string name="label_delete_account_confirmation">Вы действительно хотите удалить аккаунт?</string>
+    <string name="button_delete_account_yes">Да</string>
+    <string name="button_delete_account_no">Нет</string>
+    <string name="error_text_account_not_exists">Аккаунт уже был удалён</string>
+
+    <!-- Settings Privacy Screen -->
+    <string name="settings_privacy_title">Конфиденциальность</string>
+    <string name="settings_privacy_account_visibility">Видимость аккаунта</string>
+    <string name="settings_privacy_recommend_to_contacts">Рекомендовать меня контактам</string>
+    <string name="settings_privacy_allow_add_from_anyone">Разрешить добавлять себя в друзья пользователям не из контактов</string>
+    <string name="settings_privacy_caution">Осторожность</string>
+    <string name="settings_privacy_confirm_before_posting">Подтверждение перед тем как выложить пост</string>
+
+
+    <!-- Settings Premium Screen -->
+    <string name="settings_premium_title">Premium </string>
+    <string name="settings_premium_description_1">- больше тепла,</string>
+    <string name="settings_premium_description_2">меньше ограничений</string>
+    <string name="settings_premium_feature_voice">Расшифровка голосовых в 1 клик</string>
+    <string name="settings_premium_feature_no_limits">Без лимитов на видео и голосовые</string>
+    <string name="settings_premium_feature_friends">Без лимитов друзей</string>
+    <string name="settings_premium_feature_no_ads">Без рекламы</string>
+    <string name="settings_premium_feature_cloud">Безлимитное облачное хранение</string>
+    <string name="settings_premium_duration">Длительность подписки:</string>
+    <string name="settings_premium_one_month">Месяц</string>
+    <string name="settings_premium_one_month_cost">299₽</string>
+    <string name="settings_premium_three_month">3 месяца</string>
+    <string name="settings_premium_three_month_cost">799₽</string>
+    <string name="settings_premium_three_month_cost_per_month">266,3₽/мес</string>
+    <string name="settings_premium_one_year">Год</string>
+    <string name="settings_premium_one_year_cost">2990₽</string>
+    <string name="settings_premium_one_year_cost_per_month">249,1₽/мес</string>
+    <string name="settings_premium_buy">Купить премиум</string>
+
+    <!-- Settings Notifications Screen -->
+    <string name="settings_notifications_title">Уведомления и звуки</string>
+    <string name="settings_notifications_section">Уведомления</string>
+    <string name="settings_notifications_publications">Публикации</string>
+    <string name="settings_notifications_reactions">Реакции</string>
+    <string name="settings_notifications_in_app">В приложении</string>
+    <string name="settings_notifications_in_app_switch">Уведомления</string>
+    <string name="label_editing">Редактирование профиля</string>
+
+    <!-- Words -->
+
+    <string name="placeholder_code">X X X X X X</string>
+    <string name="reply">Ответить</string>
+    <string name="play">Проиграть</string>
+
+    <!-- Settings Errors -->
+    <string name="error_network">Нет соединения</string>
+    <string name="error_unauthorized">Авторизация истекла</string>
+    <string name="error_unknown">Произошла неизвестная ошибка</string>
+    <string name="error_server">Нет соединения</string>
+    <string name="email">Почта</string>
+    <string name="telephone_number">Номер</string>
+    <string name="login">Логин</string>
+
+    <string name="delete">Удалить</string>
+
+
+    <!-- Posts-->
+    <string name="no_posts_yet">Здесь пока нет постов</string>
+    <string name="button_delete_post">Удалить пост</string>
+    <string name="button_hide_post_for_me">Скрыть пост для меня</string>
+
+</resources>
