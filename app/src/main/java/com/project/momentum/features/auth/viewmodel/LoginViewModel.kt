@@ -31,6 +31,10 @@ sealed interface ErrorLogin {
         INVALID, EMPTY
     }
 
+    enum class DeleteError: ErrorLogin {
+        NOT_EXISTS
+    }
+
 }
 
 open class LoginViewModel : ViewModel() {

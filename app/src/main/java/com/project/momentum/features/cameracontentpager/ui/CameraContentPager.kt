@@ -3,14 +3,18 @@ package com.project.momentum.features.cameracontentpager.ui
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.VerticalPager
@@ -92,7 +96,11 @@ fun CameraContentPager(
 
     val postsState = postsViewModel.state.collectAsStateWithLifecycle()
     Surface(
-        color = ConstColours.BLACK
+        color = ConstColours.BLACK,
+        modifier = Modifier
+//            .fillMaxSize()
+            .background(ConstColours.BLACK)
+            .windowInsetsPadding(WindowInsets.systemBars)
     ) {
         Column {
             CameraTopBar(
@@ -100,7 +108,6 @@ fun CameraContentPager(
                 onGoToSettings = onGoToSettings,
                 onGoToFriends = onGoToFriends,
                 modifier = Modifier
-                    .windowInsetsPadding(WindowInsets.statusBars)
                     .fillMaxWidth()
                     .height(50.dp)
                     .padding(horizontal = 14.dp),
@@ -127,9 +134,6 @@ fun CameraContentPager(
                         WatchPhotoScreenRouteForMain(
                             onGoToTakePhoto = {},
                             onGoToGallery = onGoToGallery,
-                            onProfileClick = onProfileClick,
-                            onGoToSettings = onGoToSettings,
-                            onGoToFriends = onGoToFriends,
                             postIndex = currentPost,
                             postsState.value.posts[currentPost].userId,
                             sharedTransitionScope = sharedTransitionScope,

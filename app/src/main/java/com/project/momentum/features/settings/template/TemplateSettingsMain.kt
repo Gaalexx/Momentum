@@ -2,6 +2,8 @@ package com.project.momentum.features.settings.template
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
@@ -11,10 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.project.momentum.R
 import com.project.momentum.features.settings.viewmodel.SettingsEvent
 import com.project.momentum.features.settings.viewmodel.SettingsState
+import com.project.momentum.navigation.viewmodel.SwitchesState
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.SettingsButtonAdaptive
 import com.project.momentum.ui.assets.SwitchRow
@@ -31,6 +35,7 @@ fun SettingsMainScreenPreview() {
             onBackClick = {},
             onEvent = {},
             state = SettingsState(),
+            switchesState = SwitchesState(),
             onPremiumClick = {},
             onLogoutClick = {},
             onDeleteAccountClick = {}
@@ -43,6 +48,7 @@ fun TemplateSettingsMain(
     onBackClick: () -> Unit = {},
     onEvent: (SettingsEvent)-> Unit,
     state: SettingsState?,
+    switchesState: SwitchesState,
     onPremiumClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     onDeleteAccountClick: () -> Unit = {},
@@ -62,7 +68,6 @@ fun TemplateSettingsMain(
             .windowInsetsPadding(WindowInsets.systemBars)
 
     ) {
-
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -83,6 +88,8 @@ fun TemplateSettingsMain(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .weight(1f)
+                .verticalScroll(state = rememberScrollState())
                 .padding(horizontal = 20.dp)
         ) {
             Text(
@@ -94,19 +101,19 @@ fun TemplateSettingsMain(
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_in_app_switch),
-                enabled = state.serverSettingsState.inAppNotifications,
+                enabled = switchesState.serverSettingsState.inAppNotifications,
                 onEnabledChange = { onEvent(SettingsEvent.OnInAppNotifications) }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_publications),
-                enabled = state.serverSettingsState.publicationsEnabled,
+                enabled = switchesState.serverSettingsState.publicationsEnabled,
                 onEnabledChange = { onEvent(SettingsEvent.OnPublicationsEnabled) }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_notifications_reactions),
-                enabled = state.serverSettingsState.reactionsEnabled,
+                enabled = switchesState.serverSettingsState.reactionsEnabled,
                 onEnabledChange = { onEvent(SettingsEvent.OnReactionsEnabled) }
             )
 
@@ -121,13 +128,13 @@ fun TemplateSettingsMain(
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_recommend_to_contacts),
-                enabled = state.serverSettingsState.recommendToContacts,
+                enabled = switchesState.serverSettingsState.recommendToContacts,
                 onEnabledChange = { onEvent(SettingsEvent.OnRecommendToContacts) }
             )
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_allow_add_from_anyone),
-                enabled = state.serverSettingsState.allowAddFromAnyone,
+                enabled = switchesState.serverSettingsState.allowAddFromAnyone,
                 onEnabledChange = { onEvent(SettingsEvent.OnAllowAddFromAnyone) }
             )
 
@@ -142,7 +149,7 @@ fun TemplateSettingsMain(
 
             SwitchRow(
                 text = stringResource(R.string.settings_privacy_confirm_before_posting),
-                enabled = state.localSettingsState.confirmBeforePosting,
+                enabled = switchesState.localSettingsState.confirmBeforePosting,
                 onEnabledChange = { onEvent(SettingsEvent.OnConfirmBeforePosting) }
             )
 
@@ -155,7 +162,7 @@ fun TemplateSettingsMain(
                 icon = Icons.Default.Star,
                 text = stringResource(R.string.settings_section_premium),
                 textColor = ConstColours.GOLD,
-                modifier = Modifier
+                modifier = Modifier.padding(vertical = dimensionResource(R.dimen.medium_padding))
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -164,7 +171,7 @@ fun TemplateSettingsMain(
                 onClick = onLogoutClick,
                 icon = Icons.AutoMirrored.Filled.Logout,
                 text = stringResource(R.string.settings_section_quit),
-                modifier = Modifier
+                modifier = Modifier.padding(vertical = dimensionResource(R.dimen.medium_padding))
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -174,7 +181,7 @@ fun TemplateSettingsMain(
                 icon = Icons.Default.Delete,
                 text = stringResource(R.string.settings_section_delete),
                 textColor = ConstColours.DELETE,
-                modifier = Modifier
+                modifier = Modifier.padding(vertical = dimensionResource(R.dimen.medium_padding))
             )
 
             Spacer(modifier = Modifier.weight(1.5f))

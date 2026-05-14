@@ -2,12 +2,15 @@ package com.project.momentum.features.settings.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,6 +54,8 @@ fun SettingsPremiumScreen(
         )
     )
 
+    val isSmallScreen = LocalWindowInfo.current.containerDpSize.height < 700.dp
+
     Column(
         verticalArrangement = Arrangement.spacedBy(24.dp),
         modifier = modifier
@@ -76,11 +81,13 @@ fun SettingsPremiumScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(50.dp))
+        if (!isSmallScreen) Spacer(modifier = Modifier.height(50.dp))
 
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .weight(1f)
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp)
         ) {
             // Заголовок Premium
@@ -149,8 +156,6 @@ fun SettingsPremiumScreen(
                 icon = Icons.Default.Cloud
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
-
             // Длительность подписки
             Row(
                 modifier = Modifier
@@ -160,13 +165,11 @@ fun SettingsPremiumScreen(
                     text = stringResource(R.string.settings_premium_duration),
                     style = AppTextStyles.MainText,
                     color = ConstColours.WHITE,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(vertical = 24.dp)
                 )
 
 
             }
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             Row(
                 modifier = Modifier

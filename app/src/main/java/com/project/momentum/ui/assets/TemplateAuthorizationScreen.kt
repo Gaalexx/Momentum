@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +44,11 @@ fun TemplateAuthorizationScreen(
     isError: Boolean = false,
     errorText: String? = null,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    continueColors: ButtonColors = ButtonDefaults.buttonColors(
+        containerColor = ConstColours.TRANSPARENT_WHITE_ALPHA0,
+        contentColor = ConstColours.WHITE
+    ),
+    continueText: String = stringResource(R.string.button_continue)
 ) {
     val bg = ConstColours.BLACK
 
@@ -83,7 +90,9 @@ fun TemplateAuthorizationScreen(
                 Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
                 ContinueButton(
                     onClick = onContinueClick,
-                    modifier = Modifier.height(dimensionResource(R.dimen.button_size))
+                    modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
+                    text = continueText,
+                    colors = continueColors
                 )
 
                 SubButton(

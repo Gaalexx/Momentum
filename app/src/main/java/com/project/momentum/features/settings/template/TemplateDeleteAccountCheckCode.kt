@@ -23,10 +23,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.R
+import com.project.momentum.features.auth.models.LoginType
+import com.project.momentum.features.auth.ui.handlingErrorLogin
 import com.project.momentum.features.settings.models.DeleteAccountState
+import com.project.momentum.features.settings.ui.handlingErrorDelete
 import com.project.momentum.features.settings.viewmodel.DeleteEvent
+import com.project.momentum.ui.assets.TemplateAuthorizationScreen
 import com.project.momentum.ui.assets.TextFieldRegistration
 import com.project.momentum.ui.assets.TopBarTemplate
+import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
 
@@ -35,6 +40,7 @@ import com.project.momentum.ui.theme.ConstColours
 fun DeleteAccountCheckCodeScreenPreview() {
     TemplateDeleteAccountCheckCode(
         onBackClick = {},
+        onContinueClick = {},
         onEvent = {},
         state = DeleteAccountState(),
     )
@@ -43,59 +49,36 @@ fun DeleteAccountCheckCodeScreenPreview() {
 @Composable
 fun TemplateDeleteAccountCheckCode(
     onBackClick: () -> Unit,
+    onContinueClick: () -> Unit,
     onEvent: (DeleteEvent)-> Unit,
     state: DeleteAccountState,
     modifier: Modifier = Modifier
 ) {
-    TopBarTemplate(
-        label = R.string.label_delete_account,
-        onBackClick = {
-            onEvent(DeleteEvent.previousStep)
-            onBackClick() },
-        modifier = modifier
-    ) { paddingValues ->
-        Box(
-            modifier = modifier
-                .background(ConstColours.BLACK)
-                .padding(paddingValues)
-//                .windowIn  setsPadding(WindowInsets.systemBars) ,
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = stringResource(R.string.insert_code_email),
-                    color = ConstColours.WHITE,
-                    textAlign = TextAlign.Center,
-                    style = AppTextStyles.Headlines,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = dimensionResource(R.dimen.medium_padding))
-                )
-                Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
-                TextFieldRegistration(
-                    value = state.userData.password,
-                    onValueChange = {onEvent(DeleteEvent.updateUserCode(it))},
-                    modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Done
-                    ),
-                )
-                Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
-                ContinueButton(
-                    onClick = {onEvent(DeleteEvent.nextStep)},
-                    modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
-                    text = stringResource(R.string.button_delete_account),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ConstColours.ERROR_RED,
-                        contentColor = ConstColours.WHITE
-                    )
-                )
-            }
-        }
+    if (state.isLoading) {
+        LoadingOverlay()
+    } else {
+        TemplateAuthorizationScreen(
+            value = state.userData.verificationCode,
+            label = R.string.label_delete_account,
+            title = R.string.insert_code_email,
+            subButtonText = R.string.button_send_code_again,
+            onValueChange = {onEvent(DeleteEvent.updateUserCode(it))},
+            onBackClick = onBackClick,
+            onContinueClick = {onEvent(DeleteEvent.nextStep)},
+            onSubButtonClick = {onEvent(DeleteEvent.sendCodeAgain)},
+            modifier = modifier,
+            placeholder = stringResource(R.string.placeholder_code),
+            isError = state.isError,
+            errorText = handlingErrorDelete(state),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            continueColors = ButtonDefaults.buttonColors(
+                containerColor = ConstColours.ERROR_RED,
+                contentColor = ConstColours.WHITE
+            ),
+            continueText = stringResource(R.string.button_delete_account)
+        )
     }
 }

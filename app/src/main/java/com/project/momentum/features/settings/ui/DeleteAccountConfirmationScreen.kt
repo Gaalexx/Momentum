@@ -2,6 +2,8 @@ package com.project.momentum.features.settings.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.project.momentum.features.auth.models.NavEvent
 import com.project.momentum.features.settings.template.TemplateDeleteAccountConfirmation
@@ -22,8 +24,15 @@ fun DeleteAccountConfirmationScreen(
             }
         }
     }
-
-    TemplateDeleteAccountConfirmation(
-        onEvent = viewModel::onEvent
-    )
+    Dialog(
+        onDismissRequest = onCancel,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false
+        )
+    ) {
+        TemplateDeleteAccountConfirmation(
+            onEvent = viewModel::onEvent
+        )
+    }
 }

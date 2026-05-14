@@ -1,6 +1,7 @@
 package com.project.momentum.features.settings.template
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -24,10 +25,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.R
+import com.project.momentum.features.auth.ui.handlingErrorLogin
 import com.project.momentum.features.settings.models.DeleteAccountState
+import com.project.momentum.features.settings.ui.handlingErrorDelete
 import com.project.momentum.features.settings.viewmodel.DeleteEvent
+import com.project.momentum.ui.assets.GlassTextField
 import com.project.momentum.ui.assets.TextFieldRegistration
 import com.project.momentum.ui.assets.TopBarTemplate
+import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
 
@@ -38,69 +43,85 @@ fun DeleteAccountCheckPasswordScreenPreview() {
         onBackClick = {},
         onEvent = {},
         state = DeleteAccountState(),
+        onContinueClick = {},
+        passwordRepetition = ""
     )
 }
 
 @Composable
 fun TemplateDeleteAccountCheckPassword(
-    onBackClick: () -> Unit,
-    onEvent: (DeleteEvent)-> Unit,
     state: DeleteAccountState,
+    onEvent: (DeleteEvent)-> Unit,
+    passwordRepetition: String,
+    onBackClick: () -> Unit,
+    onContinueClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     TopBarTemplate(
         label = R.string.label_delete_account,
-        onBackClick = {
-            onEvent(DeleteEvent.previousStep)
-            onBackClick() },
+        onBackClick = onBackClick,
         modifier = modifier
     ) { paddingValues ->
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .background(ConstColours.BLACK)
                 .padding(paddingValues)
-                .windowInsetsPadding(WindowInsets.systemBars),
+//                .windowIn  setsPadding(WindowInsets.systemBars) ,
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                verticalArrangement = Arrangement.Center
             ) {
-                Spacer(Modifier.height(dimensionResource(R.dimen.delete_account_padding_height)))
-                Text(
-                    text = stringResource(R.string.insert_password),
-                    color = ConstColours.WHITE,
-                    textAlign = TextAlign.Center,
-                    style = AppTextStyles.Headlines,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = dimensionResource(R.dimen.medium_padding))
-                )
-                Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
-                TextFieldRegistration(
-                    value = state.userData.passwordFstTextField,
-                    onValueChange = {onEvent(DeleteEvent.updatePasswordFstTextField(it))},
-                    modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Done
-                    ),
-                )
-                Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
-                TextFieldRegistration(
-                    value = state.userData.passwordScdTextField,
-                    onValueChange = {onEvent(DeleteEvent.updatePasswordScdTextField(it))},
-                    modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Password,
-                        imeAction = ImeAction.Done
-                    ),
-                )
-                Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
-                ContinueButton(
-                    onClick = {onEvent(DeleteEvent.nextStep)},
-                    modifier = Modifier.height(dimensionResource(R.dimen.button_size))
-                )
+                if (state.isLoading) {
+                    LoadingOverlay()
+                } else {
+                    Text(
+                        text = stringResource(R.string.insert_password),
+                        color = ConstColours.WHITE,
+                        textAlign = TextAlign.Center,
+                        style = AppTextStyles.Headlines,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = dimensionResource(R.dimen.medium_padding))
+                    )
+                    Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
+
+                    GlassTextField(
+//                    TextFieldRegistration(
+                        value = state.userData.password,
+                        onValueChange = {onEvent(DeleteEvent.updatePasswordFstTextField(it))},
+//                        modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
+                        placeholder = stringResource(R.string.placeholder_password),
+                        isError = state.isError,
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Next
+                        ),
+                    )
+
+                    Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
+
+                    GlassTextField(
+//                    TextFieldRegistration(
+                        value = passwordRepetition,
+                        onValueChange = {onEvent(DeleteEvent.updatePasswordScdTextField(it))},
+//                        modifier = Modifier.height(dimensionResource(R.dimen.button_size)),
+                        placeholder = stringResource(R.string.placeholder_password_repetition),
+                        isError = state.isError,
+                        errorText = handlingErrorDelete(state),
+                        keyboardOptions = KeyboardOptions.Default.copy(
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Done
+                        ),
+                    )
+                    Spacer(Modifier.height(dimensionResource(R.dimen.small_padding)))
+
+                    ContinueButton(
+                        onClick = onContinueClick,
+                        modifier = Modifier.height(dimensionResource(R.dimen.button_size))
+                    )
+                }
             }
         }
     }

@@ -53,6 +53,9 @@ class ServerSettingsRepository @Inject constructor(
 
     suspend fun getServerSettingsInfo() : Result<ServerSettingsStateDTO> =
         runCatching {
-            settingsInfoAPI.getServerSettingsInfo()
+            val response = settingsInfoAPI.getServerSettingsInfo()
+            if (!response.success) throw Exception(response.message)
+
+            response.newState ?: throw Exception("Server returned no state")
         }
 }

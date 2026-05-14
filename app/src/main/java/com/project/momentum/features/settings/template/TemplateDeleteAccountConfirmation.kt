@@ -35,17 +35,21 @@ fun DeleteAccountConfirmationScreenPreview() {
 
 @Composable
 fun TemplateDeleteAccountConfirmation(
-    onEvent: (DeleteEvent)-> Unit
+    onEvent: (DeleteEvent) -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(ConstColours.BLACK.copy(alpha = 0.6f)),
         contentAlignment = Alignment.Center
-    ) {
+    )
+    {
         Column(
             modifier = Modifier
-                .background(ConstColours.WHITE, shape = RoundedCornerShape(dimensionResource(R.dimen.medium_padding)))
+                .background(
+                    ConstColours.WHITE,
+                    shape = RoundedCornerShape(dimensionResource(R.dimen.medium_padding))
+                )
                 .padding(dimensionResource(R.dimen.delete_account_stroke))
                 .width(dimensionResource(R.dimen.delete_account_padding_width)),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -59,20 +63,19 @@ fun TemplateDeleteAccountConfirmation(
 
             Spacer(Modifier.height(dimensionResource(R.dimen.delete_account_stroke)))
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ){
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 Spacer(modifier = Modifier.weight(1f))
                 ButtonForDelete(
-                    onClick = {onEvent(DeleteEvent.onConfirmDelete)},
+                    onClick = { onEvent(DeleteEvent.onConfirmDelete) },
                     text = stringResource(R.string.button_delete_account_yes),
-                    color =  ConstColours.ERROR_RED,
+                    color = ConstColours.ERROR_RED,
                 )
                 Spacer(modifier = Modifier.weight(2f))
                 ButtonForDelete(
-                    onClick = {onEvent(DeleteEvent.onCancelDelete)},
+                    onClick = { onEvent(DeleteEvent.onCancelDelete) },
                     text = stringResource(R.string.button_delete_account_no),
-                    color =  ConstColours.BLACK,
+                    color = ConstColours.BLACK,
                 )
                 Spacer(modifier = Modifier.weight(1f))
             }

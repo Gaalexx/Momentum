@@ -1,7 +1,10 @@
 package com.project.momentum.features.settings.models
 
+import com.project.momentum.features.auth.viewmodel.ErrorLogin
+
 enum class DeleteAccountStep {
     PASSWORD,
+    PASSWORD_RECOVERY,
     VERIFICATION,
     DELETE_ACCOUNT_CONFIRMATION,
     DELETE_ACCOUNT,
@@ -9,8 +12,6 @@ enum class DeleteAccountStep {
 }
 
 data class UserData(
-    val passwordFstTextField: String = "",
-    val passwordScdTextField: String = "",
     val email: String = "",
     val phone: String? = null,
     val password: String = "",
@@ -22,9 +23,8 @@ data class DeleteAccountState (
     val userData: UserData = UserData(),
     val isLoading: Boolean = false,
     val isError: Boolean = false,
-    val errorMessage: String? = null,
-    val isStepValid: Boolean = true,
+    val errorMessage: ErrorLogin = ErrorLogin.None,
     val canGoNext: Boolean = false,
-    val canGoBack: Boolean = false,
+    val canGoBack: Boolean = true,
     val showConfirmationDialog: Boolean = false
 )
