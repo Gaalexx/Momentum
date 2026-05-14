@@ -12,6 +12,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     id("com.google.gms.google-services")
+    id("vkid.manifest.placeholders")
 }
 
 val compileSdkApi = libs.versions.compileSdk.get().toInt()
@@ -23,7 +24,13 @@ val javaVersion = JavaVersion.toVersion(jvmTargetVersion)
 
 
 val localProperties = Properties()
-localProperties.load(FileInputStream(rootProject.file("local.properties")))
+val localPropertiesFile = rootProject.file("local.properties")
+
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.inputStream().use {
+        localProperties.load(it)
+    }
+}
 
 kotlin {
     jvmToolchain(jvmTargetVersion.toInt())
@@ -31,6 +38,11 @@ kotlin {
         jvmTarget.set(jvmTargetEnum)
     }
 }
+
+
+val clientId = localProperties.getProperty("clientId")
+val clientSecret = localProperties.getProperty("clientSecret")
+val vkAppId = localProperties.getProperty("vkAppId")
 
 android {
     namespace = "com.project.momentum"
@@ -71,6 +83,16 @@ android {
                 "\"\""
             }
         )
+
+        addManifestPlaceholders(
+            mapOf(
+                "VKIDRedirectHost" to "vk.ru",
+                "VKIDRedirectScheme" to "vk$vkAppId",
+                "VKIDClientID" to clientId,
+                "VKIDClientSecret" to clientSecret
+            )
+        )
+
     }
 
     buildTypes {
@@ -153,7 +175,10 @@ dependencies {
 
 
     //gms
-    implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-messaging")
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.messaging)
+
+    //vk sdk
+    implementation(libs.vkid)
 }
