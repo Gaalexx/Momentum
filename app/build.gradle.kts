@@ -174,10 +174,10 @@ dependencies {
 
 
     //gms
-    implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-messaging")
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.messaging)
 
     //vk sdk
-    implementation("com.vk.id:vkid:2.7.0")
+    implementation(libs.vkid)
 }

@@ -15,7 +15,7 @@ class MomentumApp : Application() {
     override fun onCreate() {
         super.onCreate()
         appSettingsHolder.toString()
-        VKID.init(this)
-        VKID.instance.setLocale(Locale("ru"))
+//        VKID.init(this)
+//        VKID.instance.setLocale(Locale("ru"))
     }
 }
