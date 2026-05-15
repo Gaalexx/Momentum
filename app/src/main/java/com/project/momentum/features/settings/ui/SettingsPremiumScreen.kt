@@ -2,6 +2,7 @@ package com.project.momentum.features.settings.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -81,9 +82,10 @@ fun SettingsPremiumScreen(
             )
         }
 
-        if (!isSmallScreen) Spacer(modifier = Modifier.height(50.dp))
+//        if (!isSmallScreen) Spacer(modifier = Modifier.height(50.dp))
 
         Column(
+            verticalArrangement = Arrangement.Bottom,
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
