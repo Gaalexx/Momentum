@@ -1,11 +1,15 @@
 package com.project.momentum.features.auth.ui
 
+import android.content.Context
+import android.content.ContextWrapper
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -26,7 +30,8 @@ fun AuthorizationAccountScreenPreview() {
         onValueChange = {},
         onBackClick = {},
         onContinueClick = {},
-        onSubButtonClick = {}
+        onSubButtonClick = {},
+        onVkAuthClick = {}
     )
 }
 
@@ -34,6 +39,7 @@ fun AuthorizationAccountScreenPreview() {
 fun AuthorizationAccountRoot(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
+    onVkAuthClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: AuthorizationViewModel = hiltViewModel()
@@ -61,6 +67,7 @@ fun AuthorizationAccountRoot(
         onSubButtonClick = {
             viewModel.switchLoginType()
         },
+        onVkAuthClick = onVkAuthClick,
         modifier = modifier
     )
 }
@@ -72,6 +79,7 @@ fun AuthorizationAccountScreen(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
     onSubButtonClick: () -> Unit,
+    onVkAuthClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     TemplateAuthorizationScreen(
@@ -94,6 +102,7 @@ fun AuthorizationAccountScreen(
         onBackClick = onBackClick,
         onContinueClick = onContinueClick,
         onSubButtonClick = onSubButtonClick,
+        onVkAuthClick = onVkAuthClick,
         modifier = modifier,
         placeholder =
             stringResource(when (uiState.loginType) {

@@ -1,30 +1,44 @@
 package com.project.momentum.ui.assets
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.R
 import com.project.momentum.ui.theme.AppTextStyles
@@ -40,6 +54,7 @@ fun TemplateAuthorizationScreen(
     onContinueClick: () -> Unit,
     onSubButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onVkAuthClick: (() -> Unit)? = null,
     placeholder: String? = null,
     isError: Boolean = false,
     errorText: String? = null,
@@ -99,6 +114,22 @@ fun TemplateAuthorizationScreen(
                     text = subButtonText,
                     onClick = onSubButtonClick
                 )
+
+                if (onVkAuthClick != null) {
+                    Row(
+                        modifier = modifier
+                            .padding(dimensionResource(R.dimen.medium_padding))
+                            .clickable(onClick = onVkAuthClick),
+                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.small_padding)),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.vk_logo),
+                            contentDescription = null,
+                            modifier = Modifier.size(dimensionResource(R.dimen.button_size))
+                        )
+                    }
+                }
             }
         }
     }
@@ -115,6 +146,7 @@ fun TemplateAuthorizationScreenPreview() {
         onValueChange = {},
         onBackClick = {},
         onContinueClick = {},
-        onSubButtonClick = {}
+        onSubButtonClick = {},
+        onVkAuthClick = {}
     )
 }

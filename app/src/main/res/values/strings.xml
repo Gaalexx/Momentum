@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Momentum</string>
-    <integer name="com_vk_sdk_AppId">54593472</integer>
     <string name="settings_main_screen_headliner">Settings</string>
     <string name="settings_section_privacy">Privacy</string>
     <string name="settings_section_notifications">Notifications and sounds</string>

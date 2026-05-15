@@ -6,6 +6,7 @@ firebaseBom = "34.13.0"
 kotlin = "2.2.10"
 ksp = "2.3.2"
 gms = "4.4.4"
+vkid = "2.7.0"
 
 # Android SDK
 compileSdk = "36"
@@ -51,7 +52,6 @@ uiText = "1.10.5"
 material3 = "1.4.0"
 foundation = "1.10.6"
 animationCore = "1.11.0"
-vkid = "4.1.0"
 
 [libraries]
 # Core Android
@@ -60,6 +60,7 @@ android-sdk-core = { module = "com.vk:android-sdk-core", version.ref = "androidS
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+vkid = { module = "com.vk.id:vkid", version.ref = "vkid" }
 
 
 # Compose BOM
@@ -132,7 +133,6 @@ androidx-ui-text = { group = "androidx.compose.ui", name = "ui-text", version.re
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 androidx-compose-animation-core = { group = "androidx.compose.animation", name = "animation-core", version.ref = "animationCore" }
-vkid = { module = "com.vk.id:vkid", version.ref = "vkid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

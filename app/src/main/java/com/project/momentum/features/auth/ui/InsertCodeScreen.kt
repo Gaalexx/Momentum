@@ -29,6 +29,7 @@ fun InsertCodeScreenPreview() {
         onBackClick = {},
         onContinueClick = {},
         onSubButtonClick = {},
+        onVkAuthClick = {},
     )
 }
 
@@ -36,6 +37,7 @@ fun InsertCodeScreenPreview() {
 fun InsertCodeRoot(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
+    onVkAuthClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val viewModel: RegistrationViewModel = hiltViewModel()
@@ -63,6 +65,7 @@ fun InsertCodeRoot(
         onSubButtonClick = {
             viewModel.sendCodeAgain()
         },
+        onVkAuthClick = onVkAuthClick,
         modifier = modifier,
     )
 }
@@ -74,6 +77,7 @@ fun InsertCodeScreen(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
     onSubButtonClick: () -> Unit,
+    onVkAuthClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
 
@@ -93,6 +97,7 @@ fun InsertCodeScreen(
             onBackClick = onBackClick,
             onContinueClick = onContinueClick,
             onSubButtonClick = onSubButtonClick,
+            onVkAuthClick = onVkAuthClick,
             modifier = modifier,
             placeholder = stringResource(R.string.placeholder_code),
             isError = uiState.isError,

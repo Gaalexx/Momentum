@@ -43,7 +43,8 @@ fun CreateAccountScreenPreview() {
         onValueChange = {},
         onBackClick = {},
         onContinueClick = {},
-        onSubButtonClick = {}
+        onSubButtonClick = {},
+        onVkAuthClick = {},
     )
 }
 
@@ -52,6 +53,7 @@ fun CreateAccountRoot(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
     onSubButtonClick: () -> Unit,
+    onVkAuthClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: RegistrationViewModel = hiltViewModel()
@@ -77,6 +79,7 @@ fun CreateAccountRoot(
             viewModel.nextStep()
         },
         onSubButtonClick = onSubButtonClick,
+        onVkAuthClick = onVkAuthClick,
         modifier = modifier
     )
 }
@@ -88,6 +91,7 @@ fun CreateAccountScreen(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
     onSubButtonClick: () -> Unit,
+    onVkAuthClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -104,6 +108,7 @@ fun CreateAccountScreen(
                 onBackClick = onBackClick,
                 onContinueClick = onContinueClick,
                 onSubButtonClick = onSubButtonClick,
+                onVkAuthClick = onVkAuthClick,
                 modifier = modifier,
                 placeholder = stringResource(R.string.placeholder_email),
                 isError = uiState.isError,

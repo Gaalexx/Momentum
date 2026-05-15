@@ -1,9 +1,9 @@
 package com.project.momentum
 
 import android.app.Application
-import com.project.momentum.features.auth.models.LoginType
 import com.project.momentum.features.settings.repo.AppSettingsHolder
 import com.vk.api.sdk.VK
+import com.vk.id.VKID
 import dagger.hilt.android.HiltAndroidApp
 import java.util.Locale
 import javax.inject.Inject
@@ -17,6 +17,7 @@ class MomentumApp : Application() {
         super.onCreate()
         appSettingsHolder.toString()
         VK.initialize(this)
-
+        VKID.init(this)
+        VKID.instance.setLocale(Locale.forLanguageTag("ru"))
     }
 }

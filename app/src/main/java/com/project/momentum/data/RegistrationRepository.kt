@@ -10,6 +10,7 @@ import com.project.momentum.data.auth.pushtoken.FirebasePushTokenProvider
 import com.project.momentum.data.remote.RegistrationAPI
 import com.project.momentum.features.auth.models.LoginState
 import com.project.momentum.features.auth.models.LoginType
+import com.project.momentum.features.auth.models.dto.AuthorizeVKRequestDTO
 import com.project.momentum.features.auth.models.dto.CheckCodeLoginRequestDTO
 import com.project.momentum.features.auth.models.dto.CheckCodeRequestDTO
 import com.project.momentum.features.auth.models.dto.CheckEmailRequestDTO
@@ -92,6 +93,16 @@ class RegistrationRepository @Inject constructor(
                 email = user.userData.email,
                 phone = user.userData.phone,
                 password = user.userData.password,
+                deviceInfo = deviceInfo.getPhoneInfo()
+            )
+        )
+        return response.jwt
+    }
+
+    suspend fun authorizeWithVK(vkAccessToken: String): String? {
+        val response = client.authorizeWithVK(
+            AuthorizeVKRequestDTO(
+                vkAccessToken = vkAccessToken,
                 deviceInfo = deviceInfo.getPhoneInfo()
             )
         )

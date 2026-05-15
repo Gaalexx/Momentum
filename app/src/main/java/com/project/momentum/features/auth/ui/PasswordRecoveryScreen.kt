@@ -24,6 +24,7 @@ import com.project.momentum.ui.assets.TemplateAuthorizationScreen
 fun PasswordRecoveryRoot(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
+    onVkAuthClick: () -> Unit,
 //    onSendCodeAgainClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -53,6 +54,7 @@ fun PasswordRecoveryRoot(
             viewModel.switchLoginType()
 //            viewModel.onSendCodeAgainClick()
         },
+        onVkAuthClick = onVkAuthClick,
         modifier = modifier
     )
 }
@@ -64,6 +66,7 @@ fun PasswordRecoveryScreen(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
     onSubButtonClick: () -> Unit,
+    onVkAuthClick: () -> Unit,
 //    onSendCodeAgainClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -85,6 +88,7 @@ fun PasswordRecoveryScreen(
         onBackClick = onBackClick,
         onContinueClick = onContinueClick,
         onSubButtonClick = onSubButtonClick,
+        onVkAuthClick = onVkAuthClick,
         modifier = modifier,
         placeholder = stringResource(R.string.placeholder_code),
         isError = uiState.isError,
@@ -105,6 +109,7 @@ fun PasswordRecoveryScreenPreview() {
         onBackClick = {},
         onContinueClick = {},
         onSubButtonClick = {},
+        onVkAuthClick = {},
 //        onSendCodeAgainClick = {}
     )
 }

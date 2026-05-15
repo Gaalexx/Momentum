@@ -1,8 +1,5 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.konan.properties.Properties
-import shadow.bundletool.com.android.ddmlib.Log
-import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
@@ -12,6 +9,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     id("com.google.gms.google-services")
+    id("vkid.manifest.placeholders")
 }
 
 val compileSdkApi = libs.versions.compileSdk.get().toInt()
@@ -29,6 +27,25 @@ if (localPropertiesFile.exists()) {
     localPropertiesFile.inputStream().use {
         localProperties.load(it)
     }
+}
+
+fun localProperty(name: String): String? =
+    localProperties.getProperty(name)?.trim()?.removeSurrounding("\"")?.takeIf { it.isNotEmpty() }
+
+fun requiredLocalProperty(name: String): String =
+    localProperty(name)
+        ?: error("$name not found in local.properties")
+
+val vkAppId = requiredLocalProperty("vkAppId")
+val vkClientId = requiredLocalProperty("clientId")
+val vkClientSecret = requiredLocalProperty("clientSecret")
+
+require(vkAppId.all(Char::isDigit)) {
+    "vkAppId must be numeric"
+}
+
+require(vkClientId == vkAppId) {
+    "clientId and vkAppId in local.properties must match for VK SDK auth"
 }
 
 kotlin {
@@ -74,9 +91,19 @@ android {
             "String",
             "API_KEY",
             localProperties.getProperty("API_KEY") ?: run {
-                Log.w("Momentum", "API_KEY not found in local.properties")
+                logger.warn("API_KEY not found in local.properties")
                 "\"\""
             }
+        )
+
+        resValue("integer", "com_vk_sdk_AppId", vkAppId)
+        addManifestPlaceholders(
+            mapOf(
+                "VKIDRedirectHost" to "vk.ru",
+                "VKIDRedirectScheme" to "vk$vkAppId",
+                "VKIDClientID" to vkClientId,
+                "VKIDClientSecret" to vkClientSecret,
+            )
         )
     }
 
@@ -164,7 +191,8 @@ dependencies {
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.messaging)
 
-    //vk sdk
+    // VK SDK
     implementation(libs.android.sdk.core)
     implementation(libs.android.sdk.api)
+    implementation(libs.vkid)
 }

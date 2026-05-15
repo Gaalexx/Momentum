@@ -57,7 +57,9 @@ import com.project.momentum.features.offline.ui.NoInternetScreen
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalAnimationApi::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    onVkAuth: () -> Unit
+) {
 
     SharedTransitionLayout {
         val appStartViewModel: AppStartViewModel = hiltViewModel()
@@ -81,6 +83,13 @@ fun MainScreen() {
             LoadingOverlay()
         } else {
             val backStack: NavBackStack<NavKey> = rememberNavBackStack(startRoute)
+
+            LaunchedEffect(state) {
+                if (state == AppStartState.Authorized && backStack.firstOrNull() !is NavRoutes.Camera) {
+                    backStack.clear()
+                    backStack.add(NavRoutes.Camera)
+                }
+            }
 
             fun setBase(route: NavRoutes) {
                 if (backStack.isEmpty()) {
@@ -157,7 +166,8 @@ fun MainScreen() {
                         },
                         onSubButtonClick = {
                             openOverlay(NavRoutes.AuthorizationLogin)
-                        }
+                        },
+                        onVkAuthClick = onVkAuth
                     )
                 }
 
@@ -168,7 +178,8 @@ fun MainScreen() {
                         },
                         onContinueClick = {
                             openOverlay(NavRoutes.RegistrationPassword)
-                        }
+                        },
+                        onVkAuthClick = onVkAuth
                     )
                 }
 
@@ -192,7 +203,8 @@ fun MainScreen() {
                         },
                         onContinueClick = {
                             openOverlay(NavRoutes.AuthorizationPassword)
-                        }
+                        },
+                        onVkAuthClick = onVkAuth
                     )
                 }
 
@@ -207,7 +219,8 @@ fun MainScreen() {
                         },
                         onPasswordRecoveryClick = {
                             openOverlay(NavRoutes.AuthorizationCode)
-                        }
+                        },
+                        onVkAuthClick = onVkAuth
                     )
                 }
 
@@ -218,7 +231,8 @@ fun MainScreen() {
                         },
                         onContinueClick = {
                             openOverlay(NavRoutes.Camera)
-                        }
+                        },
+                        onVkAuthClick = onVkAuth
                     )
                 }
 
