@@ -1,6 +1,7 @@
 package com.project.momentum.data.remote
 
 import android.util.Log
+import com.project.momentum.features.auth.models.dto.AuthorizeVKRequestDTO
 import com.project.momentum.features.auth.models.dto.CheckCodeLoginRequestDTO
 import com.project.momentum.features.auth.models.dto.CheckCodeLoginResponseDTO
 import com.project.momentum.features.auth.models.dto.CheckCodeRequestDTO
@@ -34,6 +35,8 @@ interface IRegistrationLoginClient {
     suspend fun sendLoginData(userData: LoginUserRequestDTO): LoginResponseDTO
 
     suspend fun sendCode(email: CheckEmailRequestDTO): CheckResponseDTO
+
+    suspend fun authorizeWithVK(dto: AuthorizeVKRequestDTO): LoginResponseDTO
 }
 
 @Singleton
@@ -110,5 +113,15 @@ class RegistrationAPI @Inject constructor(
         return response
     }
 
+    override suspend fun authorizeWithVK(dto: AuthorizeVKRequestDTO): LoginResponseDTO {
+        val response = client.post("auth/vk") {
+            setBody(dto)
+        }
+        return if (response.status.value in 200..299) {
+            response.body<LoginResponseDTO>()
+        } else {
+            LoginResponseDTO(jwt = null)
+        }
+    }
 
 }

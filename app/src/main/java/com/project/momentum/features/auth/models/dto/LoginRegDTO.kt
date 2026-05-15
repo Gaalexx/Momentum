@@ -61,6 +61,12 @@ data class GetJWTPushDTO(
     val pushToken: String?
 )
 
+@Serializable
+data class AuthorizeVKRequestDTO(
+    val vkAccessToken: String,
+    val deviceInfo: String
+)
+
 // Response DTO
 @Serializable
 data class CheckResponseDTO(

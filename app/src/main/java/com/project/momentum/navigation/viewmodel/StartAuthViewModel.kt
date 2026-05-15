@@ -167,6 +167,14 @@ class AppStartViewModel @Inject constructor(
         restoreSession()
     }
 
+    fun onVKAuthSuccess() {
+        viewModelScope.launch {
+            loadServerSettings()
+            auth.syncPushToken()
+        }
+        state = AppStartState.Authorized
+    }
+
     fun setUnauthorized() {
         state = AppStartState.Unauthorized
     }

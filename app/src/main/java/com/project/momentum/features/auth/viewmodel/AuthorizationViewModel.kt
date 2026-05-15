@@ -129,8 +129,23 @@ class AuthorizationViewModel @Inject constructor(
         validateCurrentStep(isValidPassword())
     }
 
-    fun onVkAuth(token: AccessToken) {
-        //TODO: серверная часть
+    fun onVkAuth(token: AccessToken, onSuccess: () -> Unit = {}) {
+        _state.update { it.copy(isLoading = true) }
+
+        viewModelScope.launch {
+            val refreshToken = repository.authorizeWithVK(token.token)
+            if (refreshToken != null) {
+                repository.apply {
+                    saveToken(refreshToken)
+                    authorize()
+                    syncPushToken()
+                }
+                _state.update { it.copy(currentStep = LoginStep.COMPLETED, isLoading = false) }
+                onSuccess()
+            } else {
+                _state.update { it.copy(isLoading = false, isError = true) }
+            }
+        }
     }
 
     fun onCodeAuthorization() {

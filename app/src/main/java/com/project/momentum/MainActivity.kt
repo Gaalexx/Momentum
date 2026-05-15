@@ -14,6 +14,7 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import com.project.momentum.features.auth.viewmodel.AuthorizationViewModel
 import com.project.momentum.navigation.MainScreen
+import com.project.momentum.navigation.viewmodel.AppStartViewModel
 import com.project.momentum.ui.theme.MomentumAndroidSettingsTheme
 import com.vk.api.sdk.VK
 import com.vk.dto.common.id.toUserId
@@ -39,6 +40,7 @@ class MainActivity : ComponentActivity() {
         }
     }
     private val authViewModel: AuthorizationViewModel by viewModels()
+    private val appStartViewModel: AppStartViewModel by viewModels()
     private val vkAuthCallback = object : VKIDAuthCallback {
         override fun onAuth(accessToken: AccessToken) {
             applyVkSdkCredentials(accessToken)
@@ -47,7 +49,9 @@ class MainActivity : ComponentActivity() {
                 "VKID auth success: userId=${accessToken.userID}, last name=${accessToken.userData.lastName}",
             )
 
-            authViewModel.onVkAuth(accessToken)
+            authViewModel.onVkAuth(accessToken) {
+                appStartViewModel.onVKAuthSuccess()
+            }
         }
 
         override fun onFail(fail: VKIDAuthFail) {

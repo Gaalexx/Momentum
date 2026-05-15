@@ -84,6 +84,13 @@ fun MainScreen(
         } else {
             val backStack: NavBackStack<NavKey> = rememberNavBackStack(startRoute)
 
+            LaunchedEffect(state) {
+                if (state == AppStartState.Authorized && backStack.firstOrNull() !is NavRoutes.Camera) {
+                    backStack.clear()
+                    backStack.add(NavRoutes.Camera)
+                }
+            }
+
             fun setBase(route: NavRoutes) {
                 if (backStack.isEmpty()) {
                     backStack.add(route)
