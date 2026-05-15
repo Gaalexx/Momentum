@@ -68,6 +68,7 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         askNotificationPermission()
+        VKID.instance.accessToken?.let { applyVkSdkCredentials(it) }
         setContent {
             MomentumAndroidSettingsTheme {
                 MainScreen(
