@@ -61,12 +61,5 @@
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAccent" />
 
-        // for VK captcha
-        <provider
-            android:name="com.vk.id.captcha.init.SdkInitContentProvider"
-            android:authorities="your.unique.authority"
-            android:exported="false"
-            tools:replace="authorities" />
-
     </application>
 </manifest>

@@ -12,7 +12,6 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     id("com.google.gms.google-services")
-    id("vkid.manifest.placeholders")
 }
 
 val compileSdkApi = libs.versions.compileSdk.get().toInt()
@@ -39,10 +38,6 @@ kotlin {
     }
 }
 
-
-val clientId = localProperties.getProperty("clientId")
-val clientSecret = localProperties.getProperty("clientSecret")
-val vkAppId = localProperties.getProperty("vkAppId")
 
 android {
     namespace = "com.project.momentum"
@@ -83,16 +78,6 @@ android {
                 "\"\""
             }
         )
-
-        addManifestPlaceholders(
-            mapOf(
-                "VKIDRedirectHost" to "vk.ru",
-                "VKIDRedirectScheme" to "vk$vkAppId",
-                "VKIDClientID" to clientId,
-                "VKIDClientSecret" to clientSecret
-            )
-        )
-
     }
 
     buildTypes {
@@ -180,5 +165,6 @@ dependencies {
     implementation(libs.firebase.messaging)
 
     //vk sdk
-    implementation(libs.vkid)
+    implementation(libs.android.sdk.core)
+    implementation(libs.android.sdk.api)
 }

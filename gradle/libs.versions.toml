@@ -1,6 +1,7 @@
 [versions]
 # Build tools
 agp = "9.2.1"
+androidSdkCore = "4.1.0"
 firebaseBom = "34.13.0"
 kotlin = "2.2.10"
 ksp = "2.3.2"
@@ -50,10 +51,12 @@ uiText = "1.10.5"
 material3 = "1.4.0"
 foundation = "1.10.6"
 animationCore = "1.11.0"
-vkid = "2.7.0"
+vkid = "4.1.0"
 
 [libraries]
 # Core Android
+android-sdk-api = { module = "com.vk:android-sdk-api", version.ref = "androidSdkCore" }
+android-sdk-core = { module = "com.vk:android-sdk-core", version.ref = "androidSdkCore" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
