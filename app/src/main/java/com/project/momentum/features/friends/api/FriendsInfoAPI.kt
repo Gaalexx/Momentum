@@ -34,7 +34,6 @@ class FriendsInfoAPI @Inject constructor(
             header(HttpHeaders.Authorization, sessionManager.getHeader())
         }
 
-        println("ABOBA      ${result.body<FriendRequestActionDTO>()}")
 
         return when (result.status) {
             HttpStatusCode.OK -> true

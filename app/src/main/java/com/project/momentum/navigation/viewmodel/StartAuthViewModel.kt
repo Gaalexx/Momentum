@@ -44,6 +44,8 @@ class AuthUseCase @Inject constructor(
             AuthResult.Error(AuthError.NoInternetConnectionError)
         }
 
+    suspend fun unauthorize(): Boolean = registrationRepository.clearSession()
+
     suspend fun syncPushToken() {
         registrationRepository.syncPushToken()
     }
@@ -56,7 +58,7 @@ sealed interface AppStartState {
     data object Unauthorized : AppStartState
 }
 
-data class SwitchesState (
+data class SwitchesState(
     val serverSettingsState: ServerSettingsStateDTO = ServerSettingsStateDTO(),
     val localSettingsState: LocalSettingsStateDTO = LocalSettingsStateDTO(),
 )
@@ -71,6 +73,7 @@ class AppStartViewModel @Inject constructor(
 ) : ViewModel() {
     var state by mutableStateOf<AppStartState>(AppStartState.Loading)
         private set
+
 
     private val _settingsState = MutableStateFlow(SwitchesState())
     val settingsState = _settingsState.asStateFlow()
@@ -88,6 +91,7 @@ class AppStartViewModel @Inject constructor(
             }
         }
     }
+
     fun loadServerSettings() {
         viewModelScope.launch {
             serverRep.getServerSettingsInfo()
@@ -97,7 +101,7 @@ class AppStartViewModel @Inject constructor(
                     }
                 }
                 .onFailure {
-                // TODO: обработка ошибок
+                    // TODO: обработка ошибок
                 }
         }
     }
@@ -146,6 +150,18 @@ class AppStartViewModel @Inject constructor(
         }
     }
 
+    fun endSession() {
+        if (state != AppStartState.Authorized) return
+
+        viewModelScope.launch {
+            if (auth.unauthorize()) {
+                state = AppStartState.Unauthorized
+            } else {
+                state = AppStartState.Authorized
+            }
+        }
+    }
+
     fun retrySession() {
         state = AppStartState.Loading
         restoreSession()
@@ -170,7 +186,7 @@ class AppStartViewModel @Inject constructor(
 
             } catch (e: Exception) {
                 Log.e("AppStartViewModel", "Error during logout: ${e.message}")
-                state = AppStartState.Unauthorized
+                state = AppStartState.Authorized
             }
         }
     }

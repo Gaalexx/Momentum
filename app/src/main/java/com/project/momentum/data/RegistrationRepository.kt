@@ -131,8 +131,24 @@ class RegistrationRepository @Inject constructor(
         authStorage.saveEncryptedData(encrypted)
     }
 
-    suspend fun clearSession() {
-        sessionManager.clear()
+    suspend fun clearSession(): Boolean {
+        val token = authStorage.getEncryptedData() ?: return false
+        val decrypted = try {
+            keyStoreManager.decrypt(token)
+        } catch (e: GeneralSecurityException) {
+            authStorage.clear()
+            keyStoreManager.clearKey()
+            return false
+        }
+
+        val res = authAPI.tryUnauthorize(decrypted)
+        if (res.success) {
+            sessionManager.clear()
+            keyStoreManager.clearKey()
+            return true
+        } else {
+            return false
+        }
     }
 
     suspend fun clearLocalAuthData() {

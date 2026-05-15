@@ -324,23 +324,25 @@ fun MainScreen() {
                     )
                 }
 
-            entry<NavRoutes.Settings> {
-                SettingsMainScreen(
-                    onBackClick = {
-                        closeOverlay()
-                    },
-                    onPremiumClick = {
-                        openOverlay(NavRoutes.Premium)
-                    },
-                    onLogoutClick = {
-                        closeOverlay()
-                    },
-                    onDeleteAccountClick = {
-                        openOverlay(NavRoutes.DeleteAccountCheckPassword)
-                    },
-                    appStartViewModel = appStartViewModel
-                )
-            }
+                entry<NavRoutes.Settings> {
+                    SettingsMainScreen(
+                        onBackClick = {
+                            closeOverlay()
+                        },
+                        onPremiumClick = {
+                            openOverlay(NavRoutes.Premium)
+                        },
+                        onLogoutClick = {
+                            appStartViewModel.endSession()
+                            backStack.clear()
+                            setBase(NavRoutes.RegistrationLogin)
+                        },
+                        onDeleteAccountClick = {
+                            openOverlay(NavRoutes.DeleteAccountCheckPassword)
+                        },
+                        appStartViewModel = appStartViewModel
+                    )
+                }
 
                 entry<NavRoutes.Account> {
                     AccountRoot(
@@ -488,10 +490,13 @@ fun MainScreen() {
                             }
                             toRemove.forEach { backStack.remove(it) }
 
-                            appStartViewModel.logout()
-
+//                            appStartViewModel.logout()
+//
+//                            backStack.clear()
+//
+//                            setBase(NavRoutes.RegistrationLogin)
+                            appStartViewModel.endSession()
                             backStack.clear()
-
                             setBase(NavRoutes.RegistrationLogin)
                         }
                     )
