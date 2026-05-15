@@ -22,6 +22,7 @@ fun AuthorizationPasswordRoot(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
     onPasswordRecoveryClick: () -> Unit,
+    onVkAuthClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: AuthorizationViewModel = hiltViewModel()
@@ -50,7 +51,8 @@ fun AuthorizationPasswordRoot(
         onSubButtonClick = {
             // обработать во вьюмодели
             viewModel.onCodeAuthorization()
-        }
+        },
+        onVkAuthClick = onVkAuthClick
     )
 }
 
@@ -61,6 +63,7 @@ fun AuthorizationPasswordScreen(
     onBackClick: () -> Unit,
     onContinueClick: () -> Unit,
     onSubButtonClick: () -> Unit,
+    onVkAuthClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     TemplateAuthorizationScreen(
@@ -72,6 +75,7 @@ fun AuthorizationPasswordScreen(
         onBackClick = onBackClick,
         onContinueClick = onContinueClick,
         onSubButtonClick = onSubButtonClick,
+        onVkAuthClick = onVkAuthClick,
         modifier = modifier,
         placeholder = stringResource(R.string.placeholder_password),
         isError = uiState.isError,
@@ -91,6 +95,7 @@ fun AuthorizationPasswordScreenPreview() {
         onValueChange = {},
         onBackClick = {},
         onContinueClick = {},
-        onSubButtonClick = {}
+        onSubButtonClick = {},
+        onVkAuthClick = {}
     )
 }

@@ -57,7 +57,9 @@ import com.project.momentum.features.offline.ui.NoInternetScreen
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalAnimationApi::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(
+    onVkAuth: () -> Unit
+) {
 
     SharedTransitionLayout {
         val appStartViewModel: AppStartViewModel = hiltViewModel()
@@ -157,7 +159,8 @@ fun MainScreen() {
                         },
                         onSubButtonClick = {
                             openOverlay(NavRoutes.AuthorizationLogin)
-                        }
+                        },
+                        onVkAuthClick = onVkAuth
                     )
                 }
 
@@ -168,7 +171,8 @@ fun MainScreen() {
                         },
                         onContinueClick = {
                             openOverlay(NavRoutes.RegistrationPassword)
-                        }
+                        },
+                        onVkAuthClick = onVkAuth
                     )
                 }
 
@@ -192,7 +196,8 @@ fun MainScreen() {
                         },
                         onContinueClick = {
                             openOverlay(NavRoutes.AuthorizationPassword)
-                        }
+                        },
+                        onVkAuthClick = onVkAuth
                     )
                 }
 
@@ -207,7 +212,8 @@ fun MainScreen() {
                         },
                         onPasswordRecoveryClick = {
                             openOverlay(NavRoutes.AuthorizationCode)
-                        }
+                        },
+                        onVkAuthClick = onVkAuth
                     )
                 }
 
@@ -218,7 +224,8 @@ fun MainScreen() {
                         },
                         onContinueClick = {
                             openOverlay(NavRoutes.Camera)
-                        }
+                        },
+                        onVkAuthClick = onVkAuth
                     )
                 }
 

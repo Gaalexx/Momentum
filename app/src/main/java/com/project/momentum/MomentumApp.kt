@@ -17,6 +17,5 @@ class MomentumApp : Application() {
         super.onCreate()
         appSettingsHolder.toString()
         VK.initialize(this)
-
     }
 }

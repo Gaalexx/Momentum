@@ -1,10 +1,14 @@
 package com.project.momentum.features.auth.viewmodel
 
+import androidx.activity.ComponentActivity
 import androidx.lifecycle.viewModelScope
 import com.project.momentum.features.auth.models.LoginStep
 import com.project.momentum.features.auth.models.LoginType
 import com.project.momentum.features.auth.models.NavEvent
 import com.project.momentum.data.RegistrationRepository
+import com.vk.api.sdk.VK
+import com.vk.api.sdk.auth.VKAccessToken
+import com.vk.api.sdk.auth.VKScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -127,6 +131,10 @@ class AuthorizationViewModel @Inject constructor(
             )
         }
         validateCurrentStep(isValidPassword())
+    }
+
+    fun onVkAuth(token: VKAccessToken) {
+        //TODO: серверная часть
     }
 
     fun onCodeAuthorization() {

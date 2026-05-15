@@ -5,15 +5,25 @@ import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.project.momentum.features.auth.viewmodel.AuthorizationViewModel
+import com.project.momentum.features.contentcreation.viewmodel.UploadState
 import com.project.momentum.navigation.MainScreen
 import com.project.momentum.ui.theme.MomentumAndroidSettingsTheme
 import com.project.momentum.ui.theme.MomentumTheme
+import com.vk.api.sdk.VK
+import com.vk.api.sdk.auth.VKAuthenticationResult
+import com.vk.api.sdk.auth.VKScope
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -24,14 +34,42 @@ class MainActivity : ComponentActivity() {
             showNotificationsDisabledDialog()
         }
     }
+    private lateinit var launcher: ActivityResultLauncher<Collection<VKScope>>
+    private val authViewModel: AuthorizationViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        launcher = VK.login(this) {
+            result ->
+            when (result) {
+                is VKAuthenticationResult.Failed -> { //TODO: обработка ошибок
+                    Log.e("VkAuth", "Ошибка входа: ${result.exception.toString()}")
+                }
+                is VKAuthenticationResult.Success -> {
+                    Log.d("VkAuth", "Token info: ${result.token}")
+                    authViewModel.onVkAuth(result.token)
+                }
+            }
+        }
+
         enableEdgeToEdge()
         askNotificationPermission()
         setContent {
             MomentumAndroidSettingsTheme() {
-                MainScreen()
+                MainScreen(
+                    onVkAuth = {
+                        launcher.launch(listOf(
+                                VKScope.EMAIL,
+                                VKScope.PHONE,
+                                VKScope.NOTIFICATIONS,
+                                VKScope.FRIENDS,
+                                VKScope.PHOTOS,
+                                VKScope.VIDEO,
+                            )
+                        )
+                    }
+                )
             }
         }
     }
