@@ -81,6 +81,7 @@
     <string name="friends_screen_search_support_mess">Try changing your search query</string>
     <string name="friends_screen_no_friends">You do not have any friends yet</string>
     <string name="friends_screen_no_friends_support_mess">Try changing your search query</string>
+    <string name="friends_screen_add_vk_friends">Add friends from VK</string>
 
     <string name="do_you_want_to_delete_a_friend">Are you sure you want to remove %s from your friends?</string>
 

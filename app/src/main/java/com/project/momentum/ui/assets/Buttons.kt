@@ -53,6 +53,8 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.sp
 import com.project.momentum.R
+import com.project.momentum.features.friends.viewmodel.FriendsScreenEvent
+import com.project.momentum.features.friends.viewmodel.SelectedIndex
 import com.project.momentum.features.settings.ui.SubscriptionOption
 import com.project.momentum.ui.theme.ConstColours
 
@@ -1094,6 +1096,55 @@ fun BuyButtonAdaptive(
                 color = colors.contentColor
             )
         )
+    }
+}
+
+@Composable
+fun SingleChoiceSegmentedButton(
+    modifier: Modifier = Modifier,
+    selectedIndex: SelectedIndex = SelectedIndex.EMAIL,
+    onEvent: (FriendsScreenEvent) -> Unit
+) {
+    val options = listOf(
+        stringResource(R.string.email),
+        stringResource(R.string.login)
+    )
+
+    SingleChoiceSegmentedButtonRow(
+        modifier = modifier
+    ) {
+        options.forEachIndexed { index, label ->
+            SegmentedButton(
+                shape = SegmentedButtonDefaults.itemShape(
+                    index = index,
+                    count = options.size
+                ),
+                colors = SegmentedButtonDefaults.colors(
+                    activeContentColor = ConstColours.WHITE,
+                    activeContainerColor = ConstColours.MAIN_BRAND_BLUE,
+                    inactiveContainerColor = ConstColours.MAIN_BACK_GRAY,
+                    inactiveContentColor = ConstColours.WHITE,
+                    activeBorderColor = ConstColours.WHITE,
+                    inactiveBorderColor = ConstColours.WHITE
+                ),
+                onClick = {
+                    onEvent(
+                        FriendsScreenEvent.ChangeSelectedIndex(
+                            SelectedIndex.fromIndex(
+                                index
+                            )
+                        )
+                    )
+                },
+                selected = index == selectedIndex.index,
+                label = {
+                    androidx.compose.material3.Text(
+                        label,
+                        style = AppTextStyles.ButtonText
+                    )
+                }
+            )
+        }
     }
 }
 
