@@ -3,6 +3,8 @@ package com.project.momentum.features.friends.repo
 import com.example.Models.FriendRequestActionDTO
 import com.project.momentum.data.usersinfo.UsersInfoAPI
 import com.project.momentum.features.friends.api.FriendsInfoAPI
+import com.project.momentum.features.friends.api.VkCommandAPI
+import com.project.momentum.features.friends.api.dtos.VkFriend
 import com.project.momentum.features.friends.ui.FriendRequest
 import com.project.momentum.features.friends.ui.User
 import javax.inject.Inject
@@ -11,7 +13,8 @@ import javax.inject.Singleton
 @Singleton
 class FriendsRepository @Inject constructor(
     private val friendsInfoAPI: FriendsInfoAPI,
-    private val usersInfoAPI: UsersInfoAPI
+    private val usersInfoAPI: UsersInfoAPI,
+    private val vkAPI: VkCommandAPI
 ) {
 
     sealed interface RequestBy {
@@ -122,4 +125,7 @@ class FriendsRepository @Inject constructor(
             hasPremium = response.hasPremium
         )
     }
+
+    suspend fun getVkFriends(): List<VkFriend> = vkAPI.getFriendsFromVK()
+
 }

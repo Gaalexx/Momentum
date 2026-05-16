@@ -69,6 +69,8 @@ sealed interface FriendsScreenEvent {
 
     data object RefreshPageEvent : FriendsScreenEvent
     data object AddFriendWithVK : FriendsScreenEvent
+
+    data object GetFriendsFromVkEvent : FriendsScreenEvent
 }
 
 @HiltViewModel
@@ -113,12 +115,22 @@ class FriendsViewModel @Inject constructor(
             is FriendsScreenEvent.DeleteFriendEvent -> deleteFriend()
             is FriendsScreenEvent.RefreshPageEvent -> refreshScreen()
             is FriendsScreenEvent.AddFriendWithVK -> addFriendWithVK()
+            is FriendsScreenEvent.GetFriendsFromVkEvent -> getVkFriends()
         }
     }
 
     private fun addFriendWithVK() {
         viewModelScope.launch {
 
+        }
+    }
+
+    private fun getVkFriends() {
+        viewModelScope.launch {
+            val friends = repo.getVkFriends()
+            friends.forEach { it ->
+                println("ABOBA $it")
+            }
         }
     }
 
