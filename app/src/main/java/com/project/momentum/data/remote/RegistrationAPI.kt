@@ -113,6 +113,7 @@ class RegistrationAPI @Inject constructor(
         return response
     }
 
+
     override suspend fun authorizeWithVK(dto: AuthorizeVKRequestDTO): LoginResponseDTO {
         val response = client.post("auth/vk") {
             setBody(dto)
