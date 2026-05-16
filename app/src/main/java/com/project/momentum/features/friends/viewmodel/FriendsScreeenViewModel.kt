@@ -1,5 +1,6 @@
 package com.project.momentum.features.friends.viewmodel
 
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
@@ -69,6 +70,7 @@ sealed interface FriendsScreenEvent {
 
     data object RefreshPageEvent : FriendsScreenEvent
     data object AddFriendWithVK : FriendsScreenEvent
+    data object GetFriendsFromVkEvent : FriendsScreenEvent
 }
 
 @HiltViewModel
@@ -113,12 +115,26 @@ class FriendsViewModel @Inject constructor(
             is FriendsScreenEvent.DeleteFriendEvent -> deleteFriend()
             is FriendsScreenEvent.RefreshPageEvent -> refreshScreen()
             is FriendsScreenEvent.AddFriendWithVK -> addFriendWithVK()
+            is FriendsScreenEvent.GetFriendsFromVkEvent -> getVkFriends()
         }
     }
 
     private fun addFriendWithVK() {
         viewModelScope.launch {
 
+        }
+    }
+
+    private fun getVkFriends() {
+        viewModelScope.launch {
+            try {
+                val friends = repo.getVkFriends()
+                friends.forEach { friend ->
+                    Log.d("VK", "VK friend: $friend")
+                }
+            } catch (e: Exception) {
+                Log.e("VK", "Failed to load VK friends", e)
+            }
         }
     }
 

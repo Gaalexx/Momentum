@@ -7,6 +7,7 @@ import com.example.Models.FriendRequestWithUserDetailsDTO
 import com.example.Models.FriendshipListDTO
 import com.project.momentum.data.auth.SessionManager
 import com.project.momentum.network.di.Backend
+import com.vk.api.sdk.VK
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.delete

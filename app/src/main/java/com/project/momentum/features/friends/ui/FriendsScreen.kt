@@ -201,7 +201,8 @@ fun FriendsScreen(
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 AddFriendCircleButton(
-                    onClick = { addFriend() }
+//                    onClick = { addFriend() }
+                    onClick = {onEvent(FriendsScreenEvent.GetFriendsFromVkEvent)}
                 )
 
             }

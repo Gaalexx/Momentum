@@ -195,4 +195,5 @@ dependencies {
     implementation(libs.android.sdk.core)
     implementation(libs.android.sdk.api)
     implementation(libs.vkid)
+    implementation(libs.vk.sdk.support)
 }
