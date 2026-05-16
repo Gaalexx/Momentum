@@ -249,7 +249,9 @@ fun AddFriendsWithVKScreen(
                         AddFriendItem(
                             modifier = Modifier.animateItem(),
                             friend = friend,
-                            onAddFriendClick = {},
+                            onAddFriendClick = {
+                                onEvent(FriendsScreenEvent.CreateFriendRequest.LoginRequest(friend.id))
+                            },
                         )
                     }
                 }
@@ -263,7 +265,7 @@ fun AddFriendsWithVKScreen(
 fun AddFriendItem(
     modifier: Modifier = Modifier,
     friend: User,
-    onAddFriendClick: (User) -> Unit,
+    onAddFriendClick: () -> Unit,
 ) {
 
     Row(
@@ -310,7 +312,6 @@ fun AddFriendItem(
         Text(
             modifier = Modifier
                 .padding(start = 12.dp, end = 12.dp),
-                //.weight(1f),
             text = friend.name,
             color = ConstColours.WHITE,
             style = AppTextStyles.MainText,
@@ -320,10 +321,9 @@ fun AddFriendItem(
         Spacer(modifier = Modifier.weight(1f))
 
         ContinueButton(
-            onClick = { onAddFriendClick(friend) },
+            onClick = {onAddFriendClick()},
             modifier = Modifier
                 .width(80.dp),
-                //.fillMaxWidth(0.8f),
             colors = ButtonColors(
                 containerColor = ConstColours.MAIN_BRAND_BLUE,
                 contentColor = ConstColours.WHITE,
