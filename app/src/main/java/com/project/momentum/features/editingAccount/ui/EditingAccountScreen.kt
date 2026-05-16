@@ -70,8 +70,6 @@ fun EditingAccountRoot(
     val viewModel: EditAccountViewModel = hiltViewModel()
     val uiState = viewModel.state.collectAsState()
 
-    val context = LocalContext.current
-
     val mediaLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
