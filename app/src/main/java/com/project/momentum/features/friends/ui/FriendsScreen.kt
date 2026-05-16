@@ -112,6 +112,7 @@ fun FriendsScreenRoute(
     animatedVisibilityScope: AnimatedVisibilityScope,
     onBackClick: () -> Unit,
     onFriendClick: (User) -> Unit,
+    onAddFriendClick: () -> Unit,
     viewModel: FriendsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
@@ -125,7 +126,7 @@ fun FriendsScreenRoute(
         onBackClick,
         onFriendClick,
         uiState,
-        addFriend,
+        onAddFriendClick,
         onEvent,
         errorState,
         errorTextId,
@@ -201,8 +202,8 @@ fun FriendsScreen(
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 AddFriendCircleButton(
-//                    onClick = { addFriend() }
-                    onClick = {onEvent(FriendsScreenEvent.GetFriendsFromVkEvent)}
+                    onClick = { addFriend() }
+                    //onClick = {onEvent(FriendsScreenEvent.GetFriendsFromVkEvent)}
                 )
 
             }

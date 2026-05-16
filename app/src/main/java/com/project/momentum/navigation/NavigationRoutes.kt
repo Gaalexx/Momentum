@@ -31,6 +31,13 @@ NavRoutes : NavKey {
     data object Friends : NavRoutes()
 
     @Serializable
+    data object AddFriendsWithVK : NavRoutes()
+
+    @Serializable
+    data object AddFriendsWithoutVK : NavRoutes()
+
+
+    @Serializable
     data object Premium : NavRoutes()
 
 
