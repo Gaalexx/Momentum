@@ -72,7 +72,7 @@ import com.project.momentum.features.friends.viewmodel.FriendsViewModel
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.FriendSearchField
 import com.project.momentum.ui.assets.AddFriendCircleButton
-import com.project.momentum.features.friends.ui.assets.AddFriendDialog
+//import com.project.momentum.features.friends.ui.assets.AddFriendDialog
 import com.project.momentum.features.friends.ui.assets.DeleteFriendDialog
 import com.project.momentum.features.friends.ui.assets.FriendRequestCarousel
 import com.project.momentum.features.friends.viewmodel.FriendsScreenState
@@ -450,20 +450,20 @@ fun FriendsScreen(
         }
     }
 
-    if (showAddFriendDialog) {
-        Dialog(
-            onDismissRequest = { onEvent(FriendsScreenEvent.ShowAddFriendDialogEvent(false)) }
-        ) {
-            AddFriendDialog(
-                value = addFriendQuery,
-                selectedIndex = selectedIndex,
-                onEvent = onEvent,
-                onValueChange = { onEvent(FriendsScreenEvent.AddFriendQueryChange(it)) },
-                isError = errorState,
-                errorText = if (errorTextId != null && errorState) stringResource(errorTextId) else ""
-            )
-        }
-    }
+//    if (showAddFriendDialog) {
+//        Dialog(
+//            onDismissRequest = { onEvent(FriendsScreenEvent.ShowAddFriendDialogEvent(false)) }
+//        ) {
+//            AddFriendDialog(
+//                value = addFriendQuery,
+//                selectedIndex = selectedIndex,
+//                onEvent = onEvent,
+//                onValueChange = { onEvent(FriendsScreenEvent.AddFriendQueryChange(it)) },
+//                isError = errorState,
+//                errorText = if (errorTextId != null && errorState) stringResource(errorTextId) else ""
+//            )
+//        }
+//    }
 }
 
 
