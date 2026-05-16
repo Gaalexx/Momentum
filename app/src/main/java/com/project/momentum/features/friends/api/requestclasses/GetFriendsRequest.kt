@@ -15,7 +15,7 @@ class GetFriendsRequest : ApiCommand<List<VkFriend>>() {
     override fun onExecute(manager: VKApiManager): List<VkFriend> {
         val call = VKMethodCall.Builder()
             .method("friends.get")
-            .args("friends", "photo_200,online")
+            .args("fields", "photo_200,online")
             .args("order", "name")
             .version(manager.config.version)
             .build()

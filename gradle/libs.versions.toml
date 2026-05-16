@@ -61,6 +61,7 @@ androidx-activity-compose = { module = "androidx.activity:activity-compose", ver
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
 vkid = { module = "com.vk.id:vkid", version.ref = "vkid" }
+vk-sdk-support = { module = "com.vk.id:vk-sdk-support", version.ref = "vkid" }
 
 
 # Compose BOM
