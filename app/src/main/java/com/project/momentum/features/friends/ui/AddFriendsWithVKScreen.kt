@@ -38,6 +38,8 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -50,8 +52,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.project.momentum.R
+import com.project.momentum.features.auth.viewmodel.RegistrationViewModel
 import com.project.momentum.features.friends.viewmodel.FriendsScreenEvent
 import com.project.momentum.features.friends.viewmodel.SelectedIndex
 import com.project.momentum.ui.assets.ContinueButtonAdaptive
@@ -60,12 +65,39 @@ import com.project.momentum.ui.assets.TextFieldRegistration
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.features.friends.ui.User
+import com.project.momentum.features.friends.viewmodel.FriendsScreenState
+import com.project.momentum.features.friends.viewmodel.FriendsViewModel
 import com.project.momentum.ui.assets.ContinueButton
+import com.project.momentum.ui.assets.TopBarTemplate
 import com.project.momentum.ui.theme.MomentumTheme
 import kotlinx.coroutines.launch
 
 @Composable
+fun AddFriendsWithVKScreenRoute(
+    onBackClick: () -> Unit,
+    viewModel: FriendsViewModel = hiltViewModel(),
+){
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val onEvent = viewModel::onEvent
+    val errorState = uiState.errorState
+    val errorTextId = uiState.errorText
+    val addFriendQuery = uiState.addFriendQuery
+    val selectedIndex = uiState.selectedIndex
+
+    AddFriendsWithVKScreen(
+        onBackClick = onBackClick,
+        value = addFriendQuery,
+        selectedIndex = selectedIndex,
+        onEvent = onEvent,
+        onValueChange = { onEvent(FriendsScreenEvent.AddFriendQueryChange(it)) },
+        isError = errorState,
+        errorText = if (errorTextId != null && errorState) stringResource(errorTextId) else ""
+    )
+}
+
+@Composable
 fun AddFriendsWithVKScreen(
+    onBackClick: () -> Unit,
     value: String,
     selectedIndex: SelectedIndex,
     onEvent: (FriendsScreenEvent) -> Unit = {},
@@ -75,6 +107,8 @@ fun AddFriendsWithVKScreen(
     errorText: String? = "",
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
+
+
     val vKFriends = listOf<User>(
         User(
             id = "preview1",
@@ -84,7 +118,11 @@ fun AddFriendsWithVKScreen(
             isOnline = true,
         )
     )
-
+    TopBarTemplate(
+        label = R.string.friend_search,
+        onBackClick = onBackClick,
+        modifier = Modifier,
+    ) { paddingValues ->
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -97,160 +135,157 @@ fun AddFriendsWithVKScreen(
             )
     ) {
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    horizontal = 14.dp,
-                    vertical = 10.dp
-                )
-        ) {
-
-            Column(
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .fillMaxHeight(0.4f)
-                .align(Alignment.Center)
+                    .fillMaxWidth()
+                    .padding(
+                        horizontal = 14.dp,
+                        vertical = 10.dp
+                    )
             ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = stringResource(R.string.friend_search),
-                        color = ConstColours.WHITE,
-                        style = AppTextStyles.Headlines
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    TextFieldRegistration(
-                        value = value,
-                        onValueChange = onValueChange,
-                        isError = isError,
-                        errorText = errorText,
-                        placeholder = placeholder,
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f),
-                        keyboardOptions = keyboardOptions, // TODO: изменять в зависимости от selectedIndex
-                    )
-                }
 
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    SingleChoiceSegmentedButton(
-                        modifier = Modifier.fillMaxWidth(0.8f),
-                        selectedIndex,
-                        onEvent
-                    )
-                }
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    ContinueButtonAdaptive(
-                        onClick = {
-                            when (selectedIndex) {
-                                SelectedIndex.EMAIL -> onEvent(
-                                    FriendsScreenEvent.CreateFriendRequest.EmailRequest(
-                                        value
-                                    )
-                                )
-
-                                SelectedIndex.LOGIN -> onEvent(
-                                    FriendsScreenEvent.CreateFriendRequest.LoginRequest(
-                                        value
-                                    )
-                                )
-
-                                else -> Unit
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth(0.8f),
-                        colors = ButtonColors(
-                            containerColor = ConstColours.MAIN_BRAND_BLUE,
-                            contentColor = ConstColours.WHITE,
-                            disabledContentColor = ConstColours.MAIN_BRAND_BLUE_ALPHA40,
-                            disabledContainerColor = ConstColours.WHITE
-                        ),
-                        text = stringResource(R.string.send_request)
-                    )
-                }
-            }
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp, bottom = 12.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = stringResource(R.string.friends_screen_add_vk_friends),
-                color = ConstColours.WHITE,
-                style = AppTextStyles.Headlines
-            )
-        }
-        Box(
-            modifier = Modifier
-                .fillMaxSize(),
-        ) {
-            if (vKFriends.isEmpty()) {
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                        .fillMaxWidth(0.9f)
+                        .fillMaxHeight(0.4f)
+                        .align(Alignment.Center)
                 ) {
-                    Text(
-                        text = "👥",
-                        fontSize = 48.sp,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                    Text(
-                        text = stringResource(R.string.friends_screen_no_friends),
-                        color = ConstColours.SUPPORTING_TEXT,
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = stringResource(R.string.friends_screen_no_friends_support_mess),
-                        color = ConstColours.SUPPORTING_SUB_TEXT,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = 16.dp,
-                            vertical = 8.dp
-                        ),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(
-                        items = vKFriends,
-                        key = { it.id }
-                    ) { friend ->
-                        AddFriendItem(
-                            modifier = Modifier.animateItem(),
-                            friend = friend,
-                            onAddFriendClick = {},
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        TextFieldRegistration(
+                            value = value,
+                            onValueChange = onValueChange,
+                            isError = isError,
+                            errorText = errorText,
+                            placeholder = placeholder,
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f),
+                            keyboardOptions = keyboardOptions, // TODO: изменять в зависимости от selectedIndex
                         )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        SingleChoiceSegmentedButton(
+                            modifier = Modifier.fillMaxWidth(0.8f),
+                            selectedIndex,
+                            onEvent
+                        )
+                    }
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                    ) {
+                        ContinueButtonAdaptive(
+                            onClick = {
+                                when (selectedIndex) {
+                                    SelectedIndex.EMAIL -> onEvent(
+                                        FriendsScreenEvent.CreateFriendRequest.EmailRequest(
+                                            value
+                                        )
+                                    )
+
+                                    SelectedIndex.LOGIN -> onEvent(
+                                        FriendsScreenEvent.CreateFriendRequest.LoginRequest(
+                                            value
+                                        )
+                                    )
+
+                                    else -> Unit
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth(0.8f),
+                            colors = ButtonColors(
+                                containerColor = ConstColours.MAIN_BRAND_BLUE,
+                                contentColor = ConstColours.WHITE,
+                                disabledContentColor = ConstColours.MAIN_BRAND_BLUE_ALPHA40,
+                                disabledContainerColor = ConstColours.WHITE
+                            ),
+                            text = stringResource(R.string.send_request)
+                        )
+                    }
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp, bottom = 12.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.friends_screen_add_vk_friends),
+                    color = ConstColours.WHITE,
+                    style = AppTextStyles.Headlines
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+            ) {
+                if (vKFriends.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "👥",
+                            fontSize = 48.sp,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                        Text(
+                            text = stringResource(R.string.friends_screen_no_friends),
+                            color = ConstColours.SUPPORTING_TEXT,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Text(
+                            text = stringResource(R.string.friends_screen_no_friends_support_mess),
+                            color = ConstColours.SUPPORTING_SUB_TEXT,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(top = 8.dp)
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = 16.dp,
+                                vertical = 8.dp
+                            ),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(
+                            items = vKFriends,
+                            key = { it.id }
+                        ) { friend ->
+                            AddFriendItem(
+                                modifier = Modifier.animateItem(),
+                                friend = friend,
+                                onAddFriendClick = {
+                                    onEvent(
+                                        FriendsScreenEvent.CreateFriendRequest.LoginRequest(
+                                            friend.id
+                                        )
+                                    )
+                                },
+                            )
+                        }
                     }
                 }
             }
@@ -263,7 +298,7 @@ fun AddFriendsWithVKScreen(
 fun AddFriendItem(
     modifier: Modifier = Modifier,
     friend: User,
-    onAddFriendClick: (User) -> Unit,
+    onAddFriendClick: () -> Unit,
 ) {
 
     Row(
@@ -310,7 +345,6 @@ fun AddFriendItem(
         Text(
             modifier = Modifier
                 .padding(start = 12.dp, end = 12.dp),
-                //.weight(1f),
             text = friend.name,
             color = ConstColours.WHITE,
             style = AppTextStyles.MainText,
@@ -320,10 +354,9 @@ fun AddFriendItem(
         Spacer(modifier = Modifier.weight(1f))
 
         ContinueButton(
-            onClick = { onAddFriendClick(friend) },
+            onClick = {onAddFriendClick()},
             modifier = Modifier
                 .width(80.dp),
-                //.fillMaxWidth(0.8f),
             colors = ButtonColors(
                 containerColor = ConstColours.MAIN_BRAND_BLUE,
                 contentColor = ConstColours.WHITE,
@@ -343,6 +376,7 @@ private fun PreviewPager() {
         contentAlignment = Alignment.Center
     ) {
         AddFriendsWithVKScreen(
+            onBackClick = {},
             "Что это",
             onEvent = {},
             selectedIndex = SelectedIndex.LOGIN,

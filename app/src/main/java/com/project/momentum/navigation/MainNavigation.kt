@@ -38,6 +38,9 @@ import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.ui.SendContentScreen
 import com.project.momentum.features.editingAccount.ui.EditingAccountRoot
 import com.project.momentum.features.editingAccount.viewmodel.AccountInfo
+import com.project.momentum.features.friends.ui.AddFriendsWithVKScreen
+import com.project.momentum.features.friends.ui.AddFriendsWithVKScreenRoute
+import com.project.momentum.features.friends.ui.AddFriendsWithoutVKScreenRoute
 import com.project.momentum.features.friends.ui.FriendAccountRoot
 import com.project.momentum.features.friends.ui.FriendsScreenRoute
 import com.project.momentum.features.offline.ui.NoInternetScreen
@@ -390,6 +393,7 @@ fun MainScreen(
                 }
 
                 entry<NavRoutes.Friends> {
+                    val haveVK = true
                     FriendsScreenRoute(
                         sharedTransitionScope = sharedTransitionScope,
                         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
@@ -398,8 +402,30 @@ fun MainScreen(
                         },
                         onFriendClick = { friend ->
                             openOverlay(NavRoutes.FriendAccount(friend))
-                        }
+                        },
+                        onAddFriendClick = {
+                            if (haveVK){
+                                openOverlay(NavRoutes.AddFriendsWithVK)
+                            }
+                            else{
+                                openOverlay(NavRoutes.AddFriendsWithoutVK)
+                            }
+                        },
                     )
+                }
+
+                entry<NavRoutes.AddFriendsWithVK> {
+                    AddFriendsWithVKScreenRoute(
+                        onBackClick = { closeOverlay() },
+
+                    )
+                }
+
+                entry<NavRoutes.AddFriendsWithoutVK> {
+                    AddFriendsWithoutVKScreenRoute(
+                        onBackClick = { closeOverlay() },
+
+                        )
                 }
 
                 entry<NavRoutes.FriendAccount> { route ->
