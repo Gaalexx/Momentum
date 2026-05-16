@@ -35,6 +35,9 @@
     <string name="offline_open_settings">Открыть настройки</string>
     <string name="offline_auto_refresh">Когда соединение восстановится, попробуйте повторить попытку.</string>
 
+    <string name="button_go_to_camera">К созданию поста</string>
+    <string name="button_import_media_from_vk">Загрузить медия из ВК</string>
+    <string name="button_import_media_from_device">Загрузить медиа с устройства</string>
     <string name="account_online_status">В сети</string>
     <string name="account_offline_status">Не в сети</string>
     <string name="account_my_publications">Мои публикации</string>

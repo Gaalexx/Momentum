@@ -383,7 +383,10 @@ fun MainScreen(
                         onBackClick = {
                             closeOverlay()
                         },
-                        onAddPostClick = { openOverlay(NavRoutes.Camera) },
+                        onGoToCamera = {
+                            backStack.clear()
+                            setBase(NavRoutes.Camera)
+                        },
                         sharedTransitionScope = sharedTransitionScope,
                         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
                     )

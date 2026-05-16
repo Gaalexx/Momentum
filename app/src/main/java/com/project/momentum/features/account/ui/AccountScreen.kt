@@ -44,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -63,10 +64,16 @@ import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.ui.theme.MomentumTheme
 
 
+data class AddButtonActions(
+    val onGoToCamera: () -> Unit = {},
+    val onImportPostFromVk: () -> Unit = {},
+    val onImportPostFromDevice: () -> Unit = {}
+)
+
 @Composable
 fun AccountRoot(
     onBackClick: () -> Unit,
-    onAddPostClick: () -> Unit,
+    onGoToCamera: () -> Unit,
     modifier: Modifier = Modifier,
     onEditClick: (AccountInfoState) -> Unit = {},
     onPostClick: (Int, String) -> Unit,
@@ -92,7 +99,18 @@ fun AccountRoot(
         modifier = modifier,
         userStatus = userStatus,
         onBackClick = onBackClick,
-        onAddPostClick = onAddPostClick,
+        addButtonActions = AddButtonActions(
+            onGoToCamera = onGoToCamera,
+            onImportPostFromVk = {
+
+            },
+            onImportPostFromDevice = {
+
+            }
+        ),
+        onAddPostClick = {
+            accountInfoViewModel.onEvent(AccountInfoEvent.OnShowActionsDialog(!uiInfoState.isShowingActionsDialog))
+        },
         onPostClick = { postId -> onPostClick(postId, uiInfoState.userId) },
         onLongPostClick = { post ->
             postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
@@ -127,8 +145,9 @@ fun AccountScreen(
     postDialogInfo: PostDialogInfo,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onProfileClick: () -> Unit = {},
+    addButtonActions: AddButtonActions? = null,
     onAddPostClick: (() -> Unit)? = null,
+    onProfileClick: () -> Unit = {},
     onEditClick: (() -> Unit)? = null,
     userStatus: String = stringResource(R.string.account_online_status),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -175,6 +194,16 @@ fun AccountScreen(
     }
 
     //TODO: экран загрузки (ну и состояние)
+
+    if (uiInfoState.isShowingActionsDialog &&
+        onAddPostClick != null &&
+        addButtonActions != null) {
+        Dialog(
+            onDismissRequest = onAddPostClick
+        ) {
+            ImportPostDialog(addButtonActions = addButtonActions)
+        }
+    }
 
     Column(
         modifier = modifier
@@ -271,7 +300,7 @@ fun AccountScreen(
                 Spacer(Modifier.width(dimensionResource(R.dimen.small_padding)))
                 Text(
                     text = userStatus,
-                    color = Color(0xFFA0A0A0), // TODO: fa fa fa what a faaa
+                    color = Color(0xFFA0A0A0),
                     fontSize = 16.sp
                 )
             }
@@ -322,6 +351,7 @@ private fun AccountScreenPreview() {
             postDialogInfo = PostDialogInfo(),
             onEditClick = {},
             onBackClick = {},
+            addButtonActions = AddButtonActions(),
             onAddPostClick = {},
             uiInfoState = AccountInfoState(
                 "52",

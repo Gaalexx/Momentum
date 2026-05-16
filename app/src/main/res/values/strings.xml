@@ -35,6 +35,9 @@
     <string name="offline_open_settings">Open settings</string>
     <string name="offline_auto_refresh">When the connection is restored, try again.</string>
 
+    <string name="button_go_to_camera">Go to Camera</string>
+    <string name="button_import_media_from_vk">Import media from VK</string>
+    <string name="button_import_media_from_device">Import media from Device</string>
     <string name="account_online_status">Online</string>
     <string name="account_offline_status">Offline</string>
     <string name="account_my_publications">My posts</string>

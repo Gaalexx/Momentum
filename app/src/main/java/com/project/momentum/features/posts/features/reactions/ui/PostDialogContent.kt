@@ -2,6 +2,8 @@ package com.project.momentum.features.posts.features.reactions.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
@@ -24,6 +26,7 @@ fun PostDialogContent(
         modifier = Modifier
             .clip(RoundedCornerShape(10))
             .background(ConstColours.MAIN_BACK_GRAY)
+            .width(IntrinsicSize.Max),
     ) {
         DialogEventButton(
             text = R.string.button_hide_post_for_me,
