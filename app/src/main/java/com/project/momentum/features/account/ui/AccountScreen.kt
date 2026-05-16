@@ -135,7 +135,7 @@ fun AccountRoot(
                 accountInfoViewModel.onEvent(AccountInfoEvent.OnShowActionsDialog(!uiInfoState.isShowingActionsDialog))
                 mediaLauncher.launch(
                     PickVisualMediaRequest(
-                        ActivityResultContracts.PickVisualMedia.ImageOnly
+                        ActivityResultContracts.PickVisualMedia.ImageAndVideo
                     )
                 )
             }
