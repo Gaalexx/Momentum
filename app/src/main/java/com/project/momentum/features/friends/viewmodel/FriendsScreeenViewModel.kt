@@ -68,6 +68,7 @@ sealed interface FriendsScreenEvent {
     data object DeleteFriendEvent : FriendsScreenEvent
 
     data object RefreshPageEvent : FriendsScreenEvent
+    data object AddFriendWithVK : FriendsScreenEvent
 }
 
 @HiltViewModel
@@ -111,6 +112,13 @@ class FriendsViewModel @Inject constructor(
 
             is FriendsScreenEvent.DeleteFriendEvent -> deleteFriend()
             is FriendsScreenEvent.RefreshPageEvent -> refreshScreen()
+            is FriendsScreenEvent.AddFriendWithVK -> addFriendWithVK()
+        }
+    }
+
+    private fun addFriendWithVK() {
+        viewModelScope.launch {
+
         }
     }
 
