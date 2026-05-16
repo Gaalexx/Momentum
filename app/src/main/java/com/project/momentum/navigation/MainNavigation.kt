@@ -368,6 +368,9 @@ fun MainScreen(
                                 )
                             )
                         },
+                        onGoToPreview = { uri, mediaType ->
+                            openOverlay(NavRoutes.SendPhoto(uri.toString(), mediaType))
+                        },
                         onEditClick = { uiInfoState ->
                             openOverlay(
                                 NavRoutes.EditAccount(

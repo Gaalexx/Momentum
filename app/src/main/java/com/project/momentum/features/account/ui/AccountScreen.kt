@@ -3,6 +3,10 @@
 package com.project.momentum.features.account.ui
 
 import android.content.Context
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
@@ -53,8 +57,10 @@ import com.project.momentum.features.account.models.PostData
 import com.project.momentum.features.account.viewmodel.AccountInfoEvent
 import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.account.viewmodel.AccountInfoViewModel
+import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.posts.viewmodel.GalleryEvent
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
+import com.project.momentum.network.s3.MediaType
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.EditCircleButton
 import com.project.momentum.ui.assets.PostDialogInfo
@@ -73,6 +79,7 @@ data class AddButtonActions(
 @Composable
 fun AccountRoot(
     onBackClick: () -> Unit,
+    onGoToPreview: (Uri, MediaTypeToSend) -> Unit,
     onGoToCamera: () -> Unit,
     modifier: Modifier = Modifier,
     onEditClick: (AccountInfoState) -> Unit = {},
@@ -87,6 +94,23 @@ fun AccountRoot(
     LaunchedEffect(Unit) {
         accountInfoViewModel.onEvent(AccountInfoEvent.GetInfo)
     }
+    val context = LocalContext.current
+
+    val mediaLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri == null) {
+            //TODO: сообщить что обтена выбора мб
+            return@rememberLauncherForActivityResult
+        }
+        val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
+        val mediaType = when(mimeType) {
+            "image/jpeg" -> MediaTypeToSend.PHOTO
+            "video/mp4" -> MediaTypeToSend.VIDEO
+            else -> MediaTypeToSend.PHOTO
+        }
+        onGoToPreview(uri, mediaType)
+    }
 
     val uiInfoState by accountInfoViewModel.state.collectAsStateWithLifecycle()
     val uiState by postsViewModel.state.collectAsStateWithLifecycle()
@@ -100,12 +124,20 @@ fun AccountRoot(
         userStatus = userStatus,
         onBackClick = onBackClick,
         addButtonActions = AddButtonActions(
-            onGoToCamera = onGoToCamera,
+            onGoToCamera = {
+                onGoToCamera()
+                accountInfoViewModel.onEvent(AccountInfoEvent.OnShowActionsDialog(!uiInfoState.isShowingActionsDialog))
+            },
             onImportPostFromVk = {
-
+                accountInfoViewModel.onEvent(AccountInfoEvent.OnShowActionsDialog(!uiInfoState.isShowingActionsDialog))
             },
             onImportPostFromDevice = {
-
+                accountInfoViewModel.onEvent(AccountInfoEvent.OnShowActionsDialog(!uiInfoState.isShowingActionsDialog))
+                mediaLauncher.launch(
+                    PickVisualMediaRequest(
+                        ActivityResultContracts.PickVisualMedia.ImageOnly
+                    )
+                )
             }
         ),
         onAddPostClick = {
