@@ -368,6 +368,9 @@ fun MainScreen(
                                 )
                             )
                         },
+                        onGoToPreview = { uri, mediaType ->
+                            openOverlay(NavRoutes.SendPhoto(uri.toString(), mediaType))
+                        },
                         onEditClick = { uiInfoState ->
                             openOverlay(
                                 NavRoutes.EditAccount(
@@ -383,7 +386,10 @@ fun MainScreen(
                         onBackClick = {
                             closeOverlay()
                         },
-                        onAddPostClick = { openOverlay(NavRoutes.Camera) },
+                        onGoToCamera = {
+                            backStack.clear()
+                            setBase(NavRoutes.Camera)
+                        },
                         sharedTransitionScope = sharedTransitionScope,
                         animatedVisibilityScope = LocalNavAnimatedContentScope.current,
                     )

@@ -3,6 +3,10 @@
 package com.project.momentum.features.account.ui
 
 import android.content.Context
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
@@ -44,6 +48,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
@@ -52,8 +57,10 @@ import com.project.momentum.features.account.models.PostData
 import com.project.momentum.features.account.viewmodel.AccountInfoEvent
 import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.account.viewmodel.AccountInfoViewModel
+import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.posts.viewmodel.GalleryEvent
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
+import com.project.momentum.network.s3.MediaType
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.EditCircleButton
 import com.project.momentum.ui.assets.PostDialogInfo
@@ -63,10 +70,17 @@ import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.ui.theme.MomentumTheme
 
 
+data class AddButtonActions(
+    val onGoToCamera: () -> Unit = {},
+    val onImportPostFromVk: () -> Unit = {},
+    val onImportPostFromDevice: () -> Unit = {}
+)
+
 @Composable
 fun AccountRoot(
     onBackClick: () -> Unit,
-    onAddPostClick: () -> Unit,
+    onGoToPreview: (Uri, MediaTypeToSend) -> Unit,
+    onGoToCamera: () -> Unit,
     modifier: Modifier = Modifier,
     onEditClick: (AccountInfoState) -> Unit = {},
     onPostClick: (Int, String) -> Unit,
@@ -80,6 +94,23 @@ fun AccountRoot(
     LaunchedEffect(Unit) {
         accountInfoViewModel.onEvent(AccountInfoEvent.GetInfo)
     }
+    val context = LocalContext.current
+
+    val mediaLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri == null) {
+            //TODO: сообщить что обтена выбора мб
+            return@rememberLauncherForActivityResult
+        }
+        val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
+        val mediaType = when(mimeType) {
+            "image/jpeg" -> MediaTypeToSend.PHOTO
+            "video/mp4" -> MediaTypeToSend.VIDEO
+            else -> MediaTypeToSend.PHOTO
+        }
+        onGoToPreview(uri, mediaType)
+    }
 
     val uiInfoState by accountInfoViewModel.state.collectAsStateWithLifecycle()
     val uiState by postsViewModel.state.collectAsStateWithLifecycle()
@@ -92,7 +123,26 @@ fun AccountRoot(
         modifier = modifier,
         userStatus = userStatus,
         onBackClick = onBackClick,
-        onAddPostClick = onAddPostClick,
+        addButtonActions = AddButtonActions(
+            onGoToCamera = {
+                onGoToCamera()
+                accountInfoViewModel.onEvent(AccountInfoEvent.OnShowActionsDialog(!uiInfoState.isShowingActionsDialog))
+            },
+            onImportPostFromVk = {
+                accountInfoViewModel.onEvent(AccountInfoEvent.OnShowActionsDialog(!uiInfoState.isShowingActionsDialog))
+            },
+            onImportPostFromDevice = {
+                accountInfoViewModel.onEvent(AccountInfoEvent.OnShowActionsDialog(!uiInfoState.isShowingActionsDialog))
+                mediaLauncher.launch(
+                    PickVisualMediaRequest(
+                        ActivityResultContracts.PickVisualMedia.ImageAndVideo
+                    )
+                )
+            }
+        ),
+        onAddPostClick = {
+            accountInfoViewModel.onEvent(AccountInfoEvent.OnShowActionsDialog(!uiInfoState.isShowingActionsDialog))
+        },
         onPostClick = { postId -> onPostClick(postId, uiInfoState.userId) },
         onLongPostClick = { post ->
             postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
@@ -127,8 +177,9 @@ fun AccountScreen(
     postDialogInfo: PostDialogInfo,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
-    onProfileClick: () -> Unit = {},
+    addButtonActions: AddButtonActions? = null,
     onAddPostClick: (() -> Unit)? = null,
+    onProfileClick: () -> Unit = {},
     onEditClick: (() -> Unit)? = null,
     userStatus: String = stringResource(R.string.account_online_status),
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -175,6 +226,16 @@ fun AccountScreen(
     }
 
     //TODO: экран загрузки (ну и состояние)
+
+    if (uiInfoState.isShowingActionsDialog &&
+        onAddPostClick != null &&
+        addButtonActions != null) {
+        Dialog(
+            onDismissRequest = onAddPostClick
+        ) {
+            ImportPostDialog(addButtonActions = addButtonActions)
+        }
+    }
 
     Column(
         modifier = modifier
@@ -271,7 +332,7 @@ fun AccountScreen(
                 Spacer(Modifier.width(dimensionResource(R.dimen.small_padding)))
                 Text(
                     text = userStatus,
-                    color = Color(0xFFA0A0A0), // TODO: fa fa fa what a faaa
+                    color = Color(0xFFA0A0A0),
                     fontSize = 16.sp
                 )
             }
@@ -322,6 +383,7 @@ private fun AccountScreenPreview() {
             postDialogInfo = PostDialogInfo(),
             onEditClick = {},
             onBackClick = {},
+            addButtonActions = AddButtonActions(),
             onAddPostClick = {},
             uiInfoState = AccountInfoState(
                 "52",
