@@ -17,8 +17,38 @@ data class PostData(
     val isOwner: Boolean,
     val avatarPresignedURL: String? = null,
     val reactions: List<ReactionData>? = null,
-    val createdAt: String? = null
+    val createdAt: String? = null,
+    val transcription: String? = ""
 ) {
+
+    constructor(post: PostData) : this(
+        post.id,
+        post.userId,
+        post.userName,
+        post.title,
+        post.presignedURL,
+        post.mediaType,
+        post.isOwner,
+        post.avatarPresignedURL,
+        post.reactions,
+        post.createdAt,
+        post.transcription
+    )
+
+    constructor(post: PostData, newTranscription: String?) : this(
+        post.id,
+        post.userId,
+        post.userName,
+        post.title,
+        post.presignedURL,
+        post.mediaType,
+        post.isOwner,
+        post.avatarPresignedURL,
+        post.reactions,
+        post.createdAt,
+        newTranscription
+    )
+
     fun getDate(): String {
         val instant = createdAtInstantOrNull() ?: return ""
 

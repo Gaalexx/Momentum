@@ -1,6 +1,7 @@
 package com.project.momentum.features.cameracontentpager.ui
 
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
@@ -27,6 +28,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -43,6 +45,7 @@ import com.project.momentum.features.posts.ui.WatchPhotoScreenRouteForMain
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.ui.theme.ConstColours
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 enum class MainScreenPage(val curPage: Int) {
@@ -67,6 +70,8 @@ fun CameraContentPager(
     currentPost: Int = 0,
     postsViewModel: PostsViewModel = hiltViewModel()
 ) {
+
+    val scope = rememberCoroutineScope()
 
     var enterAnimationFinished by remember {
         mutableStateOf(false)
@@ -93,6 +98,13 @@ fun CameraContentPager(
             enterAnimationFinished && pagerState.settledPage == MainScreenPage.CONTENT_CREATION.curPage
         }
     }
+
+    BackHandler(enabled = pagerState.currentPage != 0) {
+        scope.launch {
+            pagerState.animateScrollToPage(0)
+        }
+    }
+
 
     val postsState = postsViewModel.state.collectAsStateWithLifecycle()
     Surface(
@@ -132,7 +144,11 @@ fun CameraContentPager(
 
                     1 -> if (postsState.value.posts.isNotEmpty()) {
                         WatchPhotoScreenRouteForMain(
-                            onGoToTakePhoto = {},
+                            onGoToTakePhoto = {
+                                scope.launch {
+                                    pagerState.animateScrollToPage(0)
+                                }
+                            },
                             onGoToGallery = onGoToGallery,
                             postIndex = currentPost,
                             postsState.value.posts[currentPost].userId,

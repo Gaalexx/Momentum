@@ -5,6 +5,7 @@ import com.project.momentum.features.account.models.PostData
 import com.project.momentum.features.posts.api.PostsAPI
 import com.project.momentum.features.posts.features.reactions.models.ReactionData
 import com.project.momentum.features.posts.features.reactions.models.ReactionType
+import com.project.momentum.features.posts.models.dtos.GetTranscriptionResponseDTO
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -14,6 +15,12 @@ class PostsRepo @Inject constructor(
     private val postsAPI: PostsAPI,
     private val sessionManager: SessionManager
 ) {
+
+    suspend fun sendPostForTranscription(postId: String): Boolean =
+        postsAPI.sendPostForTranscription(postId)
+
+    suspend fun checkPostTranscriptionState(postId: String): GetTranscriptionResponseDTO =
+        postsAPI.checkPostTranscriptionState(postId)
 
     suspend fun getAllPosts(): List<PostData> {
         val myPostsDTO = postsAPI.getMyPosts()
@@ -51,21 +58,21 @@ class PostsRepo @Inject constructor(
         return result
     }
 
-    suspend fun deletePost(postId: String) : Boolean =
+    suspend fun deletePost(postId: String): Boolean =
         postsAPI.deletePost(postId)
 
-    suspend fun sendReaction(postId: String, reaction: ReactionType) : Boolean =
+    suspend fun sendReaction(postId: String, reaction: ReactionType): Boolean =
         postsAPI.sendReaction(postId, reaction)
 
-    suspend fun deleteReaction(postId: String, reaction: ReactionType) : Boolean =
+    suspend fun deleteReaction(postId: String, reaction: ReactionType): Boolean =
         postsAPI.deleteReaction(postId, reaction)
 
-    suspend fun getHiddenPosts() : List<String> =
+    suspend fun getHiddenPosts(): List<String> =
         postsAPI.getHiddenPosts()
 
-    suspend fun hidePost(postId: String) : Boolean =
+    suspend fun hidePost(postId: String): Boolean =
         postsAPI.hidePost(postId)
 
-    suspend fun showPost(postId: String) : Boolean =
+    suspend fun showPost(postId: String): Boolean =
         postsAPI.showPost(postId)
 }
