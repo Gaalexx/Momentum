@@ -99,49 +99,45 @@ class PostsViewModel @Inject constructor(
     }
 
     private fun getSpeechTranscription(event: GalleryEvent.GetSpeechTranscription) {
-        println("ABOBA POST INDEX ${_state.value.posts.indexOfFirst { it.id == event.postId }}")
-        viewModelScope.launch {
-            val postId = event.postId
+        val post = _state.value.posts.find { it -> it.id == event.postId }
+        if (post?.transcription == "" || post?.transcription == null) {
+            viewModelScope.launch {
+                val postId = event.postId
 
-            try {
-                changePostTranscription(postId, null)
-
-                if (!repo.sendPostForTranscription(postId)) {
+                try {
                     changePostTranscription(postId, null)
-                    println("ABOBA хуета")
-                    return@launch
+
+                    if (!repo.sendPostForTranscription(postId)) {
+                        changePostTranscription(postId, null)
+                        return@launch
+                    }
+
+                    val answer = withTimeoutOrNull(5.minutes) {
+                        var currentAnswer: GetTranscriptionResponseDTO
+
+                        do {
+                            currentAnswer = repo.checkPostTranscriptionState(postId)
+
+                            if (currentAnswer.status == TranscriptionStatus.TRANSCRIPTING) {
+                                delay(8.seconds)
+                            }
+                        } while (currentAnswer.status == TranscriptionStatus.TRANSCRIPTING)
+
+                        currentAnswer
+                    }
+
+                    val transcription = when (answer?.status) {
+                        TranscriptionStatus.DONE -> answer.transcription
+                        else -> null
+                    }
+
+                    changePostTranscription(postId, transcription)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Log.e("PostsViewModel", "Error getting transcription ${e.message ?: ""}", e)
+                    changePostTranscription(postId, null)
                 }
-
-                val answer = withTimeoutOrNull(5.minutes) {
-                    var currentAnswer: GetTranscriptionResponseDTO
-
-                    do {
-                        currentAnswer = repo.checkPostTranscriptionState(postId)
-
-                        if (currentAnswer.status == TranscriptionStatus.TRANSCRIPTING) {
-                            delay(8.seconds)
-                        }
-                        println("ABOBA")
-                    } while (currentAnswer.status == TranscriptionStatus.TRANSCRIPTING)
-
-                    currentAnswer
-                }
-
-                println("ABOBA SUCCESS!!!!")
-                val transcription = when (answer?.status) {
-                    TranscriptionStatus.DONE -> answer.transcription
-                    else -> null
-                }
-
-                if (transcription != null) {
-                    println("ABOBA ${transcription}")
-                }
-                changePostTranscription(postId, transcription)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                Log.e("PostsViewModel", "Error getting transcription ${e.message ?: ""}", e)
-                changePostTranscription(postId, null)
             }
         }
     }

@@ -732,7 +732,7 @@ fun WatchPhotoScreen(
                 Box(
                     modifier = Modifier
                         .align(Alignment.Center)
-                        .fillMaxSize(0.95f)
+                        .fillMaxSize(0.8f)
                         .clip(RoundedCornerShape(15.dp))
                         .background(color = ConstColours.MAIN_BACK_GRAY)
                         .padding(16.dp),
