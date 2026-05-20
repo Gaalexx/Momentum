@@ -75,11 +75,14 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
 import com.project.momentum.features.posts.viewmodel.GalleryEvent
@@ -738,14 +741,39 @@ fun WatchPhotoScreen(
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (currentPost?.transcription == null) {
-                        LoadingOverlay()
-                    } else {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Text(
-                            text = currentPost?.transcription ?: " ",
+                            modifier = Modifier.padding(bottom = 2.dp),
+                            text = stringResource(R.string.transcription),
+                            textAlign = TextAlign.Center,
                             color = ConstColours.WHITE
                         )
+                        Box(
+                            modifier = Modifier
+                                .clip(
+                                    RoundedCornerShape(15.dp)
+                                )
+                                .background(color = ConstColours.BLACK)
+                                .padding(4.dp)
+                                .fillMaxSize()
+                        ) {
+                            if (currentPost?.transcription == null) {
+                                LoadingOverlay()
+                            } else {
+                                Text(
+                                    modifier = Modifier
+                                        .padding(3.dp)
+                                        .verticalScroll(state = rememberScrollState()),
+                                    text = currentPost?.transcription
+                                        ?: stringResource(R.string.transcripting_error),
+                                    color = ConstColours.WHITE
+                                )
+                            }
+                        }
                     }
+
                 }
             }
         }

@@ -206,4 +206,6 @@
     <string name="button_delete_post">Delete post</string>
     <string name="button_hide_post_for_me">Hide post for me</string>
     <string name="transcripting_error">Transcription error</string>
+    <string name="transcription">Transcription</string>
+
 </resources>
