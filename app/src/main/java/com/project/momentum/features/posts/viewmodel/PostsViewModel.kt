@@ -7,8 +7,12 @@ import com.project.momentum.data.auth.SessionManager
 import com.project.momentum.features.account.models.PostData
 import com.project.momentum.features.posts.features.reactions.models.ReactionData
 import com.project.momentum.features.posts.features.reactions.models.ReactionType
+import com.project.momentum.features.posts.models.dtos.GetTranscriptionResponseDTO
+import com.project.momentum.features.posts.models.dtos.TranscriptionStatus
 import com.project.momentum.features.posts.repo.PostsRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -17,8 +21,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import java.time.Instant
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 data class PostsState(
     val posts: List<PostData>,
@@ -37,6 +44,7 @@ sealed interface GalleryEvent {
     data class OnDeletePost(val postId: String) : GalleryEvent
     data class OnHidePost(val postId: String) : GalleryEvent
     data class SelectPost(val post: String?) : GalleryEvent
+    data class GetSpeechTranscription(val postId: String) : GalleryEvent
 }
 
 sealed interface WatchPhotoEvent {
@@ -53,7 +61,7 @@ class PostsViewModel @Inject constructor(
     private val repo: PostsRepo,
     private val sessionManager: SessionManager
 ) : ViewModel() {
-    private val _state = MutableStateFlow<PostsState>(PostsState(listOf(), listOf(), false, ""))
+    private val _state = MutableStateFlow<PostsState>(PostsState(listOf(), listOf(), false, "", ""))
     val state = _state.asStateFlow()
 
     init {
@@ -72,7 +80,65 @@ class PostsViewModel @Inject constructor(
             is GalleryEvent.OnDeletePost -> deletePost(event)
             is GalleryEvent.OnHidePost -> hidePost(event)
             is GalleryEvent.SelectPost -> selectPost(event)
-            else -> println()
+            is GalleryEvent.GetSpeechTranscription -> getSpeechTranscription(event)
+        }
+    }
+
+    private fun changePostTranscription(postId: String, transcription: String?) {
+        _state.update { state ->
+            state.copy(
+                posts = state.posts.map { post ->
+                    if (post.id == postId) {
+                        post.copy(transcription = transcription)
+                    } else {
+                        post
+                    }
+                }
+            )
+        }
+    }
+
+    private fun getSpeechTranscription(event: GalleryEvent.GetSpeechTranscription) {
+        val post = _state.value.posts.find { it -> it.id == event.postId }
+        if (post?.transcription == "" || post?.transcription == null) {
+            viewModelScope.launch {
+                val postId = event.postId
+
+                try {
+                    changePostTranscription(postId, null)
+
+                    if (!repo.sendPostForTranscription(postId)) {
+                        changePostTranscription(postId, null)
+                        return@launch
+                    }
+
+                    val answer = withTimeoutOrNull(5.minutes) {
+                        var currentAnswer: GetTranscriptionResponseDTO
+
+                        do {
+                            currentAnswer = repo.checkPostTranscriptionState(postId)
+
+                            if (currentAnswer.status == TranscriptionStatus.TRANSCRIPTING) {
+                                delay(8.seconds)
+                            }
+                        } while (currentAnswer.status == TranscriptionStatus.TRANSCRIPTING)
+
+                        currentAnswer
+                    }
+
+                    val transcription = when (answer?.status) {
+                        TranscriptionStatus.DONE -> answer.transcription
+                        else -> null
+                    }
+
+                    changePostTranscription(postId, transcription)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Log.e("PostsViewModel", "Error getting transcription ${e.message ?: ""}", e)
+                    changePostTranscription(postId, null)
+                }
+            }
         }
     }
 
@@ -145,9 +211,11 @@ class PostsViewModel @Inject constructor(
     }
 
     private fun onReactionClick(event: WatchPhotoEvent.OnReactionClick) {
-        val currentUserId = sessionManager.getUserId() ?: throw Exception("PostsViewModel:onReactionClick: Unauthorized user cant see reactions") // TODO: custom Exception
+        val currentUserId = sessionManager.getUserId()
+            ?: throw Exception("PostsViewModel:onReactionClick: Unauthorized user cant see reactions") // TODO: custom Exception
 
-        val post = _state.value.posts.find { it.id == event.postId } ?: throw Exception("PostsViewModel:onReactionClick: no such post to react")
+        val post = _state.value.posts.find { it.id == event.postId }
+            ?: throw Exception("PostsViewModel:onReactionClick: no such post to react")
 
 
         //TODO: если часто добавлять или удалять реакции и проблемы с сетью
@@ -244,7 +312,8 @@ class PostsViewModel @Inject constructor(
         }
     }
 
-    private fun getCurrentUserId(): String = sessionManager.getUserId() ?: throw Exception("Unauthenticated")
+    private fun getCurrentUserId(): String =
+        sessionManager.getUserId() ?: throw Exception("Unauthenticated")
 
     private suspend fun postsUpdate() {
         val posts = repo.getAllPosts()
@@ -260,7 +329,7 @@ class PostsViewModel @Inject constructor(
         }
     }
 
-    private fun loadLocalPosts(event: GalleryEvent.OnLocalLoadPosts){
+    private fun loadLocalPosts(event: GalleryEvent.OnLocalLoadPosts) {
         viewModelScope.launch {
             _state.update {
                 it.copy(posts = event.posts)

@@ -1,8 +1,11 @@
 package com.project.momentum.features.posts.api
 
 import android.util.Log
+import com.example.Models.FriendRequestActionDTO
 import com.project.momentum.data.auth.SessionManager
 import com.project.momentum.features.posts.features.reactions.models.ReactionType
+import com.project.momentum.features.posts.models.dtos.GetTranscriptionResponseDTO
+import com.project.momentum.features.posts.models.dtos.TranscriptionStatus
 import com.project.momentum.network.di.Backend
 import com.project.momentum.network.s3.PostDTO
 import io.ktor.client.HttpClient
@@ -22,6 +25,24 @@ class PostsAPI @Inject constructor(
     @Backend private val client: HttpClient,
     private val sessionManager: SessionManager
 ) {
+
+    suspend fun sendPostForTranscription(postId: String): Boolean {
+        val response = client.get("transcript/${postId}") {
+            header(HttpHeaders.Authorization, sessionManager.getHeader())
+        }
+        return response.status.value in 200..299
+    }
+
+    suspend fun checkPostTranscriptionState(postId: String): GetTranscriptionResponseDTO {
+        val response = client.get("transcript/${postId}/status") {
+            header(HttpHeaders.Authorization, sessionManager.getHeader())
+        }
+        if (response.status == HttpStatusCode.OK) {
+            return response.body<GetTranscriptionResponseDTO>()
+        } else {
+            return GetTranscriptionResponseDTO(TranscriptionStatus.ERROR, "")
+        }
+    }
 
     suspend fun getMyPosts(): List<PostDTO> {
         return try {
@@ -60,7 +81,7 @@ class PostsAPI @Inject constructor(
         }
     }
 
-    suspend fun deletePost(postId: String) : Boolean =
+    suspend fun deletePost(postId: String): Boolean =
         try {
             val response = client.delete("post/${postId}") {
                 header(HttpHeaders.Authorization, sessionManager.getHeader())
@@ -77,7 +98,7 @@ class PostsAPI @Inject constructor(
             false
         }
 
-    suspend fun sendReaction(postId: String, reaction: ReactionType) : Boolean =
+    suspend fun sendReaction(postId: String, reaction: ReactionType): Boolean =
         try {
             val response = client.post("react/${postId}/${reaction}") {
                 header(HttpHeaders.Authorization, sessionManager.getHeader())
@@ -94,7 +115,7 @@ class PostsAPI @Inject constructor(
             false
         }
 
-    suspend fun deleteReaction(postId: String, reaction: ReactionType) : Boolean =
+    suspend fun deleteReaction(postId: String, reaction: ReactionType): Boolean =
         try {
             val response = client.delete("unreact/${postId}/${reaction}") {
                 header(HttpHeaders.Authorization, sessionManager.getHeader())
@@ -111,7 +132,7 @@ class PostsAPI @Inject constructor(
             false
         }
 
-    suspend fun getHiddenPosts() : List<String> =
+    suspend fun getHiddenPosts(): List<String> =
         try {
             val response = client.get("hidden") {
                 header(HttpHeaders.Authorization, sessionManager.getHeader())
@@ -128,7 +149,7 @@ class PostsAPI @Inject constructor(
             listOf()
         }
 
-    suspend fun hidePost(postId: String) : Boolean =
+    suspend fun hidePost(postId: String): Boolean =
         try {
             val response = client.post("hide/${postId}") {
                 header(HttpHeaders.Authorization, sessionManager.getHeader())
@@ -145,7 +166,7 @@ class PostsAPI @Inject constructor(
             false
         }
 
-    suspend fun showPost(postId: String) :Boolean =
+    suspend fun showPost(postId: String): Boolean =
         try {
             val response = client.delete("show/${postId}") {
                 header(HttpHeaders.Authorization, sessionManager.getHeader())

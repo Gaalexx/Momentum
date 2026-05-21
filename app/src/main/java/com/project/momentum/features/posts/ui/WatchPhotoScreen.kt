@@ -31,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,13 +75,19 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
 import com.project.momentum.features.posts.viewmodel.GalleryEvent
 import com.project.momentum.features.posts.viewmodel.PostsState
+import com.project.momentum.ui.assets.ContinueButtonAdaptive
 import com.project.momentum.ui.assets.VideoView
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
@@ -244,6 +251,9 @@ fun WatchPhotoScreenRoute(
                 WatchPhotoEvent.OnReactionClick(postId, reaction)
             )
         },
+        onTranscript = { postId ->
+            postsViewModel.onEvent(GalleryEvent.GetSpeechTranscription(postId))
+        },
         postIndex = postIndex,
         posts = posts,
         uiState = uiState,
@@ -259,7 +269,7 @@ fun WatchPhotoScreenFull(
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
-
+    onTranscript: (String) -> Unit,
     onHidePost: (String) -> Unit,
     onDeletePost: (String) -> Unit,
 
@@ -300,7 +310,7 @@ fun WatchPhotoScreenFull(
 
                 onHidePost = onHidePost,
                 onDeletePost = onDeletePost,
-
+                onTranscript = onTranscript,
                 postIndex = postIndex,
                 posts = posts,
                 currentUserId = uiState.currentUserId,
@@ -352,7 +362,9 @@ fun WatchPhotoScreenRouteForMain(
             postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
             postsViewModel.onEvent(GalleryEvent.SelectPost(null))
         },
-
+        onTranscript = { postId ->
+            postsViewModel.onEvent(GalleryEvent.GetSpeechTranscription(postId))
+        },
         postIndex = postIndex,
         posts = posts,
         currentUserId = uiState.currentUserId,
@@ -370,6 +382,7 @@ fun WatchPhotoScreen(
     onGoToGallery: () -> Unit,
     onHidePost: (String) -> Unit,
     onDeletePost: (String) -> Unit,
+    onTranscript: (String) -> Unit,
     postIndex: Int,
     currentUserId: String,
     posts: List<PostData>,
@@ -385,6 +398,7 @@ fun WatchPhotoScreen(
     val pagerState = rememberPagerState(initialPage = postIndex, pageCount = { posts.size })
 
     var isEditable by remember { mutableStateOf(false) }
+    var isTranscriptionVisible by remember { mutableStateOf(false) }
     val backgroundBlur by animateDpAsState(
         targetValue = if (isEditable) 18.dp else 0.dp,
         label = "watch_photo_background_blur"
@@ -393,6 +407,10 @@ fun WatchPhotoScreen(
 
     val currentPost by remember(posts, pagerState.currentPage) {
         derivedStateOf { posts.getOrNull(pagerState.currentPage) }
+    }
+
+    LaunchedEffect(currentPost?.id) {
+        isTranscriptionVisible = false
     }
 
     val screenHeight = LocalWindowInfo.current.containerDpSize.height
@@ -475,7 +493,12 @@ fun WatchPhotoScreen(
                                 .aspectRatio(1f)
                                 .combinedClickable(
                                     onClick = { onShowReactionDialog() },
-                                    onLongClick = { isEditable = !isEditable }
+                                    onLongClick = {
+                                        isEditable = !isEditable
+                                        if (!isEditable) {
+                                            isTranscriptionVisible = false
+                                        }
+                                    }
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
@@ -485,6 +508,22 @@ fun WatchPhotoScreen(
                                 isEditable = isEditable,
                                 isPlaying = pageIndex == pagerState.currentPage
                             )
+
+                            if (isEditable) {
+                                Icon(
+                                    imageVector = Icons.Default.TextFields,
+                                    contentDescription = "SpeechToText",
+                                    tint = ConstColours.WHITE,
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .padding(top = 30.dp, end = 30.dp)
+                                        .size(64.dp)
+                                        .clickable {
+                                            isTranscriptionVisible = true
+                                            onTranscript(post.id)
+                                        }
+                                )
+                            }
 
                             if (posts[pageIndex].title.isNotBlank()) {
                                 CaptionBasicLabel(
@@ -506,16 +545,38 @@ fun WatchPhotoScreen(
                                 .aspectRatio(1f)
                                 .combinedClickable(
                                     onClick = { onShowReactionDialog() },
-                                    onLongClick = { isEditable = !isEditable }
+                                    onLongClick = {
+                                        isEditable = !isEditable
+                                        if (!isEditable) {
+                                            isTranscriptionVisible = false
+                                        }
+                                    }
                                 ),
                             contentAlignment = Alignment.Center
                         ) {
+
                             AudioView(
                                 context = context,
                                 uri = post.presignedURL,
                                 isEditable = isEditable,
                                 isPlaying = pageIndex == pagerState.currentPage
                             )
+
+                            if (isEditable) {
+                                Icon(
+                                    imageVector = Icons.Default.TextFields,
+                                    contentDescription = "SpeechToText",
+                                    tint = ConstColours.WHITE,
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .padding(top = 30.dp, end = 30.dp)
+                                        .size(64.dp)
+                                        .clickable {
+                                            isTranscriptionVisible = true
+                                            onTranscript(post.id)
+                                        }
+                                )
+                            }
 
                             if (posts[pageIndex].title.isNotBlank()) {
                                 CaptionBasicLabel(
@@ -534,121 +595,185 @@ fun WatchPhotoScreen(
             }
         }
 
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .blur(backgroundBlur)
-                .clickable(
-                    enabled = isEditable,
-                    interactionSource = blurClickInteractionSource,
-                    indication = null
-                ) {
-                    isEditable = false
-                },
-            horizontalAlignment = Alignment.CenterHorizontally
-
+                .weight(1f)
         ) {
-            currentPost?.let { post ->
-                Text(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally),
-                    text = post.getDate() ?: "",
-                    color = ConstColours.WHITE,
-                    style = AppTextStyles.SupportingText
-                )
-
-                if (post.reactions != null) {
-                    ReactionsRow(
-                        curUser = currentUserId,
-                        reactionsData = post.reactions,
-                        onReactionClick = { reaction ->
-                            onReactionClick(post.id, reaction)
-                        },
-                        modifier = Modifier
-                            .height(65.dp)
-                            .padding(8.dp)
-                    )
-                } else {
-                    Spacer(modifier = Modifier
-                        .height(65.dp)
-                        .padding(8.dp))
-                }
-
-                if (isShowingReactionsDialog) {
-                    Dialog(
-                        onDismissRequest = { onShowReactionDialog() }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .blur(backgroundBlur)
+                    .clickable(
+                        enabled = isEditable,
+                        interactionSource = blurClickInteractionSource,
+                        indication = null
                     ) {
-                        ReactionsDialog(
+                        isEditable = false
+                        isTranscriptionVisible = false
+                    },
+                horizontalAlignment = Alignment.CenterHorizontally
+
+            ) {
+                currentPost?.let { post ->
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally),
+                        text = post.getDate() ?: "",
+                        color = ConstColours.WHITE,
+                        style = AppTextStyles.SupportingText
+                    )
+
+                    if (post.reactions != null) {
+                        ReactionsRow(
+                            curUser = currentUserId,
+                            reactionsData = post.reactions,
                             onReactionClick = { reaction ->
                                 onReactionClick(post.id, reaction)
-                                onShowReactionDialog()
                             },
-                            onHidePost = { onHidePost(post.id) },
-                            onDeletePost = { onDeletePost(post.id) },
-                            isOwner = post.isOwner,
+                            modifier = Modifier
+                                .height(65.dp)
+                                .padding(8.dp)
+                        )
+                    } else {
+                        Spacer(
+                            modifier = Modifier
+                                .height(65.dp)
+                                .padding(8.dp)
+                        )
+                    }
+
+                    if (isShowingReactionsDialog) {
+                        Dialog(
+                            onDismissRequest = { onShowReactionDialog() }
+                        ) {
+                            ReactionsDialog(
+                                onReactionClick = { reaction ->
+                                    onReactionClick(post.id, reaction)
+                                    onShowReactionDialog()
+                                },
+                                onHidePost = { onHidePost(post.id) },
+                                onDeletePost = { onDeletePost(post.id) },
+                                isOwner = post.isOwner,
+                            )
+                        }
+                    }
+
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ProfileLabel(
+                            name = post.userName,
+                            imageUrl = post.avatarPresignedURL,
+                            height = screenHeight * 0.1f
                         )
                     }
                 }
 
-                Box(
-                    modifier = Modifier.weight(1f),
-                    contentAlignment = Alignment.Center
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            bottom = dimensionResource(R.dimen.medium_padding),
+                            top = dimensionResource(R.dimen.small_padding)
+                        ),
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    ProfileLabel(
-                        name = post.userName,
-                        imageUrl = post.avatarPresignedURL,
-                        height = screenHeight * 0.1f
+                    IconButton(
+                        onClick = {
+                            if (!isEditable) {
+                                onGoToGallery()
+                            }
+                        },
+                        modifier = Modifier.size(dimensionResource(R.dimen.sub_button_size))
+                    ) {
+                        Icon(
+                            Icons.Default.Photo,
+                            modifier = Modifier.size(40.dp),
+                            contentDescription = stringResource(R.string.icon_flash),
+                            tint = iconTint
+                        )
+                    }
+
+                    ContinueButtonAdaptive(
+                        onClick = {
+                            if (!isEditable) {
+                                onGoToTakePhoto()
+                            }
+                        },
+                        modifier = Modifier
+                            .width(screenWidth * 0.5f)
+                            .height(dimensionResource(R.dimen.sub_button_size)),
+                        stringResource(R.string.reply),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = ConstColours.MAIN_BRAND_BLUE,
+                            contentColor = ConstColours.WHITE
+                        )
                     )
+
+                    IconButton(
+                        onClick = {
+                            if (!isEditable) {
+                                onShowReactionDialog()
+                            }
+                        },
+                        modifier = Modifier.size(dimensionResource(R.dimen.sub_button_size))
+                    ) {
+                        Icon(
+                            Icons.Outlined.MoreHoriz,
+                            modifier = Modifier.size(40.dp),
+                            contentDescription = stringResource(R.string.icon_flip_camera),
+                            tint = iconTint
+                        )
+                    }
                 }
             }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        bottom = dimensionResource(R.dimen.medium_padding),
-                        top = dimensionResource(R.dimen.small_padding)
-                    ),
-                verticalAlignment = Alignment.Bottom,
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                IconButton(
-                    onClick = onGoToGallery,
-                    modifier = Modifier.size(dimensionResource(R.dimen.sub_button_size))
-                ) {
-                    Icon(
-                        Icons.Default.Photo,
-                        modifier = Modifier.size(40.dp),
-                        contentDescription = stringResource(R.string.icon_flash),
-                        tint = iconTint
-                    )
-                }
-
-                ContinueButton(
-                    onClick = onGoToTakePhoto,
+            if (isTranscriptionVisible) {
+                Box(
                     modifier = Modifier
-                        .width(screenWidth * 0.5f)
-                        .height(dimensionResource(R.dimen.sub_button_size)),
-                    stringResource(R.string.reply),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ConstColours.MAIN_BRAND_BLUE,
-                        contentColor = ConstColours.WHITE
-                    )
-                )
-
-                IconButton(
-                    onClick = {
-                        captionFocusRequester.requestFocus()
-                        keyboardController?.show()
-                    },
-                    modifier = Modifier.size(dimensionResource(R.dimen.sub_button_size))
+                        .align(Alignment.Center)
+                        .fillMaxSize(0.8f)
+                        .clip(RoundedCornerShape(15.dp))
+                        .background(color = ConstColours.MAIN_BACK_GRAY)
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        Icons.Outlined.MoreHoriz,
-                        modifier = Modifier.size(40.dp),
-                        contentDescription = stringResource(R.string.icon_flip_camera),
-                        tint = iconTint
-                    )
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(bottom = 2.dp),
+                            text = stringResource(R.string.transcription),
+                            textAlign = TextAlign.Center,
+                            color = ConstColours.WHITE
+                        )
+                        Box(
+                            modifier = Modifier
+                                .clip(
+                                    RoundedCornerShape(15.dp)
+                                )
+                                .background(color = ConstColours.BLACK)
+                                .padding(4.dp)
+                                .fillMaxSize()
+                        ) {
+                            if (currentPost?.transcription == null) {
+                                LoadingOverlay()
+                            } else {
+                                Text(
+                                    modifier = Modifier
+                                        .padding(3.dp)
+                                        .verticalScroll(state = rememberScrollState()),
+                                    text = currentPost?.transcription
+                                        ?: stringResource(R.string.transcripting_error),
+                                    color = ConstColours.WHITE
+                                )
+                            }
+                        }
+                    }
+
                 }
             }
         }
@@ -669,6 +794,7 @@ private fun WatchPhotoScreenPreview() {
             onGoToFriends = {},
             onHidePost = {},
             onDeletePost = {},
+            onTranscript = { _ -> },
             postIndex = 0,
             posts = listOf(
                 PostData(
