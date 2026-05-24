@@ -307,35 +307,6 @@ fun AccountScreen(
                 modifier = nameModifier
             )
 
-            Spacer(Modifier.height(dimensionResource(R.dimen.extra_small_padding)))
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                if (userStatus == stringResource(R.string.account_online_status)) {
-                    Box(                         // пока у нас не определяется статус онлайн на бэке, будет такое :)
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(Color.Green)
-                    )
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(Color.Gray)
-                    )
-                }
-
-                Spacer(Modifier.width(dimensionResource(R.dimen.small_padding)))
-                Text(
-                    text = userStatus,
-                    color = Color(0xFFA0A0A0),
-                    fontSize = 16.sp
-                )
-            }
         }
 
         Spacer(Modifier.height(32.dp))
