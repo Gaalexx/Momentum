@@ -154,6 +154,7 @@
     <string name="settings_privacy_recommend_to_contacts">Рекомендовать меня контактам</string>
     <string name="settings_friend_requests">Запросы в друзья</string>
     <string name="settings_themes">Темы</string>
+    <string name="settings_hidden_posts">Скрытые посты</string>
 
 
     <!-- Settings Premium Screen -->

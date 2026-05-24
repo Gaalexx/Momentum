@@ -342,6 +342,7 @@ fun MainScreen(
                         onBackClick = {
                             closeOverlay()
                         },
+                        onHiddenPosts = { openOverlay(NavRoutes.) },
                         onPremiumClick = {
                             openOverlay(NavRoutes.Premium)
                         },

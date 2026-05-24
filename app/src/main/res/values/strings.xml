@@ -154,6 +154,7 @@
     <string name="settings_privacy_recommend_to_contacts">Recommend me to contacts</string>
     <string name="settings_friend_requests">Friend requests</string>
     <string name="settings_themes">Themes</string>
+    <string name="settings_hidden_posts">Hidden posts</string>
 
     <!-- Settings Premium Screen -->
     <string name="settings_premium_title">Premium </string>

@@ -20,6 +20,7 @@ import com.project.momentum.navigation.viewmodel.SwitchesState
 @Composable
 fun SettingsMainScreen(
     onBackClick: () -> Unit,
+    onHiddenPosts: () -> Unit = {},
     onPremiumClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     onDeleteAccountClick: () -> Unit = {},
@@ -44,9 +45,10 @@ fun SettingsMainScreen(
     ) {
         TemplateSettingsMain(
             onBackClick = onBackClick,
-            onEvent = { event -> viewModel.onEvent(event, appStartViewModel) },
+            onEvent = remember { { event -> viewModel.onEvent(event, appStartViewModel) } },
             state = uiState,
             switchesState = switchesState,
+            onHiddenPosts = onHiddenPosts,
             onPremiumClick = onPremiumClick,
             onLogoutClick = onLogoutClick,
             onDeleteAccountClick = onDeleteAccountClick
