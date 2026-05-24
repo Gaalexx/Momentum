@@ -141,7 +141,7 @@ fun TemplateSettingsMain(
                 Box(modifier = Modifier.weight(1f)) {
                     MomentumTheme   {
                         ThemeCard(
-                            onClick = {}
+                            onClick = { onEvent(SettingsEvent.OnDefaultThemeEnabled) }
                         )
                     }
                 }
@@ -149,7 +149,7 @@ fun TemplateSettingsMain(
 
                     MomentumAndroidSettingsTheme{
                         ThemeCard(
-                            onClick = {}
+                            onClick = { onEvent(SettingsEvent.OnDefaultThemeEnabled) }
                         )
                     }
                     MomentumTheme{}

@@ -28,7 +28,7 @@ sealed interface SettingsEvent {
     data object OnPublicationsEnabled : SettingsEvent
     data object OnReactionsEnabled : SettingsEvent
     data object OnFriendRequestEnabled : SettingsEvent
-    data object OnThemesEnabled : SettingsEvent
+    data object OnDefaultThemeEnabled : SettingsEvent
 }
 
 @HiltViewModel
@@ -67,7 +67,7 @@ class SettingsMainScreenViewModel @Inject constructor(
                     serverRep.changeFriendRequestEnabled(!server.friendRequestEnabled)
                 }
 
-            SettingsEvent.OnThemesEnabled ->
+            SettingsEvent.OnDefaultThemeEnabled ->
                 onServerSettingChange(appStartViewModel) {
                     serverRep.changeDefaultThemeEnabled(!server.defaultThemeEnabled)
                 }
