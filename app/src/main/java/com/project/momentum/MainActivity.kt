@@ -16,6 +16,7 @@ import com.project.momentum.features.auth.viewmodel.AuthorizationViewModel
 import com.project.momentum.navigation.MainScreen
 import com.project.momentum.navigation.viewmodel.AppStartViewModel
 import com.project.momentum.ui.theme.MomentumAndroidSettingsTheme
+import com.project.momentum.ui.theme.MomentumTheme
 import com.vk.api.sdk.VK
 import com.vk.dto.common.id.toUserId
 import com.vk.id.AccessToken
@@ -70,7 +71,7 @@ class MainActivity : ComponentActivity() {
         askNotificationPermission()
         VKID.instance.accessToken?.let { applyVkSdkCredentials(it) }
         setContent {
-            MomentumAndroidSettingsTheme {
+            MomentumTheme {
                 MainScreen(
                     onVkAuth = ::startVkAuth
                 )
