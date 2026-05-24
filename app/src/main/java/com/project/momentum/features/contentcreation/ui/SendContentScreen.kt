@@ -232,7 +232,6 @@ fun SendContentScreen(
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(innerPadding)
                 .background(ConstColours.BLACK)
                 .windowInsetsPadding(WindowInsets.systemBars),
         ) {
@@ -260,26 +259,12 @@ fun SendContentScreen(
                 uploadProgress = progress,
             )
 
+
             if (uploadingState != null) {
-                UploadProgress(
-                    modifier = Modifier.fillMaxWidth(),
-                    uploadingState = uploadingState
-                )
-            } else {
-                Spacer(modifier = Modifier.weight(0.3f))
+                UploadProgress(modifier = Modifier.fillMaxWidth(), uploadingState = uploadingState)
             }
 
-            //Spacer(Modifier.weight(0.7f))
-
-
-            if (friendsList.isNotEmpty()) {
-                FriendsToShareRow(
-                    friends = friendsList,
-                    selectedFriendIds = selectedFriendIds,
-                    onToggleFriend = { friendId -> toggleFriendSelection(friendId) }
-                )
-            }
-            Spacer(modifier = Modifier.weight(0.2f))
+            Spacer(modifier = Modifier.weight(1f))
 
             SendContentBottomControls(
                 onDelete = {
@@ -302,6 +287,18 @@ fun SendContentScreen(
                     .padding(bottom = 25.dp)
             )
 
+            Spacer(modifier = Modifier.weight(0.2f))
+
+            if (friendsList.isNotEmpty()) {
+                FriendsToShareRow(
+                    friends = friendsList,
+                    selectedFriendIds = selectedFriendIds,
+                    onToggleFriend = { friendId -> toggleFriendSelection(friendId) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.weight(1f))
 
@@ -360,45 +357,44 @@ private fun FriendAvatarItem(
                 .clip(CircleShape)
                 .background(
                     if (isSelected) {
-                        ConstColours.MAIN_BACK_GRAY
+                        ConstColours.MAIN_BRAND_BLUE
                     } else {
                         Color.Gray.copy(alpha = 0.3f)
                     }
                 )
+                .padding(if (isSelected) 2.dp else 0.dp)
         ) {
-            if (friend.avatarUrl != null) {
-                AsyncImage(
-                    model = friend.avatarUrl,
-                    contentDescription = friend.name,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = null,
-                    tint = if (isSelected) {
-                        Color.White.copy(alpha = 0.5f)
-                    } else {
-                        Color.White.copy(alpha = 0.2f)
-                    },
-                    modifier = Modifier.size(28.dp).align(Alignment.Center)
-                )
-            }
-
-            if (isSelected) {
-                Box(
-                    modifier = Modifier
-                        .size(20.dp)
-                        .align(Alignment.TopEnd)
-                        .background(Color.Green, CircleShape)
-                        .padding(4.dp)
-                ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(CircleShape)
+                    .background(
+                        if (isSelected) {
+                            ConstColours.MAIN_BACK_GRAY
+                        } else {
+                            Color.Gray.copy(alpha = 0.3f)
+                        }
+                    )
+            ) {
+                if (friend.avatarUrl != null) {
+                    AsyncImage(
+                        model = friend.avatarUrl,
+                        contentDescription = friend.name,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
                     Icon(
-                        imageVector = Icons.Default.Check,
+                        imageVector = Icons.Default.Person,
                         contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.fillMaxSize()
+                        tint = if (isSelected) {
+                            Color.White.copy(alpha = 0.8f)
+                        } else {
+                            Color.White.copy(alpha = 0.2f)
+                        },
+                        modifier = Modifier
+                            .size(28.dp)
+                            .align(Alignment.Center)
                     )
                 }
             }
@@ -406,7 +402,7 @@ private fun FriendAvatarItem(
 
         Text(
             text = friend.name ?: friend.email.take(8),
-            color = if (isSelected) Color.White else Color.White.copy(alpha = 0.5f),
+            color = if (isSelected) ConstColours.MAIN_BRAND_BLUE else Color.White.copy(alpha = 0.5f),
             fontSize = 10.sp,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
