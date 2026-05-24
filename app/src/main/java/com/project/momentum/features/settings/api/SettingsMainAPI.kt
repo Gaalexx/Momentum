@@ -17,8 +17,8 @@ interface ISettingsMainAPI {
     suspend fun changeInAppNotifications(newValue: Boolean): SettingsActionDTO
     suspend fun changePublicationsEnabled(newValue: Boolean): SettingsActionDTO
     suspend fun changeReactionsEnabled(newValue: Boolean): SettingsActionDTO
-    suspend fun changeRecommendToContacts(newValue: Boolean): SettingsActionDTO
-    suspend fun changeAllowAddFromAnyone(newValue: Boolean): SettingsActionDTO
+    suspend fun changeFriendRequestEnabled(newValue: Boolean): SettingsActionDTO
+    suspend fun changeDefaultThemeEnabled(newValue: Boolean): SettingsActionDTO
 }
 
 @Singleton
@@ -46,12 +46,12 @@ class SettingsMainAPI @Inject constructor(
         return changeSetting("settings/change-reactions-enabled", ChangeReactionsEnabledDTO(newValue))
     }
 
-    override suspend fun changeRecommendToContacts(newValue: Boolean): SettingsActionDTO {
-        return changeSetting("settings/change-recommend-to-contacts", ChangeRecommendToContactsDTO(newValue))
+    override suspend fun changeFriendRequestEnabled(newValue: Boolean): SettingsActionDTO {
+        return changeSetting("settings/change-friend-request-enabled", ChangeFriendRequestEnabledDTO(newValue))
     }
 
-    override suspend fun changeAllowAddFromAnyone(newValue: Boolean): SettingsActionDTO {
-        return changeSetting("settings/change-allow-add-from-anyone", ChangeAllowAddFromAnyoneDTO(newValue))
+    override suspend fun changeDefaultThemeEnabled(newValue: Boolean): SettingsActionDTO {
+        return changeSetting("settings/change-default-theme-enabled", ChangeDefaultThemeEnabledDTO(newValue))
     }
 
 }

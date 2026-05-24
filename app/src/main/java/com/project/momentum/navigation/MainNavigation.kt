@@ -46,7 +46,6 @@ import com.project.momentum.features.posts.ui.WatchPhotoScreenRoute
 import com.project.momentum.features.posts.ui.WatchPhotoScreenRouteForMain
 import com.project.momentum.features.settings.ui.DeleteAccountCheckCodeScreen
 import com.project.momentum.features.settings.ui.DeleteAccountCheckPasswordScreen
-import com.project.momentum.features.settings.ui.DeleteAccountConfirmationScreen
 import com.project.momentum.features.settings.ui.SettingsMainScreen
 import com.project.momentum.features.settings.ui.SettingsPremiumScreen
 import com.project.momentum.navigation.viewmodel.AppStartState

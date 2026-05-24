@@ -152,9 +152,8 @@
     <string name="settings_privacy_title">Конфиденциальность</string>
     <string name="settings_privacy_account_visibility">Видимость аккаунта</string>
     <string name="settings_privacy_recommend_to_contacts">Рекомендовать меня контактам</string>
-    <string name="settings_privacy_allow_add_from_anyone">Разрешить добавлять себя в друзья пользователям не из контактов</string>
-    <string name="settings_privacy_caution">Осторожность</string>
-    <string name="settings_privacy_confirm_before_posting">Подтверждение перед тем как выложить пост</string>
+    <string name="settings_friend_requests">Запросы в друзья</string>
+    <string name="settings_themes">Темы</string>
 
 
     <!-- Settings Premium Screen -->

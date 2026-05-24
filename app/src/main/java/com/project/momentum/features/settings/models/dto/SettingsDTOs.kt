@@ -4,11 +4,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ServerSettingsStateDTO (
-    val inAppNotifications: Boolean = false,
-    val publicationsEnabled: Boolean = false,
-    val reactionsEnabled: Boolean = false,
-    val recommendToContacts: Boolean = false,
-    val allowAddFromAnyone: Boolean = false,
+    val inAppNotifications: Boolean = true,
+    val publicationsEnabled: Boolean = true,
+    val reactionsEnabled: Boolean = true,
+    val friendRequestEnabled: Boolean = true,
+    val defaultThemeEnabled: Boolean = true,
 )
 
 @Serializable
@@ -33,19 +33,13 @@ data class ChangeReactionsEnabledDTO(
 )
 
 @Serializable
-data class ChangeRecommendToContactsDTO(
-    val recommendToContacts: Boolean
+data class ChangeFriendRequestEnabledDTO(
+    val friendRequestEnabled: Boolean
 )
 
 @Serializable
-data class ChangeAllowAddFromAnyoneDTO(
-    val allowAddFromAnyone: Boolean
-)
-
-
-@Serializable
-data class LocalSettingsStateDTO (
-    val confirmBeforePosting: Boolean = false
+data class ChangeDefaultThemeEnabledDTO(
+    val defaultThemeEnabled: Boolean
 )
 
 @Serializable

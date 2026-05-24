@@ -22,9 +22,11 @@ import com.project.momentum.navigation.viewmodel.SwitchesState
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.SettingsButtonAdaptive
 import com.project.momentum.ui.assets.SwitchRow
+import com.project.momentum.ui.assets.ThemeCard
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
+import com.project.momentum.ui.theme.MomentumAndroidSettingsTheme
 import com.project.momentum.ui.theme.MomentumTheme
 
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
@@ -117,43 +119,46 @@ fun TemplateSettingsMain(
                 onEnabledChange = { onEvent(SettingsEvent.OnReactionsEnabled) }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = stringResource(R.string.settings_privacy_account_visibility),
-                style = AppTextStyles.SubHeadlines,
-                color = ConstColours.MAIN_BRAND_BLUE,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
             SwitchRow(
-                text = stringResource(R.string.settings_privacy_recommend_to_contacts),
-                enabled = switchesState.serverSettingsState.recommendToContacts,
-                onEnabledChange = { onEvent(SettingsEvent.OnRecommendToContacts) }
-            )
-
-            SwitchRow(
-                text = stringResource(R.string.settings_privacy_allow_add_from_anyone),
-                enabled = switchesState.serverSettingsState.allowAddFromAnyone,
-                onEnabledChange = { onEvent(SettingsEvent.OnAllowAddFromAnyone) }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = stringResource(R.string.settings_privacy_caution),
-                style = AppTextStyles.SubHeadlines,
-                color = ConstColours.MAIN_BRAND_BLUE,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-
-            SwitchRow(
-                text = stringResource(R.string.settings_privacy_confirm_before_posting),
-                enabled = switchesState.localSettingsState.confirmBeforePosting,
-                onEnabledChange = { onEvent(SettingsEvent.OnConfirmBeforePosting) }
+                text = stringResource(R.string.settings_friend_requests),
+                enabled = switchesState.serverSettingsState.friendRequestEnabled,
+                onEnabledChange = { onEvent(SettingsEvent.OnFriendRequestEnabled) }
             )
 
             Spacer(modifier = Modifier.weight(1f))
+
+            Text(
+                text = stringResource(R.string.settings_themes),
+                style = AppTextStyles.SubHeadlines,
+                color = ConstColours.MAIN_BRAND_BLUE,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Box(modifier = Modifier.weight(1f)) {
+                    MomentumTheme {
+                        ThemeCard(
+                            onClick = { onEvent(SettingsEvent.OnDefaultThemeEnabled) }
+                        )
+                    }
+                }
+                Box(modifier = Modifier.weight(1f)) {
+
+                    MomentumAndroidSettingsTheme{
+                        ThemeCard(
+                            onClick = { onEvent(SettingsEvent.OnDefaultThemeEnabled) }
+                        )
+                    }
+                    MomentumTheme{}
+                }
+            }
+
+
+
+            Spacer(modifier = Modifier.weight(10f))
 
 
 
@@ -184,7 +189,7 @@ fun TemplateSettingsMain(
                 modifier = Modifier.padding(vertical = dimensionResource(R.dimen.medium_padding))
             )
 
-            Spacer(modifier = Modifier.weight(1.5f))
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }

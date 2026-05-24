@@ -1280,6 +1280,44 @@ fun SubscriptionOptionCard(
 }
 
 @Composable
+fun ThemeCard(
+    cardColor: Color = ConstColours.MAIN_BACK_GRAY,
+    circleColor1: Color = ConstColours.MAIN_BRAND_BLUE,
+    circleColor2: Color = ConstColours.MAIN_BRAND_BLUE_ALPHA40,
+    circleColor3: Color = ConstColours.WHITE,
+    onClick: () -> Unit,
+    isSelected: Boolean = false,
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = cardColor
+        ),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            listOf(circleColor1, circleColor2, circleColor3).forEach { color ->
+                Box(
+                    modifier = Modifier
+                        .size(30.dp)
+                        .padding(4.dp)
+                        .clip(RoundedCornerShape(50))
+                        .background(color)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun ButtonForDeleteAdaptive(
     onClick: () -> Unit,
     text: String,
@@ -1339,6 +1377,15 @@ fun SubscriptionOptionCardPreview() {
         ),
         isSelected = false,
         onSelect = {}
+    )
+}
+
+@Preview(name = "Subscription Option Card", group = "Buttons")
+@Composable
+fun ThemeCardPreview() {
+    ThemeCard(
+        isSelected = false,
+        onClick = {}
     )
 }
 

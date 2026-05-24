@@ -11,11 +11,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.retain.retain
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.project.momentum.features.settings.models.dto.LocalSettingsStateDTO
 import com.project.momentum.features.settings.models.dto.ServerSettingsStateDTO
-import com.project.momentum.features.settings.repo.AppSettingsHolder
 import com.project.momentum.features.settings.repo.ServerSettingsRepository
-import com.project.momentum.features.settings.repo.SettingsLocalRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
@@ -60,7 +57,6 @@ sealed interface AppStartState {
 
 data class SwitchesState(
     val serverSettingsState: ServerSettingsStateDTO = ServerSettingsStateDTO(),
-    val localSettingsState: LocalSettingsStateDTO = LocalSettingsStateDTO(),
 )
 
 
@@ -68,7 +64,6 @@ data class SwitchesState(
 class AppStartViewModel @Inject constructor(
     private val auth: AuthUseCase,
     private val serverRep: ServerSettingsRepository,
-    private val appSettings: AppSettingsHolder,
     private val regRep: RegistrationRepository
 ) : ViewModel() {
     var state by mutableStateOf<AppStartState>(AppStartState.Loading)
@@ -77,20 +72,6 @@ class AppStartViewModel @Inject constructor(
 
     private val _settingsState = MutableStateFlow(SwitchesState())
     val settingsState = _settingsState.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            appSettings.confirmBeforePost.collect { local ->
-                _settingsState.update {
-                    it.copy(
-                        localSettingsState = LocalSettingsStateDTO(
-                            confirmBeforePosting = local
-                        )
-                    )
-                }
-            }
-        }
-    }
 
     fun loadServerSettings() {
         viewModelScope.launch {
@@ -109,12 +90,6 @@ class AppStartViewModel @Inject constructor(
     fun updateServerSettings(newState: ServerSettingsStateDTO) {
         _settingsState.update {
             it.copy(serverSettingsState = newState)
-        }
-    }
-
-    fun updateLocalSettings(newState: LocalSettingsStateDTO) {
-        _settingsState.update {
-            it.copy(localSettingsState = newState)
         }
     }
 
