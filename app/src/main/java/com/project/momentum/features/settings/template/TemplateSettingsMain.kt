@@ -139,7 +139,7 @@ fun TemplateSettingsMain(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Box(modifier = Modifier.weight(1f)) {
-                    MomentumTheme   {
+                    MomentumTheme {
                         ThemeCard(
                             onClick = { onEvent(SettingsEvent.OnDefaultThemeEnabled) }
                         )

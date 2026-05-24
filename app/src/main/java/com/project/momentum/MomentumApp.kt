@@ -9,7 +9,6 @@ import javax.inject.Inject
 
 @HiltAndroidApp
 class MomentumApp : Application() {
-    @Inject
     override fun onCreate() {
         super.onCreate()
         VK.initialize(this)
