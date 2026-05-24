@@ -276,10 +276,17 @@ fun SendContentScreen(
 
 
             if (uploadingState != null) {
-                UploadProgress(modifier = Modifier.fillMaxWidth(), uploadingState = uploadingState)
+                UploadProgress(
+                    modifier = Modifier
+                        .weight(1.3f)
+                        .fillMaxWidth(),
+                    uploadingState = uploadingState
+                )
+            } else {
+                Spacer(modifier = Modifier.weight(1.3f))
             }
 
-            Spacer(modifier = Modifier.weight(1.1f))
+
 
             SendContentBottomControls(
                 onDelete = {
@@ -299,18 +306,15 @@ fun SendContentScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 25.dp)
+                    .weight(1.7f)
             )
 
-            Spacer(modifier = Modifier.weight(0.2f))
 
             if (friendsList.isNotEmpty()) {
                 FriendsToShareRow(
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxSize()
-                        .padding(bottom = 16.dp)
-                        .background(Color.White),
+                        .fillMaxSize(),
                     friends = friendsList,
                     selectedFriendIds = selectedFriendIds,
                     onToggleFriend = { friendId -> toggleFriendSelection(friendId) }
@@ -332,13 +336,11 @@ private fun FriendsToShareRow(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(
             text = "Поделиться с друзьями (${selectedFriendIds.size}/${friends.size})",
             color = ConstColours.WHITE,
-            fontSize = 12.sp,
-            modifier = Modifier.padding(bottom = 12.dp)
+            fontSize = 12.sp
         )
 
         LazyRow(
