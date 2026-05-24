@@ -192,10 +192,12 @@ fun SendContentScreen(
         }
     }
 
+    val selectFriendMessage = stringResource(R.string.snackbar_select_friend)
+
     fun sendContent() {
         if (selectedFriendIds.isEmpty()) {
             coroutineScope.launch {
-                snackbarHostState.showSnackbar("Выберите хотя бы одного друга")
+                snackbarHostState.showSnackbar(selectFriendMessage)
             }
             return
         }

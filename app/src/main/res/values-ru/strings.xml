@@ -210,4 +210,6 @@
     <string name="button_hide_post_for_me">Скрыть пост для меня</string>
     <string name="transcripting_error">Ошибка транскрипции</string>
     <string name="transcription">Расшифровка голоса</string>
+
+    <string name="snackbar_select_friend">Выберите хотя бы одного друга</string>
 </resources>
