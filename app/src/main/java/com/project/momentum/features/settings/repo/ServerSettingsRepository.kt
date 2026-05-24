@@ -35,17 +35,17 @@ class ServerSettingsRepository @Inject constructor(
             response.newState ?: throw Exception("Server returned no state")
         }
 
-    suspend fun changeRecommendToContacts(newValue: Boolean) : Result<ServerSettingsStateDTO> =
+    suspend fun changeFriendRequestEnabled(newValue: Boolean) : Result<ServerSettingsStateDTO> =
         runCatching {
-            val response = client.changeRecommendToContacts(newValue)
+            val response = client.changeFriendRequestEnabled(newValue)
             if (!response.success) throw Exception(response.message)
 
             response.newState ?: throw Exception("Server returned no state")
         }
 
-    suspend fun changeAllowAddFromAnyone(newValue: Boolean) : Result<ServerSettingsStateDTO> =
+    suspend fun changeDefaultThemeEnabled(newValue: Boolean) : Result<ServerSettingsStateDTO> =
         runCatching {
-            val response = client.changeAllowAddFromAnyone(newValue)
+            val response = client.changeDefaultThemeEnabled(newValue)
             if (!response.success) throw Exception(response.message)
 
             response.newState ?: throw Exception("Server returned no state")

@@ -19,9 +19,6 @@ import javax.inject.Singleton
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class AuthPrefs
-@Qualifier
-@Retention(AnnotationRetention.BINARY)
-annotation class LocalPrefs
 
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
@@ -38,17 +35,6 @@ object DataStoreModule {
     ): DataStore<Preferences> {
         return PreferenceDataStoreFactory.create(
             produceFile = { context.preferencesDataStoreFile("auth_prefs") }
-        )
-    }
-
-    @Provides
-    @Singleton
-    @LocalPrefs
-    fun provideLocalSettingsDataStore(
-        @ApplicationContext context: Context
-    ): DataStore<Preferences> {
-        return PreferenceDataStoreFactory.create(
-            produceFile = { context.preferencesDataStoreFile("local_settings") }
         )
     }
 

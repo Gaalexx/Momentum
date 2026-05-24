@@ -152,9 +152,8 @@
     <string name="settings_privacy_title">Privacy</string>
     <string name="settings_privacy_account_visibility">Account visibility</string>
     <string name="settings_privacy_recommend_to_contacts">Recommend me to contacts</string>
-    <string name="settings_privacy_allow_add_from_anyone">Allow users who are not in my contacts to add me as a friend</string>
-    <string name="settings_privacy_caution">Caution</string>
-    <string name="settings_privacy_confirm_before_posting">Confirm before posting</string>
+    <string name="settings_friend_requests">Friend requests</string>
+    <string name="settings_themes">Themes</string>
 
     <!-- Settings Premium Screen -->
     <string name="settings_premium_title">Premium </string>
