@@ -192,10 +192,12 @@ fun SendContentScreen(
         }
     }
 
+    val selectFriendMessage = stringResource(R.string.snackbar_select_friend)
+
     fun sendContent() {
         if (selectedFriendIds.isEmpty()) {
             coroutineScope.launch {
-                snackbarHostState.showSnackbar("Выберите хотя бы одного друга")
+                snackbarHostState.showSnackbar(selectFriendMessage)
             }
             return
         }
@@ -222,6 +224,8 @@ fun SendContentScreen(
                     uploadMediaType,
                     size = size,
                     label = caption
+                    //server integration
+                    //,receiverIds = selectedFriendIds.toList()
                 )
             )
         )
@@ -272,26 +276,19 @@ fun SendContentScreen(
                 )
             }
 
+
             if (uploadingState != null) {
                 UploadProgress(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .weight(1.3f)
+                        .fillMaxWidth(),
                     uploadingState = uploadingState
                 )
             } else {
-                Spacer(modifier = Modifier.weight(0.3f))
+                Spacer(modifier = Modifier.weight(1.3f))
             }
 
-            //Spacer(Modifier.weight(0.7f))
 
-
-            if (friendsList.isNotEmpty()) {
-                FriendsToShareRow(
-                    friends = friendsList,
-                    selectedFriendIds = selectedFriendIds,
-                    onToggleFriend = { friendId -> toggleFriendSelection(friendId) }
-                )
-            }
-            Spacer(modifier = Modifier.weight(0.2f))
 
             SendContentBottomControls(
                 onDelete = {
@@ -311,46 +308,129 @@ fun SendContentScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 25.dp)
+                    .weight(1.7f)
             )
 
 
-            Spacer(modifier = Modifier.weight(1f))
-
+            if (friendsList.isNotEmpty()) {
+                FriendsToShareRow(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxSize(),
+                    friends = friendsList,
+                    selectedFriendIds = selectedFriendIds,
+                    onToggleFriend = { friendId -> toggleFriendSelection(friendId) }
+                )
+            } else {
+                Spacer(modifier = Modifier.weight(1f))
+            }
         }
     }
 }
 
 @Composable
 private fun FriendsToShareRow(
+    modifier: Modifier = Modifier,
     friends: List<User>,
     selectedFriendIds: Set<String>,
-    onToggleFriend: (String) -> Unit,
-    modifier: Modifier = Modifier
+    onToggleFriend: (String) -> Unit
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
         Text(
             text = "Поделиться с друзьями (${selectedFriendIds.size}/${friends.size})",
             color = ConstColours.WHITE,
-            fontSize = 12.sp,
-            modifier = Modifier.padding(bottom = 12.dp)
+            fontSize = 12.sp
         )
 
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(friends) { friend ->
-                FriendAvatarItem(
+                FriendAvatarItemAdaptive(
+                    modifier = Modifier.fillMaxSize(),
                     friend = friend,
                     isSelected = selectedFriendIds.contains(friend.id),
                     onClick = { onToggleFriend(friend.id) }
                 )
             }
         }
+    }
+}
+
+
+@Composable
+private fun FriendAvatarItemAdaptive(
+    modifier: Modifier = Modifier,
+    friend: User,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .clickable { onClick() }
+            .aspectRatio(1f)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(CircleShape)
+                .background(
+                    if (isSelected) {
+                        ConstColours.MAIN_BRAND_BLUE
+                    } else {
+                        Color.Gray.copy(alpha = 0.3f)
+                    }
+                )
+                .padding(if (isSelected) 2.dp else 0.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(CircleShape)
+                    .background(
+                        if (isSelected) {
+                            ConstColours.MAIN_BACK_GRAY
+                        } else {
+                            Color.Gray.copy(alpha = 0.3f)
+                        }
+                    )
+            ) {
+                if (friend.avatarUrl != null) {
+                    AsyncImage(
+                        model = friend.avatarUrl,
+                        contentDescription = friend.name,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null,
+                        tint = if (isSelected) {
+                            Color.White.copy(alpha = 0.8f)
+                        } else {
+                            Color.White.copy(alpha = 0.2f)
+                        },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.Center)
+                    )
+                }
+            }
+        }
+
+        Text(
+            text = friend.name ?: friend.email.take(8),
+            color = if (isSelected) ConstColours.MAIN_BRAND_BLUE else Color.White.copy(alpha = 0.5f),
+            fontSize = 10.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(top = 4.dp)
+        )
     }
 }
 
@@ -372,47 +452,44 @@ private fun FriendAvatarItem(
                 .clip(CircleShape)
                 .background(
                     if (isSelected) {
-                        ConstColours.MAIN_BACK_GRAY
+                        ConstColours.MAIN_BRAND_BLUE
                     } else {
                         Color.Gray.copy(alpha = 0.3f)
                     }
                 )
+                .padding(if (isSelected) 2.dp else 0.dp)
         ) {
-            if (friend.avatarUrl != null) {
-                AsyncImage(
-                    model = friend.avatarUrl,
-                    contentDescription = friend.name,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Default.Person,
-                    contentDescription = null,
-                    tint = if (isSelected) {
-                        Color.White.copy(alpha = 0.5f)
-                    } else {
-                        Color.White.copy(alpha = 0.2f)
-                    },
-                    modifier = Modifier
-                        .size(28.dp)
-                        .align(Alignment.Center)
-                )
-            }
-
-            if (isSelected) {
-                Box(
-                    modifier = Modifier
-                        .size(20.dp)
-                        .align(Alignment.TopEnd)
-                        .background(Color.Green, CircleShape)
-                        .padding(4.dp)
-                ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(CircleShape)
+                    .background(
+                        if (isSelected) {
+                            ConstColours.MAIN_BACK_GRAY
+                        } else {
+                            Color.Gray.copy(alpha = 0.3f)
+                        }
+                    )
+            ) {
+                if (friend.avatarUrl != null) {
+                    AsyncImage(
+                        model = friend.avatarUrl,
+                        contentDescription = friend.name,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
                     Icon(
-                        imageVector = Icons.Default.Check,
+                        imageVector = Icons.Default.Person,
                         contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.fillMaxSize()
+                        tint = if (isSelected) {
+                            Color.White.copy(alpha = 0.8f)
+                        } else {
+                            Color.White.copy(alpha = 0.2f)
+                        },
+                        modifier = Modifier
+                            .size(28.dp)
+                            .align(Alignment.Center)
                     )
                 }
             }
@@ -420,7 +497,7 @@ private fun FriendAvatarItem(
 
         Text(
             text = friend.name ?: friend.email.take(8),
-            color = if (isSelected) Color.White else Color.White.copy(alpha = 0.5f),
+            color = if (isSelected) ConstColours.MAIN_BRAND_BLUE else Color.White.copy(alpha = 0.5f),
             fontSize = 10.sp,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,

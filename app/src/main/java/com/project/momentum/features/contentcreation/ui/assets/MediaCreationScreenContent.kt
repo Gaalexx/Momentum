@@ -197,8 +197,7 @@ internal fun MediaCreationContentCompact(
                     onFlipCamera = cameraState::flipCamera,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 25.dp)
-                        .weight(2f),
+                        .weight(1.7f),
                 )
             }
 
@@ -210,8 +209,7 @@ internal fun MediaCreationContentCompact(
                     onStopRecording = onStopAudioRecording,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 25.dp)
-                        .weight(2f),
+                        .weight(1.7f),
                 )
             }
         }
