@@ -280,12 +280,12 @@ fun SendContentScreen(
             if (uploadingState != null) {
                 UploadProgress(
                     modifier = Modifier
-                        .weight(1.3f)
+                        .weight(1f)
                         .fillMaxWidth(),
                     uploadingState = uploadingState
                 )
             } else {
-                Spacer(modifier = Modifier.weight(1.3f))
+                Spacer(modifier = Modifier.weight(1f))
             }
 
 
@@ -315,14 +315,14 @@ fun SendContentScreen(
             if (friendsList.isNotEmpty()) {
                 FriendsToShareRow(
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(1.3f)
                         .fillMaxSize(),
                     friends = friendsList,
                     selectedFriendIds = selectedFriendIds,
                     onToggleFriend = { friendId -> toggleFriendSelection(friendId) }
                 )
             } else {
-                Spacer(modifier = Modifier.weight(1f))
+                Spacer(modifier = Modifier.weight(1.3f))
             }
         }
     }
@@ -339,11 +339,6 @@ private fun FriendsToShareRow(
         modifier = modifier
             .fillMaxWidth()
     ) {
-        Text(
-            text = "Поделиться с друзьями (${selectedFriendIds.size}/${friends.size})",
-            color = ConstColours.WHITE,
-            fontSize = 12.sp
-        )
 
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -372,11 +367,11 @@ private fun FriendAvatarItemAdaptive(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .clickable { onClick() }
-            .aspectRatio(1f)
+
     ) {
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(0.8f)
                 .clip(CircleShape)
                 .background(
                     if (isSelected) {
@@ -385,6 +380,7 @@ private fun FriendAvatarItemAdaptive(
                         Color.Gray.copy(alpha = 0.3f)
                     }
                 )
+                .aspectRatio(1f)
                 .padding(if (isSelected) 2.dp else 0.dp)
         ) {
             Box(
@@ -427,81 +423,9 @@ private fun FriendAvatarItemAdaptive(
             text = friend.name ?: friend.email.take(8),
             color = if (isSelected) ConstColours.MAIN_BRAND_BLUE else Color.White.copy(alpha = 0.5f),
             fontSize = 10.sp,
-            maxLines = 1,
+            maxLines = 2,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 4.dp)
-        )
-    }
-}
-
-@Composable
-private fun FriendAvatarItem(
-    friend: User,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(64.dp)
-            .clickable { onClick() }
-    ) {
-        Box(
-            modifier = Modifier
-                .size(56.dp)
-                .clip(CircleShape)
-                .background(
-                    if (isSelected) {
-                        ConstColours.MAIN_BRAND_BLUE
-                    } else {
-                        Color.Gray.copy(alpha = 0.3f)
-                    }
-                )
-                .padding(if (isSelected) 2.dp else 0.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clip(CircleShape)
-                    .background(
-                        if (isSelected) {
-                            ConstColours.MAIN_BACK_GRAY
-                        } else {
-                            Color.Gray.copy(alpha = 0.3f)
-                        }
-                    )
-            ) {
-                if (friend.avatarUrl != null) {
-                    AsyncImage(
-                        model = friend.avatarUrl,
-                        contentDescription = friend.name,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                        tint = if (isSelected) {
-                            Color.White.copy(alpha = 0.8f)
-                        } else {
-                            Color.White.copy(alpha = 0.2f)
-                        },
-                        modifier = Modifier
-                            .size(28.dp)
-                            .align(Alignment.Center)
-                    )
-                }
-            }
-        }
-
-        Text(
-            text = friend.name ?: friend.email.take(8),
-            color = if (isSelected) ConstColours.MAIN_BRAND_BLUE else Color.White.copy(alpha = 0.5f),
-            fontSize = 10.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 4.dp)
+            modifier = Modifier.padding(top = 2.dp).weight(0.2f)
         )
     }
 }

@@ -182,7 +182,7 @@ internal fun MediaCreationContentCompact(
                 .weight(0.7f),
         )
 
-        Spacer(modifier = Modifier.weight(0.6f))
+        Spacer(modifier = Modifier.weight(0.3f))
 
         when (mode) {
             ContentCreationMode.Camera -> {
@@ -215,7 +215,7 @@ internal fun MediaCreationContentCompact(
         }
         Box(
             modifier = Modifier
-                .weight(1f)
+                .weight(1.3f)
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
