@@ -52,6 +52,7 @@ import com.project.momentum.navigation.viewmodel.AppStartState
 import com.project.momentum.navigation.viewmodel.AppStartViewModel
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.features.offline.ui.NoInternetScreen
+import com.project.momentum.features.settings.ui.HiddenPosts
 
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalAnimationApi::class)
@@ -337,12 +338,26 @@ fun MainScreen(
                     )
                 }
 
+                entry<NavRoutes.HiddenPosts> {
+                    HiddenPosts(
+                        onPostClick = { post ->
+                            openOverlay(NavRoutes.ContentWatch(post = post))
+                            closeAllUntilUpperElement()
+                        },
+                        onBackClick = {
+                            closeOverlay()
+                        },
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+                    )
+                }
+
                 entry<NavRoutes.Settings> {
                     SettingsMainScreen(
                         onBackClick = {
                             closeOverlay()
                         },
-                        onHiddenPosts = { openOverlay(NavRoutes.) },
+                        onHiddenPosts = { openOverlay(NavRoutes.HiddenPosts) },
                         onPremiumClick = {
                             openOverlay(NavRoutes.Premium)
                         },

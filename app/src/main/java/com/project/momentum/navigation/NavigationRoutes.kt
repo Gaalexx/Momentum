@@ -28,6 +28,9 @@ NavRoutes : NavKey {
     data object Gallery : NavRoutes()
 
     @Serializable
+    data object HiddenPosts : NavRoutes()
+
+    @Serializable
     data object Friends : NavRoutes()
 
     @Serializable
