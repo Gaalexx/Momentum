@@ -19,7 +19,9 @@ import javax.inject.Singleton
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class AuthPrefs
-
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ThemePrefs
 @Qualifier
 @Retention(AnnotationRetention.RUNTIME)
 annotation class ApplicationScope
@@ -37,7 +39,16 @@ object DataStoreModule {
             produceFile = { context.preferencesDataStoreFile("auth_prefs") }
         )
     }
-
+    @Provides
+    @Singleton
+    @ThemePrefs
+    fun provideThemeDataStore(
+        @ApplicationContext context: Context
+    ): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.create(
+            produceFile = { context.preferencesDataStoreFile("theme_prefs") }
+        )
+    }
     @Provides
     @Singleton
     @ApplicationScope

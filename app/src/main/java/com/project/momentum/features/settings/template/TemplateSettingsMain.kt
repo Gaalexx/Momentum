@@ -40,7 +40,8 @@ fun SettingsMainScreenPreview() {
             switchesState = SwitchesState(),
             onPremiumClick = {},
             onLogoutClick = {},
-            onDeleteAccountClick = {}
+            onDeleteAccountClick = {},
+            isDefaultTheme = true
         )
     }
 }
@@ -48,12 +49,14 @@ fun SettingsMainScreenPreview() {
 @Composable
 fun TemplateSettingsMain(
     onBackClick: () -> Unit = {},
+    onThemeChange: () -> Unit = {},
     onEvent: (SettingsEvent)-> Unit,
     state: SettingsState?,
     switchesState: SwitchesState,
     onPremiumClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     onDeleteAccountClick: () -> Unit = {},
+    isDefaultTheme: Boolean
 ) {
     if (state == null || state.isLoading) {
         LoadingOverlay()
@@ -141,7 +144,16 @@ fun TemplateSettingsMain(
                 Box(modifier = Modifier.weight(1f)) {
                     MomentumTheme {
                         ThemeCard(
-                            onClick = { onEvent(SettingsEvent.OnDefaultThemeEnabled) }
+                            isSelected = isDefaultTheme,
+                            onClick = {
+//                                if (!switchesState.serverSettingsState.defaultThemeEnabled) {
+//                                    onEvent(SettingsEvent.OnDefaultThemeEnabled)
+//                                    onThemeChange()
+//                                }
+                                if (!isDefaultTheme) {
+                                    onThemeChange()
+                                }
+                            }
                         )
                     }
                 }
@@ -149,7 +161,16 @@ fun TemplateSettingsMain(
 
                     MomentumAndroidSettingsTheme{
                         ThemeCard(
-                            onClick = { onEvent(SettingsEvent.OnDefaultThemeEnabled) }
+                            isSelected = !isDefaultTheme,
+                            onClick = {
+//                                if (switchesState.serverSettingsState.defaultThemeEnabled) {
+//                                    onEvent(SettingsEvent.OnDefaultThemeEnabled)
+//                                    onThemeChange()
+//                                }
+                                if (isDefaultTheme) {
+                                    onThemeChange()
+                                }
+                            }
                         )
                     }
                     MomentumTheme{}

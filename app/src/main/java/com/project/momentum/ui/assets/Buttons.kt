@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Send
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
@@ -1299,18 +1300,44 @@ fun ThemeCard(
         ),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            listOf(circleColor1, circleColor2, circleColor3).forEach { color ->
+            Row(
+                modifier = Modifier.fillMaxSize(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                listOf(circleColor1, circleColor2, circleColor3).forEach { color ->
+                    Box(
+                        modifier = Modifier
+                            .size(30.dp)
+                            .padding(4.dp)
+                            .clip(RoundedCornerShape(50))
+                            .background(color)
+                    )
+                }
+            }
+
+            if (isSelected) {
                 Box(
                     modifier = Modifier
-                        .size(30.dp)
+                        .fillMaxSize()
+                        .border(
+                            width = 3.dp,
+                            color = ConstColours.MAIN_BRAND_BLUE,
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                )
+
+                Icon(
+                    imageVector = Icons.Default.CheckCircle,
+                    contentDescription = "Selected",
+                    tint = ConstColours.MAIN_BRAND_BLUE,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .size(28.dp)
                         .padding(4.dp)
-                        .clip(RoundedCornerShape(50))
-                        .background(color)
                 )
             }
         }
