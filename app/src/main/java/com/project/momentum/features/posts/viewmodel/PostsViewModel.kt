@@ -43,6 +43,7 @@ sealed interface GalleryEvent {
     data class OnShowActionsDialog(val isShowing: Boolean) : GalleryEvent
     data class OnDeletePost(val postId: String) : GalleryEvent
     data class OnHidePost(val postId: String) : GalleryEvent
+    data class OnShowPost(val postId: String) : GalleryEvent
     data class SelectPost(val post: String?) : GalleryEvent
     data class GetSpeechTranscription(val postId: String) : GalleryEvent
 }
@@ -79,8 +80,21 @@ class PostsViewModel @Inject constructor(
             is GalleryEvent.OnShowActionsDialog -> showActionsDialogChange(event)
             is GalleryEvent.OnDeletePost -> deletePost(event)
             is GalleryEvent.OnHidePost -> hidePost(event)
+            is GalleryEvent.OnShowPost -> showPost(event)
             is GalleryEvent.SelectPost -> selectPost(event)
             is GalleryEvent.GetSpeechTranscription -> getSpeechTranscription(event)
+        }
+    }
+
+    fun onWatchPhotoEvent(event: WatchPhotoEvent) {
+        when (event) {
+            is WatchPhotoEvent.OnShowReactionDialogEvent -> showReactionDialogChange(event)
+            is WatchPhotoEvent.OnReactionClick -> try {
+                onReactionClick(event)
+            } catch (e: Exception) {
+                Log.e("PostsViewModel", "Error on reaction click ${e.message ?: ""}", e)
+                //TODO: notice user about error
+            }
         }
     }
 
@@ -142,18 +156,6 @@ class PostsViewModel @Inject constructor(
         }
     }
 
-    fun onWatchPhotoEvent(event: WatchPhotoEvent) {
-        when (event) {
-            is WatchPhotoEvent.OnShowReactionDialogEvent -> showReactionDialogChange(event)
-            is WatchPhotoEvent.OnReactionClick -> try {
-                onReactionClick(event)
-            } catch (e: Exception) {
-                Log.e("PostsViewModel", "Error on reaction click ${e.message ?: ""}", e)
-                //TODO: notice user about error
-            }
-        }
-    }
-
     private fun deletePost(event: GalleryEvent.OnDeletePost) {
         val oldState = state.value
 
@@ -187,6 +189,25 @@ class PostsViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 Log.e("PostsViewModel", "Error hiding post ${e.message ?: ""}", e)
+                _state.update { oldState }
+            }
+        }
+    }
+
+    private fun showPost(event: GalleryEvent.OnShowPost) {
+        val oldState = state.value
+
+        _state.update {
+            it.copy(hiddenPosts = it.hiddenPosts - event.postId)
+        }
+
+        viewModelScope.launch {
+            try {
+                if (!repo.showPost(event.postId)) {
+                    _state.update { oldState }
+                }
+            } catch (e: Exception) {
+                Log.e("PostsViewModel", "Error showing post ${e.message ?: ""}", e)
                 _state.update { oldState }
             }
         }

@@ -13,7 +13,7 @@ import com.project.momentum.features.account.ui.AccountScreen
 import com.project.momentum.features.account.viewmodel.AccountInfoState
 import com.project.momentum.features.posts.viewmodel.GalleryEvent
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
-import com.project.momentum.ui.assets.PostDialogInfo
+import com.project.momentum.ui.assets.DialogInfo
 
 @Composable
 fun FriendAccountRoot(
@@ -44,7 +44,7 @@ fun FriendAccountRoot(
             postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
             postsViewModel.onEvent(GalleryEvent.SelectPost(post))
         },
-        postDialogInfo = PostDialogInfo(
+        postDialogInfo = DialogInfo.PostDialogInfo(
             onHidePost = {
                 postsViewModel.onEvent(GalleryEvent.OnHidePost(uiState.selectedPost ?: throw Exception("FriendsAccountScreen:OnHidePost: Selected post is null")))
                 postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))

@@ -8,12 +8,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.HideImage
+import androidx.compose.material.icons.outlined.RemoveRedEye
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import com.project.momentum.R
 import com.project.momentum.ui.assets.DialogEventButton
-import com.project.momentum.ui.assets.PostDialogInfo
 import com.project.momentum.ui.theme.ConstColours
 
 @Composable
@@ -41,5 +41,23 @@ fun PostDialogContent(
                 textColor = ConstColours.DELETE
             )
         }
+    }
+}
+
+@Composable
+fun ShowDialogContent(
+    onShowPost: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .clip(RoundedCornerShape(10))
+            .background(ConstColours.MAIN_BACK_GRAY)
+            .width(IntrinsicSize.Max),
+    ) {
+        DialogEventButton(
+            text = R.string.button_show_post_for_me,
+            icon = Icons.Outlined.RemoveRedEye,
+            onClick = onShowPost
+        )
     }
 }

@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,8 +18,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.HideImage
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -38,6 +35,7 @@ import coil.compose.SubcomposeAsyncImage
 import com.project.momentum.R
 import com.project.momentum.features.account.models.PostData
 import com.project.momentum.features.posts.features.reactions.ui.PostDialogContent
+import com.project.momentum.features.posts.features.reactions.ui.ShowDialogContent
 import com.project.momentum.network.s3.MediaType
 import com.project.momentum.ui.custom.gradientpicker.GradientPicker
 import com.project.momentum.ui.custom.shapes.ScallopedShape
@@ -131,12 +129,24 @@ sealed class GridItem {
     data object PlusButton : GridItem()
 }
 
-data class PostDialogInfo(
-    val onHidePost: () -> Unit = {},
-    val onDeletePost: () -> Unit = {},
-    val isShowingActionsDialog: Boolean = false,
-    val selectedPost: String? = null,
-)
+sealed class DialogInfo(
+    open val isShowingActionsDialog: Boolean = false,
+    open val selectedPost: String? = null
+) {
+
+    data class PostDialogInfo(
+        override val isShowingActionsDialog: Boolean = false,
+        override val selectedPost: String? = null,
+        val onHidePost: () -> Unit = {},
+        val onDeletePost: () -> Unit = {},
+    ): DialogInfo(false, null)
+
+    data class Hidden(
+        override val isShowingActionsDialog: Boolean = false,
+        override val selectedPost: String? = null,
+        val onShowPost: () -> Unit = {}
+    ): DialogInfo(false, null)
+}
 
 
 @Composable
@@ -144,7 +154,7 @@ fun S3PhotoGrid(
     posts: List<PostData>,
     onPostClick: (Int) -> Unit,
     onLongPostClick: (String?) -> Unit,
-    postDialogInfo: PostDialogInfo,
+    postDialogInfo: DialogInfo,
     onAddPhotoClick: () -> Unit,
     modifier: Modifier = Modifier,
     showPlusButton: Boolean = true,
@@ -333,11 +343,16 @@ fun S3PhotoGrid(
         Dialog(
             onDismissRequest = { onLongPostClick(null) }
         ) {
-            PostDialogContent(
-                isOwner = posts.first{ post -> post.id == postDialogInfo.selectedPost}.isOwner,
-                onHidePost = postDialogInfo.onHidePost,
-                onDeletePost = postDialogInfo.onDeletePost,
-            )
+            when(postDialogInfo) {
+                is DialogInfo.PostDialogInfo -> PostDialogContent(
+                    isOwner = posts.first{ post -> post.id == postDialogInfo.selectedPost}.isOwner,
+                    onHidePost = postDialogInfo.onHidePost,
+                    onDeletePost = postDialogInfo.onDeletePost,
+                )
+                is DialogInfo.Hidden -> ShowDialogContent(
+                    onShowPost = postDialogInfo.onShowPost
+                )
+            }
         }
     }
 }

@@ -28,6 +28,9 @@ NavRoutes : NavKey {
     data object Gallery : NavRoutes()
 
     @Serializable
+    data object HiddenPosts : NavRoutes()
+
+    @Serializable
     data object Friends : NavRoutes()
 
     @Serializable
@@ -84,6 +87,11 @@ NavRoutes : NavKey {
     data class PreviewPhoto(
         val post: Int,
         val userId: String? = null
+    ) : NavRoutes()
+
+    @Serializable
+    data class PreviewHiddenPhoto(
+        val post: Int,
     ) : NavRoutes()
 
     @Serializable
