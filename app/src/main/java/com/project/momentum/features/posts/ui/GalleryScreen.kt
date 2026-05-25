@@ -54,38 +54,32 @@ fun GalleryScreen(
         modifier = modifier,
         posts = posts,
         isRefreshing = uiState.isRefreshing,
-        onRefresh = remember { { viewModel.onEvent(GalleryEvent.OnRefreshPosts) } },
+        onRefresh = { viewModel.onEvent(GalleryEvent.OnRefreshPosts) },
         onPostClick = onPostClick,
-        onLongPostClick = remember {
-            { post ->
-                viewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
-                viewModel.onEvent(GalleryEvent.SelectPost(post))
-            }
+        onLongPostClick = { post ->
+            viewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
+            viewModel.onEvent(GalleryEvent.SelectPost(post))
         },
         postDialogInfo = DialogInfo.PostDialogInfo(
-            onHidePost = remember {
-                {
-                    viewModel.onEvent(
-                        GalleryEvent.OnHidePost(
-                            uiState.selectedPost
-                                ?: throw Exception("GalleryScreenContent:OnHidePost: Selected post is null")
-                        )
+            onHidePost = {
+                viewModel.onEvent(
+                    GalleryEvent.OnHidePost(
+                        uiState.selectedPost
+                            ?: throw Exception("GalleryScreenContent:OnHidePost: Selected post is null")
                     )
-                    viewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
-                    viewModel.onEvent(GalleryEvent.SelectPost(null))
-                }
+                )
+                viewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
+                viewModel.onEvent(GalleryEvent.SelectPost(null))
             },
-            onDeletePost = remember {
-                {
-                    viewModel.onEvent(
-                        GalleryEvent.OnDeletePost(
-                            uiState.selectedPost
-                                ?: throw Exception("GalleryScreenContent:OnDeletePost: Selected post is null")
-                        )
+            onDeletePost = {
+                viewModel.onEvent(
+                    GalleryEvent.OnDeletePost(
+                        uiState.selectedPost
+                            ?: throw Exception("GalleryScreenContent:OnDeletePost: Selected post is null")
                     )
-                    viewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
-                    viewModel.onEvent(GalleryEvent.SelectPost(null))
-                }
+                )
+                viewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
+                viewModel.onEvent(GalleryEvent.SelectPost(null))
             },
             isShowingActionsDialog = uiState.isShowingActionsDialog,
             selectedPost = uiState.selectedPost
