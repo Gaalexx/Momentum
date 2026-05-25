@@ -47,7 +47,6 @@ import com.project.momentum.features.posts.ui.GalleryScreen
 import com.project.momentum.features.posts.ui.WatchPhotoScreenRoute
 import com.project.momentum.features.posts.ui.WatchPhotoScreenRouteForMain
 import com.project.momentum.features.settings.ui.DeleteAccountCheckCodeScreen
-import com.project.momentum.features.settings.ui.DeleteAccountCheckPasswordScreen
 import com.project.momentum.features.settings.ui.SettingsMainScreen
 import com.project.momentum.features.settings.ui.SettingsPremiumScreen
 import com.project.momentum.navigation.viewmodel.AppStartState
@@ -395,7 +394,7 @@ fun MainScreen(
                             setBase(NavRoutes.RegistrationLogin)
                         },
                         onDeleteAccountClick = {
-                            openOverlay(NavRoutes.DeleteAccountCheckPassword)
+                            openOverlay(NavRoutes.DeleteAccountCheckCode)
                         },
                         appStartViewModel = appStartViewModel,
                         isDefaultTheme = isDefaultTheme
@@ -531,16 +530,6 @@ fun MainScreen(
 
                 }
 
-                entry<NavRoutes.DeleteAccountCheckPassword> {
-                    DeleteAccountCheckPasswordScreen(
-                        onBackClick = {
-                            closeOverlay()
-                        },
-                        onContinueClick = {
-                            openOverlay(NavRoutes.DeleteAccountCheckCode)
-                        }
-                    )
-                }
 
                 entry<NavRoutes.DeleteAccountCheckCode> {
                     DeleteAccountCheckCodeScreen(
@@ -549,16 +538,9 @@ fun MainScreen(
                         },
                         onContinueClick = {
                             val toRemove = backStack.filter {
-                                it is NavRoutes.DeleteAccountCheckPassword ||
-                                        it is NavRoutes.DeleteAccountCheckCode
+                                it is NavRoutes.DeleteAccountCheckCode
                             }
                             toRemove.forEach { backStack.remove(it) }
-
-//                            appStartViewModel.logout()
-//
-//                            backStack.clear()
-//
-//                            setBase(NavRoutes.RegistrationLogin)
                             appStartViewModel.endSession()
                             backStack.clear()
                             setBase(NavRoutes.RegistrationLogin)

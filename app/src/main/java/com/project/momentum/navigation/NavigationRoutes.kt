@@ -36,10 +36,6 @@ NavRoutes : NavKey {
     @Serializable
     data object Premium : NavRoutes()
 
-
-    @Serializable
-    data object DeleteAccountCheckPassword : NavRoutes()
-
     @Serializable
     data object DeleteAccountCheckCode : NavRoutes()
 
