@@ -17,9 +17,8 @@ data class PostInformation(
     val mediaType: MediaType,
     val size: Long,
     val durationMs: Long? = null,
-    val label: String? = null
-    //server integration
-    //,val receiverIds: List<String> = emptyList()
+    val label: String? = null,
+    val receiverIds: List<String> = emptyList()
 )
 
 @Singleton
@@ -57,9 +56,8 @@ class S3InteractionRepository @Inject constructor(
                 S3UpdateStatusDTO(
                     UploadingStatus.READY,
                     presignedURLDTO.mediaId,
-                    postInfo.label
-                    //server integration
-                    //,postInfo.receiverIds
+                    postInfo.label,
+                    postInfo.receiverIds
                 )
             )
 
