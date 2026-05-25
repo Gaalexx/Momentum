@@ -151,7 +151,7 @@ fun CameraContentPager(
                             },
                             onGoToGallery = onGoToGallery,
                             postIndex = currentPost,
-                            postsState.value.posts[currentPost].userId,
+                            userId = postsState.value.posts[currentPost].userId,
                             sharedTransitionScope = sharedTransitionScope,
                             animatedVisibilityScope = animatedVisibilityScope
                         )

@@ -130,16 +130,20 @@ sealed class GridItem {
 }
 
 sealed class DialogInfo(
-    val isShowingActionsDialog: Boolean = false,
-    val selectedPost: String? = null
+    open val isShowingActionsDialog: Boolean = false,
+    open val selectedPost: String? = null
 ) {
 
     data class PostDialogInfo(
+        override val isShowingActionsDialog: Boolean = false,
+        override val selectedPost: String? = null,
         val onHidePost: () -> Unit = {},
         val onDeletePost: () -> Unit = {},
     ): DialogInfo(false, null)
 
     data class Hidden(
+        override val isShowingActionsDialog: Boolean = false,
+        override val selectedPost: String? = null,
         val onShowPost: () -> Unit = {}
     ): DialogInfo(false, null)
 }
@@ -346,11 +350,9 @@ fun S3PhotoGrid(
                     onDeletePost = postDialogInfo.onDeletePost,
                 )
                 is DialogInfo.Hidden -> ShowDialogContent(
-                    isOwner = posts.first{ post -> post.id == postDialogInfo.selectedPost}.isOwner,
                     onShowPost = postDialogInfo.onShowPost
                 )
             }
-
         }
     }
 }

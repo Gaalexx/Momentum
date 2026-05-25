@@ -90,5 +90,10 @@ NavRoutes : NavKey {
     ) : NavRoutes()
 
     @Serializable
+    data class PreviewHiddenPhoto(
+        val post: Int,
+    ) : NavRoutes()
+
+    @Serializable
     data class SendPhoto(val uri: String, val mediaTypeToSend: MediaTypeToSend) : NavRoutes()
 }

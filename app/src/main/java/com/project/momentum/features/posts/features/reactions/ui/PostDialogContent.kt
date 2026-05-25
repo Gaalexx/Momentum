@@ -47,7 +47,6 @@ fun PostDialogContent(
 @Composable
 fun ShowDialogContent(
     onShowPost: () -> Unit,
-    isOwner: Boolean,
 ) {
     Column(
         modifier = Modifier

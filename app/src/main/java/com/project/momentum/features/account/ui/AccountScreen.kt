@@ -351,7 +351,7 @@ private fun AccountScreenPreview() {
         AccountScreen(
             onPostClick = {},
             onLongPostClick = {},
-            postDialogInfo = PostDialogInfo(),
+            postDialogInfo = DialogInfo.PostDialogInfo(),
             onEditClick = {},
             onBackClick = {},
             addButtonActions = AddButtonActions(),

@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -120,11 +121,11 @@ fun ReactionButtonWithCounter(
 
 @Composable
 fun ReactionsDialog(
-    isOwner: Boolean,
-    onHidePost: () -> Unit,
-    onDeletePost: () -> Unit,
+//    isOwner: Boolean,
+//    onHidePost: () -> Unit,
+//    onDeletePost: () -> Unit,
     onReactionClick: (ReactionType) -> Unit,
-
+    content: @Composable (() -> Unit)
 ) {
     var isExpanded by rememberSaveable { mutableStateOf(false) }
 
@@ -154,14 +155,14 @@ fun ReactionsDialog(
                             ReactionButton(
                                 emoji = reaction.emoji,
                                 size = itemApproxWidth,
-                                onClick = { onReactionClick(reaction) }
+                                onClick = remember(reaction.serverKey) { { onReactionClick(reaction) } }
                             )
                         }
                         Box(
                             modifier = Modifier
                                 .width(itemApproxWidth)
                                 .aspectRatio(1f)
-                                .clickable(onClick = { isExpanded = true }), // TODO открыть расширенный список эмодзи
+                                .clickable(onClick = remember { { isExpanded = true } }), // TODO открыть расширенный список эмодзи
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
@@ -175,7 +176,7 @@ fun ReactionsDialog(
                             ReactionButton(
                                 emoji = reaction.emoji,
                                 size = itemApproxWidth,
-                                onClick = { onReactionClick(reaction) }
+                                onClick = remember(reaction.serverKey) { { onReactionClick(reaction) } }
                             )
                         }
 
@@ -198,7 +199,7 @@ fun ReactionsDialog(
                         ReactionButton(
                             emoji = it.emoji,
                             size = itemApproxWidth,
-                            onClick = { onReactionClick(it) }
+                            onClick = remember(it.serverKey) { { onReactionClick(it) } }
                         )
                     }
                 }
@@ -206,11 +207,12 @@ fun ReactionsDialog(
         }
 
         if (!isExpanded) {
-            PostDialogContent(
-                onHidePost = onHidePost,
-                onDeletePost = onDeletePost,
-                isOwner = isOwner
-            )
+            content()
+//            PostDialogContent(
+//                onHidePost = onHidePost,
+//                onDeletePost = onDeletePost,
+//                isOwner = isOwner
+//            )
         }
     }
 }
@@ -237,9 +239,11 @@ fun ReactionsRow(
             ReactionButtonWithCounter(
                 emoji = it.emoji,
                 counter = it.users.size,
-                modifier = Modifier.width(60.dp).fillMaxHeight(),
+                modifier = Modifier
+                    .width(60.dp)
+                    .fillMaxHeight(),
                 isActive = curUser in it.users,
-                onClick = { onReactionClick(it.emoji) }
+                onClick = remember(it.emoji.serverKey) { { onReactionClick(it.emoji) } }
             )
         }
     }
@@ -250,11 +254,17 @@ fun ReactionsRow(
 private fun ReactionsDialogPreview() {
     MomentumTheme {
         ReactionsDialog(
-            isOwner = true,
+//            isOwner = true,
             onReactionClick = { _ -> },
-            onHidePost = {},
-            onDeletePost = {},
-        )
+//            onHidePost = {},
+//            onDeletePost = {},
+        ) {
+            PostDialogContent(
+                isOwner = true,
+                onHidePost = {},
+                onDeletePost = {},
+            )
+        }
     }
 }
 
