@@ -40,7 +40,7 @@
     <string name="button_import_media_from_device">Загрузить медиа с устройства</string>
     <string name="account_online_status">В сети</string>
     <string name="account_offline_status">Не в сети</string>
-    <string name="account_my_publications">Мои публикации</string>
+    <string name="account_my_publications">Публикации</string>
     <string name="account_avatar">Аватар</string>
     <string name="userName">userName</string>
 
@@ -154,6 +154,7 @@
     <string name="settings_privacy_recommend_to_contacts">Рекомендовать меня контактам</string>
     <string name="settings_friend_requests">Запросы в друзья</string>
     <string name="settings_themes">Темы</string>
+    <string name="settings_hidden_posts">Скрытые посты</string>
 
 
     <!-- Settings Premium Screen -->
@@ -207,6 +208,9 @@
     <string name="no_posts_yet">Здесь пока нет постов</string>
     <string name="button_delete_post">Удалить пост</string>
     <string name="button_hide_post_for_me">Скрыть пост для меня</string>
+    <string name="button_show_post_for_me">Показать пост</string>
     <string name="transcripting_error">Ошибка транскрипции</string>
     <string name="transcription">Расшифровка голоса</string>
+
+    <string name="snackbar_select_friend">Выберите хотя бы одного друга</string>
 </resources>

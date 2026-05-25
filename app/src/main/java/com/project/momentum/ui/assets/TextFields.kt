@@ -98,7 +98,7 @@ fun GlassTextField(
     placeholder: String? = null,
     isError: Boolean = false,
     errorText: String? = null,
-    textColor: Color = Color.White,
+    textColor: Color = ConstColours.WHITE,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -109,8 +109,8 @@ fun GlassTextField(
 
     val glassGradient = Brush.linearGradient(
         colors = listOf(
-            Color.White.copy(alpha = 0.55f),
-            Color.White.copy(alpha = 0.1f)
+            textColor.copy(alpha = 0.55f),
+            textColor.copy(alpha = 0.1f)
         )
     )
 
@@ -166,10 +166,9 @@ fun GlassTextField(
                             )
 
                             drawRoundRect(
-                                color = ConstColours.BLACK.copy(alpha = 0.2f),
+                                color = textColor.copy(alpha = 0.15f),
                                 cornerRadius = radius,
                                 style = Stroke(width = 1.5.dp.toPx()),
-//                                alpha = 0.5f
                             )
                         }
                         .border(

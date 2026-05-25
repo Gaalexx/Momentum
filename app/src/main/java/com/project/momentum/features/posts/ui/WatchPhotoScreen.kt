@@ -85,9 +85,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
+import com.project.momentum.features.posts.features.reactions.ui.PostDialogContent
+import com.project.momentum.features.posts.features.reactions.ui.ShowDialogContent
 import com.project.momentum.features.posts.viewmodel.GalleryEvent
 import com.project.momentum.features.posts.viewmodel.PostsState
 import com.project.momentum.ui.assets.ContinueButtonAdaptive
+import com.project.momentum.ui.assets.DialogInfo
 import com.project.momentum.ui.assets.VideoView
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.ui.theme.AppTextStyles
@@ -230,16 +233,30 @@ fun WatchPhotoScreenRoute(
         onGoToSettings = onGoToSettings,
         onGoToFriends = onGoToFriends,
 
-        onHidePost = { postId ->
-            postsViewModel.onEvent(GalleryEvent.OnHidePost(postId))
-            postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
-            postsViewModel.onEvent(GalleryEvent.SelectPost(null))
-        },
-        onDeletePost = { postId ->
-            postsViewModel.onEvent(GalleryEvent.OnDeletePost(postId))
-            postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
-            postsViewModel.onEvent(GalleryEvent.SelectPost(null))
-        },
+        postDialogInfo = DialogInfo.PostDialogInfo(
+            onHidePost = {
+                postsViewModel.onEvent(
+                    GalleryEvent.OnHidePost(
+                        uiState.selectedPost
+                            ?: throw Exception("GalleryScreenContent:OnHidePost: Selected post is null")
+                    )
+                )
+                postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
+                postsViewModel.onEvent(GalleryEvent.SelectPost(null))
+            },
+            onDeletePost = {
+                postsViewModel.onEvent(
+                    GalleryEvent.OnDeletePost(
+                        uiState.selectedPost
+                            ?: throw Exception("GalleryScreenContent:OnDeletePost: Selected post is null")
+                    )
+                )
+                postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
+                postsViewModel.onEvent(GalleryEvent.SelectPost(null))
+            },
+            isShowingActionsDialog = uiState.isShowingActionsDialog,
+            selectedPost = uiState.selectedPost
+        ),
 
         onShowReactionDialog = {
             postsViewModel.onWatchPhotoEvent(
@@ -270,13 +287,12 @@ fun WatchPhotoScreenFull(
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
     onTranscript: (String) -> Unit,
-    onHidePost: (String) -> Unit,
-    onDeletePost: (String) -> Unit,
 
-    onShowReactionDialog: () -> Unit,
+    postDialogInfo: DialogInfo,
+
+    onShowReactionDialog: (String?) -> Unit,
     onReactionClick: (String, ReactionType) -> Unit,
     postIndex: Int,
-    userId: String? = null,
     uiState: PostsState,
     posts: List<PostData>,
     sharedTransitionScope: SharedTransitionScope? = null,
@@ -307,14 +323,11 @@ fun WatchPhotoScreenFull(
                 onReactionClick = onReactionClick,
                 onGoToTakePhoto = onGoToTakePhoto,
                 onGoToGallery = onGoToGallery,
-
-                onHidePost = onHidePost,
-                onDeletePost = onDeletePost,
                 onTranscript = onTranscript,
+                postDialogInfo = postDialogInfo,
                 postIndex = postIndex,
                 posts = posts,
                 currentUserId = uiState.currentUserId,
-                isShowingReactionsDialog = uiState.isShowingActionsDialog,
                 sharedTransitionScope = sharedTransitionScope,
                 animatedVisibilityScope = animatedVisibilityScope
             )
@@ -339,10 +352,11 @@ fun WatchPhotoScreenRouteForMain(
     val posts by postsViewModel.getShownPostsFlow().collectAsStateWithLifecycle()
 
     WatchPhotoScreen(
-        onShowReactionDialog = {
+        onShowReactionDialog = { postId ->
             postsViewModel.onWatchPhotoEvent(
                 WatchPhotoEvent.OnShowReactionDialogEvent(!uiState.isShowingActionsDialog)
             )
+            postsViewModel.onEvent(GalleryEvent.SelectPost(postId))
         },
         onReactionClick = { postId, reaction ->
             postsViewModel.onWatchPhotoEvent(
@@ -351,24 +365,36 @@ fun WatchPhotoScreenRouteForMain(
         },
         onGoToTakePhoto = onGoToTakePhoto,
         onGoToGallery = onGoToGallery,
-
-        onHidePost = { postId ->
-            postsViewModel.onEvent(GalleryEvent.OnHidePost(postId))
-            postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
-            postsViewModel.onEvent(GalleryEvent.SelectPost(null))
-        },
-        onDeletePost = { postId ->
-            postsViewModel.onEvent(GalleryEvent.OnDeletePost(postId))
-            postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
-            postsViewModel.onEvent(GalleryEvent.SelectPost(null))
-        },
+        postDialogInfo = DialogInfo.PostDialogInfo(
+            onHidePost = {
+                postsViewModel.onEvent(
+                    GalleryEvent.OnHidePost(
+                        uiState.selectedPost
+                            ?: throw Exception("GalleryScreenContent:OnHidePost: Selected post is null")
+                    )
+                )
+                postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
+                postsViewModel.onEvent(GalleryEvent.SelectPost(null))
+            },
+            onDeletePost = {
+                postsViewModel.onEvent(
+                    GalleryEvent.OnDeletePost(
+                        uiState.selectedPost
+                            ?: throw Exception("GalleryScreenContent:OnDeletePost: Selected post is null")
+                    )
+                )
+                postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
+                postsViewModel.onEvent(GalleryEvent.SelectPost(null))
+            },
+            isShowingActionsDialog = uiState.isShowingActionsDialog,
+            selectedPost = uiState.selectedPost
+        ),
         onTranscript = { postId ->
             postsViewModel.onEvent(GalleryEvent.GetSpeechTranscription(postId))
         },
         postIndex = postIndex,
         posts = posts,
         currentUserId = uiState.currentUserId,
-        isShowingReactionsDialog = uiState.isShowingActionsDialog,
         sharedTransitionScope = sharedTransitionScope,
         animatedVisibilityScope = animatedVisibilityScope
     )
@@ -376,17 +402,15 @@ fun WatchPhotoScreenRouteForMain(
 
 @Composable
 fun WatchPhotoScreen(
-    onShowReactionDialog: () -> Unit,
+    onShowReactionDialog: (String?) -> Unit,
     onReactionClick: (String, ReactionType) -> Unit,
     onGoToTakePhoto: () -> Unit,
     onGoToGallery: () -> Unit,
-    onHidePost: (String) -> Unit,
-    onDeletePost: (String) -> Unit,
+    postDialogInfo: DialogInfo,
     onTranscript: (String) -> Unit,
     postIndex: Int,
     currentUserId: String,
     posts: List<PostData>,
-    isShowingReactionsDialog: Boolean,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
 ) {
@@ -429,7 +453,6 @@ fun WatchPhotoScreen(
                 state = pagerState,
                 userScrollEnabled = !isEditable,
                 modifier = Modifier
-//                    .fillMaxWidth()
                     .heightIn(max = screenHeight * 0.5f)
                     .aspectRatio(1f)
             ) { pageIndex ->
@@ -460,7 +483,7 @@ fun WatchPhotoScreen(
                                 .aspectRatio(1f)
                                 .clip(RoundedCornerShape(60.dp))
                                 .background(ConstColours.MAIN_BACK_GRAY)
-                                .clickable { onShowReactionDialog() }
+                                .clickable { onShowReactionDialog(post.id) }
                         ) {
                             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
@@ -492,7 +515,7 @@ fun WatchPhotoScreen(
                                 .fillMaxWidth()
                                 .aspectRatio(1f)
                                 .combinedClickable(
-                                    onClick = { onShowReactionDialog() },
+                                    onClick = { onShowReactionDialog(post.id) },
                                     onLongClick = {
                                         isEditable = !isEditable
                                         if (!isEditable) {
@@ -544,7 +567,7 @@ fun WatchPhotoScreen(
                                 .fillMaxWidth()
                                 .aspectRatio(1f)
                                 .combinedClickable(
-                                    onClick = { onShowReactionDialog() },
+                                    onClick = { onShowReactionDialog(post.id) },
                                     onLongClick = {
                                         isEditable = !isEditable
                                         if (!isEditable) {
@@ -643,19 +666,27 @@ fun WatchPhotoScreen(
                         )
                     }
 
-                    if (isShowingReactionsDialog) {
+                    if (postDialogInfo.isShowingActionsDialog) {
                         Dialog(
-                            onDismissRequest = { onShowReactionDialog() }
+                            onDismissRequest = { onShowReactionDialog(null) }
                         ) {
                             ReactionsDialog(
                                 onReactionClick = { reaction ->
                                     onReactionClick(post.id, reaction)
-                                    onShowReactionDialog()
+                                    onShowReactionDialog(null)
                                 },
-                                onHidePost = { onHidePost(post.id) },
-                                onDeletePost = { onDeletePost(post.id) },
-                                isOwner = post.isOwner,
-                            )
+                            ) {
+                                when(postDialogInfo) {
+                                    is DialogInfo.PostDialogInfo -> PostDialogContent(
+                                        isOwner = post.isOwner,
+                                        onHidePost = postDialogInfo.onHidePost,
+                                        onDeletePost = postDialogInfo.onDeletePost,
+                                    )
+                                    is DialogInfo.Hidden -> ShowDialogContent(
+                                        onShowPost = postDialogInfo.onShowPost
+                                    )
+                                }
+                            }
                         }
                     }
 
@@ -716,7 +747,7 @@ fun WatchPhotoScreen(
                     IconButton(
                         onClick = {
                             if (!isEditable) {
-                                onShowReactionDialog()
+                                onShowReactionDialog(null)
                             }
                         },
                         modifier = Modifier.size(dimensionResource(R.dimen.sub_button_size))
@@ -792,8 +823,7 @@ private fun WatchPhotoScreenPreview() {
             onGoToSettings = {},
             onProfileClick = {},
             onGoToFriends = {},
-            onHidePost = {},
-            onDeletePost = {},
+            postDialogInfo = DialogInfo.PostDialogInfo(),
             onTranscript = { _ -> },
             postIndex = 0,
             posts = listOf(

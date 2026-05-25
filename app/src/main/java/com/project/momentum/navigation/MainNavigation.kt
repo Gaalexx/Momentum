@@ -55,6 +55,8 @@ import com.project.momentum.navigation.viewmodel.AppStartViewModel
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.features.offline.ui.NoInternetScreen
 import com.project.momentum.ui.theme.ThemeManager
+import com.project.momentum.features.posts.ui.WatchHiddenPhotoScreenRoute
+import com.project.momentum.features.settings.ui.HiddenPosts
 
 
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalAnimationApi::class)
@@ -342,6 +344,40 @@ fun MainScreen(
                     )
                 }
 
+                entry<NavRoutes.HiddenPosts> {
+                    HiddenPosts(
+                        onPostClick = { post ->
+                            openOverlay(NavRoutes.PreviewHiddenPhoto(post = post))
+                        },
+                        onBackClick = {
+                            closeOverlay()
+                        },
+                        sharedTransitionScope = sharedTransitionScope,
+                        animatedVisibilityScope = LocalNavAnimatedContentScope.current,
+                    )
+                }
+
+                entry<NavRoutes.PreviewHiddenPhoto> { route ->
+                    WatchHiddenPhotoScreenRoute(
+                        onGoToTakePhoto = {
+                            openOverlay(NavRoutes.Camera)
+                        },
+                        onGoToGallery = {
+                            closeOverlay()
+                        },
+                        onGoToSettings = {
+                            openOverlay(NavRoutes.Settings(currentBackTo()))
+                        },
+                        onProfileClick = {
+                            openOverlay(NavRoutes.Account(currentBackTo()))
+                        },
+                        onGoToFriends = {
+                            openOverlay(NavRoutes.Friends)
+                        },
+                        postIndex = route.post,
+                    )
+                }
+
                 entry<NavRoutes.Settings> {
                     val isDefaultTheme by themeManager.isDefaultTheme.collectAsState()
                     SettingsMainScreen(
@@ -349,6 +385,7 @@ fun MainScreen(
                             closeOverlay()
                         },
                         onThemeChange = {themeManager.toggleTheme()},
+                        onHiddenPosts = { openOverlay(NavRoutes.HiddenPosts) },
                         onPremiumClick = {
                             openOverlay(NavRoutes.Premium)
                         },

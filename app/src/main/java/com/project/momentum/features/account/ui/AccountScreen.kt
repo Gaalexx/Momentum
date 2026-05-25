@@ -62,8 +62,8 @@ import com.project.momentum.features.posts.viewmodel.GalleryEvent
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
 import com.project.momentum.network.s3.MediaType
 import com.project.momentum.ui.assets.BackCircleButton
+import com.project.momentum.ui.assets.DialogInfo
 import com.project.momentum.ui.assets.EditCircleButton
-import com.project.momentum.ui.assets.PostDialogInfo
 import com.project.momentum.ui.assets.S3PhotoGrid
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
@@ -148,7 +148,7 @@ fun AccountRoot(
             postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
             postsViewModel.onEvent(GalleryEvent.SelectPost(post))
         },
-        postDialogInfo = PostDialogInfo(
+        postDialogInfo = DialogInfo.PostDialogInfo(
             onHidePost = {
                 postsViewModel.onEvent(GalleryEvent.OnHidePost(uiState.selectedPost ?: throw Exception("AccountScreen:OnHidePost: Selected post is null")))
                 postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
@@ -174,7 +174,7 @@ fun AccountScreen(
     posts: List<PostData>,
     onPostClick: (Int) -> Unit,
     onLongPostClick: (String?) -> Unit,
-    postDialogInfo: PostDialogInfo,
+    postDialogInfo: DialogInfo.PostDialogInfo,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     addButtonActions: AddButtonActions? = null,
@@ -307,35 +307,6 @@ fun AccountScreen(
                 modifier = nameModifier
             )
 
-            Spacer(Modifier.height(dimensionResource(R.dimen.extra_small_padding)))
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                if (userStatus == stringResource(R.string.account_online_status)) {
-                    Box(                         // пока у нас не определяется статус онлайн на бэке, будет такое :)
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(Color.Green)
-                    )
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(Color.Gray)
-                    )
-                }
-
-                Spacer(Modifier.width(dimensionResource(R.dimen.small_padding)))
-                Text(
-                    text = userStatus,
-                    color = Color(0xFFA0A0A0),
-                    fontSize = 16.sp
-                )
-            }
         }
 
         Spacer(Modifier.height(32.dp))
@@ -380,7 +351,7 @@ private fun AccountScreenPreview() {
         AccountScreen(
             onPostClick = {},
             onLongPostClick = {},
-            postDialogInfo = PostDialogInfo(),
+            postDialogInfo = DialogInfo.PostDialogInfo(),
             onEditClick = {},
             onBackClick = {},
             addButtonActions = AddButtonActions(),

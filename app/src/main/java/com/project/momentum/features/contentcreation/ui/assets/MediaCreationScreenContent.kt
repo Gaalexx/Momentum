@@ -182,7 +182,7 @@ internal fun MediaCreationContentCompact(
                 .weight(0.7f),
         )
 
-        Spacer(modifier = Modifier.weight(0.6f))
+        Spacer(modifier = Modifier.weight(0.3f))
 
         when (mode) {
             ContentCreationMode.Camera -> {
@@ -197,8 +197,7 @@ internal fun MediaCreationContentCompact(
                     onFlipCamera = cameraState::flipCamera,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 25.dp)
-                        .weight(2f),
+                        .weight(1.7f),
                 )
             }
 
@@ -210,14 +209,13 @@ internal fun MediaCreationContentCompact(
                     onStopRecording = onStopAudioRecording,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 25.dp)
-                        .weight(2f),
+                        .weight(1.7f),
                 )
             }
         }
         Box(
             modifier = Modifier
-                .weight(1f)
+                .weight(1.3f)
                 .fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {

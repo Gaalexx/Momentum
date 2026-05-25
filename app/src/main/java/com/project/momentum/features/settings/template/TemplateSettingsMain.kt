@@ -7,6 +7,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.RemoveRedEye
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -53,6 +54,7 @@ fun TemplateSettingsMain(
     onEvent: (SettingsEvent)-> Unit,
     state: SettingsState?,
     switchesState: SwitchesState,
+    onHiddenPosts: () -> Unit = {},
     onPremiumClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     onDeleteAccountClick: () -> Unit = {},
@@ -177,11 +179,17 @@ fun TemplateSettingsMain(
                 }
             }
 
-
-
             Spacer(modifier = Modifier.weight(10f))
 
+            SettingsButtonAdaptive(
+                onClick = onHiddenPosts,
+                icon = Icons.Outlined.RemoveRedEye,
+                text = stringResource(R.string.settings_hidden_posts),
+                textColor = ConstColours.WHITE,
+                modifier = Modifier.padding(vertical = dimensionResource(R.dimen.medium_padding))
+            )
 
+            Spacer(modifier = Modifier.weight(0.5f))
 
             SettingsButtonAdaptive(
                 onClick = onPremiumClick,
@@ -191,7 +199,7 @@ fun TemplateSettingsMain(
                 modifier = Modifier.padding(vertical = dimensionResource(R.dimen.medium_padding))
             )
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.5f))
 
             SettingsButtonAdaptive(
                 onClick = onLogoutClick,
@@ -200,7 +208,7 @@ fun TemplateSettingsMain(
                 modifier = Modifier.padding(vertical = dimensionResource(R.dimen.medium_padding))
             )
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.5f))
 
             SettingsButtonAdaptive(
                 onClick = onDeleteAccountClick,
@@ -210,7 +218,7 @@ fun TemplateSettingsMain(
                 modifier = Modifier.padding(vertical = dimensionResource(R.dimen.medium_padding))
             )
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(0.5f))
         }
     }
 }

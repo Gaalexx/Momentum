@@ -21,6 +21,7 @@ import com.project.momentum.navigation.viewmodel.AppStartViewModel
 import com.project.momentum.ui.theme.MomentumTheme
 import com.project.momentum.ui.theme.MomentumThemeVariant
 import com.project.momentum.ui.theme.ThemeManager
+import com.project.momentum.ui.theme.MomentumAndroidSettingsTheme
 import com.vk.api.sdk.VK
 import com.vk.dto.common.id.toUserId
 import com.vk.id.AccessToken
