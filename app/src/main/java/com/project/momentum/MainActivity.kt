@@ -18,8 +18,8 @@ import androidx.core.content.ContextCompat
 import com.project.momentum.features.auth.viewmodel.AuthorizationViewModel
 import com.project.momentum.navigation.MainScreen
 import com.project.momentum.navigation.viewmodel.AppStartViewModel
-import com.project.momentum.ui.theme.MomentumAndroidSettingsTheme
 import com.project.momentum.ui.theme.MomentumTheme
+import com.project.momentum.ui.theme.MomentumThemeVariant
 import com.project.momentum.ui.theme.ThemeManager
 import com.vk.api.sdk.VK
 import com.vk.dto.common.id.toUserId
@@ -81,14 +81,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             val isDefaultTheme by themeManager.isDefaultTheme.collectAsState()
 
-            val themeWrapper: @Composable (@Composable () -> Unit) -> Unit =
-                if (isDefaultTheme) {
-                    { content -> MomentumTheme(content = content) }
-                } else {
-                    { content -> MomentumAndroidSettingsTheme(content = content) }
-                }
-
-            themeWrapper {
+            MomentumTheme(
+                themeVariant = if (isDefaultTheme) MomentumThemeVariant.Momentum else MomentumThemeVariant.AndroidSettings
+            ) {
                 MainScreen(
                     themeManager = themeManager,
                     onVkAuth = ::startVkAuth
