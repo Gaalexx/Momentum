@@ -25,8 +25,8 @@ sealed interface UploadState {
 
 sealed interface UploadEvent {
     data class Send(val postInfo: PostInformation) : UploadEvent
-    //data object Retry : UploadEvent
-    //data object Reset : UploadEvent
+    data class ToggleFriend(val friendId: String) : UploadEvent
+    data class SyncFriends(val friendIds: List<String>) : UploadEvent
 }
 
 @HiltViewModel
@@ -40,6 +40,9 @@ class ContentCreationViewModel @Inject constructor(
     private val _state = MutableStateFlow<UploadState>(UploadState.Idle)
     val state = _state.asStateFlow()
 
+    private val _selectedFriendIds = MutableStateFlow<Set<String>>(emptySet())
+    val selectedFriendIds = _selectedFriendIds.asStateFlow()
+
     fun onEvent(event: UploadEvent) {
         when (event) {
             is UploadEvent.Send -> {
@@ -47,8 +50,16 @@ class ContentCreationViewModel @Inject constructor(
                     upload(event.postInfo)
                 }
             }
-
-            else -> {}
+            is UploadEvent.ToggleFriend -> {
+                _selectedFriendIds.value = if (_selectedFriendIds.value.contains(event.friendId)) {
+                    _selectedFriendIds.value - event.friendId
+                } else {
+                    _selectedFriendIds.value + event.friendId
+                }
+            }
+            is UploadEvent.SyncFriends -> {
+                _selectedFriendIds.value = event.friendIds.toSet()
+            }
         }
     }
 
@@ -65,9 +76,10 @@ class ContentCreationViewModel @Inject constructor(
 
     private fun upload(postInfo: PostInformation) {
         viewModelScope.launch {
+            val receiverIds = _selectedFriendIds.value.toList()
             runCatching {
                 _state.value = UploadState.Uploading(progress = 0)
-                uploaderRepo.sendContent(postInfo) { progress, total ->
+                uploaderRepo.sendContent(postInfo.copy(receiverIds = receiverIds)) { progress, total ->
                     _state.value =
                         UploadState.Uploading(progress = calculateUploadPercent(progress, total))
                 }

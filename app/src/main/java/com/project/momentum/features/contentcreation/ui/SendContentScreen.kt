@@ -154,6 +154,11 @@ fun SendContentScreen(
         friendsViewModel.onEvent(FriendsScreenEvent.GetFriends)
     }
 
+    val selectedFriendIds by vm.selectedFriendIds.collectAsStateWithLifecycle()
+
+    LaunchedEffect(friendsList) {
+        vm.onEvent(UploadEvent.SyncFriends(friendsList.map { it.id }))
+    }
 
     val context = LocalContext.current
     var caption by rememberSaveable { mutableStateOf("") }
@@ -163,35 +168,8 @@ fun SendContentScreen(
         shouldRequest = mediaType != MediaTypeToSend.AUDIO
     )
 
-    var selectedFriendIds by rememberSaveable {
-        mutableStateOf<Set<String>>(emptySet())
-    }
-    LaunchedEffect(friendsList) {
-        selectedFriendIds = friendsList.map { it.id }.toSet()
-    }
-    LaunchedEffect(Unit) {
-        friendsViewModel.onEvent(FriendsScreenEvent.GetFriends)
-    }
-
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-
-    LaunchedEffect(friendsList) {
-        val validIds = friendsList.map { it.id }.toSet()
-        if (selectedFriendIds.any { it !in validIds }) {
-            selectedFriendIds = selectedFriendIds.filter { it in validIds }.toSet()
-            // todo: snackbar
-        }
-    }
-
-    fun toggleFriendSelection(friendId: String) {
-        selectedFriendIds = if (selectedFriendIds.contains(friendId)) {
-            selectedFriendIds.minus(friendId)
-        } else {
-            selectedFriendIds.plus(friendId)
-        }
-    }
-
     val selectFriendMessage = stringResource(R.string.snackbar_select_friend)
 
     fun sendContent() {
@@ -224,8 +202,6 @@ fun SendContentScreen(
                     uploadMediaType,
                     size = size,
                     label = caption
-                    //server integration
-                    //,receiverIds = selectedFriendIds.toList()
                 )
             )
         )
@@ -303,7 +279,7 @@ fun SendContentScreen(
                 isSendEnabled = selectedFriendIds.isNotEmpty(),
                 onSendBlocked = {
                     coroutineScope.launch {
-                        snackbarHostState.showSnackbar("Выберите хотя бы одного друга")
+                        snackbarHostState.showSnackbar(selectFriendMessage)
                     }
                 },
                 modifier = Modifier
@@ -319,7 +295,7 @@ fun SendContentScreen(
                         .fillMaxSize(),
                     friends = friendsList,
                     selectedFriendIds = selectedFriendIds,
-                    onToggleFriend = { friendId -> toggleFriendSelection(friendId) }
+                    onToggleFriend = { friendId -> vm.onEvent(UploadEvent.ToggleFriend(friendId)) }
                 )
             } else {
                 Spacer(modifier = Modifier.weight(1.3f))
@@ -425,7 +401,9 @@ private fun FriendAvatarItemAdaptive(
             fontSize = 10.sp,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 2.dp).weight(0.2f)
+            modifier = Modifier
+                .padding(top = 2.dp)
+                .weight(0.2f)
         )
     }
 }
