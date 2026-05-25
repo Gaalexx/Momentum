@@ -3,11 +3,15 @@ package com.project.momentum.data.auth.datastore
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.project.momentum.data.auth.keystore.EncryptedData
 import com.project.momentum.di.AuthPrefs
+import com.project.momentum.di.ThemePrefs
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -49,3 +53,22 @@ class AuthStorageImpl @Inject constructor(
     }
 }
 
+@Singleton
+class ThemeDataStore @Inject constructor(
+    @ThemePrefs private val dataStore: DataStore<Preferences>
+) {
+    companion object {
+        private val IS_DEFAULT_THEME = booleanPreferencesKey("is_default_theme")
+    }
+
+    val isDefaultThemeFlow: Flow<Boolean> = dataStore.data
+        .map { preferences ->
+            preferences[IS_DEFAULT_THEME] ?: true
+        }
+
+    suspend fun setDefaultTheme(isDefault: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[IS_DEFAULT_THEME] = isDefault
+        }
+    }
+}

@@ -20,12 +20,14 @@ import com.project.momentum.navigation.viewmodel.SwitchesState
 @Composable
 fun SettingsMainScreen(
     onBackClick: () -> Unit,
+    onThemeChange: () -> Unit = {},
     onHiddenPosts: () -> Unit = {},
     onPremiumClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     onDeleteAccountClick: () -> Unit = {},
     viewModel: SettingsMainScreenViewModel = hiltViewModel(),
-    appStartViewModel: AppStartViewModel
+    appStartViewModel: AppStartViewModel,
+    isDefaultTheme: Boolean
 ) {
     val uiState by viewModel.state.collectAsStateWithLifecycle()
     val switchesState by appStartViewModel.settingsState.collectAsStateWithLifecycle()
@@ -45,13 +47,15 @@ fun SettingsMainScreen(
     ) {
         TemplateSettingsMain(
             onBackClick = onBackClick,
-            onEvent = remember { { event -> viewModel.onEvent(event, appStartViewModel) } },
+            onThemeChange = onThemeChange,
+            onEvent = { event -> viewModel.onEvent(event, appStartViewModel) },
             state = uiState,
             switchesState = switchesState,
             onHiddenPosts = onHiddenPosts,
             onPremiumClick = onPremiumClick,
             onLogoutClick = onLogoutClick,
-            onDeleteAccountClick = onDeleteAccountClick
+            onDeleteAccountClick = onDeleteAccountClick,
+            isDefaultTheme = isDefaultTheme
         )
     }
 }

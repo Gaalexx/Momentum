@@ -15,6 +15,8 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.NavBackStack
@@ -52,6 +54,7 @@ import com.project.momentum.navigation.viewmodel.AppStartState
 import com.project.momentum.navigation.viewmodel.AppStartViewModel
 import com.project.momentum.ui.common.LoadingOverlay
 import com.project.momentum.features.offline.ui.NoInternetScreen
+import com.project.momentum.ui.theme.ThemeManager
 import com.project.momentum.features.posts.ui.WatchHiddenPhotoScreenRoute
 import com.project.momentum.features.settings.ui.HiddenPosts
 
@@ -59,7 +62,9 @@ import com.project.momentum.features.settings.ui.HiddenPosts
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun MainScreen(
-    onVkAuth: () -> Unit
+    onVkAuth: () -> Unit,
+    //onThemeChange: () -> Unit = {},
+    themeManager: ThemeManager
 ) {
 
     SharedTransitionLayout {
@@ -374,10 +379,12 @@ fun MainScreen(
                 }
 
                 entry<NavRoutes.Settings> {
+                    val isDefaultTheme by themeManager.isDefaultTheme.collectAsState()
                     SettingsMainScreen(
                         onBackClick = {
                             closeOverlay()
                         },
+                        onThemeChange = {themeManager.toggleTheme()},
                         onHiddenPosts = { openOverlay(NavRoutes.HiddenPosts) },
                         onPremiumClick = {
                             openOverlay(NavRoutes.Premium)
@@ -390,7 +397,8 @@ fun MainScreen(
                         onDeleteAccountClick = {
                             openOverlay(NavRoutes.DeleteAccountCheckPassword)
                         },
-                        appStartViewModel = appStartViewModel
+                        appStartViewModel = appStartViewModel,
+                        isDefaultTheme = isDefaultTheme
                     )
                 }
 

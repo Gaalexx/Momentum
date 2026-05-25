@@ -11,12 +11,17 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
 import com.project.momentum.features.auth.viewmodel.AuthorizationViewModel
 import com.project.momentum.navigation.MainScreen
 import com.project.momentum.navigation.viewmodel.AppStartViewModel
-import com.project.momentum.ui.theme.MomentumAndroidSettingsTheme
 import com.project.momentum.ui.theme.MomentumTheme
+import com.project.momentum.ui.theme.MomentumThemeVariant
+import com.project.momentum.ui.theme.ThemeManager
+import com.project.momentum.ui.theme.MomentumAndroidSettingsTheme
 import com.vk.api.sdk.VK
 import com.vk.dto.common.id.toUserId
 import com.vk.id.AccessToken
@@ -26,9 +31,13 @@ import com.vk.id.VKIDAuthFail
 import com.vk.id.auth.VKIDAuthCallback
 import com.vk.id.auth.VKIDAuthParams
 import dagger.hilt.android.AndroidEntryPoint
+import jakarta.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var themeManager: ThemeManager
+
     private companion object {
         val VKID_AUTH_SCOPES = setOf("email", "friends", "photos", "video")
     }
@@ -71,8 +80,13 @@ class MainActivity : ComponentActivity() {
         askNotificationPermission()
         VKID.instance.accessToken?.let { applyVkSdkCredentials(it) }
         setContent {
-            MomentumTheme {
+            val isDefaultTheme by themeManager.isDefaultTheme.collectAsState()
+
+            MomentumTheme(
+                themeVariant = if (isDefaultTheme) MomentumThemeVariant.Momentum else MomentumThemeVariant.AndroidSettings
+            ) {
                 MainScreen(
+                    themeManager = themeManager,
                     onVkAuth = ::startVkAuth
                 )
             }
