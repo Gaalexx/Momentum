@@ -380,12 +380,15 @@ fun SettingsButtonAdaptive(
             .clickable { onClick() }
     ) {
         Row(
+            modifier = Modifier.background(
+                color = ConstColours.BLACK
+            ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = contentDescription,
-                tint = iconColor
+                tint = iconColor,
             )
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -1660,7 +1663,11 @@ private fun PreviewDeleteButtons() {
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        ButtonForDeleteAdaptive(onClick = {}, text = "Удалить", color = ConstColours.MAIN_BRAND_BLUE)
+        ButtonForDeleteAdaptive(
+            onClick = {},
+            text = "Удалить",
+            color = ConstColours.MAIN_BRAND_BLUE
+        )
         ButtonForDelete(
             onClick = {},
             text = "Удалить",

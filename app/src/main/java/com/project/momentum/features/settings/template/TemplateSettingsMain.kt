@@ -33,7 +33,7 @@ import com.project.momentum.ui.theme.MomentumTheme
 @Preview(showBackground = true, backgroundColor = 0xFFFFFFFF)
 @Composable
 fun SettingsMainScreenPreview() {
-    MomentumTheme {
+    MomentumAndroidSettingsTheme() {
         TemplateSettingsMain(
             onBackClick = {},
             onEvent = {},
@@ -175,7 +175,6 @@ fun TemplateSettingsMain(
                             }
                         )
                     }
-                    MomentumTheme{}
                 }
             }
 
