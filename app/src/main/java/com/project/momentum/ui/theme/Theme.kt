@@ -10,6 +10,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
 
 enum class MomentumThemeVariant {
@@ -134,16 +135,16 @@ fun MomentumTheme(
         dynamicColor = dynamicColor,
         themeVariant = themeVariant
     )
-    ConstColours.use(
-        colorScheme.toConstColours(
-            dynamicColor = dynamicColor,
-            themeVariant = themeVariant
-        )
+    val colours = colorScheme.toConstColours(
+        dynamicColor = dynamicColor,
+        themeVariant = themeVariant
     )
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = AppTypography,
-        content = content
-    )
+    CompositionLocalProvider(LocalMomentumColours provides colours) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = AppTypography,
+            content = content
+        )
+    }
 }

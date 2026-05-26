@@ -147,6 +147,7 @@ fun RecordingBorderProgress(
     modifier: Modifier = Modifier,
 ) {
     val progressPath = remember { PathMeasure() }
+    val strokeColor = ConstColours.WHITE
 
     Canvas(modifier = modifier) {
         val fullPath = Path().apply {
@@ -196,7 +197,7 @@ fun RecordingBorderProgress(
 
         drawPath(
             path = segmentPath,
-            color = ConstColours.WHITE,
+            color = strokeColor,
             style = Stroke(width = 8.dp.toPx()),
         )
     }

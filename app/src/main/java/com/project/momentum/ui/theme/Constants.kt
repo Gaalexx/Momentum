@@ -1,6 +1,9 @@
 package com.project.momentum.ui.theme
 
 import androidx.compose.material3.ColorScheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 
 data class MomentumColours(
@@ -60,29 +63,37 @@ object MomentumColourDefaults {
         )
 }
 
+val LocalMomentumColours = staticCompositionLocalOf { MomentumColourDefaults.Static }
+
 object ConstColours {
-    @Volatile
-    private var activeColours = MomentumColourDefaults.Static
-
-    internal fun use(colours: MomentumColours) {
-        activeColours = colours
-    }
-
-    val BLACK: Color get() = activeColours.black
-    val WHITE: Color get() = activeColours.white
-    val MAIN_BRAND_BLUE: Color get() = activeColours.mainBrandBlue
-    val MAIN_BACK_GRAY: Color get() = activeColours.mainBackGray
-    val ERROR_RED: Color get() = activeColours.errorRed
-    val RED: Color get() = activeColours.red
-
-    val DELETE: Color get() = activeColours.delete
-    val MAIN_BRAND_BLUE_ALPHA40: Color get() = activeColours.mainBrandBlueAlpha40
-    val MAIN_GLASS_GRAY_ALPHA62: Color get() = activeColours.mainGlassGrayAlpha62
-    val TRANSPARENT_WHITE_ALPHA0: Color get() = activeColours.transparentWhiteAlpha0
-
-    val SUPPORTING_TEXT: Color get() = activeColours.supportingText
-    val SUPPORTING_SUB_TEXT: Color get() = activeColours.supportingSubText
-    val GOLD: Color get() = activeColours.gold
-    val GOLD_ALPHA30: Color get() = activeColours.goldAlpha30
-    val ACCOUNT_LOGO_TINT: Color get() = activeColours.accountLogoTint
+    val BLACK: Color
+        @Composable @ReadOnlyComposable get() = LocalMomentumColours.current.black
+    val WHITE: Color
+        @Composable @ReadOnlyComposable get() = LocalMomentumColours.current.white
+    val MAIN_BRAND_BLUE: Color
+        @Composable @ReadOnlyComposable get() = LocalMomentumColours.current.mainBrandBlue
+    val MAIN_BACK_GRAY: Color
+        @Composable @ReadOnlyComposable get() = LocalMomentumColours.current.mainBackGray
+    val ERROR_RED: Color
+        @Composable @ReadOnlyComposable get() = LocalMomentumColours.current.errorRed
+    val RED: Color
+        @Composable @ReadOnlyComposable get() = LocalMomentumColours.current.red
+    val DELETE: Color
+        @Composable @ReadOnlyComposable get() = LocalMomentumColours.current.delete
+    val MAIN_BRAND_BLUE_ALPHA40: Color
+        @Composable @ReadOnlyComposable get() = LocalMomentumColours.current.mainBrandBlueAlpha40
+    val MAIN_GLASS_GRAY_ALPHA62: Color
+        @Composable @ReadOnlyComposable get() = LocalMomentumColours.current.mainGlassGrayAlpha62
+    val TRANSPARENT_WHITE_ALPHA0: Color
+        @Composable @ReadOnlyComposable get() = LocalMomentumColours.current.transparentWhiteAlpha0
+    val SUPPORTING_TEXT: Color
+        @Composable @ReadOnlyComposable get() = LocalMomentumColours.current.supportingText
+    val SUPPORTING_SUB_TEXT: Color
+        @Composable @ReadOnlyComposable get() = LocalMomentumColours.current.supportingSubText
+    val GOLD: Color
+        @Composable @ReadOnlyComposable get() = LocalMomentumColours.current.gold
+    val GOLD_ALPHA30: Color
+        @Composable @ReadOnlyComposable get() = LocalMomentumColours.current.goldAlpha30
+    val ACCOUNT_LOGO_TINT: Color
+        @Composable @ReadOnlyComposable get() = LocalMomentumColours.current.accountLogoTint
 }
