@@ -25,7 +25,7 @@ object GradientPicker {
         }
     }
 
-    fun pickDetermined(postId: String): Brush {     // TODO реализовать метод
+    fun pickDetermined(postId: String): Brush {
         val rnd = Random.nextInt(0, 2)
         val colors: List<Color> = colors.shuffled().take(2)
         return when (rnd) {

@@ -52,7 +52,7 @@ class S3InteractionRepository @Inject constructor(
         )
 
         val body =
-            client.sendMessageOnComplete(    // TODO в зависимости от того какой ответ, то и будем отображать на экране
+            client.sendMessageOnComplete(
                 S3UpdateStatusDTO(
                     UploadingStatus.READY,
                     presignedURLDTO.mediaId,
@@ -81,7 +81,7 @@ class S3InteractionRepository @Inject constructor(
             )
 
             val body =
-                client.sendAvatarUploadingStatus(    // TODO в зависимости от того какой ответ, то и будем отображать на экране
+                client.sendAvatarUploadingStatus(
                     S3UpdateStatusDTO(
                         UploadingStatus.READY,
                         presignedURLDTO.mediaId,
@@ -91,7 +91,7 @@ class S3InteractionRepository @Inject constructor(
         } catch (e: Exception) {
             //TODO: сообщить юзеру об ошибке
             val body =
-                client.sendAvatarUploadingStatus(    // TODO в зависимости от того какой ответ, то и будем отображать на экране
+                client.sendAvatarUploadingStatus(
                     S3UpdateStatusDTO(
                         UploadingStatus.FAILED,
                         presignedURLDTO.mediaId,
