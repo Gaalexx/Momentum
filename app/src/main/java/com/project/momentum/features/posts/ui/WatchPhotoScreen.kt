@@ -66,14 +66,12 @@ import com.project.momentum.features.posts.viewmodel.WatchPhotoEvent
 import com.project.momentum.network.s3.MediaType
 import com.project.momentum.ui.assets.AudioView
 import com.project.momentum.ui.assets.CaptionBasicLabel
-import com.project.momentum.ui.assets.ContinueButton
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -81,10 +79,9 @@ import androidx.compose.material.icons.filled.TextFields
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalWindowInfo
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
+import com.project.momentum.features.newcontentcreation.ui.assets.CameraTopBar
 import com.project.momentum.features.posts.features.reactions.ui.PostDialogContent
 import com.project.momentum.features.posts.features.reactions.ui.ShowDialogContent
 import com.project.momentum.features.posts.viewmodel.GalleryEvent

@@ -18,19 +18,16 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.outlined.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material.icons.outlined.TextFields
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -65,7 +62,7 @@ import com.project.momentum.R
 import com.project.momentum.features.contentcreation.media.AudioRecordingFormat
 import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.contentcreation.permissions.rememberCameraPermissionState
-import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
+import com.project.momentum.features.newcontentcreation.ui.assets.CameraTopBar
 import com.project.momentum.features.contentcreation.viewmodel.ContentCreationViewModel
 import com.project.momentum.features.contentcreation.viewmodel.UploadEvent
 import com.project.momentum.features.contentcreation.viewmodel.UploadState
@@ -80,14 +77,8 @@ import com.project.momentum.ui.theme.MomentumTheme
 
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.layout.width
-import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.Image
-import coil.request.ImageRequest
-import coil.compose.rememberAsyncImagePainter
 import androidx.compose.foundation.shape.CircleShape
 import com.project.momentum.features.friends.viewmodel.FriendsViewModel
-import com.example.Models.FriendshipResponseDTO
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.clickable
 import androidx.compose.ui.text.style.TextOverflow
@@ -95,7 +86,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.unit.sp
 import com.project.momentum.features.friends.ui.User
 import com.project.momentum.features.friends.viewmodel.FriendsScreenEvent
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Scaffold

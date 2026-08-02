@@ -615,6 +615,101 @@ fun BigCircleForMainScreenActionAdaptive(
     }
 }
 
+
+@Composable
+fun MyBigCircleForMainScreenActionAdaptive(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    onLongPressStart: () -> Unit,
+    onLongPressEnd: () -> Unit,
+    onStartProgress: () -> Unit = {},
+    onEndProgress: () -> Unit = {},
+    ring: Dp = 14.dp,
+    enabled: Boolean = true,
+    progressStarted: Boolean = false
+) {
+    var pressed by remember { mutableStateOf(false) }
+    var longMode by remember { mutableStateOf(false) }
+
+    val progress = remember { Animatable(0f) }
+    val scope = rememberCoroutineScope()
+
+    fun startPulsations() {
+        scope.launch {
+            progress.snapTo(0f)
+            // progressStarted.value = true
+            while (pressed) {
+                progress.animateTo(
+                    targetValue = 1f,
+                    animationSpec = tween(
+                        durationMillis = 750,
+                        easing = LinearEasing
+                    )
+                )
+                progress.animateTo(
+                    targetValue = 0f,
+                    animationSpec = tween(
+                        durationMillis = 750,
+                        easing = LinearEasing
+                    )
+                )
+                if (!(progressStarted && pressed)) {
+                    break
+                }
+            }
+
+            // progressStarted.value = false
+            progress.snapTo(0f)
+        }
+    }
+
+    fun stopPulsations(reset: Boolean = true) {
+        scope.launch {
+            progress.stop()
+            if (reset) progress.snapTo(0f)
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .clip(CircleShape)
+            .background(if (progressStarted && pressed) ConstColours.MAIN_BRAND_BLUE_ALPHA40 else ConstColours.MAIN_BACK_GRAY),
+        contentAlignment = Alignment.Center
+    ) {
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize(0.8f + 0.2f * progress.value)
+                //.padding(ring - (ring.value * progress.value).dp)
+                .clip(CircleShape)
+                .pointerInput(enabled) {
+                    if (!enabled) return@pointerInput
+                    detectTapGestures(
+                        onTap = { onClick() },
+                        onLongPress = {
+                            longMode = true
+                            onLongPressStart()
+                            onStartProgress()
+                            startPulsations()
+                        },
+                        onPress = {
+                            pressed = true
+                            val released = tryAwaitRelease()
+                            pressed = false
+                            if (longMode) {
+                                onLongPressEnd()
+                                longMode = false
+                                onEndProgress()
+                                stopPulsations()
+                            }
+                        }
+                    )
+                }
+                .background(ConstColours.WHITE)
+        )
+    }
+}
+
 @Composable
 fun BigCircleForMainScreenAction(
     modifier: Modifier = Modifier,

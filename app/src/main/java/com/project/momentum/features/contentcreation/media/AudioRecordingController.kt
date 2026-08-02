@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -179,7 +180,7 @@ class AudioRecordingController(
     }
 
     private fun createRecorder(file: File): MediaRecorder {
-        return MediaRecorder().apply {
+        return MediaRecorder(context).apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.OGG)
             setOutputFile(file.absolutePath)

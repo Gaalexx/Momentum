@@ -22,8 +22,8 @@ import com.project.momentum.features.contentcreation.permissions.rememberCameraP
 import com.project.momentum.features.contentcreation.permissions.rememberMicrophonePermissionState
 import com.project.momentum.features.contentcreation.state.CameraScreenState
 import com.project.momentum.features.contentcreation.state.rememberCameraScreenState
-import com.project.momentum.features.contentcreation.ui.assets.MediaCreationContent
-import com.project.momentum.features.contentcreation.ui.assets.MediaCreationContentCompact
+import com.project.momentum.features.newcontentcreation.ui.assets.MediaCreationContent
+import com.project.momentum.features.newcontentcreation.ui.assets.MediaCreationContentCompact
 import com.project.momentum.features.contentcreation.viewmodel.CameraViewModel
 import com.project.momentum.ui.theme.MomentumTheme
 
@@ -38,7 +38,6 @@ fun MediaCreationRoot(
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
-    maxRecordMs: Int = DefaultMaxRecordMs,
     cameraPreviewEnabled: Boolean = true,
     cameraViewModel: CameraViewModel = hiltViewModel()
 ) {
@@ -51,7 +50,7 @@ fun MediaCreationRoot(
         onProfileClick = onProfileClick,
         onGoToSettings = onGoToSettings,
         onGoToFriends = onGoToFriends,
-        maxRecordMs = maxRecordMs,
+        maxRecordMs = DefaultMaxRecordMs,
         cameraState = vmState.value,
         cameraPreviewEnabled = cameraPreviewEnabled
     )
@@ -162,7 +161,6 @@ fun CameraLikeScreen(
     onGoToGallery: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
-    maxRecordMs: Int = DefaultMaxRecordMs,
 ) {
     MediaCreationRoot(
         modifier = modifier,
@@ -171,7 +169,6 @@ fun CameraLikeScreen(
         onProfileClick = onProfileClick,
         onGoToSettings = onGoToSettings,
         onGoToFriends = onGoToFriends,
-        maxRecordMs = maxRecordMs
     )
 }
 

@@ -1,5 +1,6 @@
-package com.project.momentum.features.contentcreation.ui.assets
+package com.project.momentum.features.newcontentcreation.ui.assets
 
+import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -8,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Mic
@@ -31,6 +31,8 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.state.CameraScreenState
+import com.project.momentum.features.contentcreation.ui.assets.CameraPreviewContainer
+import com.project.momentum.features.newcontentcreation.ui.CameraView
 import com.project.momentum.ui.assets.AudioRadialVisualizer
 import com.project.momentum.ui.theme.ConstColours
 
@@ -67,7 +69,7 @@ internal fun MediaCreationPreviewCard(
     Box(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
-    ){
+    ) {
         Box(
             modifier = Modifier
                 .heightIn(max = screenHeight * 0.5f)
@@ -99,6 +101,80 @@ internal fun MediaCreationPreviewCard(
                                 CameraPreviewContainer(
                                     state = cameraState,
                                     modifier = Modifier.fillMaxSize(),
+                                )
+                            }
+
+                            else -> {
+                                CameraInactivePlaceholder()
+                            }
+                        }
+                    }
+
+                    ContentCreationMode.Audio -> {
+                        AudioRadialVisualizer(
+                            level = audioLevel,
+                            modifier = Modifier.fillMaxSize(),
+                        )
+                        if (!hasMicrophonePermission) {
+                            PermissionPlaceholder(iconMode = ContentCreationMode.Audio)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+internal fun MyMediaCreationPreviewCard(
+    modifier: Modifier = Modifier,
+    mode: ContentCreationMode,
+    hasCameraPermission: Boolean,
+    hasMicrophonePermission: Boolean,
+    progress: Float,
+    audioLevel: Float,
+    cameraPreviewEnabled: Boolean = true,
+    controller: LifecycleCameraController
+) {
+    val screenHeight = LocalWindowInfo.current.containerDpSize.height
+    val screenWidth = LocalWindowInfo.current.containerDpSize.width
+
+    Box(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .heightIn(max = screenHeight * 0.5f)
+                .aspectRatio(1f)
+                .clip(PreviewCardShape)
+                .background(ConstColours.BLACK),
+        ) {
+            RecordingBorderProgress(
+                progress = progress,
+                modifier = Modifier.fillMaxSize(),
+            )
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(0.95f)
+                    .aspectRatio(1f)
+                    .clip(PreviewCardShape)
+                    .background(ConstColours.MAIN_BACK_GRAY)
+                    .align(Alignment.Center),
+            ) {
+                when (mode) {
+                    ContentCreationMode.Camera -> {
+                        when {
+                            !hasCameraPermission -> {
+                                PermissionPlaceholder(iconMode = ContentCreationMode.Camera)
+                            }
+
+                            cameraPreviewEnabled -> {
+                                CameraView(
+                                    controller = controller,
+                                    modifier = Modifier.fillMaxSize()
                                 )
                             }
 

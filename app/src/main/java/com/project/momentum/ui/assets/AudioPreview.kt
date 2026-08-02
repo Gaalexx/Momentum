@@ -27,7 +27,7 @@ import androidx.media3.common.C
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
-import com.project.momentum.features.contentcreation.ui.assets.RecordingBorderProgress
+import com.project.momentum.features.newcontentcreation.ui.assets.RecordingBorderProgress
 import com.project.momentum.ui.theme.ConstColours
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

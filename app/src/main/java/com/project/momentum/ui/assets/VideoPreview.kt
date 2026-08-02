@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.compose.PlayerSurface
-import com.project.momentum.features.contentcreation.ui.assets.RecordingBorderProgress
+import com.project.momentum.features.newcontentcreation.ui.assets.RecordingBorderProgress
 import com.project.momentum.ui.theme.ConstColours
 import kotlinx.coroutines.delay
 import androidx.compose.foundation.gestures.detectDragGestures
