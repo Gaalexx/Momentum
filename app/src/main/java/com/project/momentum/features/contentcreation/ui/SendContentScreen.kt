@@ -91,6 +91,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Scaffold
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
+import com.project.momentum.features.newcontentcreation.mediaconfig.PhotoRecordingFormat
+import com.project.momentum.features.newcontentcreation.mediaconfig.VideoRecordingFormat
 
 
 fun deleteByUri(context: Context, uri: Uri): Boolean {
@@ -172,8 +174,8 @@ fun SendContentScreen(
 
         val safeUri = uri
         val mimeType = when (mediaType) {
-            MediaTypeToSend.PHOTO -> context.contentResolver.getType(safeUri) ?: "image/jpeg"
-            MediaTypeToSend.VIDEO -> context.contentResolver.getType(safeUri) ?: "video/mp4"
+            MediaTypeToSend.PHOTO -> PhotoRecordingFormat.STORAGE_MIME_TYPE
+            MediaTypeToSend.VIDEO -> VideoRecordingFormat.STORAGE_MIME_TYPE
             MediaTypeToSend.AUDIO -> AudioRecordingFormat.UPLOAD_MIME_TYPE
         }
         val uploadMediaType = when (mediaType) {

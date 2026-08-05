@@ -41,6 +41,8 @@ import com.project.momentum.features.newcontentcreation.viewmodel.CameraEvent
 import com.project.momentum.features.newcontentcreation.viewmodel.CameraState
 import com.project.momentum.features.newcontentcreation.viewmodel.NewCameraViewModel
 import com.project.momentum.ui.theme.ConstColours
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.launch
 import java.io.File
 
 @Composable
@@ -145,9 +147,13 @@ fun MyMediaCreationScreen(
                     captureButtonState = cameraState.isRecording,//cameraCaptureButtonState,
                     onToggleTorch = { onEvent(CameraEvent.OnToggleFlash) },
                     onTakePhoto = {
-                        onEvent(CameraEvent.OnTakePhoto)
-                        val uri = File(context.filesDir, PhotoRecordingFormat.FILE_NAME).toUri()
-                        onGoToPreview(uri, MediaTypeToSend.PHOTO)
+                        scope.launch {
+                            val result = CompletableDeferred<Uri>()
+                            onEvent(CameraEvent.OnTakePhoto(result))
+                            val uri = result.await()
+                            onGoToPreview(uri, MediaTypeToSend.PHOTO)
+                        }
+
                     },
                     onStartRecording = {
                         onEvent(CameraEvent.OnRecordVideoSwitch)

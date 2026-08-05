@@ -2,6 +2,7 @@ package com.project.momentum.features.newcontentcreation.viewmodel
 
 
 import android.content.Context
+import android.net.Uri
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
@@ -12,6 +13,7 @@ import com.project.momentum.features.newcontentcreation.repos.CameraControllerRe
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -26,7 +28,7 @@ data class CameraState(
 
 
 sealed interface CameraEvent {
-    data object OnTakePhoto : CameraEvent
+    data class OnTakePhoto(val result: CompletableDeferred<Uri>) : CameraEvent
     data object OnRecordVideoSwitch : CameraEvent
 
     data object OnRecordAudioSwitch : CameraEvent
@@ -54,7 +56,7 @@ class NewCameraViewModel @Inject constructor(
     fun onEvent(event: CameraEvent) {
         when (event) {
             is CameraEvent.OnTakePhoto -> {
-                onTakePhoto()
+                onTakePhoto(event.result)
             }
 
             is CameraEvent.OnRecordVideoSwitch -> {
@@ -104,9 +106,10 @@ class NewCameraViewModel @Inject constructor(
         }
     }
 
-    private fun onTakePhoto() {
+    private fun onTakePhoto(result: CompletableDeferred<Uri>) {
         viewModelScope.launch {
-            cameraRepo.onTakePhoto()
+            val uri = cameraRepo.onTakePhoto()
+            result.complete(uri)
         }
     }
 

@@ -97,13 +97,16 @@ class CameraControllerRepo @Inject constructor(
         return false
     }
 
-    suspend fun onTakePhoto() {
+    suspend fun onTakePhoto(): Uri {
         val output = File(context.filesDir, PhotoRecordingFormat.FILE_NAME)
         val result: Bitmap = takePicture()
-        FileOutputStream(output).use { out ->
-            result.compress(Bitmap.CompressFormat.JPEG, 100, out)
+        withContext(Dispatchers.IO) {
+            FileOutputStream(output).use { out ->
+                result.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            }
         }
         result.recycle()
+        return output.toUri()
     }
 
 
@@ -118,10 +121,9 @@ class CameraControllerRepo @Inject constructor(
                         val rect = image.cropRect
                         val degrees = image.imageInfo.rotationDegrees.toFloat()
                         val full = image.toBitmap()
-                        image.close()
                         val matrix = android.graphics.Matrix().apply {
                             if (_lensFacing.value == CameraSelector.LENS_FACING_FRONT) {
-                                preScale(-1f, 1f)
+                                preScale(1f, -1f)
                             }
                         }
                         matrix.postRotate(degrees)
