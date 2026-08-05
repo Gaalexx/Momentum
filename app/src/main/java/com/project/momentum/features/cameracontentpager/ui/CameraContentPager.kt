@@ -136,7 +136,7 @@ fun CameraContentPager(
 //                        cameraPreviewEnabled = isCameraPageActive
 //                    )
                     0 -> MyMediaCreationRoot(
-                        onGoToPreview = { it -> },
+                        onGoToPreview = onGoToPreview,
                         onProfileClick = onProfileClick,
                         onGoToSettings = onGoToSettings,
                         onGoToFriends = onGoToFriends

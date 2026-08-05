@@ -3,9 +3,11 @@
 agp = "9.3.1"
 androidSdkCore = "4.1.0"
 firebaseBom = "34.17.0"
+hiltLifecycleViewmodelCompose = "1.4.0"
 kotlin = "2.4.10"
 ksp = "2.3.2"
-gms = "4.4.4"
+#noinspection GradleDependency,GradleDependency
+gms = "4.5.0"
 vkid = "2.7.0"
 
 # Android SDK
@@ -31,7 +33,7 @@ hiltNavigationCompose = "1.4.0"
 # Networking
 ktor = "3.5.2"
 kotlinxCoroutines = "1.11.0"
-serializationJson = "1.6.3"
+serializationJson = "1.11.0"
 
 # Media and UI
 camerax = "1.6.1"
@@ -61,6 +63,7 @@ android-sdk-core = { module = "com.vk:android-sdk-core", version.ref = "androidS
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+androidx-hilt-lifecycle-viewmodel-compose = { module = "androidx.hilt:hilt-lifecycle-viewmodel-compose", version.ref = "hiltLifecycleViewmodelCompose" }
 vkid = { module = "com.vk.id:vkid", version.ref = "vkid" }
 
 

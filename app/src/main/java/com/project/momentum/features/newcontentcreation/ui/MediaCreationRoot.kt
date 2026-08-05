@@ -1,6 +1,7 @@
 package com.project.momentum.features.newcontentcreation.ui
 
 import android.graphics.Bitmap
+import android.net.Uri
 import android.widget.Toast
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.animation.core.Animatable
@@ -20,13 +21,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.core.net.toUri
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.contentcreation.permissions.rememberCameraPermissionState
 import com.project.momentum.features.contentcreation.permissions.rememberMicrophonePermissionState
 import com.project.momentum.features.contentcreation.ui.DefaultMaxRecordMs
+import com.project.momentum.features.newcontentcreation.mediaconfig.AudioRecordingFormat
+import com.project.momentum.features.newcontentcreation.mediaconfig.PhotoRecordingFormat
+import com.project.momentum.features.newcontentcreation.mediaconfig.VideoRecordingFormat
 import com.project.momentum.features.newcontentcreation.ui.assets.AudioBottomControls
 import com.project.momentum.features.newcontentcreation.ui.assets.GalleryButton
 import com.project.momentum.features.newcontentcreation.ui.assets.MyCameraBottomControls
@@ -36,12 +41,12 @@ import com.project.momentum.features.newcontentcreation.viewmodel.CameraEvent
 import com.project.momentum.features.newcontentcreation.viewmodel.CameraState
 import com.project.momentum.features.newcontentcreation.viewmodel.NewCameraViewModel
 import com.project.momentum.ui.theme.ConstColours
-import kotlinx.coroutines.launch
+import java.io.File
 
 @Composable
 fun MyMediaCreationRoot(
     modifier: Modifier = Modifier,
-    onGoToPreview: (MediaTypeToSend) -> Unit,
+    onGoToPreview: (Uri, MediaTypeToSend) -> Unit,
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
@@ -50,7 +55,6 @@ fun MyMediaCreationRoot(
     val vmState = contentCreationViewModel.state.collectAsStateWithLifecycle().value
     val controller = contentCreationViewModel.controller
     val onEvent = contentCreationViewModel::onEvent
-    val lastImage = contentCreationViewModel.lastImage.collectAsStateWithLifecycle().value
 
     MyMediaCreationScreen(
         modifier = modifier,
@@ -60,22 +64,20 @@ fun MyMediaCreationRoot(
         onGoToFriends = onGoToFriends,
         cameraState = vmState,
         onEvent = onEvent,
-        controller = controller,
-        lastImage = lastImage
+        controller = controller
     )
 }
 
 @Composable
 fun MyMediaCreationScreen(
     modifier: Modifier = Modifier,
-    onGoToPreview: (MediaTypeToSend) -> Unit,
+    onGoToPreview: (Uri, MediaTypeToSend) -> Unit,
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
     cameraState: CameraState,
     onEvent: (CameraEvent) -> Unit,
     controller: LifecycleCameraController,
-    lastImage: Bitmap?
 ) {
 
     val scope = rememberCoroutineScope()
@@ -89,22 +91,21 @@ fun MyMediaCreationScreen(
 
     val progress = remember { Animatable(0f) }
 
-    if (cameraState.isRecording) {
-        LaunchedEffect(Unit) {
-            scope.launch {
-                progress.snapTo(0f)
-                progress.animateTo(
-                    targetValue = 1f,
-                    animationSpec = tween(
-                        durationMillis = DefaultMaxRecordMs,
-                        easing = LinearEasing,
-                    ),
-                )
-                onEvent(CameraEvent.OnStopAllRecords)
-                progress.snapTo(0f)
-            }
+    LaunchedEffect(cameraState.isRecording) {
+        if (cameraState.isRecording) {
+            progress.snapTo(0f)
+            progress.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(
+                    durationMillis = DefaultMaxRecordMs,
+                    easing = LinearEasing,
+                ),
+            )
+            progress.snapTo(0f)
+            onEvent(CameraEvent.OnStopAllRecords)
+        } else {
+            progress.snapTo(0f)
         }
-
     }
 
 
@@ -113,8 +114,6 @@ fun MyMediaCreationScreen(
             .fillMaxSize()
             .background(ConstColours.BLACK),
     ) {
-
-
         MyMediaCreationPreviewCard(
             mode = cameraState.contentCreationMode,
             hasCameraPermission = hasCameraPermission,
@@ -147,22 +146,16 @@ fun MyMediaCreationScreen(
                     onToggleTorch = { onEvent(CameraEvent.OnToggleFlash) },
                     onTakePhoto = {
                         onEvent(CameraEvent.OnTakePhoto)
-                        if (lastImage == null) {
-                            Toast.makeText(
-                                context,
-                                "Error with camera",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        } else {
-                            onGoToPreview(MediaTypeToSend.PHOTO)
-                        }
+                        val uri = File(context.filesDir, PhotoRecordingFormat.FILE_NAME).toUri()
+                        onGoToPreview(uri, MediaTypeToSend.PHOTO)
                     },
                     onStartRecording = {
                         onEvent(CameraEvent.OnRecordVideoSwitch)
                     },
                     onStopRecording = {
                         onEvent(CameraEvent.OnRecordVideoSwitch)
-                        onGoToPreview(MediaTypeToSend.VIDEO)
+                        val uri = File(context.filesDir, VideoRecordingFormat.FILE_NAME).toUri()
+                        onGoToPreview(uri, MediaTypeToSend.VIDEO)
                     },
                     onFlipCamera = { onEvent(CameraEvent.OnFlipCamera) },
                     modifier = Modifier
@@ -178,7 +171,8 @@ fun MyMediaCreationScreen(
                     onStartRecording = { onEvent(CameraEvent.OnRecordAudioSwitch) },
                     onStopRecording = {
                         onEvent(CameraEvent.OnRecordAudioSwitch)
-                        onGoToPreview(MediaTypeToSend.AUDIO)
+                        val uri = File(context.filesDir, AudioRecordingFormat.FILE_NAME).toUri()
+                        onGoToPreview(uri, MediaTypeToSend.AUDIO)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -189,8 +183,7 @@ fun MyMediaCreationScreen(
         Box(
             modifier = Modifier
                 .weight(1.3f)
-                .fillMaxWidth(),
-            contentAlignment = Alignment.Center
+                .fillMaxWidth(), contentAlignment = Alignment.Center
         ) {
             GalleryButton(modifier = Modifier, onClick = {})
         }

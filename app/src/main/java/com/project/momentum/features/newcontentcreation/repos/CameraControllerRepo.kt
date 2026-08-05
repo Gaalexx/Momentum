@@ -3,6 +3,7 @@ package com.project.momentum.features.newcontentcreation.repos
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -15,15 +16,24 @@ import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
 import androidx.camera.view.video.AudioConfig
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import com.project.momentum.di.IoDispatcher
+import com.project.momentum.features.newcontentcreation.mediaconfig.PhotoRecordingFormat
+import com.project.momentum.features.newcontentcreation.mediaconfig.VideoRecordingFormat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileOutputStream
 import javax.inject.Inject
+import kotlin.coroutines.resumeWithException
 
 
 @ViewModelScoped
@@ -34,19 +44,20 @@ class CameraControllerRepo @Inject constructor(
     var _videoRecording: Recording? = null
         private set
 
-    var _controller: LifecycleCameraController = LifecycleCameraController(context).apply {
-        setEnabledUseCases(CameraController.IMAGE_CAPTURE or CameraController.VIDEO_CAPTURE)
-        cameraSelector = CameraSelector.Builder()
-            .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-            .build()
-    }
-        private set
-
-    private val _lensFacing = MutableStateFlow(CameraSelector.LENS_FACING_BACK)
+    private val _lensFacing = MutableStateFlow(CameraSelector.LENS_FACING_FRONT)
     val lensFacing = _lensFacing.asStateFlow()
 
     private val _torchEnabled = MutableStateFlow(false)
     val torchEnabled = _torchEnabled.asStateFlow()
+
+    var _controller: LifecycleCameraController = LifecycleCameraController(context).apply {
+        setEnabledUseCases(CameraController.IMAGE_CAPTURE or CameraController.VIDEO_CAPTURE)
+        cameraSelector = CameraSelector.Builder()
+            .requireLensFacing(_lensFacing.value)
+            .build()
+    }
+        private set
+
 
     fun flipCamera() {
         if (_videoRecording != null) {
@@ -78,7 +89,7 @@ class CameraControllerRepo @Inject constructor(
     fun toggleTorch(): Boolean {
         val newTorchState = !torchEnabled.value
 
-        if (_controller.torchState.isInitialized && hasTorch()) {
+        if (hasTorch()) {
             _controller.enableTorch(newTorchState)
             _torchEnabled.update { newTorchState }
             return true
@@ -86,34 +97,56 @@ class CameraControllerRepo @Inject constructor(
         return false
     }
 
-    fun onTakePhoto(): Bitmap? {
-        var result: Bitmap? = null
+    suspend fun onTakePhoto() {
+        val output = File(context.filesDir, PhotoRecordingFormat.FILE_NAME)
+        val result: Bitmap = takePicture()
+        FileOutputStream(output).use { out ->
+            result.compress(Bitmap.CompressFormat.JPEG, 100, out)
+        }
+        result.recycle()
+    }
+
+
+    private suspend fun takePicture(): Bitmap = suspendCancellableCoroutine { cont ->
         _controller.takePicture(
-            ContextCompat.getMainExecutor(context),
+            context.mainExecutor,
             object : ImageCapture.OnImageCapturedCallback() {
                 override fun onCaptureSuccess(image: ImageProxy) {
                     super.onCaptureSuccess(image)
 
-                    val rect = image.cropRect
-                    val degrees = image.imageInfo.rotationDegrees.toFloat()
-                    val full = image.toBitmap()
-                    image.close()
-                    val matrix = android.graphics.Matrix()
-                    matrix.postRotate(degrees)
-                    result = Bitmap.createBitmap(
-                        full, rect.left, rect.top, rect.width(), rect.height(), matrix, true
-                    )
-                    // _state.update { it.copy(lastImage = result) } // TODO не забыть перенести во вью модель
+                    try {
+                        val rect = image.cropRect
+                        val degrees = image.imageInfo.rotationDegrees.toFloat()
+                        val full = image.toBitmap()
+                        image.close()
+                        val matrix = android.graphics.Matrix().apply {
+                            if (_lensFacing.value == CameraSelector.LENS_FACING_FRONT) {
+                                preScale(-1f, 1f)
+                            }
+                        }
+                        matrix.postRotate(degrees)
+                        val result = Bitmap.createBitmap(
+                            full, rect.left, rect.top, rect.width(), rect.height(), matrix, true
+                        )
+                        if (result != full) {
+                            full.recycle()
+                        }
+                        cont.resume(result) { _, b, _ -> b.recycle() }
+                    } catch (e: Exception) {
+                        cont.resumeWithException(e)
+                    } finally {
+                        image.close()
+                    }
+
                 }
 
                 override fun onError(exception: ImageCaptureException) {
                     super.onError(exception)
                     Log.e("PHOTO CAMERA", "Photo error occurred")
-                    // Toast.makeText(context, "Photo error occurred", Toast.LENGTH_LONG).show()
                 }
 
-            })
-        return result
+            }
+        )
     }
 
     @SuppressLint("MissingPermission")
@@ -126,7 +159,7 @@ class CameraControllerRepo @Inject constructor(
             return true
         }
 
-        val output = File(context.filesDir, "myRec.mp4")
+        val output = File(context.filesDir, VideoRecordingFormat.FILE_NAME)
 
 //        _state.update {                       // TODO не забыть перенести во вью модель
 //            it.copy(isRecording = true)

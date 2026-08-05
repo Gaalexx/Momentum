@@ -59,7 +59,7 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.project.momentum.R
-import com.project.momentum.features.contentcreation.media.AudioRecordingFormat
+import com.project.momentum.features.newcontentcreation.mediaconfig.AudioRecordingFormat
 import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.contentcreation.permissions.rememberCameraPermissionState
 import com.project.momentum.features.newcontentcreation.ui.assets.CameraTopBar

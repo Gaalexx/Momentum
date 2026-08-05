@@ -5,11 +5,9 @@ import android.media.MediaRecorder
 import android.util.Log
 import android.widget.Toast
 import com.project.momentum.di.IoDispatcher
-import com.project.momentum.features.contentcreation.media.AudioRecordingFormat
+import com.project.momentum.features.newcontentcreation.mediaconfig.AudioRecordingFormat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.update
 import java.io.File
 import javax.inject.Inject
 
@@ -29,7 +27,7 @@ class AudioRecorderRepo @Inject constructor(
             return
         }
 
-        val outputFile = File(context.filesDir, "myRec.${AudioRecordingFormat.FILE_EXTENSION}")
+        val outputFile = File(context.filesDir, AudioRecordingFormat.FILE_NAME)
         _audioRecording = MediaRecorder(context).apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
             setOutputFormat(MediaRecorder.OutputFormat.OGG)

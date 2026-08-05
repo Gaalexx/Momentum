@@ -1,28 +1,11 @@
 package com.project.momentum.features.newcontentcreation.viewmodel
 
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
-import android.media.MediaRecorder
-import android.util.Log
-import android.widget.Toast
-import androidx.annotation.OptIn
-import androidx.camera.core.CameraControl
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.ImageProxy
-import androidx.camera.video.FileOutputOptions
-import androidx.camera.video.Recording
-import androidx.camera.video.VideoRecordEvent
-import androidx.camera.view.CameraController
 import androidx.camera.view.LifecycleCameraController
-import androidx.camera.view.video.AudioConfig
 import androidx.compose.runtime.Stable
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
-import com.project.momentum.features.contentcreation.media.AudioRecordingFormat
+import androidx.lifecycle.viewModelScope
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.newcontentcreation.repos.AudioRecorderRepo
 import com.project.momentum.features.newcontentcreation.repos.CameraControllerRepo
@@ -32,7 +15,7 @@ import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.io.File
+import kotlinx.coroutines.launch
 
 @Stable
 data class CameraState(
@@ -61,13 +44,11 @@ class NewCameraViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<CameraState>(CameraState())
-    private val _lastImage = MutableStateFlow<Bitmap?>(null)
 
 
     val controller: LifecycleCameraController get() = cameraRepo._controller
 
     val state = _state.asStateFlow()
-    val lastImage = _lastImage.asStateFlow()
 
 
     fun onEvent(event: CameraEvent) {
@@ -115,8 +96,8 @@ class NewCameraViewModel @Inject constructor(
         }
     }
 
-    private fun onToggleFlash(){
-        if(cameraRepo.toggleTorch()){
+    private fun onToggleFlash() {
+        if (cameraRepo.toggleTorch()) {
             _state.update {
                 it.copy(torchEnabled = !it.torchEnabled)
             }
@@ -124,7 +105,9 @@ class NewCameraViewModel @Inject constructor(
     }
 
     private fun onTakePhoto() {
-        _lastImage.update { cameraRepo.onTakePhoto() }
+        viewModelScope.launch {
+            cameraRepo.onTakePhoto()
+        }
     }
 
     private fun onChangeMode(event: CameraEvent.OnContentCreationModeChange) {
