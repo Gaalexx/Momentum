@@ -62,6 +62,7 @@ class CameraControllerRepo @Inject constructor(
             .requireLensFacing(_lensFacing.value)
             .build()
         videoCaptureMirrorMode = MirrorMode.MIRROR_MODE_ON_FRONT_ONLY
+        isTapToFocusEnabled = false
     }
         private set
 
