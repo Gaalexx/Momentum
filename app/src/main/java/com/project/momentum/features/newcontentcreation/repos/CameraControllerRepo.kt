@@ -9,6 +9,7 @@ import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
+import androidx.camera.core.MirrorMode
 import androidx.camera.video.FileOutputOptions
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoRecordEvent
@@ -22,9 +23,9 @@ import com.project.momentum.features.newcontentcreation.mediaconfig.PhotoRecordi
 import com.project.momentum.features.newcontentcreation.mediaconfig.VideoRecordingFormat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -41,6 +42,11 @@ class CameraControllerRepo @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val io: CoroutineDispatcher
 ) {
+
+    private companion object {
+        const val TAG = "CAMERA REPOSITORY"
+    }
+
     var _videoRecording: Recording? = null
         private set
 
@@ -55,12 +61,14 @@ class CameraControllerRepo @Inject constructor(
         cameraSelector = CameraSelector.Builder()
             .requireLensFacing(_lensFacing.value)
             .build()
+        videoCaptureMirrorMode = MirrorMode.MIRROR_MODE_ON_FRONT_ONLY
     }
         private set
 
 
     fun flipCamera() {
         if (_videoRecording != null) {
+            Log.e(TAG, "Flip camera error!")
             return
         }
 
@@ -144,7 +152,7 @@ class CameraControllerRepo @Inject constructor(
 
                 override fun onError(exception: ImageCaptureException) {
                     super.onError(exception)
-                    Log.e("PHOTO CAMERA", "Photo error occurred")
+                    Log.e(TAG, "Photo error occurred")
                 }
 
             }
@@ -152,40 +160,39 @@ class CameraControllerRepo @Inject constructor(
     }
 
     @SuppressLint("MissingPermission")
-    fun onRecordVideo(): Boolean {
+    suspend fun onRecordVideo(result: CompletableDeferred<Uri?>): Uri? {
         if (_videoRecording != null) {
             _videoRecording!!.stop()
-//            _state.update {                   // TODO не забыть перенести во вью модель
-//                it.copy(isRecording = false)
-//            }
-            return true
+            _videoRecording = null
+            return result.await()
         }
 
         val output = File(context.filesDir, VideoRecordingFormat.FILE_NAME)
 
-//        _state.update {                       // TODO не забыть перенести во вью модель
-//            it.copy(isRecording = true)
-//        }
-        var result: Boolean = false
-        _videoRecording = _controller.startRecording(
-            FileOutputOptions.Builder(output).build(),
-            AudioConfig.create(true),
-            ContextCompat.getMainExecutor(context),
-        ) { event ->
-            when (event) {
-                is VideoRecordEvent.Finalize -> {
-                    if (event.hasError()) {
-                        _videoRecording?.close()
-                        _videoRecording = null
-                        result = false
-                        Log.e("VIDEO RECORDER", "Video recording failed")
-                    } else {
-                        result = true
+        try {
+            _videoRecording = _controller.startRecording(
+                FileOutputOptions.Builder(output).build(),
+                AudioConfig.create(true),
+                ContextCompat.getMainExecutor(context),
+            ) { event ->
+                when (event) {
+                    is VideoRecordEvent.Finalize -> {
+                        if (event.hasError()) {
+                            _videoRecording?.close()
+                            _videoRecording = null
+                            Log.e(TAG, "Video recording failed")
+
+                            result.complete(null)
+                        } else {
+                            result.complete(event.outputResults.outputUri)
+                        }
                     }
                 }
             }
+        } catch (e: Exception) {
+            result.complete(null)
         }
-        return result
+        return null
     }
 
     fun recordingIsActive(): Boolean {

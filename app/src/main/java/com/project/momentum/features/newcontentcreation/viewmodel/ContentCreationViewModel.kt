@@ -5,9 +5,11 @@ import android.content.Context
 import android.net.Uri
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.runtime.Stable
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
+import com.project.momentum.features.newcontentcreation.mediaconfig.AudioRecordingFormat
 import com.project.momentum.features.newcontentcreation.repos.AudioRecorderRepo
 import com.project.momentum.features.newcontentcreation.repos.CameraControllerRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.File
 
 @Stable
 data class CameraState(
@@ -29,10 +32,10 @@ data class CameraState(
 
 sealed interface CameraEvent {
     data class OnTakePhoto(val result: CompletableDeferred<Uri>) : CameraEvent
-    data object OnRecordVideoSwitch : CameraEvent
+    data class OnRecordVideoSwitch(val result: CompletableDeferred<Uri?>) : CameraEvent
 
     data object OnRecordAudioSwitch : CameraEvent
-    data object OnStopAllRecords : CameraEvent
+    data class OnStopAllRecords(val result: CompletableDeferred<Uri?>) : CameraEvent
     data class OnContentCreationModeChange(val mode: ContentCreationMode) : CameraEvent
     data object OnFlipCamera : CameraEvent
     data object OnToggleFlash : CameraEvent
@@ -60,7 +63,7 @@ class NewCameraViewModel @Inject constructor(
             }
 
             is CameraEvent.OnRecordVideoSwitch -> {
-                onRecordVideo()
+                onRecordVideo(event.result)
             }
 
             is CameraEvent.OnContentCreationModeChange -> {
@@ -72,7 +75,7 @@ class NewCameraViewModel @Inject constructor(
             }
 
             is CameraEvent.OnStopAllRecords -> {
-                onStopAllRecords()
+                onStopAllRecords(event.result)
             }
 
             is CameraEvent.OnFlipCamera -> {
@@ -89,12 +92,14 @@ class NewCameraViewModel @Inject constructor(
         cameraRepo.flipCamera()
     }
 
-    private fun onRecordVideo() {
-        cameraRepo.onRecordVideo()
-        _state.update {
-            it.copy(
-                isRecording = !it.isRecording
-            )
+    private fun onRecordVideo(result: CompletableDeferred<Uri?>) {
+        viewModelScope.launch {
+            val uri = cameraRepo.onRecordVideo(result)
+            _state.update {
+                it.copy(
+                    isRecording = !it.isRecording
+                )
+            }
         }
     }
 
@@ -128,17 +133,21 @@ class NewCameraViewModel @Inject constructor(
         }
     }
 
-    private fun onStopAllRecords() {
-        if (cameraRepo.recordingIsActive()) {
-            cameraRepo.onRecordVideo()
-        }
-        if (audioRepo.recordingIsActive()) {
-            audioRepo.onRecorderSwitch()
-        }
-        _state.update {
-            it.copy(
-                isRecording = !it.isRecording
-            )
+    private fun onStopAllRecords(result: CompletableDeferred<Uri?>) {
+        viewModelScope.launch {
+            var uri: Uri? = null
+            if (cameraRepo.recordingIsActive()) {
+                cameraRepo.onRecordVideo(result) // result.complete внутри метода
+            } else if (audioRepo.recordingIsActive()) {
+                audioRepo.onRecorderSwitch()
+                uri = File(context.filesDir, AudioRecordingFormat.FILE_NAME).toUri()
+                result.complete(uri)
+            }
+            _state.update {
+                it.copy(
+                    isRecording = !it.isRecording
+                )
+            }
         }
     }
 

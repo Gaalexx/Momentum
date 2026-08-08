@@ -2,6 +2,7 @@ package com.project.momentum.features.newcontentcreation.ui
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.animation.core.Animatable
@@ -16,8 +17,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -104,7 +107,19 @@ fun MyMediaCreationScreen(
                 ),
             )
             progress.snapTo(0f)
-            onEvent(CameraEvent.OnStopAllRecords)
+            val result = CompletableDeferred<Uri?>()
+            onEvent(CameraEvent.OnStopAllRecords(result))
+            val uri = result.await()
+            if (uri != null) {
+                onGoToPreview(
+                    uri,
+                    if (cameraState.contentCreationMode == ContentCreationMode.Camera) MediaTypeToSend.VIDEO else MediaTypeToSend.AUDIO
+                )
+            } else {
+                Toast.makeText(context, "Error with media recording occurred", Toast.LENGTH_LONG)
+                    .show()
+            }
+
         } else {
             progress.snapTo(0f)
         }
@@ -141,6 +156,9 @@ fun MyMediaCreationScreen(
 
         when (cameraState.contentCreationMode) {
             ContentCreationMode.Camera -> {
+
+                var pendingRecording by remember { mutableStateOf<CompletableDeferred<Uri?>?>(null) }
+
                 MyCameraBottomControls(
                     torchEnabled = cameraState.torchEnabled,
                     captureEnabled = hasCameraPermission,
@@ -153,15 +171,24 @@ fun MyMediaCreationScreen(
                             val uri = result.await()
                             onGoToPreview(uri, MediaTypeToSend.PHOTO)
                         }
-
                     },
                     onStartRecording = {
-                        onEvent(CameraEvent.OnRecordVideoSwitch)
+                        scope.launch {
+                            val result = CompletableDeferred<Uri?>()
+                            pendingRecording = result
+                            onEvent(CameraEvent.OnRecordVideoSwitch(result))
+                        }
+
                     },
                     onStopRecording = {
-                        onEvent(CameraEvent.OnRecordVideoSwitch)
-                        val uri = File(context.filesDir, VideoRecordingFormat.FILE_NAME).toUri()
-                        onGoToPreview(uri, MediaTypeToSend.VIDEO)
+
+                        val result = pendingRecording ?: return@MyCameraBottomControls
+                        pendingRecording = null
+                        scope.launch {
+                            onEvent(CameraEvent.OnRecordVideoSwitch(result))
+                            val uri = File(context.filesDir, VideoRecordingFormat.FILE_NAME).toUri()
+                            onGoToPreview(uri, MediaTypeToSend.VIDEO)
+                        }
                     },
                     onFlipCamera = { onEvent(CameraEvent.OnFlipCamera) },
                     modifier = Modifier

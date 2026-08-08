@@ -15,15 +15,16 @@ class AudioRecorderRepo @Inject constructor(
     @ApplicationContext private val context: Context,
     @IoDispatcher private val io: CoroutineDispatcher
 ) {
+    private companion object {
+        const val TAG = "RECORDER REPOSITORY"
+    }
+
     private var _audioRecording: MediaRecorder? = null
 
     fun onRecorderSwitch() {
         if (_audioRecording != null) {
             _audioRecording!!.stop()
             _audioRecording!!.release()
-//            _state.update {                   // TODO перенести во вью модель
-//                it.copy(isRecording = false)
-//            }
             return
         }
 
@@ -39,14 +40,11 @@ class AudioRecorderRepo @Inject constructor(
             try {
                 prepare()
             } catch (e: Exception) {
-                Log.e("AUDIO RECORDER", "prepare() failed")
+                Log.e(TAG, "prepare() failed")
                 Toast.makeText(context, "Audio recorder failed", Toast.LENGTH_LONG).show()
             }
         }
         _audioRecording!!.start()
-//        _state.update {                       // TODO перенести во вью модель
-//            it.copy(isRecording = true)
-//        }
     }
 
     fun recordingIsActive(): Boolean {
