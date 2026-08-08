@@ -20,7 +20,7 @@ fun rememberCameraPermissionState(
     val hasPermission = remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) ==
-                PackageManager.PERMISSION_GRANTED,
+                    PackageManager.PERMISSION_GRANTED,
         )
     }
 

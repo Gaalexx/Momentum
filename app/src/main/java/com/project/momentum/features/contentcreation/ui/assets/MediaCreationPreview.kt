@@ -1,21 +1,26 @@
 package com.project.momentum.features.contentcreation.ui.assets
 
+import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.tappableElement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,14 +28,17 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
-import com.project.momentum.features.contentcreation.state.CameraScreenState
+import com.project.momentum.features.contentcreation.ui.CameraView
 import com.project.momentum.ui.assets.AudioRadialVisualizer
 import com.project.momentum.ui.theme.ConstColours
 
@@ -56,18 +64,19 @@ internal fun MediaCreationPreviewCard(
     mode: ContentCreationMode,
     hasCameraPermission: Boolean,
     hasMicrophonePermission: Boolean,
-    cameraState: CameraScreenState,
     progress: Float,
     audioLevel: Float,
     cameraPreviewEnabled: Boolean = true,
+    controller: LifecycleCameraController
 ) {
     val screenHeight = LocalWindowInfo.current.containerDpSize.height
     val screenWidth = LocalWindowInfo.current.containerDpSize.width
 
+
     Box(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
-    ){
+    ) {
         Box(
             modifier = Modifier
                 .heightIn(max = screenHeight * 0.5f)
@@ -96,9 +105,9 @@ internal fun MediaCreationPreviewCard(
                             }
 
                             cameraPreviewEnabled -> {
-                                CameraPreviewContainer(
-                                    state = cameraState,
-                                    modifier = Modifier.fillMaxSize(),
+                                CameraView(
+                                    controller = controller,
+                                    modifier = Modifier.fillMaxSize()
                                 )
                             }
 
@@ -123,23 +132,6 @@ internal fun MediaCreationPreviewCard(
     }
 }
 
-@Composable
-internal fun CameraPreviewCard(
-    hasCameraPermission: Boolean,
-    state: CameraScreenState,
-    progress: Float,
-    modifier: Modifier = Modifier,
-) {
-    MediaCreationPreviewCard(
-        mode = ContentCreationMode.Camera,
-        hasCameraPermission = hasCameraPermission,
-        hasMicrophonePermission = true,
-        cameraState = state,
-        progress = progress,
-        audioLevel = 0f,
-        modifier = modifier,
-    )
-}
 
 @Composable
 fun RecordingBorderProgress(

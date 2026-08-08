@@ -16,17 +16,17 @@ import androidx.compose.material.icons.outlined.WbSunny
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.project.momentum.R
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
-import com.project.momentum.ui.assets.BigCircleForMainScreenActionAdaptive
 import com.project.momentum.ui.assets.BigCircleMicroButtonAdaptive
 import com.project.momentum.ui.assets.CircleButton
+import com.project.momentum.ui.assets.MyBigCircleForMainScreenActionAdaptive
 import com.project.momentum.ui.theme.ConstColours
 
 @Composable
@@ -57,28 +57,39 @@ internal fun MediaCreationModeSwitcher(
 }
 
 @Composable
-internal fun CameraModeSwitcher(
-    onGoToRecorder: () -> Unit,
+internal fun MyMediaCreationModeSwitcher(
+    mode: ContentCreationMode,
+    enabled: Boolean,
+    onModeChange: (ContentCreationMode) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    MediaCreationModeSwitcher(
-        mode = ContentCreationMode.Camera,
-        enabled = true,
-        onModeChange = { mode ->
-            if (mode == ContentCreationMode.Audio) {
-                onGoToRecorder()
-            }
-        },
-        modifier = modifier,
-    )
+    Row(
+        modifier = modifier.padding(horizontal = 30.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        ModeCircleButton(
+            selected = mode == ContentCreationMode.Camera,
+            enabled = enabled,
+            onClick = { onModeChange(ContentCreationMode.Camera) },
+            icon = Icons.Outlined.PhotoCamera,
+        )
+        ModeCircleButton(
+            selected = mode == ContentCreationMode.Audio,
+            enabled = enabled,
+            onClick = { onModeChange(ContentCreationMode.Audio) },
+            icon = Icons.Outlined.Mic,
+        )
+    }
 }
+
 
 @Composable
 private fun ModeCircleButton(
     selected: Boolean,
     enabled: Boolean,
     onClick: () -> Unit,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
 ) {
     val activeAlpha = if (enabled) 1f else 0.45f
     CircleButton(
@@ -91,11 +102,12 @@ private fun ModeCircleButton(
     )
 }
 
+
 @Composable
 internal fun CameraBottomControls(
     torchEnabled: Boolean,
     captureEnabled: Boolean,
-    captureButtonState: MutableState<Boolean>,
+    captureButtonState: Boolean,
     onToggleTorch: () -> Unit,
     onTakePhoto: () -> Unit,
     onStartRecording: () -> Unit,
@@ -130,7 +142,7 @@ internal fun CameraBottomControls(
         }
 
         Box(modifier = Modifier.weight(1.5f), contentAlignment = Alignment.Center) {
-            BigCircleForMainScreenActionAdaptive(
+            MyBigCircleForMainScreenActionAdaptive(
                 onClick = onTakePhoto,
                 onLongPressStart = onStartRecording,
                 onLongPressEnd = onStopRecording,

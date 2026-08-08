@@ -1,12 +1,8 @@
 package com.project.momentum.features.contentcreation.viewmodel
 
-import android.content.Context
-import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.project.momentum.features.contentcreation.ui.deleteByUri
-import com.project.momentum.network.s3.MediaType
 import com.project.momentum.network.s3.PostInformation
 import com.project.momentum.network.s3.S3InteractionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -50,6 +46,7 @@ class ContentCreationViewModel @Inject constructor(
                     upload(event.postInfo)
                 }
             }
+
             is UploadEvent.ToggleFriend -> {
                 _selectedFriendIds.value = if (_selectedFriendIds.value.contains(event.friendId)) {
                     _selectedFriendIds.value - event.friendId
@@ -57,6 +54,7 @@ class ContentCreationViewModel @Inject constructor(
                     _selectedFriendIds.value + event.friendId
                 }
             }
+
             is UploadEvent.SyncFriends -> {
                 _selectedFriendIds.value = event.friendIds.toSet()
             }

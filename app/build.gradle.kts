@@ -124,9 +124,9 @@ android {
         compose = true
         buildConfig = true
     }
-    kotlinOptions {
-        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
-    }
+//    kotlinOptions {
+//        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+//    }
 }
 
 dependencies {
@@ -167,6 +167,7 @@ dependencies {
 
     // Dependency injection
     implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.datastore.core)
     implementation(libs.androidx.compose.runtime)

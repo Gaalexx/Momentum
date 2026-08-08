@@ -10,8 +10,6 @@ import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,14 +43,12 @@ import com.project.momentum.features.friends.ui.FriendsScreenRoute
 import com.project.momentum.features.offline.ui.NoInternetScreen
 import com.project.momentum.features.posts.ui.GalleryScreen
 import com.project.momentum.features.posts.ui.WatchPhotoScreenRoute
-import com.project.momentum.features.posts.ui.WatchPhotoScreenRouteForMain
 import com.project.momentum.features.settings.ui.DeleteAccountCheckCodeScreen
 import com.project.momentum.features.settings.ui.SettingsMainScreen
 import com.project.momentum.features.settings.ui.SettingsPremiumScreen
 import com.project.momentum.navigation.viewmodel.AppStartState
 import com.project.momentum.navigation.viewmodel.AppStartViewModel
 import com.project.momentum.ui.common.LoadingOverlay
-import com.project.momentum.features.offline.ui.NoInternetScreen
 import com.project.momentum.ui.theme.ThemeManager
 import com.project.momentum.features.posts.ui.WatchHiddenPhotoScreenRoute
 import com.project.momentum.features.settings.ui.HiddenPosts
@@ -383,7 +379,7 @@ fun MainScreen(
                         onBackClick = {
                             closeOverlay()
                         },
-                        onThemeChange = {themeManager.toggleTheme()},
+                        onThemeChange = { themeManager.toggleTheme() },
                         onHiddenPosts = { openOverlay(NavRoutes.HiddenPosts) },
                         onPremiumClick = {
                             openOverlay(NavRoutes.Premium)
@@ -477,8 +473,6 @@ fun MainScreen(
                         onContinueClick = { closeOverlay() }
                     )
                 }
-
-
 
                 entry<NavRoutes.SendPhoto> { route ->
                     val uri = Uri.parse(route.uri)

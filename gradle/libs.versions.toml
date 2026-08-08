@@ -1,57 +1,60 @@
 [versions]
 # Build tools
-agp = "9.2.1"
+agp = "9.3.1"
 androidSdkCore = "4.1.0"
-firebaseBom = "34.13.0"
-kotlin = "2.2.10"
+firebaseBom = "34.17.0"
+hiltLifecycleViewmodelCompose = "1.4.0"
+kotlin = "2.4.10"
 ksp = "2.3.2"
-gms = "4.4.4"
+#noinspection GradleDependency,GradleDependency
+gms = "4.5.0"
 vkid = "2.7.0"
 
 # Android SDK
-compileSdk = "36"
-ktorClientAndroid = "3.4.1"
-ktorClientLogging = "3.4.1"
-minSdk = "30"
+compileSdk = "37"
+ktorClientAndroid = "3.5.2"
+ktorClientLogging = "3.5.2"
+minSdk = "31"
+#noinspection OldTargetApi
 targetSdk = "36"
 jvmTarget = "11"
 
 # AndroidX core
-datastore = "1.1.1"
-activityCompose = "1.12.1"
-coreKtx = "1.17.0"
-lifecycle = "2.10.0"
-navigation3 = "1.0.1"
+datastore = "1.2.1"
+activityCompose = "1.13.0"
+coreKtx = "1.19.0"
+lifecycle = "2.11.0"
+navigation3 = "1.1.5"
 
 # Dependency injection
-hilt = "2.59.2"
-hiltNavigationCompose = "1.2.0"
+hilt = "2.60.1"
+hiltNavigationCompose = "1.4.0"
 
 # Networking
-ktor = "3.4.0"
-kotlinxCoroutines = "1.7.3"
-serializationJson = "1.6.3"
+ktor = "3.5.2"
+kotlinxCoroutines = "1.11.0"
+serializationJson = "1.11.0"
 
 # Media and UI
-camerax = "1.3.4"
+camerax = "1.6.1"
 coil = "2.7.0"
-composeBom = "2024.09.00"
+composeBom = "2026.06.01"
 lottie = "6.7.1"
-media3 = "1.10.0"
-constraintLayout = "1.1.1"
+media3 = "1.10.1"
+constraintLayout = "1.1.2"
 
 # Testing
 androidxJunit = "1.3.0"
 espressoCore = "3.7.0"
 junit4 = "4.13.2"
-datastoreCore = "1.2.0"
-transportRuntime = "4.1.0"
-runtime = "1.10.5"
+datastoreCore = "1.2.1"
+transportRuntime = "4.1.1"
+runtime = "1.11.4"
 datastorePreferencesCore = "1.2.1"
-uiText = "1.10.5"
+uiText = "1.11.4"
 material3 = "1.4.0"
-foundation = "1.10.6"
-animationCore = "1.11.0"
+foundation = "1.11.4"
+animationCore = "1.11.4"
 
 [libraries]
 # Core Android
@@ -60,6 +63,7 @@ android-sdk-core = { module = "com.vk:android-sdk-core", version.ref = "androidS
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
+androidx-hilt-lifecycle-viewmodel-compose = { module = "androidx.hilt:hilt-lifecycle-viewmodel-compose", version.ref = "hiltLifecycleViewmodelCompose" }
 vkid = { module = "com.vk.id:vkid", version.ref = "vkid" }
 
 

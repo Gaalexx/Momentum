@@ -8,20 +8,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.captionBar
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -36,9 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.models.MediaTypeToSend
-import com.project.momentum.features.contentcreation.ui.DefaultMaxRecordMs
-import com.project.momentum.features.contentcreation.ui.MediaCreationRoot
-import com.project.momentum.features.contentcreation.ui.MediaCreationScreen
+import com.project.momentum.features.contentcreation.ui.MyMediaCreationRoot
 import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
 import com.project.momentum.features.posts.ui.NoPostsYet
 import com.project.momentum.features.posts.ui.WatchPhotoScreenRouteForMain
@@ -63,7 +57,7 @@ fun CameraContentPager(
     onGoToGallery: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
-    maxRecordMs: Int = DefaultMaxRecordMs,
+    //maxRecordMs: Int = DefaultMaxRecordMs,
     onGoToTakePhoto: () -> Unit,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
@@ -132,14 +126,19 @@ fun CameraContentPager(
                 modifier = Modifier.fillMaxSize()
             ) { page ->
                 when (page) {
-                    0 -> MediaCreationRoot(
-                        initialMode = initialMode,
+//                    0 -> MediaCreationRoot(
+//                        initialMode = initialMode,
+//                        onGoToPreview = onGoToPreview,
+//                        onProfileClick = onProfileClick,
+//                        onGoToSettings = onGoToSettings,
+//                        onGoToFriends = onGoToFriends,
+//                        cameraPreviewEnabled = isCameraPageActive
+//                    )
+                    0 -> MyMediaCreationRoot(
                         onGoToPreview = onGoToPreview,
                         onProfileClick = onProfileClick,
                         onGoToSettings = onGoToSettings,
-                        onGoToFriends = onGoToFriends,
-                        maxRecordMs = maxRecordMs,
-                        cameraPreviewEnabled = isCameraPageActive
+                        onGoToFriends = onGoToFriends
                     )
 
                     1 -> if (postsState.value.posts.isNotEmpty()) {
