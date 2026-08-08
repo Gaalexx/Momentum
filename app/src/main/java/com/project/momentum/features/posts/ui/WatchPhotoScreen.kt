@@ -81,7 +81,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import com.project.momentum.features.newcontentcreation.ui.assets.CameraTopBar
+import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
 import com.project.momentum.features.posts.features.reactions.ui.PostDialogContent
 import com.project.momentum.features.posts.features.reactions.ui.ShowDialogContent
 import com.project.momentum.features.posts.viewmodel.GalleryEvent
@@ -673,12 +673,13 @@ fun WatchPhotoScreen(
                                     onShowReactionDialog(null)
                                 },
                             ) {
-                                when(postDialogInfo) {
+                                when (postDialogInfo) {
                                     is DialogInfo.PostDialogInfo -> PostDialogContent(
                                         isOwner = post.isOwner,
                                         onHidePost = postDialogInfo.onHidePost,
                                         onDeletePost = postDialogInfo.onDeletePost,
                                     )
+
                                     is DialogInfo.Hidden -> ShowDialogContent(
                                         onShowPost = postDialogInfo.onShowPost
                                     )

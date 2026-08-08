@@ -1,4 +1,4 @@
-package com.project.momentum.features.newcontentcreation.ui
+package com.project.momentum.features.contentcreation.ui
 
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT

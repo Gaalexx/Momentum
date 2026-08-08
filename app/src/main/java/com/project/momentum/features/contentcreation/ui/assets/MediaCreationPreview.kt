@@ -1,4 +1,4 @@
-package com.project.momentum.features.newcontentcreation.ui.assets
+package com.project.momentum.features.contentcreation.ui.assets
 
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.foundation.Canvas
@@ -30,9 +30,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
-import com.project.momentum.features.contentcreation.state.CameraScreenState
-import com.project.momentum.features.contentcreation.ui.assets.CameraPreviewContainer
-import com.project.momentum.features.newcontentcreation.ui.CameraView
+import com.project.momentum.features.contentcreation.ui.CameraView
 import com.project.momentum.ui.assets.AudioRadialVisualizer
 import com.project.momentum.ui.theme.ConstColours
 
@@ -54,80 +52,6 @@ private fun CameraInactivePlaceholder(
 
 @Composable
 internal fun MediaCreationPreviewCard(
-    modifier: Modifier = Modifier,
-    mode: ContentCreationMode,
-    hasCameraPermission: Boolean,
-    hasMicrophonePermission: Boolean,
-    cameraState: CameraScreenState,
-    progress: Float,
-    audioLevel: Float,
-    cameraPreviewEnabled: Boolean = true,
-) {
-    val screenHeight = LocalWindowInfo.current.containerDpSize.height
-    val screenWidth = LocalWindowInfo.current.containerDpSize.width
-
-    Box(
-        modifier = modifier.fillMaxWidth(),
-        contentAlignment = Alignment.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .heightIn(max = screenHeight * 0.5f)
-                .aspectRatio(1f)
-                .clip(PreviewCardShape)
-                .background(ConstColours.BLACK),
-        ) {
-            RecordingBorderProgress(
-                progress = progress,
-                modifier = Modifier.fillMaxSize(),
-            )
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.95f)
-                    .aspectRatio(1f)
-                    .clip(PreviewCardShape)
-                    .background(ConstColours.MAIN_BACK_GRAY)
-                    .align(Alignment.Center),
-            ) {
-                when (mode) {
-                    ContentCreationMode.Camera -> {
-                        when {
-                            !hasCameraPermission -> {
-                                PermissionPlaceholder(iconMode = ContentCreationMode.Camera)
-                            }
-
-                            cameraPreviewEnabled -> {
-                                CameraPreviewContainer(
-                                    state = cameraState,
-                                    modifier = Modifier.fillMaxSize(),
-                                )
-                            }
-
-                            else -> {
-                                CameraInactivePlaceholder()
-                            }
-                        }
-                    }
-
-                    ContentCreationMode.Audio -> {
-                        AudioRadialVisualizer(
-                            level = audioLevel,
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                        if (!hasMicrophonePermission) {
-                            PermissionPlaceholder(iconMode = ContentCreationMode.Audio)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-
-@Composable
-internal fun MyMediaCreationPreviewCard(
     modifier: Modifier = Modifier,
     mode: ContentCreationMode,
     hasCameraPermission: Boolean,
@@ -199,23 +123,6 @@ internal fun MyMediaCreationPreviewCard(
     }
 }
 
-@Composable
-internal fun CameraPreviewCard(
-    hasCameraPermission: Boolean,
-    state: CameraScreenState,
-    progress: Float,
-    modifier: Modifier = Modifier,
-) {
-    MediaCreationPreviewCard(
-        mode = ContentCreationMode.Camera,
-        hasCameraPermission = hasCameraPermission,
-        hasMicrophonePermission = true,
-        cameraState = state,
-        progress = progress,
-        audioLevel = 0f,
-        modifier = modifier,
-    )
-}
 
 @Composable
 fun RecordingBorderProgress(

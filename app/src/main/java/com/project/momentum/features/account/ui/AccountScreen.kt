@@ -12,7 +12,6 @@ import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,14 +23,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -60,7 +57,6 @@ import com.project.momentum.features.account.viewmodel.AccountInfoViewModel
 import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.posts.viewmodel.GalleryEvent
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
-import com.project.momentum.network.s3.MediaType
 import com.project.momentum.ui.assets.BackCircleButton
 import com.project.momentum.ui.assets.DialogInfo
 import com.project.momentum.ui.assets.EditCircleButton
@@ -104,7 +100,7 @@ fun AccountRoot(
             return@rememberLauncherForActivityResult
         }
         val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
-        val mediaType = when(mimeType) {
+        val mediaType = when (mimeType) {
             "image/jpeg" -> MediaTypeToSend.PHOTO
             "video/mp4" -> MediaTypeToSend.VIDEO
             else -> MediaTypeToSend.PHOTO
@@ -150,12 +146,22 @@ fun AccountRoot(
         },
         postDialogInfo = DialogInfo.PostDialogInfo(
             onHidePost = {
-                postsViewModel.onEvent(GalleryEvent.OnHidePost(uiState.selectedPost ?: throw Exception("AccountScreen:OnHidePost: Selected post is null")))
+                postsViewModel.onEvent(
+                    GalleryEvent.OnHidePost(
+                        uiState.selectedPost
+                            ?: throw Exception("AccountScreen:OnHidePost: Selected post is null")
+                    )
+                )
                 postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
                 postsViewModel.onEvent(GalleryEvent.SelectPost(null))
             },
             onDeletePost = {
-                postsViewModel.onEvent(GalleryEvent.OnDeletePost(uiState.selectedPost ?: throw Exception("AccountScreen:OnDeletePost: Selected post is null")))
+                postsViewModel.onEvent(
+                    GalleryEvent.OnDeletePost(
+                        uiState.selectedPost
+                            ?: throw Exception("AccountScreen:OnDeletePost: Selected post is null")
+                    )
+                )
                 postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
                 postsViewModel.onEvent(GalleryEvent.SelectPost(null))
             },
@@ -229,7 +235,8 @@ fun AccountScreen(
 
     if (uiInfoState.isShowingActionsDialog &&
         onAddPostClick != null &&
-        addButtonActions != null) {
+        addButtonActions != null
+    ) {
         Dialog(
             onDismissRequest = onAddPostClick
         ) {

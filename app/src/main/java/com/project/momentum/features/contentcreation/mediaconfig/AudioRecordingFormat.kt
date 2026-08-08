@@ -1,4 +1,4 @@
-package com.project.momentum.features.newcontentcreation.mediaconfig
+package com.project.momentum.features.contentcreation.mediaconfig
 
 internal object AudioRecordingFormat {
     const val FILE_EXTENSION = "ogg"

@@ -1,4 +1,4 @@
-package com.project.momentum.features.newcontentcreation.ui.assets
+package com.project.momentum.features.contentcreation.ui.assets
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,7 +16,6 @@ import androidx.compose.material.icons.outlined.WbSunny
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,7 +24,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.project.momentum.R
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
-import com.project.momentum.ui.assets.BigCircleForMainScreenActionAdaptive
 import com.project.momentum.ui.assets.BigCircleMicroButtonAdaptive
 import com.project.momentum.ui.assets.CircleButton
 import com.project.momentum.ui.assets.MyBigCircleForMainScreenActionAdaptive
@@ -85,22 +83,6 @@ internal fun MyMediaCreationModeSwitcher(
     }
 }
 
-@Composable
-internal fun CameraModeSwitcher(
-    onGoToRecorder: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    MediaCreationModeSwitcher(
-        mode = ContentCreationMode.Camera,
-        enabled = true,
-        onModeChange = { mode ->
-            if (mode == ContentCreationMode.Audio) {
-                onGoToRecorder()
-            }
-        },
-        modifier = modifier,
-    )
-}
 
 @Composable
 private fun ModeCircleButton(
@@ -120,78 +102,9 @@ private fun ModeCircleButton(
     )
 }
 
+
 @Composable
 internal fun CameraBottomControls(
-    torchEnabled: Boolean,
-    captureEnabled: Boolean,
-    captureButtonState: MutableState<Boolean>,
-    onToggleTorch: () -> Unit,
-    onTakePhoto: () -> Unit,
-    onStartRecording: () -> Unit,
-    onStopRecording: () -> Unit,
-    onFlipCamera: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val iconTint = if (captureEnabled) {
-        ConstColours.WHITE
-    } else {
-        ConstColours.WHITE.copy(alpha = 0.4f)
-    }
-
-
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(
-            onClick = onToggleTorch,
-            enabled = captureEnabled,
-            modifier = Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically),
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.WbSunny,
-                contentDescription = stringResource(R.string.icon_flash),
-                tint = if (torchEnabled) ConstColours.MAIN_BRAND_BLUE else iconTint,
-                modifier = Modifier.fillMaxSize(0.8f),
-            )
-        }
-
-        Box(modifier = Modifier.weight(1.5f), contentAlignment = Alignment.Center) {
-            BigCircleForMainScreenActionAdaptive(
-                onClick = onTakePhoto,
-                onLongPressStart = onStartRecording,
-                onLongPressEnd = onStopRecording,
-                onStartProgress = {},
-                onEndProgress = {},
-                enabled = captureEnabled,
-                progressStarted = captureButtonState,
-                modifier = Modifier
-                    .aspectRatio(1f)//.align(Alignment.Center),
-            )
-        }
-
-
-        IconButton(
-            onClick = onFlipCamera,
-            enabled = captureEnabled,
-            modifier = Modifier
-                .weight(1f)
-                .align(Alignment.CenterVertically),
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Cached,
-                contentDescription = stringResource(R.string.icon_flip_camera),
-                tint = iconTint,
-                modifier = Modifier.fillMaxSize(0.8f),
-            )
-        }
-    }
-}
-
-@Composable
-internal fun MyCameraBottomControls(
     torchEnabled: Boolean,
     captureEnabled: Boolean,
     captureButtonState: Boolean,

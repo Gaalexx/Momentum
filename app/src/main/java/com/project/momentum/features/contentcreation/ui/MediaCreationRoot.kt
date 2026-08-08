@@ -1,8 +1,6 @@
-package com.project.momentum.features.newcontentcreation.ui
+package com.project.momentum.features.contentcreation.ui
 
-import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import android.widget.Toast
 import androidx.camera.view.LifecycleCameraController
 import androidx.compose.animation.core.Animatable
@@ -31,22 +29,22 @@ import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.contentcreation.permissions.rememberCameraPermissionState
 import com.project.momentum.features.contentcreation.permissions.rememberMicrophonePermissionState
-import com.project.momentum.features.contentcreation.ui.DefaultMaxRecordMs
-import com.project.momentum.features.newcontentcreation.mediaconfig.AudioRecordingFormat
-import com.project.momentum.features.newcontentcreation.mediaconfig.PhotoRecordingFormat
-import com.project.momentum.features.newcontentcreation.mediaconfig.VideoRecordingFormat
-import com.project.momentum.features.newcontentcreation.ui.assets.AudioBottomControls
-import com.project.momentum.features.newcontentcreation.ui.assets.GalleryButton
-import com.project.momentum.features.newcontentcreation.ui.assets.MyCameraBottomControls
-import com.project.momentum.features.newcontentcreation.ui.assets.MyMediaCreationModeSwitcher
-import com.project.momentum.features.newcontentcreation.ui.assets.MyMediaCreationPreviewCard
-import com.project.momentum.features.newcontentcreation.viewmodel.CameraEvent
-import com.project.momentum.features.newcontentcreation.viewmodel.CameraState
-import com.project.momentum.features.newcontentcreation.viewmodel.NewCameraViewModel
+import com.project.momentum.features.contentcreation.mediaconfig.AudioRecordingFormat
+import com.project.momentum.features.contentcreation.mediaconfig.VideoRecordingFormat
+import com.project.momentum.features.contentcreation.ui.assets.AudioBottomControls
+import com.project.momentum.features.contentcreation.ui.assets.GalleryButton
+import com.project.momentum.features.contentcreation.ui.assets.CameraBottomControls
+import com.project.momentum.features.contentcreation.ui.assets.MyMediaCreationModeSwitcher
+import com.project.momentum.features.contentcreation.ui.assets.MediaCreationPreviewCard
+import com.project.momentum.features.contentcreation.viewmodel.CameraEvent
+import com.project.momentum.features.contentcreation.viewmodel.CameraState
+import com.project.momentum.features.contentcreation.viewmodel.MediaInputViewModel
 import com.project.momentum.ui.theme.ConstColours
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import java.io.File
+
+const val DefaultMaxRecordMs = 60_000
 
 @Composable
 fun MyMediaCreationRoot(
@@ -55,7 +53,7 @@ fun MyMediaCreationRoot(
     onProfileClick: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
-    contentCreationViewModel: NewCameraViewModel = hiltViewModel()
+    contentCreationViewModel: MediaInputViewModel = hiltViewModel()
 ) {
     val vmState = contentCreationViewModel.state.collectAsStateWithLifecycle().value
     val controller = contentCreationViewModel.controller
@@ -131,7 +129,7 @@ fun MyMediaCreationScreen(
             .fillMaxSize()
             .background(ConstColours.BLACK),
     ) {
-        MyMediaCreationPreviewCard(
+        MediaCreationPreviewCard(
             mode = cameraState.contentCreationMode,
             hasCameraPermission = hasCameraPermission,
             hasMicrophonePermission = hasMicrophonePermission,
@@ -159,7 +157,7 @@ fun MyMediaCreationScreen(
 
                 var pendingRecording by remember { mutableStateOf<CompletableDeferred<Uri?>?>(null) }
 
-                MyCameraBottomControls(
+                CameraBottomControls(
                     torchEnabled = cameraState.torchEnabled,
                     captureEnabled = hasCameraPermission,
                     captureButtonState = cameraState.isRecording,//cameraCaptureButtonState,
@@ -182,7 +180,7 @@ fun MyMediaCreationScreen(
                     },
                     onStopRecording = {
 
-                        val result = pendingRecording ?: return@MyCameraBottomControls
+                        val result = pendingRecording ?: return@CameraBottomControls
                         pendingRecording = null
                         scope.launch {
                             onEvent(CameraEvent.OnRecordVideoSwitch(result))

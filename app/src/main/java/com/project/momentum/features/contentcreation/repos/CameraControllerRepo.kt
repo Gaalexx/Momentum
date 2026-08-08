@@ -1,4 +1,4 @@
-package com.project.momentum.features.newcontentcreation.repos
+package com.project.momentum.features.contentcreation.repos
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -19,8 +19,8 @@ import androidx.camera.view.video.AudioConfig
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import com.project.momentum.di.IoDispatcher
-import com.project.momentum.features.newcontentcreation.mediaconfig.PhotoRecordingFormat
-import com.project.momentum.features.newcontentcreation.mediaconfig.VideoRecordingFormat
+import com.project.momentum.features.contentcreation.mediaconfig.PhotoRecordingFormat
+import com.project.momentum.features.contentcreation.mediaconfig.VideoRecordingFormat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.CompletableDeferred

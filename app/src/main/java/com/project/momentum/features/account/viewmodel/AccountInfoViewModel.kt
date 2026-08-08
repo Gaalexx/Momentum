@@ -1,19 +1,8 @@
 package com.project.momentum.features.account.viewmodel
 
-import android.content.Context
-import android.net.Uri
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.project.momentum.features.account.ui.AccountScreen
 import com.project.momentum.features.account.usecases.GetInfoUseCase
-import com.project.momentum.features.contentcreation.viewmodel.UploadState
-import com.project.momentum.features.editingAccount.viewmodel.AvatarInfo
-import com.project.momentum.network.s3.MediaType
-import com.project.momentum.network.s3.PostInformation
 import com.project.momentum.network.s3.S3InteractionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -46,8 +35,11 @@ class AccountInfoViewModel @Inject constructor(
     private val uploaderRepo: S3InteractionRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow<AccountInfoState>(AccountInfoState(
-        "", "", "")) //TODO: isLoading
+    private val _state = MutableStateFlow<AccountInfoState>(
+        AccountInfoState(
+            "", "", ""
+        )
+    ) //TODO: isLoading
     val state = _state.asStateFlow()
 
     init {

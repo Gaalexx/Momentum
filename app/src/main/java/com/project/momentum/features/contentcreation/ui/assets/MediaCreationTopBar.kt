@@ -1,4 +1,4 @@
-package com.project.momentum.features.newcontentcreation.ui.assets
+package com.project.momentum.features.contentcreation.ui.assets
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio

@@ -59,10 +59,10 @@ import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.project.momentum.R
-import com.project.momentum.features.newcontentcreation.mediaconfig.AudioRecordingFormat
+import com.project.momentum.features.contentcreation.mediaconfig.AudioRecordingFormat
 import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.contentcreation.permissions.rememberCameraPermissionState
-import com.project.momentum.features.newcontentcreation.ui.assets.CameraTopBar
+import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
 import com.project.momentum.features.contentcreation.viewmodel.ContentCreationViewModel
 import com.project.momentum.features.contentcreation.viewmodel.UploadEvent
 import com.project.momentum.features.contentcreation.viewmodel.UploadState
@@ -91,8 +91,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Scaffold
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
-import com.project.momentum.features.newcontentcreation.mediaconfig.PhotoRecordingFormat
-import com.project.momentum.features.newcontentcreation.mediaconfig.VideoRecordingFormat
+import com.project.momentum.features.contentcreation.mediaconfig.PhotoRecordingFormat
+import com.project.momentum.features.contentcreation.mediaconfig.VideoRecordingFormat
 
 
 fun deleteByUri(context: Context, uri: Uri): Boolean {

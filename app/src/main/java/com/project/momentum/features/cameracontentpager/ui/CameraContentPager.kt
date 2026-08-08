@@ -32,9 +32,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.models.MediaTypeToSend
-import com.project.momentum.features.contentcreation.ui.MediaCreationRoot
-import com.project.momentum.features.newcontentcreation.ui.MyMediaCreationRoot
-import com.project.momentum.features.newcontentcreation.ui.assets.CameraTopBar
+import com.project.momentum.features.contentcreation.ui.MyMediaCreationRoot
+import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
 import com.project.momentum.features.posts.ui.NoPostsYet
 import com.project.momentum.features.posts.ui.WatchPhotoScreenRouteForMain
 import com.project.momentum.features.posts.viewmodel.PostsViewModel

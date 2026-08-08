@@ -1,11 +1,11 @@
-package com.project.momentum.features.newcontentcreation.repos
+package com.project.momentum.features.contentcreation.repos
 
 import android.content.Context
 import android.media.MediaRecorder
 import android.util.Log
 import android.widget.Toast
 import com.project.momentum.di.IoDispatcher
-import com.project.momentum.features.newcontentcreation.mediaconfig.AudioRecordingFormat
+import com.project.momentum.features.contentcreation.mediaconfig.AudioRecordingFormat
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import java.io.File

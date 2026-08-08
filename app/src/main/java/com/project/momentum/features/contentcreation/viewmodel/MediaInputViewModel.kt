@@ -1,4 +1,4 @@
-package com.project.momentum.features.newcontentcreation.viewmodel
+package com.project.momentum.features.contentcreation.viewmodel
 
 
 import android.content.Context
@@ -9,9 +9,9 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
-import com.project.momentum.features.newcontentcreation.mediaconfig.AudioRecordingFormat
-import com.project.momentum.features.newcontentcreation.repos.AudioRecorderRepo
-import com.project.momentum.features.newcontentcreation.repos.CameraControllerRepo
+import com.project.momentum.features.contentcreation.mediaconfig.AudioRecordingFormat
+import com.project.momentum.features.contentcreation.repos.AudioRecorderRepo
+import com.project.momentum.features.contentcreation.repos.CameraControllerRepo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import jakarta.inject.Inject
@@ -42,7 +42,7 @@ sealed interface CameraEvent {
 }
 
 @HiltViewModel
-class NewCameraViewModel @Inject constructor(
+class MediaInputViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val cameraRepo: CameraControllerRepo,
     private val audioRepo: AudioRecorderRepo
