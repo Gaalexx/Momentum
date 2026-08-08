@@ -109,7 +109,6 @@ internal fun MediaCreationPreviewCard(
                                     controller = controller,
                                     modifier = Modifier.fillMaxSize()
                                 )
-
                             }
 
                             else -> {

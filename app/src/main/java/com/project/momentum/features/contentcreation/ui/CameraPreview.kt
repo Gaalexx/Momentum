@@ -30,29 +30,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
-//@Composable
-//fun CameraView(
-//    controller: LifecycleCameraController,
-//    modifier: Modifier = Modifier
-//) {
-//    val lifecycleOwner = LocalLifecycleOwner.current
-//
-//
-//
-//    AndroidView(
-//        modifier = modifier,
-//        factory = { ctx ->
-//            PreviewView(ctx).apply {
-//                this.controller = controller
-//                controller.bindToLifecycle(lifecycleOwner)
-//                implementationMode = PreviewView.ImplementationMode.COMPATIBLE
-//                scaleType = PreviewView.ScaleType.FILL_CENTER
-//                layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, MATCH_PARENT)
-//            }
-//        },
-//    )
-//}
-
 @Composable
 fun CameraView(
     controller: LifecycleCameraController,
