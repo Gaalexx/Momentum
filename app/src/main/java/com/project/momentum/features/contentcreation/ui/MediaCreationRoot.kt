@@ -25,17 +25,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.project.momentum.features.contentcreation.mediaconfig.AudioRecordingFormat
+import com.project.momentum.features.contentcreation.mediaconfig.VideoRecordingFormat
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.contentcreation.permissions.rememberCameraPermissionState
 import com.project.momentum.features.contentcreation.permissions.rememberMicrophonePermissionState
-import com.project.momentum.features.contentcreation.mediaconfig.AudioRecordingFormat
-import com.project.momentum.features.contentcreation.mediaconfig.VideoRecordingFormat
 import com.project.momentum.features.contentcreation.ui.assets.AudioBottomControls
-import com.project.momentum.features.contentcreation.ui.assets.GalleryButton
 import com.project.momentum.features.contentcreation.ui.assets.CameraBottomControls
-import com.project.momentum.features.contentcreation.ui.assets.MyMediaCreationModeSwitcher
+import com.project.momentum.features.contentcreation.ui.assets.GalleryButton
 import com.project.momentum.features.contentcreation.ui.assets.MediaCreationPreviewCard
+import com.project.momentum.features.contentcreation.ui.assets.MyMediaCreationModeSwitcher
 import com.project.momentum.features.contentcreation.viewmodel.CameraEvent
 import com.project.momentum.features.contentcreation.viewmodel.CameraState
 import com.project.momentum.features.contentcreation.viewmodel.MediaInputViewModel
@@ -160,7 +160,7 @@ fun MyMediaCreationScreen(
                 CameraBottomControls(
                     torchEnabled = cameraState.torchEnabled,
                     captureEnabled = hasCameraPermission,
-                    captureButtonState = cameraState.isRecording,//cameraCaptureButtonState,
+                    isRecording = cameraState.isRecording,//cameraCaptureButtonState,
                     onToggleTorch = { onEvent(CameraEvent.OnToggleFlash) },
                     onTakePhoto = {
                         scope.launch {
@@ -199,11 +199,15 @@ fun MyMediaCreationScreen(
                 AudioBottomControls(
                     enabled = hasMicrophonePermission,
                     isRecording = cameraState.isRecording,
-                    onStartRecording = { onEvent(CameraEvent.OnRecordAudioSwitch) },
+                    onStartRecording = {
+                        scope.launch { onEvent(CameraEvent.OnRecordAudioSwitch) }
+                    },
                     onStopRecording = {
-                        onEvent(CameraEvent.OnRecordAudioSwitch)
-                        val uri = File(context.filesDir, AudioRecordingFormat.FILE_NAME).toUri()
-                        onGoToPreview(uri, MediaTypeToSend.AUDIO)
+                        scope.launch {
+                            onEvent(CameraEvent.OnRecordAudioSwitch)
+                            val uri = File(context.filesDir, AudioRecordingFormat.FILE_NAME).toUri()
+                            onGoToPreview(uri, MediaTypeToSend.AUDIO)
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
