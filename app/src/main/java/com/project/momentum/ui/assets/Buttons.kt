@@ -2,7 +2,7 @@ package com.project.momentum.ui.assets
 
 
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -10,7 +10,21 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
@@ -24,39 +38,48 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Group
-import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.PersonAdd
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.BlurEffect
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.project.momentum.ui.theme.AppTextStyles
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.sp
 import com.project.momentum.R
 import com.project.momentum.features.settings.ui.SubscriptionOption
+import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
 
 
@@ -314,9 +337,7 @@ fun CircleButton(
         shadowElevation = shadowElevation
     ) {
         IconButton(
-            onClick = onClick,
-            enabled = enabled,
-            modifier = Modifier.fillMaxSize()
+            onClick = onClick, enabled = enabled, modifier = Modifier.fillMaxSize()
         ) {
             Icon(
                 imageVector = icon,
@@ -349,9 +370,7 @@ fun CircleButtonAdaptive(
         shadowElevation = shadowElevation
     ) {
         IconButton(
-            onClick = onClick,
-            enabled = enabled,
-            modifier = Modifier.fillMaxSize()
+            onClick = onClick, enabled = enabled, modifier = Modifier.fillMaxSize()
         ) {
             Icon(
                 imageVector = icon,
@@ -379,8 +398,7 @@ fun SettingsButtonAdaptive(
             .background(
                 color = ConstColours.BLACK,
             )
-            .clickable { onClick() }
-    ) {
+            .clickable { onClick() }) {
         Row(
             modifier = Modifier.background(
                 color = ConstColours.BLACK
@@ -396,9 +414,7 @@ fun SettingsButtonAdaptive(
             Spacer(modifier = Modifier.width(16.dp))
 
             Text(
-                text = text,
-                color = textColor,
-                style = AppTextStyles.MainText
+                text = text, color = textColor, style = AppTextStyles.MainText
             )
         }
     }
@@ -421,8 +437,7 @@ fun SettingsButton(
             .background(
                 color = ConstColours.BLACK,
             )
-            .clickable { onClick() }
-    ) {
+            .clickable { onClick() }) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -436,9 +451,7 @@ fun SettingsButton(
             Spacer(modifier = Modifier.width(16.dp))
 
             Text(
-                text = text,
-                color = textColor,
-                style = AppTextStyles.MainText
+                text = text, color = textColor, style = AppTextStyles.MainText
             )
         }
     }
@@ -470,14 +483,11 @@ fun FriendsPillButtonAdaptive(
         contentPadding = PaddingValues(horizontal = 22.dp, vertical = 0.dp)
     ) {
         Icon(
-            imageVector = Icons.Outlined.Group,
-            contentDescription = null
+            imageVector = Icons.Outlined.Group, contentDescription = null
         )
         Spacer(Modifier.width(10.dp))
         Text(
-            text = text,
-            style = MaterialTheme.typography.titleMedium,
-            color = ConstColours.WHITE
+            text = text, style = MaterialTheme.typography.titleMedium, color = ConstColours.WHITE
         )
     }
 }
@@ -515,9 +525,7 @@ fun FriendsPillButton(
         )
         Spacer(Modifier.width(10.dp))
         Text(
-            text = text,
-            style = MaterialTheme.typography.titleMedium,
-            color = ConstColours.WHITE
+            text = text, style = MaterialTheme.typography.titleMedium, color = ConstColours.WHITE
         )
     }
 }
@@ -535,28 +543,28 @@ fun MyBigCircleForMainScreenActionAdaptive(
     var pressed by remember { mutableStateOf(false) }
     var longMode by remember { mutableStateOf(false) }
     val progress = remember { Animatable(0f) }
+    val haptic = LocalHapticFeedback.current
 
-    LaunchedEffect(isRecording) {
-        if (isRecording) {
+
+    LaunchedEffect(isRecording, pressed) {
+        if (isRecording && pressed) {
+
             progress.snapTo(0f)
-            while (pressed) {
+
+            while (true) {
                 progress.animateTo(
-                    targetValue = 1f,
-                    animationSpec = tween(
-                        durationMillis = 750,
-                        easing = LinearEasing
+                    targetValue = 1f, animationSpec = tween(
+                        durationMillis = 950, easing = FastOutSlowInEasing
                     )
                 )
+
                 progress.animateTo(
-                    targetValue = 0f,
-                    animationSpec = tween(
-                        durationMillis = 750,
-                        easing = LinearEasing
+                    targetValue = 0f, animationSpec = tween(
+                        durationMillis = 1200, easing = FastOutSlowInEasing
                     )
                 )
             }
 
-            progress.snapTo(0f)
         } else {
             progress.stop()
             progress.snapTo(0f)
@@ -567,39 +575,94 @@ fun MyBigCircleForMainScreenActionAdaptive(
     Box(
         modifier = modifier
             .clip(CircleShape)
-            .background(if (isRecording && pressed) ConstColours.MAIN_BRAND_BLUE_ALPHA40 else ConstColours.MAIN_BACK_GRAY),
+            .background(ConstColours.MAIN_BACK_GRAY),
         contentAlignment = Alignment.Center
     ) {
+        if (isRecording && pressed) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(0.84f)
+                    .graphicsLayer {
+
+                        val outerProgress =
+                            progress.value * progress.value * (3f - 2f * progress.value)
+
+                        val scale = 1f + 0.14f * outerProgress
+
+                        scaleX = scale
+                        scaleY = scale
+
+                        alpha = 0.15f + 0.20f * progress.value
+
+                        renderEffect = BlurEffect(
+                            radiusX = 30f, radiusY = 30f, edgeTreatment = TileMode.Decal
+                        )
+                    }
+                    .background(
+                        color = ConstColours.MAIN_BRAND_BLUE, shape = CircleShape
+                    ))
+
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(0.81f)
+                    .graphicsLayer {
+
+                        val scale = 1f + 0.08f * progress.value
+
+                        scaleX = scale
+                        scaleY = scale
+
+                        alpha = 0.35f + 0.30f * progress.value
+
+                        renderEffect = BlurEffect(
+                            radiusX = 12f, radiusY = 12f, edgeTreatment = TileMode.Decal
+                        )
+                    }
+                    .background(
+                        color = ConstColours.MAIN_BRAND_BLUE, shape = CircleShape
+                    ))
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxSize(0.8f)
-                .graphicsLayer {
-                    val s = 1f + 0.25f * progress.value
-                    scaleX = s
-                    scaleY = s
-                }
                 .clip(CircleShape)
-                .pointerInput(Unit) {
-                    if (!enabled) return@pointerInput
+                .pointerInput(enabled) {
+
+                    if (!enabled) {
+                        return@pointerInput
+                    }
+
                     detectTapGestures(
-                        onTap = { onClick() },
+                        onTap = {
+                            onClick()
+                        },
+
                         onLongPress = {
                             longMode = true
+
                             onLongPressStart()
+
+                            haptic.performHapticFeedback(
+                                HapticFeedbackType.LongPress
+                            )
                         },
+
                         onPress = {
                             pressed = true
+
                             tryAwaitRelease()
+
                             pressed = false
+
                             if (longMode) {
                                 onLongPressEnd()
                                 longMode = false
                             }
-                        }
-                    )
+                        })
                 }
-                .background(ConstColours.WHITE)
-        )
+                .background(ConstColours.WHITE))
     }
 }
 
@@ -616,8 +679,7 @@ fun BigCircleSendPhotoActionAdaptive(
         modifier = modifier
             .clip(CircleShape)
             .clickable(enabled = enabled, onClick = onClick)
-            .background(outerColor),
-        contentAlignment = Alignment.Center
+            .background(outerColor), contentAlignment = Alignment.Center
     ) {
         Box(
             modifier = Modifier
@@ -663,8 +725,7 @@ fun EditButtonAdaptive(
     onEditProfile: () -> Unit,
     modifier: Modifier = Modifier,
     colors: ButtonColors = ButtonDefaults.buttonColors(
-        containerColor = ConstColours.MAIN_BRAND_BLUE,
-        contentColor = ConstColours.WHITE
+        containerColor = ConstColours.MAIN_BRAND_BLUE, contentColor = ConstColours.WHITE
     )
 ) {
     Button(
@@ -673,21 +734,16 @@ fun EditButtonAdaptive(
         shape = RoundedCornerShape(50.dp),
         modifier = modifier.heightIn(min = 32.dp),
         contentPadding = PaddingValues(
-            horizontal = dimensionResource(R.dimen.small_padding),
-            vertical = 0.dp
+            horizontal = dimensionResource(R.dimen.small_padding), vertical = 0.dp
         )
     ) {
         Icon(
-            imageVector = Icons.Filled.Edit,
-            contentDescription = null,
-            tint = colors.contentColor
+            imageVector = Icons.Filled.Edit, contentDescription = null, tint = colors.contentColor
         )
         Spacer(Modifier.width(dimensionResource(R.dimen.extra_small_padding)))
         Text(
-            text = stringResource(R.string.button_edit),
-            style = AppTextStyles.SubButtonText.copy(
-                textAlign = TextAlign.Center,
-                color = colors.contentColor
+            text = stringResource(R.string.button_edit), style = AppTextStyles.SubButtonText.copy(
+                textAlign = TextAlign.Center, color = colors.contentColor
             )
         )
     }
@@ -699,8 +755,7 @@ fun EditButton(
     modifier: Modifier = Modifier,
     iconSize: Dp = 18.dp,
     colors: ButtonColors = ButtonDefaults.buttonColors(
-        containerColor = ConstColours.MAIN_BRAND_BLUE,
-        contentColor = ConstColours.WHITE
+        containerColor = ConstColours.MAIN_BRAND_BLUE, contentColor = ConstColours.WHITE
     )
 ) {
     Button(
@@ -709,8 +764,7 @@ fun EditButton(
         shape = RoundedCornerShape(50.dp),
         modifier = modifier.heightIn(min = 32.dp),
         contentPadding = PaddingValues(
-            horizontal = dimensionResource(R.dimen.small_padding),
-            vertical = 0.dp
+            horizontal = dimensionResource(R.dimen.small_padding), vertical = 0.dp
         )
     ) {
         Icon(
@@ -721,10 +775,8 @@ fun EditButton(
         )
         Spacer(Modifier.width(dimensionResource(R.dimen.extra_small_padding)))
         Text(
-            text = stringResource(R.string.button_edit),
-            style = AppTextStyles.SubButtonText.copy(
-                textAlign = TextAlign.Center,
-                color = colors.contentColor
+            text = stringResource(R.string.button_edit), style = AppTextStyles.SubButtonText.copy(
+                textAlign = TextAlign.Center, color = colors.contentColor
             )
         )
     }
@@ -781,8 +833,7 @@ fun ContinueButtonAdaptive(
     modifier: Modifier = Modifier,
     text: String = stringResource(R.string.button_continue),
     colors: ButtonColors = ButtonDefaults.buttonColors(
-        containerColor = ConstColours.TRANSPARENT_WHITE_ALPHA0,
-        contentColor = ConstColours.WHITE
+        containerColor = ConstColours.TRANSPARENT_WHITE_ALPHA0, contentColor = ConstColours.WHITE
     ),
     backGroundColor: Color = ConstColours.MAIN_BRAND_BLUE
 ) {
@@ -793,11 +844,9 @@ fun ContinueButtonAdaptive(
             .background(
                 brush = Brush.linearGradient(
                     colors = listOf(
-                        backGroundColor,
-                        backGroundColor.copy(alpha = 0.5f)
+                        backGroundColor, backGroundColor.copy(alpha = 0.5f)
                     )
-                ),
-                shape = RoundedCornerShape(50.dp)
+                ), shape = RoundedCornerShape(50.dp)
 
             )
             .clip(RoundedCornerShape(50.dp)),
@@ -810,8 +859,7 @@ fun ContinueButtonAdaptive(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             style = AppTextStyles.ButtonText.copy(
-                textAlign = TextAlign.Center,
-                color = colors.contentColor
+                textAlign = TextAlign.Center, color = colors.contentColor
             )
         )
     }
@@ -824,15 +872,11 @@ fun ContinueButton(
     text: String = stringResource(R.string.button_continue),
     height: Dp = dimensionResource(R.dimen.button_size),
     colors: ButtonColors = ButtonDefaults.buttonColors(
-        containerColor = ConstColours.TRANSPARENT_WHITE_ALPHA0,
-        contentColor = ConstColours.WHITE
+        containerColor = ConstColours.TRANSPARENT_WHITE_ALPHA0, contentColor = ConstColours.WHITE
     )
 ) {
     ContinueButtonAdaptive(
-        onClick = onClick,
-        modifier = modifier.height(height),
-        text = text,
-        colors = colors
+        onClick = onClick, modifier = modifier.height(height), text = text, colors = colors
     )
 }
 
@@ -854,8 +898,7 @@ fun CancelButtonAdaptive(
         shape = RoundedCornerShape(50.dp),
         colors = colors,
         border = BorderStroke(
-            width = dimensionResource(R.dimen.thickness_divider),
-            color = colors.contentColor
+            width = dimensionResource(R.dimen.thickness_divider), color = colors.contentColor
         )
     ) {
         Text(
@@ -863,8 +906,7 @@ fun CancelButtonAdaptive(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             style = AppTextStyles.ButtonText.copy(
-                textAlign = TextAlign.Center,
-                color = colors.contentColor
+                textAlign = TextAlign.Center, color = colors.contentColor
             ),
             textAlign = TextAlign.Center,
             color = colors.contentColor
@@ -884,10 +926,7 @@ fun CancelButton(
     )
 ) {
     CancelButtonAdaptive(
-        onClick = onClick,
-        modifier = modifier.height(height),
-        text = text,
-        colors = colors
+        onClick = onClick, modifier = modifier.height(height), text = text, colors = colors
     )
 }
 
@@ -897,8 +936,7 @@ fun BuyButtonAdaptive(
     onClick: () -> Unit,
     text: String = stringResource(R.string.settings_premium_buy),
     colors: ButtonColors = ButtonDefaults.buttonColors(
-        containerColor = ConstColours.GOLD,
-        contentColor = ConstColours.WHITE
+        containerColor = ConstColours.GOLD, contentColor = ConstColours.WHITE
     )
 ) {
     Button(
@@ -912,8 +950,7 @@ fun BuyButtonAdaptive(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             style = AppTextStyles.ButtonText.copy(
-                textAlign = TextAlign.Center,
-                color = colors.contentColor
+                textAlign = TextAlign.Center, color = colors.contentColor
             )
         )
     }
@@ -926,15 +963,11 @@ fun BuyButton(
     text: String = stringResource(R.string.settings_premium_buy),
     height: Dp = dimensionResource(R.dimen.button_size),
     colors: ButtonColors = ButtonDefaults.buttonColors(
-        containerColor = ConstColours.GOLD,
-        contentColor = ConstColours.WHITE
+        containerColor = ConstColours.GOLD, contentColor = ConstColours.WHITE
     )
 ) {
     BuyButtonAdaptive(
-        modifier = modifier.height(height),
-        onClick = onClick,
-        text = text,
-        colors = colors
+        modifier = modifier.height(height), onClick = onClick, text = text, colors = colors
     )
 }
 
@@ -954,8 +987,7 @@ fun StableSwitch(
     val thumbRadius = thumbSize / 2
 
     val thumbOffset by animateDpAsState(
-        targetValue = if (enabled) width - thumbSize - 6.dp else 6.dp,
-        label = "thumbOffset"
+        targetValue = if (enabled) width - thumbSize - 6.dp else 6.dp, label = "thumbOffset"
     )
 
     Box(
@@ -966,8 +998,7 @@ fun StableSwitch(
             .background(if (enabled) enabledTrackColor else disabledTrackColor)
             .clickable { onEnabledChange(!enabled) }
             .padding(horizontal = 0.dp),
-        contentAlignment = Alignment.CenterStart
-    ) {
+        contentAlignment = Alignment.CenterStart) {
         Box(
             modifier = Modifier
                 .offset(x = thumbOffset)
@@ -981,9 +1012,7 @@ fun StableSwitch(
 
 @Composable
 fun SwitchRow(
-    text: String,
-    enabled: Boolean,
-    onEnabledChange: (Boolean) -> Unit
+    text: String, enabled: Boolean, onEnabledChange: (Boolean) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -996,21 +1025,18 @@ fun SwitchRow(
             text = text,
             style = AppTextStyles.MainText,
             color = ConstColours.WHITE,
-            modifier = Modifier
-                .weight(1f)
+            modifier = Modifier.weight(1f)
         )
 
         StableSwitch(
-            enabled = enabled,
-            onEnabledChange = onEnabledChange
+            enabled = enabled, onEnabledChange = onEnabledChange
         )
     }
 }
 
 @Composable
 fun PremiumFeatureItem(
-    text: String,
-    icon: ImageVector
+    text: String, icon: ImageVector
 ) {
     Row(
         modifier = Modifier
@@ -1028,18 +1054,14 @@ fun PremiumFeatureItem(
         Spacer(modifier = Modifier.width(12.dp))
 
         Text(
-            text = text,
-            style = AppTextStyles.MainText,
-            color = ConstColours.WHITE
+            text = text, style = AppTextStyles.MainText, color = ConstColours.WHITE
         )
     }
 }
 
 @Composable
 fun SubscriptionOptionCard(
-    option: SubscriptionOption,
-    isSelected: Boolean,
-    onSelect: () -> Unit
+    option: SubscriptionOption, isSelected: Boolean, onSelect: () -> Unit
 ) {
     Card(
         modifier = Modifier
@@ -1047,8 +1069,7 @@ fun SubscriptionOptionCard(
             .aspectRatio(0.8f)
             .clickable(onClick = onSelect),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected)
-                ConstColours.MAIN_BRAND_BLUE.copy(alpha = 0.2f)
+            containerColor = if (isSelected) ConstColours.MAIN_BRAND_BLUE.copy(alpha = 0.2f)
             else ConstColours.MAIN_BACK_GRAY
         ),
         shape = RoundedCornerShape(12.dp)
@@ -1167,48 +1188,37 @@ fun ThemeCard(
 
 @Composable
 fun ButtonForDeleteAdaptive(
-    onClick: () -> Unit,
-    text: String,
-    color: Color
+    onClick: () -> Unit, text: String, color: Color
 ) {
     Button(
         onClick = onClick,
         modifier = Modifier,
         shape = RoundedCornerShape(999.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = ConstColours.WHITE,
-            contentColor = ConstColours.WHITE
+            containerColor = ConstColours.WHITE, contentColor = ConstColours.WHITE
         )
     ) {
         Text(
-            text = text,
-            style = MaterialTheme.typography.titleMedium,
-            color = color
+            text = text, style = MaterialTheme.typography.titleMedium, color = color
         )
     }
 }
 
 @Composable
 fun ButtonForDelete(
-    onClick: () -> Unit,
-    text: String,
-    color: Color,
-    horizontalPadding: Dp = 22.dp
+    onClick: () -> Unit, text: String, color: Color, horizontalPadding: Dp = 22.dp
 ) {
     Button(
         onClick = onClick,
         modifier = Modifier,
         shape = RoundedCornerShape(999.dp),
         colors = ButtonDefaults.buttonColors(
-            containerColor = ConstColours.WHITE,
-            contentColor = ConstColours.WHITE
+            containerColor = ConstColours.WHITE, contentColor = ConstColours.WHITE
         ),
         contentPadding = PaddingValues(horizontal = horizontalPadding, vertical = 0.dp)
     ) {
         Text(
-            text = text,
-            style = MaterialTheme.typography.titleMedium,
-            color = color
+            text = text, style = MaterialTheme.typography.titleMedium, color = color
         )
     }
 }
@@ -1222,19 +1232,14 @@ fun SubscriptionOptionCardPreview() {
             title = "Год",
             price = "1200",
             month_cost = "100",
-        ),
-        isSelected = false,
-        onSelect = {}
-    )
+        ), isSelected = false, onSelect = {})
 }
 
 @Preview(name = "Subscription Option Card", group = "Buttons")
 @Composable
 fun ThemeCardPreview() {
     ThemeCard(
-        isSelected = false,
-        onClick = {}
-    )
+        isSelected = false, onClick = {})
 }
 
 @Preview(name = "Buy Buttons", group = "Buttons")
@@ -1244,13 +1249,9 @@ fun BuyButtonPreview() {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         BuyButtonAdaptive(
-            modifier = Modifier,
-            {}
-        )
+            modifier = Modifier, {})
         BuyButton(
-            modifier = Modifier,
-            onClick = {}
-        )
+            modifier = Modifier, onClick = {})
     }
 }
 
@@ -1261,17 +1262,13 @@ fun ContinueButtonPreview() {
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         ContinueButtonAdaptive(
-            {}
-        )
+            {})
         CancelButtonAdaptive(
-            {}
-        )
+            {})
         ContinueButton(
-            {}
-        )
+            {})
         CancelButton(
-            {}
-        )
+            {})
     }
 }
 
@@ -1336,8 +1333,7 @@ fun PreviewAdaptiveButtonsOverview() {
     Column(
         Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -1385,8 +1381,7 @@ private fun PreviewFriendsPill() {
 @Composable
 private fun PreviewSettingsButton() {
     Column(
-        Modifier.padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         SettingsButtonAdaptive(
             onClick = {},
@@ -1420,8 +1415,7 @@ fun PreviewBigCircleAdaptive() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         BigCircleSendPhotoActionAdaptive(
-            onClick = {},
-            modifier = Modifier.size(132.dp)
+            onClick = {}, modifier = Modifier.size(132.dp)
         )
     }
 }
@@ -1449,14 +1443,10 @@ private fun PreviewDeleteButtons() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         ButtonForDeleteAdaptive(
-            onClick = {},
-            text = "Удалить",
-            color = ConstColours.MAIN_BRAND_BLUE
+            onClick = {}, text = "Удалить", color = ConstColours.MAIN_BRAND_BLUE
         )
         ButtonForDelete(
-            onClick = {},
-            text = "Удалить",
-            color = ConstColours.MAIN_BRAND_BLUE
+            onClick = {}, text = "Удалить", color = ConstColours.MAIN_BRAND_BLUE
         )
     }
 }

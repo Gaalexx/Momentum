@@ -137,6 +137,7 @@ dependencies {
 
     // Compose
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.ui.graphics)
     implementation(libs.bundles.compose)
     implementation(libs.lottie.compose)
     implementation(libs.androidx.compose.constraintlayout)

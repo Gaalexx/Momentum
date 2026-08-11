@@ -154,7 +154,9 @@ internal fun CameraBottomControls(
 
 
         IconButton(
-            onClick = onFlipCamera,
+            onClick = if (isRecording) {
+                {}
+            } else onFlipCamera,
             enabled = captureEnabled,
             modifier = Modifier
                 .weight(1f)
@@ -163,7 +165,7 @@ internal fun CameraBottomControls(
             Icon(
                 imageVector = Icons.Outlined.Cached,
                 contentDescription = stringResource(R.string.icon_flip_camera),
-                tint = iconTint,
+                tint = if (isRecording) iconTint.copy(alpha = 0.4f) else iconTint,
                 modifier = Modifier.fillMaxSize(0.8f),
             )
         }

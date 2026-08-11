@@ -21,6 +21,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -50,9 +51,6 @@ const val DefaultMaxRecordMs = 60_000
 fun MyMediaCreationRoot(
     modifier: Modifier = Modifier,
     onGoToPreview: (Uri, MediaTypeToSend) -> Unit,
-    onProfileClick: () -> Unit,
-    onGoToSettings: () -> Unit,
-    onGoToFriends: () -> Unit,
     contentCreationViewModel: MediaInputViewModel = hiltViewModel()
 ) {
     val vmState = contentCreationViewModel.state.collectAsStateWithLifecycle().value
@@ -62,9 +60,6 @@ fun MyMediaCreationRoot(
     MyMediaCreationScreen(
         modifier = modifier,
         onGoToPreview = onGoToPreview,
-        onProfileClick = onProfileClick,
-        onGoToSettings = onGoToSettings,
-        onGoToFriends = onGoToFriends,
         cameraState = vmState,
         onEvent = onEvent,
         controller = controller
@@ -75,9 +70,6 @@ fun MyMediaCreationRoot(
 fun MyMediaCreationScreen(
     modifier: Modifier = Modifier,
     onGoToPreview: (Uri, MediaTypeToSend) -> Unit,
-    onProfileClick: () -> Unit,
-    onGoToSettings: () -> Unit,
-    onGoToFriends: () -> Unit,
     cameraState: CameraState,
     onEvent: (CameraEvent) -> Unit,
     controller: LifecycleCameraController,

@@ -28,7 +28,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.models.MediaTypeToSend
@@ -57,7 +57,6 @@ fun CameraContentPager(
     onGoToGallery: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
-    //maxRecordMs: Int = DefaultMaxRecordMs,
     onGoToTakePhoto: () -> Unit,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
@@ -104,7 +103,6 @@ fun CameraContentPager(
     Surface(
         color = ConstColours.BLACK,
         modifier = Modifier
-//            .fillMaxSize()
             .background(ConstColours.BLACK)
             .windowInsetsPadding(WindowInsets.systemBars)
     ) {
@@ -126,19 +124,9 @@ fun CameraContentPager(
                 modifier = Modifier.fillMaxSize()
             ) { page ->
                 when (page) {
-//                    0 -> MediaCreationRoot(
-//                        initialMode = initialMode,
-//                        onGoToPreview = onGoToPreview,
-//                        onProfileClick = onProfileClick,
-//                        onGoToSettings = onGoToSettings,
-//                        onGoToFriends = onGoToFriends,
-//                        cameraPreviewEnabled = isCameraPageActive
-//                    )
+
                     0 -> MyMediaCreationRoot(
-                        onGoToPreview = onGoToPreview,
-                        onProfileClick = onProfileClick,
-                        onGoToSettings = onGoToSettings,
-                        onGoToFriends = onGoToFriends
+                        onGoToPreview = onGoToPreview
                     )
 
                     1 -> if (postsState.value.posts.isNotEmpty()) {
