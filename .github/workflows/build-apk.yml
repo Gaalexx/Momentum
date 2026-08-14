@@ -2,12 +2,11 @@ name: Build APK
 
 on:
   push:
-    branches: [ main ]      # любой merge/push в main
-  workflow_dispatch:        # + кнопка ручного запуска во вкладке Actions
+    branches: [ main ]
+  workflow_dispatch:
 
 env:
-  # debug — работает сразу. Поменяй на release, когда добавишь keystore.
-  BUILD_TYPE: debug
+  BUILD_TYPE: release
 
 jobs:
   build:
