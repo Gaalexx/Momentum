@@ -12,17 +12,26 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.layout.positionOnScreen
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -35,6 +44,7 @@ import com.project.momentum.features.contentcreation.permissions.rememberMicroph
 import com.project.momentum.features.contentcreation.ui.assets.AudioBottomControls
 import com.project.momentum.features.contentcreation.ui.assets.CameraBottomControls
 import com.project.momentum.features.contentcreation.ui.assets.GalleryButton
+import com.project.momentum.features.contentcreation.ui.assets.LockBubble
 import com.project.momentum.features.contentcreation.ui.assets.MediaCreationPreviewCard
 import com.project.momentum.features.contentcreation.ui.assets.MyMediaCreationModeSwitcher
 import com.project.momentum.features.contentcreation.viewmodel.CameraEvent
@@ -44,6 +54,7 @@ import com.project.momentum.ui.theme.ConstColours
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import java.io.File
+import kotlin.math.roundToInt
 
 const val DefaultMaxRecordMs = 60_000
 
@@ -85,6 +96,11 @@ fun MyMediaCreationScreen(
     )
 
     val progress = remember { Animatable(0f) }
+    val floatingProgress = remember { Animatable(0f) }
+    val offsetYDif = remember { mutableIntStateOf(0) }
+    var buttonTopOffset by remember { mutableStateOf(Offset.Zero) }
+    val bubbleSize = 45.dp
+    var maximumBubbleYOffset by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(cameraState.isRecording) {
         if (cameraState.isRecording) {
@@ -115,106 +131,181 @@ fun MyMediaCreationScreen(
         }
     }
 
-
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(ConstColours.BLACK),
-    ) {
-        MediaCreationPreviewCard(
-            mode = cameraState.contentCreationMode,
-            hasCameraPermission = hasCameraPermission,
-            hasMicrophonePermission = hasMicrophonePermission,
-            progress = progress.value,
-            audioLevel = 0.0F/* audioRecording?. */,
-            cameraPreviewEnabled = true,
-            controller = controller
-        )
-
-        MyMediaCreationModeSwitcher(
-            mode = cameraState.contentCreationMode,
-            enabled = !cameraState.isRecording,
-            onModeChange = { it ->
-                onEvent(CameraEvent.OnContentCreationModeChange(it))
-            },
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .weight(0.7f),
-        )
-
-        Spacer(modifier = Modifier.weight(0.3f))
-
-        when (cameraState.contentCreationMode) {
-            ContentCreationMode.Camera -> {
-
-                var pendingRecording by remember { mutableStateOf<CompletableDeferred<Uri?>?>(null) }
-
-                CameraBottomControls(
-                    torchEnabled = cameraState.torchEnabled,
-                    captureEnabled = hasCameraPermission,
-                    isRecording = cameraState.isRecording,//cameraCaptureButtonState,
-                    onToggleTorch = { onEvent(CameraEvent.OnToggleFlash) },
-                    onTakePhoto = {
-                        scope.launch {
-                            val result = CompletableDeferred<Uri>()
-                            onEvent(CameraEvent.OnTakePhoto(result))
-                            val uri = result.await()
-                            onGoToPreview(uri, MediaTypeToSend.PHOTO)
-                        }
-                    },
-                    onStartRecording = {
-                        scope.launch {
-                            val result = CompletableDeferred<Uri?>()
-                            pendingRecording = result
-                            onEvent(CameraEvent.OnRecordVideoSwitch(result))
-                        }
-
-                    },
-                    onStopRecording = {
-
-                        val result = pendingRecording ?: return@CameraBottomControls
-                        pendingRecording = null
-                        scope.launch {
-                            onEvent(CameraEvent.OnRecordVideoSwitch(result))
-                            val uri = File(context.filesDir, VideoRecordingFormat.FILE_NAME).toUri()
-                            onGoToPreview(uri, MediaTypeToSend.VIDEO)
-                        }
-                    },
-                    onFlipCamera = { onEvent(CameraEvent.OnFlipCamera) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1.7f),
+    LaunchedEffect(cameraState.isRecording) {
+        if (cameraState.isRecording) {
+            floatingProgress.snapTo(0f)
+            while (true) {
+                floatingProgress.animateTo(
+                    targetValue = 1f,
+                    animationSpec = tween(
+                        durationMillis = 1000,
+                        easing = LinearEasing
+                    )
+                )
+                floatingProgress.animateTo(
+                    targetValue = -1f,
+                    animationSpec = tween(
+                        durationMillis = 1000,
+                        easing = LinearEasing
+                    )
                 )
             }
-
-            ContentCreationMode.Audio -> {
-                AudioBottomControls(
-                    enabled = hasMicrophonePermission,
-                    isRecording = cameraState.isRecording,
-                    onStartRecording = {
-                        scope.launch { onEvent(CameraEvent.OnRecordAudioSwitch) }
-                    },
-                    onStopRecording = {
-                        scope.launch {
-                            onEvent(CameraEvent.OnRecordAudioSwitch)
-                            val uri = File(context.filesDir, AudioRecordingFormat.FILE_NAME).toUri()
-                            onGoToPreview(uri, MediaTypeToSend.AUDIO)
-                        }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1.7f),
-                )
-            }
-        }
-        Box(
-            modifier = Modifier
-                .weight(1.3f)
-                .fillMaxWidth(), contentAlignment = Alignment.Center
-        ) {
-            GalleryButton(modifier = Modifier, onClick = {})
+        } else {
+            floatingProgress.snapTo(0f)
         }
     }
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+    ) {
+
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .background(ConstColours.BLACK),
+        ) {
+
+            val controlsModifier: Modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .weight(1.7f)
+                    .onGloballyPositioned { coordinates ->
+                        buttonTopOffset = Offset(
+                            x = coordinates.positionInParent().x + coordinates.size.width / 2f,
+                            y = coordinates.positionInParent().y
+                        )
+                    }
+
+            MediaCreationPreviewCard(
+                mode = cameraState.contentCreationMode,
+                hasCameraPermission = hasCameraPermission,
+                hasMicrophonePermission = hasMicrophonePermission,
+                progress = progress.value,
+                audioLevel = 0.0F/* audioRecording?. */,
+                cameraPreviewEnabled = true,
+                controller = controller
+            )
+
+            MyMediaCreationModeSwitcher(
+                mode = cameraState.contentCreationMode,
+                enabled = !cameraState.isRecording,
+                onModeChange = { it ->
+                    onEvent(CameraEvent.OnContentCreationModeChange(it))
+                },
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .weight(0.7f)
+                    .onGloballyPositioned { coords ->
+                        maximumBubbleYOffset =
+                            (coords.positionInParent().y.roundToInt() - coords.size.height / 2)
+                    },
+            )
+
+            Spacer(modifier = Modifier.weight(0.3f))
+
+            when (cameraState.contentCreationMode) {
+
+                ContentCreationMode.Camera -> {
+
+                    var pendingRecording by remember {
+                        mutableStateOf<CompletableDeferred<Uri?>?>(
+                            null
+                        )
+                    }
+
+                    CameraBottomControls(
+                        torchEnabled = cameraState.torchEnabled,
+                        captureEnabled = hasCameraPermission,
+                        isRecording = cameraState.isRecording,
+                        onToggleTorch = { onEvent(CameraEvent.OnToggleFlash) },
+                        onTakePhoto = {
+                            scope.launch {
+                                val result = CompletableDeferred<Uri>()
+                                onEvent(CameraEvent.OnTakePhoto(result))
+                                val uri = result.await()
+                                onGoToPreview(uri, MediaTypeToSend.PHOTO)
+                            }
+                        },
+                        onStartRecording = {
+                            scope.launch {
+                                val result = CompletableDeferred<Uri?>()
+                                pendingRecording = result
+                                onEvent(CameraEvent.OnRecordVideoSwitch(result))
+                            }
+
+                        },
+                        onStopRecording = {
+
+                            val result = pendingRecording ?: return@CameraBottomControls
+                            pendingRecording = null
+                            scope.launch {
+                                onEvent(CameraEvent.OnRecordVideoSwitch(result))
+                                val uri =
+                                    File(context.filesDir, VideoRecordingFormat.FILE_NAME).toUri()
+                                onGoToPreview(uri, MediaTypeToSend.VIDEO)
+                            }
+                        },
+                        onFlipCamera = { onEvent(CameraEvent.OnFlipCamera) },
+                        modifier = controlsModifier,
+                        offsetY = offsetYDif
+                    )
+                }
+
+                ContentCreationMode.Audio -> {
+                    AudioBottomControls(
+                        enabled = hasMicrophonePermission,
+                        isRecording = cameraState.isRecording,
+                        onStartRecording = {
+                            scope.launch { onEvent(CameraEvent.OnRecordAudioSwitch) }
+                        },
+                        onStopRecording = {
+                            scope.launch {
+                                onEvent(CameraEvent.OnRecordAudioSwitch)
+                                val uri =
+                                    File(context.filesDir, AudioRecordingFormat.FILE_NAME).toUri()
+                                onGoToPreview(uri, MediaTypeToSend.AUDIO)
+                            }
+                        },
+                        modifier = controlsModifier,
+                        offsetY = offsetYDif
+                    )
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .weight(1.3f)
+                    .fillMaxWidth(), contentAlignment = Alignment.Center
+            ) {
+                GalleryButton(modifier = Modifier, onClick = {})
+            }
+        }
+
+        if (cameraState.isRecording) {
+
+            LockBubble(
+                modifier = Modifier
+                    .offset {
+                        IntOffset(
+                            x = (buttonTopOffset.x - bubbleSize.roundToPx() / 2f).roundToInt(),
+                            y = (buttonTopOffset.y.roundToInt() + offsetYDif.intValue).coerceIn(
+                                maximumBubbleYOffset, buttonTopOffset.y.roundToInt()
+                            ) + (bubbleSize.roundToPx() / 4f * floatingProgress.value).roundToInt()
+                        )
+                    }
+                    .size(bubbleSize),
+                isLocked = false,
+                progress = {
+                    (1f - ((buttonTopOffset.y.roundToInt() + offsetYDif.intValue).coerceIn(
+                        maximumBubbleYOffset, buttonTopOffset.y.roundToInt()
+                    )
+                        .toFloat() - maximumBubbleYOffset) / (buttonTopOffset.y.roundToInt() - maximumBubbleYOffset)) / 2f + 0.5f
+                }
+            )
+        }
+
+    }
+
 
 }
 

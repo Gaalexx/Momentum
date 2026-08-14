@@ -24,7 +24,7 @@ datastore = "1.2.1"
 activityCompose = "1.13.0"
 coreKtx = "1.19.0"
 lifecycle = "2.11.0"
-navigation3 = "1.1.5"
+navigation3 = "1.1.6"
 
 # Dependency injection
 hilt = "2.60.1"
@@ -38,9 +38,9 @@ serializationJson = "1.11.0"
 # Media and UI
 camerax = "1.6.1"
 coil = "2.7.0"
-composeBom = "2026.06.01"
+composeBom = "2026.08.00"
 lottie = "6.7.1"
-media3 = "1.10.1"
+media3 = "1.11.0"
 constraintLayout = "1.1.2"
 
 # Testing
@@ -49,13 +49,13 @@ espressoCore = "3.7.0"
 junit4 = "4.13.2"
 datastoreCore = "1.2.1"
 transportRuntime = "4.1.1"
-runtime = "1.11.4"
+runtime = "1.12.0"
 datastorePreferencesCore = "1.2.1"
-uiText = "1.11.4"
+uiText = "1.12.0"
 material3 = "1.4.0"
-foundation = "1.11.4"
-animationCore = "1.11.4"
-uiGraphics = "1.11.4"
+foundation = "1.12.0"
+animationCore = "1.12.0"
+uiGraphics = "1.12.0"
 
 [libraries]
 # Core Android
@@ -100,7 +100,9 @@ firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serializationJson" }
+#noinspection SimilarGradleDependency
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+#noinspection SimilarGradleDependency
 ktor-client-android-v341 = { module = "io.ktor:ktor-client-android", version.ref = "ktorClientAndroid" }
 ktor-client-contentnegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }

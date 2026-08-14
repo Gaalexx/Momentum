@@ -1,6 +1,7 @@
 package com.project.momentum.ui.assets
 
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
@@ -9,6 +10,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -52,7 +54,9 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -81,6 +85,7 @@ import com.project.momentum.R
 import com.project.momentum.features.settings.ui.SubscriptionOption
 import com.project.momentum.ui.theme.AppTextStyles
 import com.project.momentum.ui.theme.ConstColours
+import kotlin.math.roundToInt
 
 
 @Composable
@@ -539,6 +544,7 @@ fun MyBigCircleForMainScreenActionAdaptive(
     onLongPressEnd: () -> Unit,
     enabled: Boolean = true,
     isRecording: Boolean = false,
+    offsetY: MutableState<Int> = mutableIntStateOf(0)
 ) {
     var pressed by remember { mutableStateOf(false) }
     var longMode by remember { mutableStateOf(false) }
@@ -575,7 +581,8 @@ fun MyBigCircleForMainScreenActionAdaptive(
     Box(
         modifier = modifier
             .clip(CircleShape)
-            .background(ConstColours.MAIN_BACK_GRAY),
+            .background(ConstColours.MAIN_BACK_GRAY)
+            ,
         contentAlignment = Alignment.Center
     ) {
         if (isRecording && pressed) {
@@ -661,6 +668,13 @@ fun MyBigCircleForMainScreenActionAdaptive(
                                 longMode = false
                             }
                         })
+                }
+                .pointerInput(Unit) {
+                    detectDragGesturesAfterLongPress { change, dragAmount ->
+                        change.consume()
+                        offsetY.value += dragAmount.y.roundToInt()
+                        //Log.e("ANIMATION", offsetY.value.toString())
+                    }
                 }
                 .background(ConstColours.WHITE))
     }

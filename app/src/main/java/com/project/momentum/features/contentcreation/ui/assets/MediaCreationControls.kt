@@ -16,6 +16,7 @@ import androidx.compose.material.icons.outlined.WbSunny
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,32 +29,6 @@ import com.project.momentum.ui.assets.CircleButton
 import com.project.momentum.ui.assets.MyBigCircleForMainScreenActionAdaptive
 import com.project.momentum.ui.theme.ConstColours
 
-@Composable
-internal fun MediaCreationModeSwitcher(
-    mode: ContentCreationMode,
-    enabled: Boolean,
-    onModeChange: (ContentCreationMode) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier.padding(horizontal = 30.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        ModeCircleButton(
-            selected = mode == ContentCreationMode.Camera,
-            enabled = enabled,
-            onClick = { onModeChange(ContentCreationMode.Camera) },
-            icon = Icons.Outlined.PhotoCamera,
-        )
-        ModeCircleButton(
-            selected = mode == ContentCreationMode.Audio,
-            enabled = enabled,
-            onClick = { onModeChange(ContentCreationMode.Audio) },
-            icon = Icons.Outlined.Mic,
-        )
-    }
-}
 
 @Composable
 internal fun MyMediaCreationModeSwitcher(
@@ -113,6 +88,7 @@ internal fun CameraBottomControls(
     onFlipCamera: () -> Unit,
     isRecording: Boolean = false,
     modifier: Modifier = Modifier,
+    offsetY: MutableState<Int>
 ) {
     val iconTint = if (captureEnabled) {
         ConstColours.WHITE
@@ -147,6 +123,7 @@ internal fun CameraBottomControls(
                 onLongPressEnd = onStopRecording,
                 enabled = captureEnabled,
                 isRecording = isRecording,
+                offsetY = offsetY,
                 modifier = Modifier
                     .aspectRatio(1f)//.align(Alignment.Center),
             )
@@ -179,6 +156,7 @@ internal fun AudioBottomControls(
     onStartRecording: () -> Unit,
     onStopRecording: () -> Unit,
     modifier: Modifier = Modifier,
+    offsetY: MutableState<Int>
 ) {
     Box(
         modifier = modifier,
@@ -192,7 +170,8 @@ internal fun AudioBottomControls(
             onLongPressStart = onStartRecording,
             onLongPressEnd = onStopRecording,
             enabled = enabled,
-            isRecording = isRecording
+            isRecording = isRecording,
+            offsetY = offsetY
         )
     }
 }
