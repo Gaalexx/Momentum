@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -25,11 +26,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.layout.positionOnScreen
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -41,6 +44,7 @@ import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.contentcreation.permissions.rememberCameraPermissionState
 import com.project.momentum.features.contentcreation.permissions.rememberMicrophonePermissionState
+import com.project.momentum.features.contentcreation.structures.rememberSwipeOffsetHolder
 import com.project.momentum.features.contentcreation.ui.assets.AudioBottomControls
 import com.project.momentum.features.contentcreation.ui.assets.CameraBottomControls
 import com.project.momentum.features.contentcreation.ui.assets.GalleryButton
@@ -96,11 +100,23 @@ fun MyMediaCreationScreen(
     )
 
     val progress = remember { Animatable(0f) }
-    val floatingProgress = remember { Animatable(0f) }
-    val offsetYDif = remember { mutableIntStateOf(0) }
-    var buttonTopOffset by remember { mutableStateOf(Offset.Zero) }
-    val bubbleSize = 45.dp
-    var maximumBubbleYOffset by remember { mutableIntStateOf(0) }
+    val haptic = LocalHapticFeedback.current
+    val offsetHolder = rememberSwipeOffsetHolder(45.dp)
+
+    val lockReached by remember {
+        derivedStateOf {
+            val y =
+                offsetHolder.buttonTopOffset.value.y.roundToInt() + offsetHolder.offsetYDif.intValue
+            y <= offsetHolder.maximumBubbleYOffset.intValue
+        }
+    }
+
+    LaunchedEffect(lockReached) {
+        if (lockReached && !offsetHolder.isLocked.value) {
+            offsetHolder.isLocked.value = true
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        }
+    }
 
     LaunchedEffect(cameraState.isRecording) {
         if (cameraState.isRecording) {
@@ -133,16 +149,16 @@ fun MyMediaCreationScreen(
 
     LaunchedEffect(cameraState.isRecording) {
         if (cameraState.isRecording) {
-            floatingProgress.snapTo(0f)
+            offsetHolder.floatingProgress.snapTo(0f)
             while (true) {
-                floatingProgress.animateTo(
+                offsetHolder.floatingProgress.animateTo(
                     targetValue = 1f,
                     animationSpec = tween(
                         durationMillis = 1000,
                         easing = LinearEasing
                     )
                 )
-                floatingProgress.animateTo(
+                offsetHolder.floatingProgress.animateTo(
                     targetValue = -1f,
                     animationSpec = tween(
                         durationMillis = 1000,
@@ -151,7 +167,7 @@ fun MyMediaCreationScreen(
                 )
             }
         } else {
-            floatingProgress.snapTo(0f)
+            offsetHolder.floatingProgress.snapTo(0f)
         }
     }
 
@@ -171,7 +187,7 @@ fun MyMediaCreationScreen(
                     .fillMaxWidth()
                     .weight(1.7f)
                     .onGloballyPositioned { coordinates ->
-                        buttonTopOffset = Offset(
+                        offsetHolder.buttonTopOffset.value = Offset(
                             x = coordinates.positionInParent().x + coordinates.size.width / 2f,
                             y = coordinates.positionInParent().y
                         )
@@ -197,7 +213,7 @@ fun MyMediaCreationScreen(
                     .align(Alignment.CenterHorizontally)
                     .weight(0.7f)
                     .onGloballyPositioned { coords ->
-                        maximumBubbleYOffset =
+                        offsetHolder.maximumBubbleYOffset.intValue =
                             (coords.positionInParent().y.roundToInt() - coords.size.height / 2)
                     },
             )
@@ -233,7 +249,6 @@ fun MyMediaCreationScreen(
                                 pendingRecording = result
                                 onEvent(CameraEvent.OnRecordVideoSwitch(result))
                             }
-
                         },
                         onStopRecording = {
 
@@ -244,11 +259,12 @@ fun MyMediaCreationScreen(
                                 val uri =
                                     File(context.filesDir, VideoRecordingFormat.FILE_NAME).toUri()
                                 onGoToPreview(uri, MediaTypeToSend.VIDEO)
+                                offsetHolder.refresh()
                             }
                         },
                         onFlipCamera = { onEvent(CameraEvent.OnFlipCamera) },
                         modifier = controlsModifier,
-                        offsetY = offsetYDif
+                        offsetHolder = offsetHolder
                     )
                 }
 
@@ -265,10 +281,11 @@ fun MyMediaCreationScreen(
                                 val uri =
                                     File(context.filesDir, AudioRecordingFormat.FILE_NAME).toUri()
                                 onGoToPreview(uri, MediaTypeToSend.AUDIO)
+                                offsetHolder.refresh()
                             }
                         },
                         modifier = controlsModifier,
-                        offsetY = offsetYDif
+                        offsetHolder = offsetHolder
                     )
                 }
             }
@@ -287,19 +304,20 @@ fun MyMediaCreationScreen(
                 modifier = Modifier
                     .offset {
                         IntOffset(
-                            x = (buttonTopOffset.x - bubbleSize.roundToPx() / 2f).roundToInt(),
-                            y = (buttonTopOffset.y.roundToInt() + offsetYDif.intValue).coerceIn(
-                                maximumBubbleYOffset, buttonTopOffset.y.roundToInt()
-                            ) + (bubbleSize.roundToPx() / 4f * floatingProgress.value).roundToInt()
+                            x = (offsetHolder.buttonTopOffset.value.x - offsetHolder.bubbleSize.roundToPx() / 2f).roundToInt(),
+                            y = (offsetHolder.buttonTopOffset.value.y.roundToInt() + offsetHolder.offsetYDif.intValue).coerceIn(
+                                offsetHolder.maximumBubbleYOffset.intValue,
+                                offsetHolder.buttonTopOffset.value.y.roundToInt()
+                            ) + (offsetHolder.bubbleSize.roundToPx() / 4f * if (offsetHolder.isLocked.value) 1f else offsetHolder.floatingProgress.value).roundToInt()
                         )
                     }
-                    .size(bubbleSize),
-                isLocked = false,
+                    .size(offsetHolder.bubbleSize),
                 progress = {
-                    (1f - ((buttonTopOffset.y.roundToInt() + offsetYDif.intValue).coerceIn(
-                        maximumBubbleYOffset, buttonTopOffset.y.roundToInt()
+                    (1f - ((offsetHolder.buttonTopOffset.value.y.roundToInt() + offsetHolder.offsetYDif.intValue).coerceIn(
+                        offsetHolder.maximumBubbleYOffset.intValue,
+                        offsetHolder.buttonTopOffset.value.y.roundToInt()
                     )
-                        .toFloat() - maximumBubbleYOffset) / (buttonTopOffset.y.roundToInt() - maximumBubbleYOffset)) / 2f + 0.5f
+                        .toFloat() - offsetHolder.maximumBubbleYOffset.intValue) / (offsetHolder.buttonTopOffset.value.y.roundToInt() - offsetHolder.maximumBubbleYOffset.intValue)) / 2f + 0.5f
                 }
             )
         }

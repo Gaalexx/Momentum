@@ -24,7 +24,7 @@ import com.project.momentum.ui.theme.ConstColours
 
 @Composable
 fun LockBubble(
-    modifier: Modifier = Modifier, isLocked: Boolean, progress: () -> Float
+    modifier: Modifier = Modifier, progress: () -> Float
 ) {
 
     val dynamicProperties = rememberLottieDynamicProperties(
@@ -62,5 +62,5 @@ fun LockBubble(
 @Preview
 @Composable
 private fun LockBubblePreview() {
-    LockBubble(modifier = Modifier.size(100.dp), false, { 0.25f })
+    LockBubble(modifier = Modifier.size(100.dp), { 0.25f })
 }

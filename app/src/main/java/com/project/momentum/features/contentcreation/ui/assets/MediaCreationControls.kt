@@ -25,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.project.momentum.R
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
+import com.project.momentum.features.contentcreation.structures.SwipeOffsetHolder
 import com.project.momentum.ui.assets.CircleButton
 import com.project.momentum.ui.assets.MyBigCircleForMainScreenActionAdaptive
 import com.project.momentum.ui.theme.ConstColours
@@ -88,7 +89,7 @@ internal fun CameraBottomControls(
     onFlipCamera: () -> Unit,
     isRecording: Boolean = false,
     modifier: Modifier = Modifier,
-    offsetY: MutableState<Int>
+    offsetHolder: SwipeOffsetHolder
 ) {
     val iconTint = if (captureEnabled) {
         ConstColours.WHITE
@@ -123,7 +124,7 @@ internal fun CameraBottomControls(
                 onLongPressEnd = onStopRecording,
                 enabled = captureEnabled,
                 isRecording = isRecording,
-                offsetY = offsetY,
+                offsetHolder = offsetHolder,
                 modifier = Modifier
                     .aspectRatio(1f)//.align(Alignment.Center),
             )
@@ -156,7 +157,7 @@ internal fun AudioBottomControls(
     onStartRecording: () -> Unit,
     onStopRecording: () -> Unit,
     modifier: Modifier = Modifier,
-    offsetY: MutableState<Int>
+    offsetHolder: SwipeOffsetHolder
 ) {
     Box(
         modifier = modifier,
@@ -171,7 +172,7 @@ internal fun AudioBottomControls(
             onLongPressEnd = onStopRecording,
             enabled = enabled,
             isRecording = isRecording,
-            offsetY = offsetY
+            offsetHolder = offsetHolder
         )
     }
 }
