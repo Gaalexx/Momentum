@@ -16,6 +16,7 @@ import androidx.compose.material.icons.outlined.WbSunny
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,37 +25,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.project.momentum.R
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
-import com.project.momentum.ui.assets.BigCircleMicroButtonAdaptive
+import com.project.momentum.features.contentcreation.structures.SwipeOffsetHolder
 import com.project.momentum.ui.assets.CircleButton
 import com.project.momentum.ui.assets.MyBigCircleForMainScreenActionAdaptive
 import com.project.momentum.ui.theme.ConstColours
 
-@Composable
-internal fun MediaCreationModeSwitcher(
-    mode: ContentCreationMode,
-    enabled: Boolean,
-    onModeChange: (ContentCreationMode) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier.padding(horizontal = 30.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        ModeCircleButton(
-            selected = mode == ContentCreationMode.Camera,
-            enabled = enabled,
-            onClick = { onModeChange(ContentCreationMode.Camera) },
-            icon = Icons.Outlined.PhotoCamera,
-        )
-        ModeCircleButton(
-            selected = mode == ContentCreationMode.Audio,
-            enabled = enabled,
-            onClick = { onModeChange(ContentCreationMode.Audio) },
-            icon = Icons.Outlined.Mic,
-        )
-    }
-}
 
 @Composable
 internal fun MyMediaCreationModeSwitcher(
@@ -107,13 +82,14 @@ private fun ModeCircleButton(
 internal fun CameraBottomControls(
     torchEnabled: Boolean,
     captureEnabled: Boolean,
-    captureButtonState: Boolean,
     onToggleTorch: () -> Unit,
     onTakePhoto: () -> Unit,
     onStartRecording: () -> Unit,
     onStopRecording: () -> Unit,
     onFlipCamera: () -> Unit,
+    isRecording: Boolean = false,
     modifier: Modifier = Modifier,
+    offsetHolder: SwipeOffsetHolder
 ) {
     val iconTint = if (captureEnabled) {
         ConstColours.WHITE
@@ -146,10 +122,9 @@ internal fun CameraBottomControls(
                 onClick = onTakePhoto,
                 onLongPressStart = onStartRecording,
                 onLongPressEnd = onStopRecording,
-                onStartProgress = {},
-                onEndProgress = {},
                 enabled = captureEnabled,
-                progressStarted = captureButtonState,
+                isRecording = isRecording,
+                offsetHolder = offsetHolder,
                 modifier = Modifier
                     .aspectRatio(1f)//.align(Alignment.Center),
             )
@@ -157,7 +132,9 @@ internal fun CameraBottomControls(
 
 
         IconButton(
-            onClick = onFlipCamera,
+            onClick = if (isRecording) {
+                {}
+            } else onFlipCamera,
             enabled = captureEnabled,
             modifier = Modifier
                 .weight(1f)
@@ -166,7 +143,7 @@ internal fun CameraBottomControls(
             Icon(
                 imageVector = Icons.Outlined.Cached,
                 contentDescription = stringResource(R.string.icon_flip_camera),
-                tint = iconTint,
+                tint = if (isRecording) iconTint.copy(alpha = 0.4f) else iconTint,
                 modifier = Modifier.fillMaxSize(0.8f),
             )
         }
@@ -180,29 +157,22 @@ internal fun AudioBottomControls(
     onStartRecording: () -> Unit,
     onStopRecording: () -> Unit,
     modifier: Modifier = Modifier,
+    offsetHolder: SwipeOffsetHolder
 ) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
-        BigCircleMicroButtonAdaptive(
-            onLongPress = onStartRecording,
-            onLongPressEnd = onStopRecording,
-            enabled = enabled,
-            isRecording = isRecording,
-            outerColor = if (enabled) {
-                ConstColours.MAIN_BACK_GRAY
-            } else {
-                ConstColours.MAIN_BACK_GRAY.copy(alpha = 0.45f)
-            },
-            innerColor = if (enabled) {
-                ConstColours.WHITE
-            } else {
-                Color.White.copy(alpha = 0.55f)
-            },
+        MyBigCircleForMainScreenActionAdaptive(
+            onClick = {},
             modifier = Modifier
                 .align(Alignment.Center)
                 .aspectRatio(1f),
+            onLongPressStart = onStartRecording,
+            onLongPressEnd = onStopRecording,
+            enabled = enabled,
+            isRecording = isRecording,
+            offsetHolder = offsetHolder
         )
     }
 }

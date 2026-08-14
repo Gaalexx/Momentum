@@ -25,6 +25,7 @@ class AudioRecorderRepo @Inject constructor(
         if (_audioRecording != null) {
             _audioRecording!!.stop()
             _audioRecording!!.release()
+            _audioRecording = null
             return
         }
 

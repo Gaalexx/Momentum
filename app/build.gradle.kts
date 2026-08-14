@@ -36,6 +36,10 @@ fun requiredLocalProperty(name: String): String =
     localProperty(name)
         ?: error("$name not found in local.properties")
 
+// Сначала переменная окружения (CI), потом local.properties (локальная сборка)
+fun secret(name: String): String? =
+    System.getenv(name)?.takeIf { it.isNotEmpty() } ?: localProperty(name)
+
 val vkAppId = requiredLocalProperty("vkAppId")
 val vkClientId = requiredLocalProperty("clientId")
 val vkClientSecret = requiredLocalProperty("clientSecret")
@@ -55,16 +59,25 @@ kotlin {
     }
 }
 
-
 android {
     namespace = "com.project.momentum"
     compileSdkVersion(compileSdkApi)
+
+    signingConfigs {
+        create("release") {
+            storeFile = file("keystore.jks")
+            storePassword = secret("KEYSTORE_PASSWORD")
+            keyAlias = secret("KEY_ALIAS")
+            keyPassword = secret("KEY_PASSWORD")
+        }
+    }
 
     defaultConfig {
         applicationId = "com.project.momentum"
         minSdk = minSdkApi
         targetSdk = targetSdkApi
-        versionCode = 1
+        // На CI берётся номер запуска, локально всегда 1
+        versionCode = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInt()
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -109,11 +122,9 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true
+            isShrinkResources = true
         }
     }
     compileOptions {
@@ -124,9 +135,6 @@ android {
         compose = true
         buildConfig = true
     }
-//    kotlinOptions {
-//        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
-//    }
 }
 
 dependencies {
@@ -135,15 +143,16 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.datastore.preferences)
 
-    // Compose
+    // Compose BOM — обязателен на всех трёх конфигурациях,
+    // иначе consistent resolution в AGP 9 роняет androidTest
     implementation(platform(libs.androidx.compose.bom))
+    testImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+
+    // Compose
     implementation(libs.bundles.compose)
     implementation(libs.lottie.compose)
     implementation(libs.androidx.compose.constraintlayout)
-
-    // Material
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.material3)
 
     // Architecture
     implementation(libs.bundles.lifecycle)
@@ -163,31 +172,24 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.bundles.ktor)
     implementation(libs.ktor.client.logging)
-    implementation(libs.ktor.client.android.v341)
 
     // Dependency injection
     implementation(libs.hilt.android)
     implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.datastore.core)
-    implementation(libs.androidx.compose.runtime)
     implementation(libs.androidx.datastore.preferences.core)
-    implementation(libs.androidx.ui.text)
-    implementation(libs.androidx.foundation)
-    implementation(libs.androidx.compose.animation.core)
 
     ksp(libs.hilt.compiler)
 
     // Tests
     testImplementation(libs.junit4)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.bundles.androidx.test)
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-
-    //gms
+    // gms
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
     implementation(libs.firebase.messaging)

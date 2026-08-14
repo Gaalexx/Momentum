@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
 
-@Stable
 data class CameraState(
     val torchEnabled: Boolean = false,
     val contentCreationMode: ContentCreationMode = ContentCreationMode.Camera,

@@ -28,12 +28,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.contentcreation.ui.MyMediaCreationRoot
 import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
+import com.project.momentum.features.contentcreation.viewmodel.ContentCreationViewModel
+import com.project.momentum.features.contentcreation.viewmodel.MediaInputViewModel
 import com.project.momentum.features.posts.ui.NoPostsYet
 import com.project.momentum.features.posts.ui.WatchPhotoScreenRouteForMain
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
@@ -57,25 +59,16 @@ fun CameraContentPager(
     onGoToGallery: () -> Unit,
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
-    //maxRecordMs: Int = DefaultMaxRecordMs,
     onGoToTakePhoto: () -> Unit,
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
     currentPost: Int = 0,
-    postsViewModel: PostsViewModel = hiltViewModel()
+    postsViewModel: PostsViewModel = hiltViewModel(),
+    mediaInputViewModel: MediaInputViewModel = hiltViewModel()
 ) {
 
     val scope = rememberCoroutineScope()
 
-    var enterAnimationFinished by remember {
-        mutableStateOf(false)
-    }
-
-    LaunchedEffect(Unit) {
-        enterAnimationFinished = false
-        delay(500)
-        enterAnimationFinished = true
-    }
 
     val pagerState = rememberPagerState(
         initialPage = mainScreenPage.ordinal,
@@ -87,11 +80,6 @@ fun CameraContentPager(
         snapPositionalThreshold = 0.125f
     )
 
-    val isCameraPageActive by remember {
-        derivedStateOf {
-            enterAnimationFinished && pagerState.settledPage == MainScreenPage.CONTENT_CREATION.curPage
-        }
-    }
 
     BackHandler(enabled = pagerState.currentPage != 0) {
         scope.launch {
@@ -101,10 +89,10 @@ fun CameraContentPager(
 
 
     val postsState = postsViewModel.state.collectAsStateWithLifecycle()
+    val miState = mediaInputViewModel.state.collectAsStateWithLifecycle()
     Surface(
         color = ConstColours.BLACK,
         modifier = Modifier
-//            .fillMaxSize()
             .background(ConstColours.BLACK)
             .windowInsetsPadding(WindowInsets.systemBars)
     ) {
@@ -123,22 +111,13 @@ fun CameraContentPager(
             VerticalPager(
                 state = pagerState,
                 flingBehavior = flingBehavior,
+                userScrollEnabled = !miState.value.isRecording,
                 modifier = Modifier.fillMaxSize()
             ) { page ->
                 when (page) {
-//                    0 -> MediaCreationRoot(
-//                        initialMode = initialMode,
-//                        onGoToPreview = onGoToPreview,
-//                        onProfileClick = onProfileClick,
-//                        onGoToSettings = onGoToSettings,
-//                        onGoToFriends = onGoToFriends,
-//                        cameraPreviewEnabled = isCameraPageActive
-//                    )
+
                     0 -> MyMediaCreationRoot(
-                        onGoToPreview = onGoToPreview,
-                        onProfileClick = onProfileClick,
-                        onGoToSettings = onGoToSettings,
-                        onGoToFriends = onGoToFriends
+                        onGoToPreview = onGoToPreview
                     )
 
                     1 -> if (postsState.value.posts.isNotEmpty()) {
