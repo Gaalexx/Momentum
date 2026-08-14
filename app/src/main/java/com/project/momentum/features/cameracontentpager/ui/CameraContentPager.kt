@@ -34,6 +34,8 @@ import com.project.momentum.features.contentcreation.models.ContentCreationMode
 import com.project.momentum.features.contentcreation.models.MediaTypeToSend
 import com.project.momentum.features.contentcreation.ui.MyMediaCreationRoot
 import com.project.momentum.features.contentcreation.ui.assets.CameraTopBar
+import com.project.momentum.features.contentcreation.viewmodel.ContentCreationViewModel
+import com.project.momentum.features.contentcreation.viewmodel.MediaInputViewModel
 import com.project.momentum.features.posts.ui.NoPostsYet
 import com.project.momentum.features.posts.ui.WatchPhotoScreenRouteForMain
 import com.project.momentum.features.posts.viewmodel.PostsViewModel
@@ -61,20 +63,12 @@ fun CameraContentPager(
     sharedTransitionScope: SharedTransitionScope? = null,
     animatedVisibilityScope: AnimatedVisibilityScope? = null,
     currentPost: Int = 0,
-    postsViewModel: PostsViewModel = hiltViewModel()
+    postsViewModel: PostsViewModel = hiltViewModel(),
+    mediaInputViewModel: MediaInputViewModel = hiltViewModel()
 ) {
 
     val scope = rememberCoroutineScope()
 
-    var enterAnimationFinished by remember {
-        mutableStateOf(false)
-    }
-
-    LaunchedEffect(Unit) {
-        enterAnimationFinished = false
-        delay(500)
-        enterAnimationFinished = true
-    }
 
     val pagerState = rememberPagerState(
         initialPage = mainScreenPage.ordinal,
@@ -86,11 +80,6 @@ fun CameraContentPager(
         snapPositionalThreshold = 0.125f
     )
 
-    val isCameraPageActive by remember {
-        derivedStateOf {
-            enterAnimationFinished && pagerState.settledPage == MainScreenPage.CONTENT_CREATION.curPage
-        }
-    }
 
     BackHandler(enabled = pagerState.currentPage != 0) {
         scope.launch {
@@ -100,6 +89,7 @@ fun CameraContentPager(
 
 
     val postsState = postsViewModel.state.collectAsStateWithLifecycle()
+    val miState = mediaInputViewModel.state.collectAsStateWithLifecycle()
     Surface(
         color = ConstColours.BLACK,
         modifier = Modifier
@@ -121,6 +111,7 @@ fun CameraContentPager(
             VerticalPager(
                 state = pagerState,
                 flingBehavior = flingBehavior,
+                userScrollEnabled = !miState.value.isRecording,
                 modifier = Modifier.fillMaxSize()
             ) { page ->
                 when (page) {
