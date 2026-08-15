@@ -49,7 +49,7 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.airbnb.lottie.LottieComposition
@@ -93,6 +93,8 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import com.project.momentum.features.contentcreation.mediaconfig.PhotoRecordingFormat
 import com.project.momentum.features.contentcreation.mediaconfig.VideoRecordingFormat
+import com.project.momentum.features.posts.viewmodel.GalleryEvent
+import com.project.momentum.features.posts.viewmodel.PostsViewModel
 
 
 fun deleteByUri(context: Context, uri: Uri): Boolean {
@@ -118,7 +120,8 @@ fun SendContentScreen(
     uri: Uri,
     mediaType: MediaTypeToSend,
     vm: ContentCreationViewModel = hiltViewModel(),
-    friendsViewModel: FriendsViewModel = hiltViewModel()
+    friendsViewModel: FriendsViewModel = hiltViewModel(),
+    postsViewModel: PostsViewModel = hiltViewModel()
 ) {
 
     val uploadState by vm.state.collectAsStateWithLifecycle()
@@ -132,7 +135,11 @@ fun SendContentScreen(
 
     LaunchedEffect(uploadState) {
         when (uploadState) {
-            is UploadState.Success -> onGoToTakePhoto()
+            is UploadState.Success -> {
+                postsViewModel.onEvent(GalleryEvent.OnLoadPosts)
+                onGoToTakePhoto()
+            }
+
             is UploadState.Error -> onError()
             else -> Unit
         }

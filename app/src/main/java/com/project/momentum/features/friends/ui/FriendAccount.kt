@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.project.momentum.R
 import com.project.momentum.features.account.ui.AccountScreen
@@ -46,12 +46,22 @@ fun FriendAccountRoot(
         },
         postDialogInfo = DialogInfo.PostDialogInfo(
             onHidePost = {
-                postsViewModel.onEvent(GalleryEvent.OnHidePost(uiState.selectedPost ?: throw Exception("FriendsAccountScreen:OnHidePost: Selected post is null")))
+                postsViewModel.onEvent(
+                    GalleryEvent.OnHidePost(
+                        uiState.selectedPost
+                            ?: throw Exception("FriendsAccountScreen:OnHidePost: Selected post is null")
+                    )
+                )
                 postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
                 postsViewModel.onEvent(GalleryEvent.SelectPost(null))
             },
             onDeletePost = {
-                postsViewModel.onEvent(GalleryEvent.OnDeletePost(uiState.selectedPost ?: throw Exception("FriendsAccountScreen:OnHidePost: Selected post is null")))
+                postsViewModel.onEvent(
+                    GalleryEvent.OnDeletePost(
+                        uiState.selectedPost
+                            ?: throw Exception("FriendsAccountScreen:OnHidePost: Selected post is null")
+                    )
+                )
                 postsViewModel.onEvent(GalleryEvent.OnShowActionsDialog(!uiState.isShowingActionsDialog))
                 postsViewModel.onEvent(GalleryEvent.SelectPost(null))
             },
