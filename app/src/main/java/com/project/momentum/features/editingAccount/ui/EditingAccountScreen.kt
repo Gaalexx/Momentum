@@ -43,7 +43,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.project.momentum.R
 import com.project.momentum.features.auth.models.NavEvent
@@ -64,7 +64,7 @@ import com.project.momentum.ui.theme.ConstColours
 fun EditingAccountRoot(
     currentUserInfo: AccountInfo,
     onBackClick: () -> Unit,
-    onContinueClick: () ->Unit,
+    onContinueClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val viewModel: EditAccountViewModel = hiltViewModel()
@@ -119,17 +119,18 @@ fun EditingAccountScreen(
     onPhoneChange: (String) -> Unit,
     onProfileClick: () -> Unit,
     onBackClick: () -> Unit,
-    onContinueClick: () ->Unit,
+    onContinueClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
     val headLine: @Composable (String) -> Unit = {
-        Text (
+        Text(
             text = it,
             style = AppTextStyles.Headlines,
             color = ConstColours.MAIN_BRAND_BLUE,
         )
     }
+
     @Composable
     fun EditTextField(
         title: String,
@@ -143,7 +144,7 @@ fun EditingAccountScreen(
             imeAction = ImeAction.Next
         )
     ) {
-        Text (
+        Text(
             text = title,
             style = AppTextStyles.SubHeadlines,
             color = ConstColours.MAIN_BRAND_BLUE,
@@ -165,7 +166,7 @@ fun EditingAccountScreen(
     if (uiInfoState is EditAccountState.Loading) {
         LoadingOverlay()
     } else
-        TopBarTemplate (
+        TopBarTemplate(
             label = R.string.label_editing,
             onBackClick = onBackClick,
             modifier = modifier
@@ -191,14 +192,14 @@ fun EditingAccountScreen(
                             .clickable(onClick = onProfileClick)
                     ) {
                         if (uiInfoState.fields.profilePhotoURL == null) {
-    //                        Image(
-    //                            painter = painterResource(R.drawable.profile_image_small),
-    //                            contentDescription = null,
-    //                            modifier = Modifier
-    //                                .height(80.dp)
-    //                                .aspectRatio(1f)
-    //                                .align(Alignment.Center),
-    //                        )
+                            //                        Image(
+                            //                            painter = painterResource(R.drawable.profile_image_small),
+                            //                            contentDescription = null,
+                            //                            modifier = Modifier
+                            //                                .height(80.dp)
+                            //                                .aspectRatio(1f)
+                            //                                .align(Alignment.Center),
+                            //                        )
                             if (userData.profilePhotoURL == null) {
                                 Icon(
                                     imageVector = Icons.Outlined.AccountCircle,

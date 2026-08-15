@@ -24,7 +24,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.project.momentum.ui.theme.ConstColours
 import com.project.momentum.ui.assets.ContinueButton
 import com.project.momentum.R
@@ -43,7 +43,11 @@ import com.project.momentum.ui.theme.AppTextStyles
 @Composable
 fun CreatePasswordScreenPreview() {
     CreatePasswordScreen(
-    uiState = LoginState(currentStep = LoginStep.PASSWORD, isError = false, errorMessage = ErrorLogin.PasswordError.NO_DIGITS),
+        uiState = LoginState(
+            currentStep = LoginStep.PASSWORD,
+            isError = false,
+            errorMessage = ErrorLogin.PasswordError.NO_DIGITS
+        ),
         passwordRepetition = "",
         onValueChangeFirst = {},
         onValueChangeSecond = {},

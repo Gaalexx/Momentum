@@ -6,9 +6,11 @@ import com.project.momentum.features.posts.api.PostsAPI
 import com.project.momentum.features.posts.features.reactions.models.ReactionData
 import com.project.momentum.features.posts.features.reactions.models.ReactionType
 import com.project.momentum.features.posts.models.dtos.GetTranscriptionResponseDTO
+import kotlinx.coroutines.delay
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.milliseconds
 
 @Singleton
 class PostsRepo @Inject constructor(
