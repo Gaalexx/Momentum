@@ -20,3 +20,11 @@ data class GetTranscriptionResponseDTO(
     val status: TranscriptionStatus,
     val transcription: String
 )
+
+@Serializable
+data class DeletePostResponseDTO(
+    val success: Boolean,
+    val message: String,
+    val s3Deleted: Boolean,
+    val postId: String? = null
+)

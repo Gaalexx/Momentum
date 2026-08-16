@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.Models.FriendRequestActionDTO
 import com.project.momentum.data.auth.SessionManager
 import com.project.momentum.features.posts.features.reactions.models.ReactionType
+import com.project.momentum.features.posts.models.dtos.DeletePostResponseDTO
 import com.project.momentum.features.posts.models.dtos.GetTranscriptionResponseDTO
 import com.project.momentum.features.posts.models.dtos.TranscriptionStatus
 import com.project.momentum.network.di.Backend
@@ -90,7 +91,10 @@ class PostsAPI @Inject constructor(
                 Log.d("PostsAPI", "Post deleted: ${response.status}")
                 true
             } else {
-                Log.e("PostsAPI", "Error deleting post: ${response.status}")
+                Log.e(
+                    "PostsAPI",
+                    "Error deleting post: ${response.status}. ${response.body<DeletePostResponseDTO>().message}"
+                )
                 false
             }
         } catch (e: Exception) {

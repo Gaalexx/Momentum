@@ -62,6 +62,11 @@ class PostsViewModel @Inject constructor(
     private val repo: PostsRepo,
     private val sessionManager: SessionManager
 ) : ViewModel() {
+
+    companion object {
+        const val TAG = "PostsViewModel"
+    }
+
     private val _state = MutableStateFlow<PostsState>(PostsState(listOf(), listOf(), false, "", ""))
     val state = _state.asStateFlow()
 
@@ -92,7 +97,7 @@ class PostsViewModel @Inject constructor(
             is WatchPhotoEvent.OnReactionClick -> try {
                 onReactionClick(event)
             } catch (e: Exception) {
-                Log.e("PostsViewModel", "Error on reaction click ${e.message ?: ""}", e)
+                Log.e(TAG, "Error on reaction click ${e.message ?: ""}", e)
                 //TODO: notice user about error
             }
         }
@@ -149,7 +154,7 @@ class PostsViewModel @Inject constructor(
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {
-                    Log.e("PostsViewModel", "Error getting transcription ${e.message ?: ""}", e)
+                    Log.e(TAG, "Error getting transcription ${e.message ?: ""}", e)
                     changePostTranscription(postId, null)
                 }
             }
@@ -157,20 +162,16 @@ class PostsViewModel @Inject constructor(
     }
 
     private fun deletePost(event: GalleryEvent.OnDeletePost) {
-        val oldState = state.value
-
-        _state.update {
-            it.copy(posts = it.posts.filter { post -> post.id != event.postId })
-        }
-
         viewModelScope.launch {
             try {
-                if (!repo.deletePost(event.postId)) {
-                    _state.update { oldState }
+                Log.e("DEBUG DELETE", event.postId)
+                if (repo.deletePost(event.postId)) {
+                    _state.update { it.copy(posts = it.posts.filter { post -> post.id != event.postId }) }
+                } else {
+                    Log.e(TAG, "Unknown error while deleting post")
                 }
             } catch (e: Exception) {
-                Log.e("PostsViewModel", "Error deleting post ${e.message ?: ""}", e)
-                _state.update { oldState }
+                Log.e(TAG, "Error deleting post ${e.message ?: ""}", e)
             }
         }
     }
@@ -188,7 +189,7 @@ class PostsViewModel @Inject constructor(
                     _state.update { oldState }
                 }
             } catch (e: Exception) {
-                Log.e("PostsViewModel", "Error hiding post ${e.message ?: ""}", e)
+                Log.e(TAG, "Error hiding post ${e.message ?: ""}", e)
                 _state.update { oldState }
             }
         }
@@ -207,7 +208,7 @@ class PostsViewModel @Inject constructor(
                     _state.update { oldState }
                 }
             } catch (e: Exception) {
-                Log.e("PostsViewModel", "Error showing post ${e.message ?: ""}", e)
+                Log.e(TAG, "Error showing post ${e.message ?: ""}", e)
                 _state.update { oldState }
             }
         }
@@ -283,7 +284,7 @@ class PostsViewModel @Inject constructor(
                     _state.update { oldState }
                 }
             } catch (e: Exception) {
-                Log.e("PostsViewModel", "Error deleting reaction ${e.message ?: ""}", e)
+                Log.e(TAG, "Error deleting reaction ${e.message ?: ""}", e)
                 _state.update { oldState }
             }
         }
@@ -327,7 +328,7 @@ class PostsViewModel @Inject constructor(
                     _state.update { oldState }
                 }
             } catch (e: Exception) {
-                Log.e("PostsViewModel", "Error sending reaction ${e.message ?: ""}", e)
+                Log.e(TAG, "Error sending reaction ${e.message ?: ""}", e)
                 _state.update { oldState }
             }
         }
