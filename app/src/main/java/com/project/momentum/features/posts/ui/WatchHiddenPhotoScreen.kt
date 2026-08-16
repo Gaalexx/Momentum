@@ -70,6 +70,9 @@ fun WatchHiddenPhotoScreenRoute(
         posts = hiddenPosts,
         uiState = uiState,
         sharedTransitionScope = sharedTransitionScope,
-        animatedVisibilityScope = animatedVisibilityScope
+        animatedVisibilityScope = animatedVisibilityScope,
+        onPostSelect = { postId ->
+            postsViewModel.onEvent(GalleryEvent.SelectPost(postId))
+        }
     )
 }

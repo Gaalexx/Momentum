@@ -268,6 +268,9 @@ fun WatchPhotoScreenRoute(
         onTranscript = { postId ->
             postsViewModel.onEvent(GalleryEvent.GetSpeechTranscription(postId))
         },
+        onPostSelect = { postId ->
+            postsViewModel.onEvent(GalleryEvent.SelectPost(postId))
+        },
         postIndex = postIndex,
         posts = posts,
         uiState = uiState,
@@ -284,9 +287,8 @@ fun WatchPhotoScreenFull(
     onGoToSettings: () -> Unit,
     onGoToFriends: () -> Unit,
     onTranscript: (String) -> Unit,
-
+    onPostSelect: (String) -> Unit,
     postDialogInfo: DialogInfo,
-
     onShowReactionDialog: (String?) -> Unit,
     onReactionClick: (String, ReactionType) -> Unit,
     postIndex: Int,
@@ -326,7 +328,8 @@ fun WatchPhotoScreenFull(
                 posts = posts,
                 currentUserId = uiState.currentUserId,
                 sharedTransitionScope = sharedTransitionScope,
-                animatedVisibilityScope = animatedVisibilityScope
+                animatedVisibilityScope = animatedVisibilityScope,
+                onPostSelect = onPostSelect
             )
         }
     }
@@ -389,6 +392,9 @@ fun WatchPhotoScreenRouteForMain(
         onTranscript = { postId ->
             postsViewModel.onEvent(GalleryEvent.GetSpeechTranscription(postId))
         },
+        onPostSelect = { postId ->
+            postsViewModel.onEvent(GalleryEvent.SelectPost(postId))
+        },
         postIndex = postIndex,
         posts = posts,
         currentUserId = uiState.currentUserId,
@@ -403,6 +409,7 @@ fun WatchPhotoScreen(
     onReactionClick: (String, ReactionType) -> Unit,
     onGoToTakePhoto: () -> Unit,
     onGoToGallery: () -> Unit,
+    onPostSelect: (String) -> Unit,
     postDialogInfo: DialogInfo,
     onTranscript: (String) -> Unit,
     postIndex: Int,
@@ -415,7 +422,6 @@ fun WatchPhotoScreen(
     val iconTint = ConstColours.WHITE
     val context = LocalContext.current
     val captionFocusRequester = remember { FocusRequester() }
-    val keyboardController = LocalSoftwareKeyboardController.current
     val pagerState = rememberPagerState(initialPage = postIndex, pageCount = { posts.size })
 
     var isEditable by remember { mutableStateOf(false) }
@@ -432,6 +438,12 @@ fun WatchPhotoScreen(
 
     LaunchedEffect(currentPost?.id) {
         isTranscriptionVisible = false
+    }
+
+    LaunchedEffect(currentPost?.id) {
+        currentPost?.let {
+            onPostSelect(it.id)
+        }
     }
 
     val screenHeight = LocalWindowInfo.current.containerDpSize.height
@@ -639,7 +651,7 @@ fun WatchPhotoScreen(
                     Text(
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally),
-                        text = post.getDate() ?: "",
+                        text = post.getDate(),
                         color = ConstColours.WHITE,
                         style = AppTextStyles.SupportingText
                     )
@@ -745,7 +757,9 @@ fun WatchPhotoScreen(
                     IconButton(
                         onClick = {
                             if (!isEditable) {
-                                onShowReactionDialog(null)
+                                currentPost?.let { post ->
+                                    onShowReactionDialog(post.id)
+                                }
                             }
                         },
                         modifier = Modifier.size(dimensionResource(R.dimen.sub_button_size))
@@ -820,6 +834,7 @@ private fun WatchPhotoScreenPreview() {
             onGoToGallery = {},
             onGoToSettings = {},
             onProfileClick = {},
+            onPostSelect = {},
             onGoToFriends = {},
             postDialogInfo = DialogInfo.PostDialogInfo(),
             onTranscript = { _ -> },
