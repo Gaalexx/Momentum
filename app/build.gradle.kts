@@ -33,8 +33,7 @@ fun localProperty(name: String): String? =
     localProperties.getProperty(name)?.trim()?.removeSurrounding("\"")?.takeIf { it.isNotEmpty() }
 
 fun requiredLocalProperty(name: String): String =
-    localProperty(name)
-        ?: error("$name not found in local.properties")
+    localProperty(name) ?: error("$name not found in local.properties")
 
 // Сначала переменная окружения (CI), потом local.properties (локальная сборка)
 fun secret(name: String): String? =
@@ -83,9 +82,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField(
-            "String",
-            "BACKEND_BUILD_URL",
-            "\"http://193.233.20.47/api/momentum/\""
+            "String", "BACKEND_BUILD_URL", "\"http://45.87.246.232/api/momentum/\""
         )
 
 //        buildConfigField(
@@ -95,19 +92,14 @@ android {
 //        )
 
         buildConfigField(
-            "String",
-            "EMAIL_CHECKER",
-            "\"https://rapid-email-verifier.fly.dev/api/\""
+            "String", "EMAIL_CHECKER", "\"https://rapid-email-verifier.fly.dev/api/\""
         )
 
         buildConfigField(
-            "String",
-            "API_KEY",
-            localProperties.getProperty("API_KEY") ?: run {
+            "String", "API_KEY", localProperties.getProperty("API_KEY") ?: run {
                 logger.warn("API_KEY not found in local.properties")
                 "\"\""
-            }
-        )
+            })
 
         resValue("integer", "com_vk_sdk_AppId", vkAppId)
         addManifestPlaceholders(
