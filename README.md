@@ -1,6 +1,8 @@
 # Momentum
 
-**Momentum** — Android-клиент приватной социальной сети для близкого круга людей. Приложение помогает сохранять фото, короткие видео и голосовые заметки в общей хронологической ленте, делиться ими с выбранными друзьями и возвращаться к истории отношений без механик публичной соцсети.
+**Momentum** — Android-клиент приватной социальной сети для близкого круга людей. Приложение
+помогает сохранять фото, короткие видео и голосовые заметки в общей хронологической ленте, делиться
+ими с выбранными друзьями и возвращаться к истории отношений без механик публичной соцсети.
 
 ## Возможности
 
@@ -44,7 +46,8 @@ com.project.momentum/
                                       Compose-компоненты и кастомные Canvas-элементы
 ```
 
-`app/src/main/res/` — ресурсы приложения, `app/src/main/assets/` — локальные mock-данные (`posts.json`, `users.json`).
+`app/src/main/res/` — ресурсы приложения, `app/src/main/assets/` — локальные mock-данные (
+`posts.json`, `users.json`).
 
 ## Технологии
 
@@ -94,7 +97,8 @@ Debug-сборка:
 ./gradlew assembleDebug
 ```
 
-Release-сборка (нужен `app/keystore.jks` и секреты подписи; включены R8 и удаление неиспользуемых ресурсов):
+Release-сборка (нужен `app/keystore.jks` и секреты подписи; включены R8 и удаление неиспользуемых
+ресурсов):
 
 ```bash
 ./gradlew assembleRelease
@@ -104,22 +108,23 @@ Release-сборка (нужен `app/keystore.jks` и секреты подпи
 
 ## CI
 
-`.github/workflows/build-apk.yml` — GitHub Actions: на push в `main` и по `workflow_dispatch` собирается подписанный release-APK.
+`.github/workflows/build-apk.yml` — GitHub Actions: на push в `main` и по `workflow_dispatch`
+собирается подписанный release-APK.
 
-Пайплайн восстанавливает `local.properties`, `google-services.json` и `keystore.jks` из секретов репозитория, публикует APK как артефакт (хранится 30 дней) и отправляет сборку в Telegram-канал команды. При падении сборки в тот же канал приходит уведомление со ссылкой на run.
+Пайплайн восстанавливает `local.properties`, `google-services.json` и `keystore.jks` из секретов
+репозитория, публикует APK как артефакт (хранится 30 дней) и отправляет сборку в Telegram-канал
+команды. При падении сборки в тот же канал приходит уведомление со ссылкой на run.
 
-Используемые секреты: `VK_APP_ID`, `VK_CLIENT_SECRET`, `API_KEY`, `GOOGLE_SERVICES_JSON_BASE64`, `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`, `TG_CHAT_ID`, `TG_BOT_TOKEN`.
+Используемые секреты: `VK_APP_ID`, `VK_CLIENT_SECRET`, `API_KEY`, `GOOGLE_SERVICES_JSON_BASE64`,
+`KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`, `KEY_PASSWORD`, `TG_CHAT_ID`, `TG_BOT_TOKEN`.
 
 ## Ссылки
 
-[Макеты в Figma](https://www.figma.com/design/Ea7SuLOEx3nSAsTS36PKHy/Zavoz?node-id=0-1&p=f&t=veO7JMIP3wd3y4WW-0)
-[ТЗ](https://docs.google.com/document/d/1Vdnet940qkdQ249nMprJ8Al9bJk9Qou2/edit)
+[Макеты в Figma](https://www.figma.com/design/MfCqiFbAHOL4DYvjxEz5Nc/Current-Momentum?node-id=1-2&t=lK6Fx2M9tMDSP60w-0)
 
 ## Команда
 
-Название команды: **Zavoz**
-
-- Гайдуков Александр ([Gaalexx](https://github.com/Gaalexx)) — тимлид, Android-разработчик
-- Кондратенко Александр ([abracadabrabrabra](https://github.com/abracadabrabrabra)) — дизайнер, Android-разработчик
+- Гайдуков Александр ([Gaalexx](https://github.com/Gaalexx)) — Android-разработчик
+- Кондратенко Александр ([abracadabrabrabra](https://github.com/abracadabrabrabra)) — бэкенд
+  разработчик
 - Гусев Савелий ([guse95](https://github.com/guse95)) — Android-разработчик
-- Заворотный Алексей ([AlekseiZavorotnyi](https://github.com/AlekseiZavorotnyi)) — Android-разработчик
