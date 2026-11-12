@@ -12,6 +12,7 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
 
+        maven(url = "https://nexus-external.vkteam.ru/repository/maven/")
         maven(url = "https://artifactory-external.vkpartner.ru/artifactory/vkid-sdk-android/")
         maven(url = "https://artifactory-external.vkpartner.ru/artifactory/maven/")
     }
@@ -25,6 +26,7 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
 
+        maven(url = "https://nexus-external.vkteam.ru/repository/maven/")
         maven {
             url = URI("https://artifactory-external.vkpartner.ru/artifactory/vkid-sdk-android/")
         }
