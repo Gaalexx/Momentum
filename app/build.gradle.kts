@@ -12,6 +12,8 @@ plugins {
     id("vkid.manifest.placeholders")
 }
 
+apply(from = rootProject.file("gradle/architecture.gradle.kts"))
+
 val compileSdkApi = libs.versions.compileSdk.get().toInt()
 val minSdkApi = libs.versions.minSdk.get().toInt()
 val targetSdkApi = libs.versions.targetSdk.get().toInt()

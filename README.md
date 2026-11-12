@@ -22,29 +22,55 @@
 
 ## Архитектура
 
-Проект организован по feature-first подходу, слой представления — MVVM.
+Проект организован по слоям **presentation → domain ← data**, слой представления — MVVM.
+Слои находятся в одном Gradle-модуле `app`; зависимости между ними проверяются задачей
+`verifyArchitecture`, которая запускается при сборке и `check`.
 
-```
+```text
 com.project.momentum/
-├── MainActivity.kt, MomentumApp.kt   точка входа, инициализация Hilt, VK SDK/VK ID, темы и Compose
-├── MyFirebaseMessagingService.kt     приём push-уведомлений FCM
-├── navigation/                       типизированные routes на androidx.navigation3,
-│                                     корневой NavDisplay, стартовый экран по состоянию сессии
-├── features/                         account, auth, cameracontentpager, contentcreation,
-│   │                                 editingAccount, friends, offline, posts, settings
-│   ├── */ui/                         Compose-экраны и пользовательские сценарии
-│   ├── */viewmodel/                  состояние экранов, события UI и вызовы репозиториев
-│   ├── */models/                     DTO, UI-state и локальные модели
-│   ├── */repo/, */api/               работа с backend внутри конкретной фичи
-│   └── */usecases/                   вынесенная бизнес-логика там, где она есть
-├── data/                             регистрация, логин, восстановление сессии, общая auth-логика
-│   └── auth/                         JWT в памяти, зашифрованное хранение refresh-данных
-│                                     через DataStore и Android Keystore
-├── network/                          Ktor-клиенты, DI-квалификаторы, S3 upload, сетевые модели
-├── di/                               Hilt-модули приложения
-└── ui/                               общая тема, дизайн-константы, переиспользуемые
-                                      Compose-компоненты и кастомные Canvas-элементы
+├── MomentumApp.kt                    инициализация приложения, Hilt и VK SDK
+├── presentation/
+│   ├── MainActivity.kt               Android entry point и интеграция VK ID с UI
+│   ├── navigation/                   Navigation 3, маршруты и стартовое состояние
+│   ├── account/, auth/, friends/     экраны, ViewModel, UI-state и события
+│   ├── posts/, settings/             экраны ленты и настроек
+│   ├── editingaccount/               редактирование профиля
+│   ├── contentcreation/              съёмка, предпросмотр, разрешения и отправка
+│   │   └── capture/                  CameraX/MediaRecorder адаптеры жизненного цикла UI
+│   ├── cameracontentpager/, offline/  контейнер камеры/ленты и offline-экран
+│   └── common/                       тема и переиспользуемые Compose-компоненты
+├── domain/
+│   ├── */model/                      бизнес-модели без Android и сетевой сериализации
+│   ├── */repository/                 контракты репозиториев
+│   └── */usecase/                    бизнес-сценарии, зависящие от контрактов
+├── data/
+│   ├── */remote/                     Ktor API и сериализуемые DTO
+│   ├── */mapper/                     преобразования DTO в доменные модели
+│   ├── */repository/                 реализации доменных контрактов
+│   ├── auth/                         сессия, DataStore, Keystore, устройство, push-токен
+│   ├── settings/local/               хранение темы
+│   └── push/                         Firebase Messaging Service
+└── di/                               Hilt bindings, сетевые клиенты и platform providers
 ```
+
+Правила зависимостей:
+
+- `presentation` обращается к контрактам и моделям `domain`. Состояния форм, навигационные
+  аргументы, отображение ошибок и форматирование дат остаются в `presentation`.
+- `domain` не знает об Android, Compose, Ktor, DTO, сериализации и реализациях хранилищ.
+  Здесь допустимы Kotlin/JDK, coroutines и аннотации constructor injection.
+- `data` реализует контракты `domain`, преобразует DTO на границе репозиториев и не импортирует UI.
+  Android URI передаётся через бизнес-контракт строкой; преобразование выполняется на границах слоёв.
+- `di` связывает контракты с реализациями. ViewModel получают интерфейсы через Hilt.
+- Сценарии, объединяющие бизнес-операции, оформляются use case. Простые запросы ViewModel может
+  выполнять через доменный контракт репозитория без дополнительного класса-посредника.
+
+CameraX-контроллеры, управление записью, разрешения и воспроизведение принадлежат presentation:
+они работают с Android UI и жизненным циклом экрана. Загрузка, удалённое хранение медиа и сетевые
+модели находятся в data. Это позволяет не протаскивать `Context`, `Uri` и `LifecycleOwner` в domain.
+
+При добавлении функциональности сначала определите доменную модель и контракт, затем добавьте
+реализацию в data и Hilt binding, после чего подключите их к presentation.
 
 `app/src/main/res/` — ресурсы приложения, `app/src/main/assets/` — локальные mock-данные (
 `posts.json`, `users.json`).
@@ -90,6 +116,12 @@ API_KEY="..."
 Firebase настраивается через `app/google-services.json` (файл не хранится в репозитории).
 
 ## Сборка
+
+Проверка границ слоёв:
+
+```bash
+./gradlew :app:verifyArchitecture
+```
 
 Debug-сборка:
 

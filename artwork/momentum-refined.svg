@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="560" height="313" viewBox="0 0 560 313" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Momentum — ribbon mark</title>
+  <desc id="desc">Refined continuous M ribbon. Original vector paths, transparent background. Cyan and blue left face, violet fold, pink and warm gold right arch.</desc>
+  <defs>
+    <path id="momentum-silhouette" d="M 38,263
+ C 74,256 95,205 127,139
+ C 159,73 185,32 226,32
+ C 267,32 282,59 282,103
+ L 282,145
+ C 282,160 285,166 290,166
+ C 298,166 306,146 318,124
+ C 352,62 379,32 421,32
+ C 463,32 480,59 480,105
+ L 480,157
+ C 480,219 493,250 524,264
+ C 528,266 529,268 525,271
+ C 513,278 497,281 480,281
+ C 426,281 402,249 402,190
+ L 402,154
+ C 402,140 400,132 395,132
+ C 389,132 386,142 380,155
+ C 344,231 313,279 265,279
+ C 222,279 202,253 202,207
+ L 202,155
+ C 202,141 200,132 195,132
+ C 189,132 185,144 179,157
+ C 143,235 114,280 74,280
+ C 58,280 45,275 35,270
+ C 31,268 32,265 38,263 Z"/>
+    <clipPath id="momentum-clip"><use xlink:href="#momentum-silhouette"/></clipPath>
+    <linearGradient id="momentum-front" gradientUnits="userSpaceOnUse" x1="295" y1="279" x2="365" y2="32">
+      <stop offset="0" stop-color="#B139ED"/>
+      <stop offset="0.40" stop-color="#F04CB5"/>
+      <stop offset="0.72" stop-color="#FF8F94"/>
+      <stop offset="1" stop-color="#FFE38A"/>
+    </linearGradient>
+    <linearGradient id="momentum-left" gradientUnits="userSpaceOnUse" x1="182" y1="32" x2="115" y2="280">
+      <stop offset="0" stop-color="#85EEF0"/>
+      <stop offset="0.48" stop-color="#519AF8"/>
+      <stop offset="1" stop-color="#3159ED"/>
+    </linearGradient>
+    <linearGradient id="momentum-fold" gradientUnits="userSpaceOnUse" x1="246" y1="56" x2="254" y2="239">
+      <stop offset="0" stop-color="#477CF5"/>
+      <stop offset="0.55" stop-color="#533CE7"/>
+      <stop offset="1" stop-color="#6F2BDD"/>
+    </linearGradient>
+    <linearGradient id="momentum-right" gradientUnits="userSpaceOnUse" x1="443" y1="58" x2="464" y2="281">
+      <stop offset="0" stop-color="#FF914D"/>
+      <stop offset="0.46" stop-color="#FF627C"/>
+      <stop offset="1" stop-color="#F136A3"/>
+    </linearGradient>
+  </defs>
+  <use xlink:href="#momentum-silhouette" fill="url(#momentum-front)"/>
+  <g clip-path="url(#momentum-clip)">
+    <path fill="url(#momentum-fold)" d="M 274,54 C 280,68 282,84 282,103 L 282,145 C 282,160 285,166 290,166 C 267,202 244,235 222,237 C 207,238 202,225 202,207 L 202,155 C 202,141 200,132 195,132 C 222,86 250,37 274,54 Z"/>
+    <path fill="url(#momentum-left)" d="M 0,300 L 0,0 L 300,0 L 274,54 C 250,37 222,86 195,132 C 189,132 185,144 179,157 C 143,235 114,280 74,280 L 0,300 Z"/>
+    <path fill="url(#momentum-right)" d="M 472,54 C 494,44 560,45 560,80 L 560,320 L 395,320 L 395,132 C 423,86 449,37 472,54 Z"/>
+  </g>
+</svg>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Original artwork: artwork/momentum-refined.svg. Keep the mark inside the adaptive safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.12"
+        android:scaleY="0.12"
+        android:translateX="20.4"
+        android:translateY="35.22">
+        <path android:fillColor="#FFFFFF" android:pathData="M 38,263 C 74,256 95,205 127,139 C 159,73 185,32 226,32 C 267,32 282,59 282,103 L 282,145 C 282,160 285,166 290,166 C 298,166 306,146 318,124 C 352,62 379,32 421,32 C 463,32 480,59 480,105 L 480,157 C 480,219 493,250 524,264 C 528,266 529,268 525,271 C 513,278 497,281 480,281 C 426,281 402,249 402,190 L 402,154 C 402,140 400,132 395,132 C 389,132 386,142 380,155 C 344,231 313,279 265,279 C 222,279 202,253 202,207 L 202,155 C 202,141 200,132 195,132 C 189,132 185,144 179,157 C 143,235 114,280 74,280 C 58,280 45,275 35,270 C 31,268 32,265 38,263 Z" />
+    </group>
+</vector>

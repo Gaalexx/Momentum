@@ -1,0 +1,111 @@
+package com.project.momentum.presentation.auth.ui
+
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.project.momentum.R
+import com.project.momentum.presentation.auth.models.LoginState
+import com.project.momentum.presentation.auth.models.LoginStep
+import com.project.momentum.domain.auth.model.LoginType
+import com.project.momentum.presentation.auth.models.NavEvent
+import com.project.momentum.presentation.auth.viewmodel.RegistrationViewModel
+import com.project.momentum.presentation.common.assets.TemplateAuthorizationScreen
+import com.project.momentum.presentation.common.common.LoadingOverlay
+
+@Preview(showBackground = true)
+@Composable
+fun InsertCodeScreenPreview() {
+    InsertCodeScreen(
+        uiState = LoginState(currentStep = LoginStep.VERIFICATION),
+        onValueChange = {},
+        onBackClick = {},
+        onContinueClick = {},
+        onSubButtonClick = {},
+        onVkAuthClick = {},
+    )
+}
+
+@Composable
+fun InsertCodeRoot(
+    onBackClick: () -> Unit,
+    onContinueClick: () -> Unit,
+    onVkAuthClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val viewModel: RegistrationViewModel = hiltViewModel()
+    val uiState by viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvents.collect { event ->
+            when (event) {
+                NavEvent.NavigateToNextScreen -> onContinueClick()
+                else -> onBackClick()
+            }
+        }
+    }
+
+    InsertCodeScreen(
+        uiState = uiState,
+        onValueChange = { viewModel.updateUserCode(it) },
+        onBackClick = {
+            viewModel.previousStep()
+            onBackClick()
+        },
+        onContinueClick = {
+            viewModel.nextStep()
+        },
+        onSubButtonClick = {
+            viewModel.sendCodeAgain()
+        },
+        onVkAuthClick = onVkAuthClick,
+        modifier = modifier,
+    )
+}
+
+@Composable
+fun InsertCodeScreen(
+    uiState: LoginState,
+    onValueChange: (String) -> Unit,
+    onBackClick: () -> Unit,
+    onContinueClick: () -> Unit,
+    onSubButtonClick: () -> Unit,
+    onVkAuthClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+
+    if (uiState.isLoading) {
+        LoadingOverlay()
+    } else {
+        TemplateAuthorizationScreen(
+            value = uiState.userData.verificationCode,
+            label = R.string.label_create_account,
+            title =
+                when (uiState.loginType) {
+                    LoginType.EMAIL -> R.string.insert_code_email
+                    else -> R.string.insert_code_phone
+                },
+            subButtonText = R.string.button_send_code_again,
+            onValueChange = onValueChange,
+            onBackClick = onBackClick,
+            onContinueClick = onContinueClick,
+            onSubButtonClick = onSubButtonClick,
+            onVkAuthClick = onVkAuthClick,
+            modifier = modifier,
+            placeholder = stringResource(R.string.placeholder_code),
+            isError = uiState.isError,
+            errorText = handlingErrorLogin(uiState),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+        )
+    }
+}

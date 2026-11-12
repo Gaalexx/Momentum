@@ -1,5 +1,6 @@
 package com.project.momentum.data.auth
 
+import com.project.momentum.domain.auth.repository.UserSession
 import android.util.Base64
 import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,11 +10,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SessionManager @Inject constructor() {
+class SessionManager @Inject constructor() : UserSession {
     private val _jwt = MutableStateFlow<String?>(null)
     val jwt: StateFlow<String?> = _jwt
 
-    fun getUserId(): String? {
+    override fun getUserId(): String? {
         val token = getToken() ?: return null
         return try {
             val parts = token.split(".")

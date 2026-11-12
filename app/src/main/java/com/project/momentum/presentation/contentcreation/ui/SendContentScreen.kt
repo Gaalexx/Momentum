@@ -1,0 +1,593 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
+package com.project.momentum.presentation.contentcreation.ui
+
+import android.content.Context
+import android.net.Uri
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.outlined.PhotoCamera
+import androidx.compose.material.icons.outlined.TextFields
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
+import com.airbnb.lottie.LottieComposition
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.LottieConstants
+import com.airbnb.lottie.compose.animateLottieCompositionAsState
+import com.airbnb.lottie.compose.rememberLottieComposition
+import com.project.momentum.R
+import com.project.momentum.presentation.contentcreation.mediaconfig.AudioRecordingFormat
+import com.project.momentum.presentation.contentcreation.models.MediaTypeToSend
+import com.project.momentum.presentation.contentcreation.permissions.rememberCameraPermissionState
+import com.project.momentum.presentation.contentcreation.ui.assets.CameraTopBar
+import com.project.momentum.presentation.contentcreation.viewmodel.ContentCreationViewModel
+import com.project.momentum.presentation.contentcreation.viewmodel.UploadEvent
+import com.project.momentum.presentation.contentcreation.viewmodel.UploadState
+import com.project.momentum.domain.media.model.MediaType
+import com.project.momentum.domain.media.model.PostInformation
+import com.project.momentum.presentation.common.assets.AudioPreview
+import com.project.momentum.presentation.common.assets.BigCircleSendPhotoActionAdaptive
+import com.project.momentum.presentation.common.assets.CaptionBasicInput
+import com.project.momentum.presentation.common.assets.VideoPreview
+import com.project.momentum.presentation.common.theme.ConstColours
+import com.project.momentum.presentation.common.theme.MomentumTheme
+
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import com.project.momentum.presentation.friends.viewmodel.FriendsViewModel
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.ui.unit.sp
+import com.project.momentum.domain.friends.model.User
+import com.project.momentum.presentation.friends.viewmodel.FriendsScreenEvent
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Scaffold
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
+import com.project.momentum.presentation.contentcreation.mediaconfig.PhotoRecordingFormat
+import com.project.momentum.presentation.contentcreation.mediaconfig.VideoRecordingFormat
+import com.project.momentum.presentation.posts.viewmodel.GalleryEvent
+import com.project.momentum.presentation.posts.viewmodel.PostsViewModel
+
+
+@Composable
+fun SendContentScreen(
+    modifier: Modifier = Modifier,
+    onGoToTakePhoto: () -> Unit,
+    onProfileClick: () -> Unit,
+    onGoToSettings: () -> Unit,
+    onGoToFriends: () -> Unit,
+    onError: () -> Unit,
+    uri: Uri,
+    mediaType: MediaTypeToSend,
+    vm: ContentCreationViewModel = hiltViewModel(),
+    friendsViewModel: FriendsViewModel = hiltViewModel(),
+    postsViewModel: PostsViewModel = hiltViewModel()
+) {
+
+    val uploadState by vm.state.collectAsStateWithLifecycle()
+    val uploadingState = uploadState as? UploadState.Uploading
+    val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.loading))
+    val progress by animateLottieCompositionAsState(
+        composition = composition,
+        iterations = LottieConstants.IterateForever,
+        isPlaying = uploadingState != null
+    )
+
+    LaunchedEffect(uploadState) {
+        when (uploadState) {
+            is UploadState.Success -> {
+                postsViewModel.onEvent(GalleryEvent.OnLoadPosts)
+                onGoToTakePhoto()
+            }
+
+            is UploadState.Error -> onError()
+            else -> Unit
+        }
+
+    }
+
+    val friendsScreenState by friendsViewModel.state.collectAsStateWithLifecycle()
+    val friendsList = friendsScreenState.friends
+
+    LaunchedEffect(Unit) {
+        friendsViewModel.onEvent(FriendsScreenEvent.GetFriends)
+    }
+
+    val selectedFriendIds by vm.selectedFriendIds.collectAsStateWithLifecycle()
+
+    LaunchedEffect(friendsList) {
+        vm.onEvent(UploadEvent.SyncFriends(friendsList.map { it.id }))
+    }
+
+    val context = LocalContext.current
+    var caption by rememberSaveable { mutableStateOf("") }
+    val captionFocusRequester = remember { FocusRequester() }
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val hasCameraPermission by rememberCameraPermissionState(
+        shouldRequest = mediaType != MediaTypeToSend.AUDIO
+    )
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+    val selectFriendMessage = stringResource(R.string.snackbar_select_friend)
+
+    fun sendContent() {
+        if (selectedFriendIds.isEmpty()) {
+            coroutineScope.launch {
+                snackbarHostState.showSnackbar(selectFriendMessage)
+            }
+            return
+        }
+
+        val safeUri = uri
+        val mimeType = when (mediaType) {
+            MediaTypeToSend.PHOTO -> PhotoRecordingFormat.STORAGE_MIME_TYPE
+            MediaTypeToSend.VIDEO -> VideoRecordingFormat.STORAGE_MIME_TYPE
+            MediaTypeToSend.AUDIO -> AudioRecordingFormat.UPLOAD_MIME_TYPE
+        }
+        val uploadMediaType = when (mediaType) {
+            MediaTypeToSend.PHOTO -> MediaType.IMAGE
+            MediaTypeToSend.VIDEO -> MediaType.VIDEO
+            MediaTypeToSend.AUDIO -> MediaType.AUDIO
+        }
+        val size = context.contentResolver.openFileDescriptor(safeUri, "r")
+            ?.use { pfd -> pfd.statSize }?.takeIf { it >= 0 } ?: 0L
+
+        vm.onEvent(
+            UploadEvent.Send(
+                PostInformation(
+                    safeUri.toString(),
+                    mimeType,
+                    uploadMediaType,
+                    size = size,
+                    label = caption
+                )
+            )
+        )
+    }
+
+    val screenHeight = LocalWindowInfo.current.containerDpSize.height
+    val screenWidth = LocalWindowInfo.current.containerDpSize.width
+    Scaffold(
+        modifier = modifier,
+        containerColor = ConstColours.BLACK,
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { _ ->
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .background(ConstColours.BLACK)
+                .windowInsetsPadding(WindowInsets.systemBars),
+        ) {
+            CameraTopBar(
+                onProfileClick = onProfileClick,
+                onGoToSettings = onGoToSettings,
+                onGoToFriends = onGoToFriends,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .padding(horizontal = 14.dp),
+            )
+
+            Spacer(Modifier.height(5.dp))
+
+            Box(
+                modifier = modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                SendContentPreviewCard(
+                    hasCameraPermission = hasCameraPermission,
+                    mediaType = mediaType,
+                    uri = uri,
+                    caption = caption,
+                    onCaptionChange = { caption = it },
+                    captionFocusRequester = captionFocusRequester,
+                    isUploading = uploadingState != null,
+                    uploadComposition = composition,
+                    uploadProgress = progress,
+                    modifier = Modifier
+                        .heightIn(max = screenHeight * 0.5f)
+                        .aspectRatio(1f)
+                )
+            }
+
+
+            if (uploadingState != null) {
+                UploadProgress(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    uploadingState = uploadingState
+                )
+            } else {
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
+
+
+            SendContentBottomControls(
+                onDelete = {
+                    coroutineScope.launch {
+                        vm.discardContent(uri.toString())
+                        onGoToTakePhoto()
+                    }
+                },
+                onSend = ::sendContent,
+                onEditCaption = {
+                    captionFocusRequester.requestFocus()
+                    keyboardController?.show()
+                },
+                isSendEnabled = selectedFriendIds.isNotEmpty(),
+                onSendBlocked = {
+                    coroutineScope.launch {
+                        snackbarHostState.showSnackbar(selectFriendMessage)
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1.7f)
+            )
+
+
+            if (friendsList.isNotEmpty()) {
+                FriendsToShareRow(
+                    modifier = Modifier
+                        .weight(1.3f)
+                        .fillMaxSize(),
+                    friends = friendsList,
+                    selectedFriendIds = selectedFriendIds,
+                    onToggleFriend = { friendId -> vm.onEvent(UploadEvent.ToggleFriend(friendId)) }
+                )
+            } else {
+                Spacer(modifier = Modifier.weight(1.3f))
+            }
+        }
+    }
+}
+
+@Composable
+private fun FriendsToShareRow(
+    modifier: Modifier = Modifier,
+    friends: List<User>,
+    selectedFriendIds: Set<String>,
+    onToggleFriend: (String) -> Unit
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(friends) { friend ->
+                FriendAvatarItemAdaptive(
+                    modifier = Modifier.fillMaxSize(),
+                    friend = friend,
+                    isSelected = selectedFriendIds.contains(friend.id),
+                    onClick = { onToggleFriend(friend.id) }
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun FriendAvatarItemAdaptive(
+    modifier: Modifier = Modifier,
+    friend: User,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .clickable { onClick() }
+
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(0.8f)
+                .clip(CircleShape)
+                .background(
+                    if (isSelected) {
+                        ConstColours.MAIN_BRAND_BLUE
+                    } else {
+                        Color.Gray.copy(alpha = 0.3f)
+                    }
+                )
+                .aspectRatio(1f)
+                .padding(if (isSelected) 2.dp else 0.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(CircleShape)
+                    .background(
+                        if (isSelected) {
+                            ConstColours.MAIN_BACK_GRAY
+                        } else {
+                            Color.Gray.copy(alpha = 0.3f)
+                        }
+                    )
+            ) {
+                if (friend.avatarUrl != null) {
+                    AsyncImage(
+                        model = friend.avatarUrl,
+                        contentDescription = friend.name,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null,
+                        tint = if (isSelected) {
+                            Color.White.copy(alpha = 0.8f)
+                        } else {
+                            Color.White.copy(alpha = 0.2f)
+                        },
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .align(Alignment.Center)
+                    )
+                }
+            }
+        }
+
+        Text(
+            text = friend.name ?: friend.email.take(8),
+            color = if (isSelected) ConstColours.MAIN_BRAND_BLUE else Color.White.copy(alpha = 0.5f),
+            fontSize = 10.sp,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .padding(top = 2.dp)
+                .weight(0.2f)
+        )
+    }
+}
+
+@Composable
+private fun SendContentPreviewCard(
+    hasCameraPermission: Boolean,
+    mediaType: MediaTypeToSend,
+    uri: Uri,
+    caption: String,
+    onCaptionChange: (String) -> Unit,
+    captionFocusRequester: FocusRequester,
+    isUploading: Boolean,
+    uploadComposition: LottieComposition?,
+    uploadProgress: Float,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .clip(RoundedCornerShape(60.dp))
+            .background(ConstColours.BLACK)
+    ) {
+        if (hasCameraPermission || mediaType == MediaTypeToSend.AUDIO) {
+            when (mediaType) {
+                MediaTypeToSend.PHOTO -> {
+                    Box(
+                        Modifier
+                            .fillMaxWidth(0.95f)
+                            .aspectRatio(1f)
+                            .clip(RoundedCornerShape(60.dp))
+                            .background(ConstColours.MAIN_BACK_GRAY)
+                            .align(Alignment.Center)
+                    ) {
+                        AsyncImage(
+                            model = uri,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                }
+
+                MediaTypeToSend.VIDEO -> {
+                    VideoPreview(context = context, uri = uri)
+                }
+
+                MediaTypeToSend.AUDIO -> {
+                    AudioPreview(context = context, uri = uri)
+                }
+            }
+        } else {
+            Box(
+                Modifier
+                    .fillMaxWidth(0.95f)
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(60.dp))
+                    .background(Color(0xFF2A2E39))
+                    .align(Alignment.Center)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.PhotoCamera,
+                    contentDescription = null,
+                    tint = Color.White.copy(alpha = 0.35f),
+                    modifier = Modifier.size(56.dp)
+                )
+            }
+        }
+
+        CaptionBasicInput(
+            caption,
+            onCaptionChange,
+            placeholder = stringResource(R.string.label_write_comment),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth(0.9f)
+                .padding(16.dp)
+                .focusRequester(captionFocusRequester)
+        )
+
+        if (isUploading) {
+            LottieAnimation(
+                composition = uploadComposition,
+                progress = { uploadProgress },
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    }
+}
+
+@Composable
+private fun SendContentBottomControls(
+    onDelete: () -> Unit,
+    onSend: () -> Unit,
+    onEditCaption: () -> Unit,
+    isSendEnabled: Boolean,
+    onSendBlocked: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            onClick = onDelete,
+            modifier = Modifier
+                .weight(1f)
+                .align(Alignment.CenterVertically),
+        ) {
+            Icon(
+                imageVector = Icons.Default.Cancel,
+                modifier = Modifier.fillMaxSize(0.8f),
+                contentDescription = stringResource(R.string.icon_flash),
+                tint = ConstColours.WHITE
+            )
+        }
+
+        Box(
+            modifier = Modifier.weight(1.5f),
+            contentAlignment = Alignment.Center
+        ) {
+            BigCircleSendPhotoActionAdaptive(
+                onClick = if (isSendEnabled) onSend else onSendBlocked,
+                modifier = Modifier.aspectRatio(1f),
+                enabled = true
+            )
+        }
+
+        IconButton(
+            onClick = onEditCaption,
+            modifier = Modifier
+                .weight(1f)
+                .align(Alignment.CenterVertically),
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.TextFields,
+                modifier = Modifier.fillMaxSize(0.8f),
+                contentDescription = stringResource(R.string.icon_flip_camera),
+                tint = ConstColours.WHITE
+            )
+        }
+    }
+}
+
+@Composable
+private fun UploadProgress(modifier: Modifier = Modifier, uploadingState: UploadState.Uploading?) {
+    if (uploadingState == null) {
+        Spacer(modifier = modifier)
+    } else {
+        val progress = uploadingState.progress
+
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 28.dp, vertical = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (progress != null) {
+                LinearProgressIndicator(
+                    progress = { progress / 100f },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                Text(
+                    text = "$progress%",
+                    color = ConstColours.WHITE
+                )
+            } else {
+                LinearProgressIndicator(
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+
+}
+
+
+@Preview(showBackground = true, backgroundColor = 0xFF0B0C0F)
+@Composable
+private fun CameraLikeScreenPreview() {
+    MomentumTheme {
+        SendContentScreen(
+            onGoToTakePhoto = {},
+            onProfileClick = {},
+            onGoToSettings = {},
+            onError = {},
+            onGoToFriends = {},
+            mediaType = MediaTypeToSend.VIDEO,
+            uri = Uri.parse("https://avatars.mds.yandex.net/i?id=bd0db579c3e6b8b77e497c3185128489_l-13017849-images-thumbs&n=13")
+        )
+    }
+}

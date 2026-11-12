@@ -1,0 +1,53 @@
+package com.project.momentum.data.settings.remote
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class ServerSettingsStateDTO (
+    val inAppNotifications: Boolean = true,
+    val publicationsEnabled: Boolean = true,
+    val reactionsEnabled: Boolean = true,
+    val friendRequestEnabled: Boolean = true,
+    val defaultThemeEnabled: Boolean = true,
+)
+
+@Serializable
+data class SettingsActionDTO(
+    val success: Boolean,
+    val message: String,
+    val newState: ServerSettingsStateDTO? = null
+)
+@Serializable
+data class ChangeInAppNotificationsDTO(
+    val inAppNotifications: Boolean
+)
+
+@Serializable
+data class ChangePublicationsEnabledDTO(
+    val publicationsEnabled: Boolean
+)
+
+@Serializable
+data class ChangeReactionsEnabledDTO(
+    val reactionsEnabled: Boolean
+)
+
+@Serializable
+data class ChangeFriendRequestEnabledDTO(
+    val friendRequestEnabled: Boolean
+)
+
+@Serializable
+data class ChangeDefaultThemeEnabledDTO(
+    val defaultThemeEnabled: Boolean
+)
+
+@Serializable
+data class SettingsBooleanDTO(
+    val success: Boolean,
+    val message: String,
+)
+@Serializable
+data class SettingsCheckPasswordDTO(
+    val password: String
+)

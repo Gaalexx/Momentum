@@ -1,0 +1,28 @@
+package com.project.momentum.presentation.settings.models
+
+import com.project.momentum.presentation.auth.viewmodel.ErrorLogin
+
+enum class DeleteAccountStep {
+    VERIFICATION,
+    DELETE_ACCOUNT_CONFIRMATION,
+    DELETE_ACCOUNT,
+    COMPLETED
+}
+
+data class UserData(
+    val email: String = "",
+    val phone: String? = null,
+    val password: String = "",
+    val verificationCode: String = "",
+)
+
+data class DeleteAccountState (
+    val currentStep: DeleteAccountStep = DeleteAccountStep.VERIFICATION,
+    val userData: UserData = UserData(),
+    val isLoading: Boolean = false,
+    val isError: Boolean = false,
+    val errorMessage: ErrorLogin = ErrorLogin.None,
+    val canGoNext: Boolean = false,
+    val canGoBack: Boolean = true,
+    val showConfirmationDialog: Boolean = false
+)

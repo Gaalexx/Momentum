@@ -1,0 +1,391 @@
+package com.project.momentum.presentation.posts.viewmodel
+
+import android.util.Log
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.project.momentum.domain.auth.repository.UserSession
+import com.project.momentum.domain.posts.model.PostData
+import com.project.momentum.domain.posts.model.ReactionData
+import com.project.momentum.domain.posts.model.ReactionType
+import com.project.momentum.domain.posts.repository.PostsRepository
+import com.project.momentum.domain.posts.usecase.TranscribePostUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import java.time.Instant
+import javax.inject.Inject
+
+data class PostsState(
+    val posts: List<PostData>,
+    val hiddenPosts: List<String>,
+    val isRefreshing: Boolean,
+    val currentUserId: String,
+    val selectedPost: String? = null,
+    val isShowingActionsDialog: Boolean = false,
+)
+
+sealed interface GalleryEvent {
+    data object OnLoadPosts : GalleryEvent
+    data object OnRefreshPosts : GalleryEvent
+    data class OnLocalLoadPosts(val posts: List<PostData>) : GalleryEvent
+    data class OnShowActionsDialog(val isShowing: Boolean) : GalleryEvent
+    data class OnDeletePost(val postId: String) : GalleryEvent
+    data class OnHidePost(val postId: String) : GalleryEvent
+    data class OnShowPost(val postId: String) : GalleryEvent
+    data class SelectPost(val post: String?) : GalleryEvent
+    data class GetSpeechTranscription(val postId: String) : GalleryEvent
+}
+
+sealed interface WatchPhotoEvent {
+    data class OnShowReactionDialogEvent(val isShowing: Boolean) : WatchPhotoEvent
+
+    data class OnReactionClick(
+        val postId: String,
+        val reaction: ReactionType,
+    ) : WatchPhotoEvent
+}
+
+@HiltViewModel
+class PostsViewModel @Inject constructor(
+    private val repo: PostsRepository,
+    private val transcribePost: TranscribePostUseCase,
+    private val sessionManager: UserSession
+) : ViewModel() {
+
+    companion object {
+        const val TAG = "PostsViewModel"
+    }
+
+    private val _state = MutableStateFlow<PostsState>(PostsState(listOf(), listOf(), false, "", ""))
+    val state = _state.asStateFlow()
+
+    init {
+        loadAllPosts()
+        _state.update {
+            it.copy(currentUserId = getCurrentUserId())
+        }
+    }
+
+    fun onEvent(event: GalleryEvent) {
+        when (event) {
+            is GalleryEvent.OnLoadPosts -> loadAllPosts()
+            is GalleryEvent.OnRefreshPosts -> refreshPosts()
+            is GalleryEvent.OnLocalLoadPosts -> loadLocalPosts(event)
+            is GalleryEvent.OnShowActionsDialog -> showActionsDialogChange(event)
+            is GalleryEvent.OnDeletePost -> deletePost(event)
+            is GalleryEvent.OnHidePost -> hidePost(event)
+            is GalleryEvent.OnShowPost -> showPost(event)
+            is GalleryEvent.SelectPost -> selectPost(event)
+            is GalleryEvent.GetSpeechTranscription -> getSpeechTranscription(event)
+        }
+    }
+
+    fun onWatchPhotoEvent(event: WatchPhotoEvent) {
+        when (event) {
+            is WatchPhotoEvent.OnShowReactionDialogEvent -> showReactionDialogChange(event)
+            is WatchPhotoEvent.OnReactionClick -> try {
+                onReactionClick(event)
+            } catch (e: Exception) {
+                Log.e(TAG, "Error on reaction click ${e.message ?: ""}", e)
+                //TODO: notice user about error
+            }
+        }
+    }
+
+    private fun changePostTranscription(postId: String, transcription: String?) {
+        _state.update { state ->
+            state.copy(
+                posts = state.posts.map { post ->
+                    if (post.id == postId) {
+                        post.copy(transcription = transcription)
+                    } else {
+                        post
+                    }
+                }
+            )
+        }
+    }
+
+    private fun getSpeechTranscription(event: GalleryEvent.GetSpeechTranscription) {
+        val post = _state.value.posts.find { it -> it.id == event.postId }
+        if (post?.transcription == "" || post?.transcription == null) {
+            viewModelScope.launch {
+                val postId = event.postId
+
+                try {
+                    changePostTranscription(postId, null)
+
+                    val transcription = transcribePost(postId)
+
+                    changePostTranscription(postId, transcription)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Log.e(TAG, "Error getting transcription ${e.message ?: ""}", e)
+                    changePostTranscription(postId, null)
+                }
+            }
+        }
+    }
+
+    private fun deletePost(event: GalleryEvent.OnDeletePost) {
+        viewModelScope.launch {
+            try {
+                Log.e("DEBUG DELETE", event.postId)
+                if (repo.deletePost(event.postId)) {
+                    _state.update { it.copy(posts = it.posts.filter { post -> post.id != event.postId }) }
+                } else {
+                    Log.e(TAG, "Unknown error while deleting post")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error deleting post ${e.message ?: ""}", e)
+            }
+        }
+    }
+
+    private fun hidePost(event: GalleryEvent.OnHidePost) {
+        val oldState = state.value
+
+        _state.update {
+            it.copy(hiddenPosts = it.hiddenPosts + listOf(event.postId))
+        }
+
+        viewModelScope.launch {
+            try {
+                if (!repo.hidePost(event.postId)) {
+                    _state.update { oldState }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error hiding post ${e.message ?: ""}", e)
+                _state.update { oldState }
+            }
+        }
+    }
+
+    private fun showPost(event: GalleryEvent.OnShowPost) {
+        val oldState = state.value
+
+        _state.update {
+            it.copy(hiddenPosts = it.hiddenPosts - event.postId)
+        }
+
+        viewModelScope.launch {
+            try {
+                if (!repo.showPost(event.postId)) {
+                    _state.update { oldState }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error showing post ${e.message ?: ""}", e)
+                _state.update { oldState }
+            }
+        }
+    }
+
+    private fun selectPost(event: GalleryEvent.SelectPost) {
+        _state.update {
+            it.copy(selectedPost = event.post)
+        }
+    }
+
+    private fun showActionsDialogChange(event: GalleryEvent.OnShowActionsDialog) {
+        _state.update {
+            it.copy(isShowingActionsDialog = event.isShowing)
+        }
+    }
+
+    private fun showReactionDialogChange(event: WatchPhotoEvent.OnShowReactionDialogEvent) {
+        _state.update {
+            it.copy(isShowingActionsDialog = event.isShowing)
+        }
+    }
+
+    private fun onReactionClick(event: WatchPhotoEvent.OnReactionClick) {
+        val currentUserId = sessionManager.getUserId()
+            ?: throw Exception("PostsViewModel:onReactionClick: Unauthorized user cant see reactions") // TODO: custom Exception
+
+        val post = _state.value.posts.find { it.id == event.postId }
+            ?: throw Exception("PostsViewModel:onReactionClick: no such post to react")
+
+
+        //TODO: если часто добавлять или удалять реакции и проблемы с сетью
+        // то отображается некорректное состояние например:
+        // удалились реакции на клиенте но на сервере всё ещё ошибка
+        // и при обновлении постов будет несоответствие состояний
+        // (из ниоткуда появятся вроде как удаленные реакции)
+
+        if (post.reactions?.find { it.emoji == event.reaction }
+                ?.users?.any { it == currentUserId } ?: false) {
+            deleteReaction(currentUserId, event.postId, event.reaction)
+        } else {
+            sendReaction(currentUserId, event.postId, event.reaction)
+        }
+    }
+
+    private fun deleteReaction(userId: String, postId: String, currentReaction: ReactionType) {
+        val oldState = _state.value
+
+        _state.update { state ->
+            state.copy(
+                posts = state.posts.map { post ->
+                    if (post.id == postId) {
+                        if (post.reactions?.any { it.emoji == currentReaction } ?: false) {
+                            post.copy(
+                                reactions = post.reactions.mapNotNull { reaction ->
+                                    if (reaction.emoji == currentReaction) {
+                                        if (reaction.users.size > 1) {
+                                            reaction.copy(
+                                                users = reaction.users - userId
+                                            )
+                                        } else null
+                                    } else reaction
+                                }
+                            )
+                        } else throw Exception("PostsViewModel:deleteReaction: no such reaction or reactions == null")
+                    } else post
+                }
+            )
+        }
+        viewModelScope.launch {
+            try {
+                if (!repo.deleteReaction(postId, currentReaction)) {
+                    _state.update { oldState }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error deleting reaction ${e.message ?: ""}", e)
+                _state.update { oldState }
+            }
+        }
+    }
+
+    private fun sendReaction(userId: String, postId: String, currentReaction: ReactionType) {
+        val oldState = _state.value
+
+        _state.update { state ->
+            state.copy(
+                posts = state.posts.map { post ->
+                    if (post.id == postId) {
+                        if ((post.reactions ?: listOf()).any { it.emoji == currentReaction }) {
+                            post.copy(
+                                reactions = (post.reactions ?: listOf()).map { reaction ->
+                                    if (reaction.emoji == currentReaction) {
+                                        reaction.copy(
+                                            users = reaction.users + listOf(userId)
+                                        )
+                                    } else reaction
+                                }
+                            )
+                        } else {
+                            post.copy(
+                                reactions = (post.reactions ?: listOf()) + listOf(
+                                    ReactionData(
+                                        currentReaction,
+                                        users = listOf(userId)
+                                    )
+                                )
+                            )
+                        }
+
+                    } else post
+                }
+            )
+        }
+        viewModelScope.launch {
+            try {
+                if (!repo.sendReaction(postId, currentReaction)) {
+                    _state.update { oldState }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error sending reaction ${e.message ?: ""}", e)
+                _state.update { oldState }
+            }
+        }
+    }
+
+    private fun getCurrentUserId(): String =
+        sessionManager.getUserId() ?: throw Exception("Unauthenticated")
+
+    private suspend fun postsUpdate() {
+        val posts = repo.getAllPosts()
+        _state.update {
+            it.copy(posts = posts)
+        }
+    }
+
+    private suspend fun hiddenPostsUpdate() {
+        val posts = repo.getHiddenPosts()
+        _state.update {
+            it.copy(hiddenPosts = posts)
+        }
+    }
+
+    private fun loadLocalPosts(event: GalleryEvent.OnLocalLoadPosts) {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(posts = event.posts)
+            }
+        }
+    }
+
+    private fun loadAllPosts() {
+        viewModelScope.launch {
+            postsUpdate()
+            hiddenPostsUpdate()
+        }
+    }
+
+    private fun refreshPosts() {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(isRefreshing = true)
+            }
+            postsUpdate()
+            hiddenPostsUpdate()
+            _state.update {
+                it.copy(isRefreshing = false)
+            }
+        }
+    }
+
+    fun getUserPostsFlow(userId: String): StateFlow<List<PostData>> {
+        return state.map { s ->
+            s.posts
+                .filter { it.userId == userId && it.id !in s.hiddenPosts }
+                .sortedByDescending { it.createdAtInstantOrNull() ?: Instant.MIN }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = listOf()
+        )
+    }
+
+    fun getShownPostsFlow(): StateFlow<List<PostData>> {
+        return state.map { s ->
+            s.posts
+                .filter { it.id !in s.hiddenPosts }
+                .sortedByDescending { it.createdAtInstantOrNull() ?: Instant.MIN }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = listOf()
+        )
+    }
+
+    fun getHiddenPostsFlow(): StateFlow<List<PostData>> {
+        return state.map { s ->
+            s.posts
+                .filter { it.id in s.hiddenPosts }
+                .sortedByDescending { it.createdAtInstantOrNull() ?: Instant.MIN }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = listOf()
+        )
+    }
+}

@@ -1,0 +1,125 @@
+package com.project.momentum.presentation.auth.ui
+
+import android.content.Context
+import android.content.ContextWrapper
+import androidx.activity.ComponentActivity
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.project.momentum.R
+import com.project.momentum.presentation.auth.models.LoginState
+import com.project.momentum.domain.auth.model.LoginType
+import com.project.momentum.presentation.auth.models.NavEvent
+import com.project.momentum.presentation.auth.viewmodel.AuthorizationViewModel
+import com.project.momentum.presentation.common.assets.TemplateAuthorizationScreen
+
+@Preview
+@Composable
+fun AuthorizationAccountScreenPreview() {
+    AuthorizationAccountScreen(
+        uiState = LoginState(),
+        onValueChange = {},
+        onBackClick = {},
+        onContinueClick = {},
+        onSubButtonClick = {},
+        onVkAuthClick = {}
+    )
+}
+
+@Composable
+fun AuthorizationAccountRoot(
+    onBackClick: () -> Unit,
+    onContinueClick: () -> Unit,
+    onVkAuthClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val viewModel: AuthorizationViewModel = hiltViewModel()
+    val uiState by viewModel.state.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvents.collect { event ->
+            when (event) {
+                NavEvent.NavigateToNextScreen -> onContinueClick()
+                else -> onBackClick()
+            }
+        }
+    }
+
+    AuthorizationAccountScreen(
+        uiState = uiState,
+        onValueChange = { viewModel.updateUserEmail(it) },
+        onBackClick = {
+            viewModel.previousStep()
+            onBackClick()
+        },
+        onContinueClick = {
+            viewModel.nextStep()
+        },
+        onSubButtonClick = {
+            viewModel.switchLoginType()
+        },
+        onVkAuthClick = onVkAuthClick,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun AuthorizationAccountScreen(
+    uiState: LoginState,
+    onValueChange: (String) -> Unit,
+    onBackClick: () -> Unit,
+    onContinueClick: () -> Unit,
+    onSubButtonClick: () -> Unit,
+    onVkAuthClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    TemplateAuthorizationScreen(
+        value = when (uiState.loginType) {
+            LoginType.EMAIL -> uiState.userData.email
+            else -> uiState.userData.phone ?: ""
+        },
+        label = R.string.label_authorization,
+        title =
+            when (uiState.loginType) {
+                LoginType.EMAIL -> R.string.insert_email
+                else -> R.string.insert_phone_number
+            },
+        subButtonText =
+            when (uiState.loginType) {
+                LoginType.EMAIL -> R.string.button_authorization_by_phone_number
+                else -> R.string.button_authorization_by_email
+            },
+        onValueChange = onValueChange,
+        onBackClick = onBackClick,
+        onContinueClick = onContinueClick,
+        onSubButtonClick = onSubButtonClick,
+        onVkAuthClick = onVkAuthClick,
+        modifier = modifier,
+        placeholder =
+            stringResource(
+                when (uiState.loginType) {
+                    LoginType.EMAIL -> R.string.placeholder_email
+                    else -> R.string.placeholder_phone_number
+                }
+            ),
+        isError = uiState.isError,
+        errorText = handlingErrorLogin(uiState),
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType =
+                when (uiState.loginType) {
+                    LoginType.EMAIL -> KeyboardType.Email
+                    else -> KeyboardType.Phone
+                },
+            imeAction = ImeAction.Done
+        ),
+    )
+}
