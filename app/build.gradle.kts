@@ -103,7 +103,6 @@ android {
                 "\"\""
             })
 
-        resValue("integer", "com_vk_sdk_AppId", vkAppId)
         addManifestPlaceholders(
             mapOf(
                 "VKIDRedirectHost" to "vk.ru",
@@ -189,7 +188,5 @@ dependencies {
     implementation(libs.firebase.messaging)
 
     // VK SDK
-    implementation(libs.android.sdk.core)
-    implementation(libs.android.sdk.api)
     implementation(libs.vkid)
 }

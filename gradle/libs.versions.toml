@@ -1,7 +1,6 @@
 [versions]
 # Build tools
 agp = "9.3.3"
-androidSdkCore = "4.1.0"
 firebaseBom = "34.17.0"
 hiltLifecycleViewmodelCompose = "1.4.0"
 kotlin = "2.4.10"
@@ -50,8 +49,6 @@ junit4 = "4.13.2"
 
 [libraries]
 # Core Android
-android-sdk-api = { module = "com.vk:android-sdk-api", version.ref = "androidSdkCore" }
-android-sdk-core = { module = "com.vk:android-sdk-core", version.ref = "androidSdkCore" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }

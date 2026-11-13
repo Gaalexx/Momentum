@@ -24,8 +24,6 @@ import com.project.momentum.presentation.common.theme.MomentumTheme
 import com.project.momentum.presentation.common.theme.MomentumThemeVariant
 import com.project.momentum.presentation.common.theme.ThemeManager
 import com.project.momentum.presentation.common.theme.MomentumAndroidSettingsTheme
-import com.vk.api.sdk.VK
-import com.vk.dto.common.id.toUserId
 import com.vk.id.AccessToken
 import com.vk.id.OAuth
 import com.vk.id.VKID
@@ -55,7 +53,6 @@ class MainActivity : ComponentActivity() {
     private val appStartViewModel: AppStartViewModel by viewModels()
     private val vkAuthCallback = object : VKIDAuthCallback {
         override fun onAuth(accessToken: AccessToken) {
-            applyVkSdkCredentials(accessToken)
             Log.d(
                 "VkAuth",
                 "VKID auth success: userId=${accessToken.userID}, last name=${accessToken.userData.lastName}",
@@ -80,7 +77,6 @@ class MainActivity : ComponentActivity() {
 
         enableEdgeToEdge()
         askNotificationPermission()
-        VKID.instance.accessToken?.let { applyVkSdkCredentials(it) }
         setContent {
             val isDefaultTheme by themeManager.isDefaultTheme.collectAsState()
 
@@ -106,31 +102,6 @@ class MainActivity : ComponentActivity() {
             },
         )
     }
-
-    private fun applyVkSdkCredentials(accessToken: AccessToken) {
-        val createdMs = System.currentTimeMillis()
-        val expiresInSec = accessToken.toVkSdkExpiresInSec(createdMs)
-
-        VK.setCredentials(
-            accessToken.userID.toUserId(),
-            accessToken.token,
-            null,
-            expiresInSec,
-            createdMs,
-            true,
-        )
-
-        Log.d("VkAuth", "VK SDK credentials applied from VKID token: expiresInSec=$expiresInSec")
-    }
-
-    private fun AccessToken.toVkSdkExpiresInSec(createdMs: Long): Int =
-        if (expireTime > createdMs) {
-            ((expireTime - createdMs) / 1000L)
-                .coerceAtMost(Int.MAX_VALUE.toLong())
-                .toInt()
-        } else {
-            -1
-        }
 
     private fun VKIDAuthFail.toThrowable(): Throwable? =
         when (this) {
