@@ -1,6 +1,7 @@
 package com.project.momentum.domain.auth.repository
 
 import com.project.momentum.domain.auth.model.AuthCredentials
+import com.project.momentum.domain.auth.model.LoginType
 
 interface RegistrationRepository {
     suspend fun checkRegistrationLoginDB(user: AuthCredentials): Boolean
@@ -10,7 +11,7 @@ interface RegistrationRepository {
     suspend fun checkAuthorizationUserCode(user: AuthCredentials): String?
     suspend fun register(user: AuthCredentials): String?
     suspend fun login(user: AuthCredentials): String?
-    suspend fun authorizeWithVK(vkAccessToken: String): String?
+    suspend fun authorizeWithForeignId(type: LoginType): String?
     suspend fun authorize(): String?
     suspend fun syncPushToken(): String?
     suspend fun saveToken(token: String)

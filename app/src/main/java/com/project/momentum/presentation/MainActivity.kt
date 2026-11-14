@@ -7,29 +7,17 @@ import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.content.ContextCompat
-import com.project.momentum.presentation.auth.viewmodel.AuthorizationViewModel
 import com.project.momentum.presentation.navigation.MainScreen
-import com.project.momentum.presentation.navigation.viewmodel.AppStartViewModel
 import com.project.momentum.presentation.common.theme.MomentumTheme
 import com.project.momentum.presentation.common.theme.MomentumThemeVariant
 import com.project.momentum.presentation.common.theme.ThemeManager
-import com.project.momentum.presentation.common.theme.MomentumAndroidSettingsTheme
-import com.vk.id.AccessToken
-import com.vk.id.OAuth
-import com.vk.id.VKID
-import com.vk.id.VKIDAuthFail
-import com.vk.id.auth.VKIDAuthCallback
-import com.vk.id.auth.VKIDAuthParams
 import dagger.hilt.android.AndroidEntryPoint
 import jakarta.inject.Inject
 
@@ -38,37 +26,11 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var themeManager: ThemeManager
 
-    private companion object {
-        val VKID_AUTH_SCOPES = setOf("email", "friends", "photos", "video")
-    }
-
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission(),
     ) { isGranted: Boolean ->
         if (!isGranted) {
             showNotificationsDisabledDialog()
-        }
-    }
-    private val authViewModel: AuthorizationViewModel by viewModels()
-    private val appStartViewModel: AppStartViewModel by viewModels()
-    private val vkAuthCallback = object : VKIDAuthCallback {
-        override fun onAuth(accessToken: AccessToken) {
-            Log.d(
-                "VkAuth",
-                "VKID auth success: userId=${accessToken.userID}, last name=${accessToken.userData.lastName}",
-            )
-
-            authViewModel.onVkAuth(accessToken) {
-                appStartViewModel.onVKAuthSuccess()
-            }
-        }
-
-        override fun onFail(fail: VKIDAuthFail) {
-            Log.e(
-                "VkAuth",
-                "VKID auth failed: type=${fail.javaClass.simpleName}, description=${fail.description}",
-                fail.toThrowable(),
-            )
         }
     }
 
@@ -83,33 +45,10 @@ class MainActivity : ComponentActivity() {
             MomentumTheme(
                 themeVariant = if (isDefaultTheme) MomentumThemeVariant.Momentum else MomentumThemeVariant.AndroidSettings
             ) {
-                MainScreen(
-                    themeManager = themeManager,
-                    onVkAuth = ::startVkAuth
-                )
+                MainScreen(themeManager = themeManager)
             }
         }
     }
-
-    private fun startVkAuth() {
-        VKID.instance.authorize(
-            lifecycleOwner = this,
-            callback = vkAuthCallback,
-            params = VKIDAuthParams {
-                scopes = VKID_AUTH_SCOPES
-                useOAuthProviderIfPossible = false
-                oAuth = OAuth.VK
-            },
-        )
-    }
-
-    private fun VKIDAuthFail.toThrowable(): Throwable? =
-        when (this) {
-            is VKIDAuthFail.FailedApiCall -> throwable
-            is VKIDAuthFail.FailedRedirectActivity -> throwable
-            is VKIDAuthFail.NoBrowserAvailable -> throwable
-            else -> null
-        }
 
     private fun askNotificationPermission() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {

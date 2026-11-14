@@ -25,6 +25,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.navigation3.ui.NavDisplay
+import com.project.momentum.domain.auth.model.LoginType
 import com.project.momentum.presentation.account.ui.AccountRoot
 import com.project.momentum.presentation.auth.ui.AuthorizationAccountRoot
 import com.project.momentum.presentation.auth.ui.AuthorizationPasswordRoot
@@ -57,8 +58,6 @@ import com.project.momentum.presentation.settings.ui.HiddenPosts
 @OptIn(ExperimentalSharedTransitionApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun MainScreen(
-    onVkAuth: () -> Unit,
-    //onThemeChange: () -> Unit = {},
     themeManager: ThemeManager
 ) {
 
@@ -168,7 +167,7 @@ fun MainScreen(
                         onSubButtonClick = {
                             openOverlay(NavRoutes.AuthorizationLogin)
                         },
-                        onVkAuthClick = onVkAuth
+                        onVkAuthClick = { appStartViewModel.onForeignIdAuth(LoginType.VKID) }
                     )
                 }
 
@@ -180,7 +179,7 @@ fun MainScreen(
                         onContinueClick = {
                             openOverlay(NavRoutes.RegistrationPassword)
                         },
-                        onVkAuthClick = onVkAuth
+                        onVkAuthClick = { appStartViewModel.onForeignIdAuth(LoginType.VKID) }
                     )
                 }
 
@@ -205,7 +204,7 @@ fun MainScreen(
                         onContinueClick = {
                             openOverlay(NavRoutes.AuthorizationPassword)
                         },
-                        onVkAuthClick = onVkAuth
+                        onVkAuthClick = { appStartViewModel.onForeignIdAuth(LoginType.VKID) }
                     )
                 }
 
@@ -221,7 +220,7 @@ fun MainScreen(
                         onPasswordRecoveryClick = {
                             openOverlay(NavRoutes.AuthorizationCode)
                         },
-                        onVkAuthClick = onVkAuth
+                        onVkAuthClick = { appStartViewModel.onForeignIdAuth(LoginType.VKID) }
                     )
                 }
 
@@ -233,7 +232,7 @@ fun MainScreen(
                         onContinueClick = {
                             openOverlay(NavRoutes.Camera)
                         },
-                        onVkAuthClick = onVkAuth
+                        onVkAuthClick = { appStartViewModel.onForeignIdAuth(LoginType.VKID) }
                     )
                 }
 

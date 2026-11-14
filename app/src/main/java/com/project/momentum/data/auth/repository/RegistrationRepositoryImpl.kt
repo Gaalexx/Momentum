@@ -5,13 +5,13 @@ import com.project.momentum.data.auth.remote.AuthAPI
 import com.project.momentum.data.auth.SessionManager
 import com.project.momentum.data.auth.datastore.AuthStorageImpl
 import com.project.momentum.data.auth.deviceinfo.DeviceInfo
+import com.project.momentum.data.auth.foreignidauth.ForeignIdAuth
 import com.project.momentum.data.auth.keystore.KeystoreManager
 import com.project.momentum.data.auth.pushtoken.FirebasePushTokenProvider
 import com.project.momentum.data.auth.remote.RegistrationAPI
 import com.project.momentum.domain.auth.model.AuthCredentials
 import com.project.momentum.domain.auth.repository.RegistrationRepository
 import com.project.momentum.domain.auth.model.LoginType
-import com.project.momentum.data.auth.remote.AuthorizeVKRequestDTO
 import com.project.momentum.data.auth.remote.CheckCodeLoginRequestDTO
 import com.project.momentum.data.auth.remote.CheckCodeRequestDTO
 import com.project.momentum.data.auth.remote.CheckEmailRequestDTO
@@ -31,7 +31,8 @@ class RegistrationRepositoryImpl @Inject constructor(
     private val keyStoreManager: KeystoreManager,
     private val sessionManager: SessionManager,
     private val deviceInfo: DeviceInfo,
-    private val pushTokenProvider: FirebasePushTokenProvider
+    private val pushTokenProvider: FirebasePushTokenProvider,
+    private val authIdTypes: Set<@JvmSuppressWildcards ForeignIdAuth>
 ) : RegistrationRepository {
     override suspend fun checkRegistrationLoginDB(user: AuthCredentials): Boolean {
         val response = when (user.loginType) {
@@ -101,14 +102,8 @@ class RegistrationRepositoryImpl @Inject constructor(
         return response.jwt
     }
 
-    override suspend fun authorizeWithVK(vkAccessToken: String): String? {
-        val response = client.authorizeWithVK(
-            AuthorizeVKRequestDTO(
-                vkAccessToken = vkAccessToken,
-                deviceInfo = deviceInfo.getPhoneInfo()
-            )
-        )
-        return response.jwt
+    override suspend fun authorizeWithForeignId(type: LoginType): String? {
+        return authIdTypes.firstOrNull { it.type == type }?.auth()
     }
 
     override suspend fun authorize(): String? {

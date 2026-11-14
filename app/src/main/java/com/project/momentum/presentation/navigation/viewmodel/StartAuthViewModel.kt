@@ -1,7 +1,9 @@
 package com.project.momentum.presentation.navigation.viewmodel
 
 import android.util.Log
+import com.project.momentum.domain.auth.model.LoginType
 import com.project.momentum.domain.auth.usecase.AuthUseCase
+import com.project.momentum.domain.auth.usecase.CompleteSignInUseCase
 import com.project.momentum.domain.auth.usecase.AuthResult
 import com.project.momentum.domain.auth.usecase.AuthError
 import kotlinx.coroutines.CancellationException
@@ -36,7 +38,8 @@ data class SwitchesState(
 class AppStartViewModel @Inject constructor(
     private val auth: AuthUseCase,
     private val serverRep: ServerSettingsRepository,
-    private val regRep: RegistrationRepository
+    private val regRep: RegistrationRepository,
+    private val completeSignIn: CompleteSignInUseCase
 ) : ViewModel() {
     var state by mutableStateOf<AppStartState>(AppStartState.Loading)
         private set
@@ -114,12 +117,13 @@ class AppStartViewModel @Inject constructor(
         restoreSession()
     }
 
-    fun onVKAuthSuccess() {
+    fun onForeignIdAuth(type: LoginType) {
         viewModelScope.launch {
+            val refreshToken = regRep.authorizeWithForeignId(type) ?: return@launch
+            completeSignIn(refreshToken)
             loadServerSettings()
-            auth.syncPushToken()
+            state = AppStartState.Authorized
         }
-        state = AppStartState.Authorized
     }
 
     fun setUnauthorized() {

@@ -2,6 +2,7 @@ package com.project.momentum.di
 
 import android.content.ContentResolver
 import android.content.Context
+import com.vk.id.VKID
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,6 +18,9 @@ object AndroidModule {
     @Provides
     fun provideContentResolver(@ApplicationContext ctx: Context): ContentResolver =
         ctx.contentResolver
+
+    @Provides
+    fun provideVkId(): VKID = VKID.instance
 
     @Provides
     @IoDispatcher

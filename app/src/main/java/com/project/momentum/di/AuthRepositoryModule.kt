@@ -1,8 +1,10 @@
 package com.project.momentum.di
 
 import com.project.momentum.data.auth.SessionManager
+import com.project.momentum.data.auth.foreignidauth.ForeignIdAuth
 import com.project.momentum.data.auth.repository.EmailCheckerImpl
 import com.project.momentum.data.auth.repository.RegistrationRepositoryImpl
+import com.project.momentum.data.auth.vk.VkIdAuthDataSource
 import com.project.momentum.data.settings.repository.DeleteAccountRepositoryImpl
 import com.project.momentum.data.settings.repository.ServerSettingsRepositoryImpl
 import com.project.momentum.domain.auth.repository.EmailChecker
@@ -14,12 +16,17 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dagger.multibindings.IntoSet
 
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class AuthRepositoryModule {
     @Binds
     abstract fun bindRegistrationRepository(implementation: RegistrationRepositoryImpl): RegistrationRepository
+
+    @Binds
+    @IntoSet
+    abstract fun bindVkIdAuth(implementation: VkIdAuthDataSource): ForeignIdAuth
 
     @Binds
     abstract fun bindEmailChecker(implementation: EmailCheckerImpl): EmailChecker
