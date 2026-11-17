@@ -24,16 +24,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.project.momentum.R
 import com.project.momentum.presentation.common.theme.AppTextStyles
 import com.project.momentum.presentation.common.theme.ConstColours
 
@@ -76,7 +73,7 @@ fun TextFieldRegistration(
         isError = isError,
         keyboardOptions = keyboardOptions,
         maxLines = 1,
-        shape = RoundedCornerShape(36.dp),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.control_corner_radius)),
         colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = ConstColours.BLACK,
             unfocusedTextColor = ConstColours.BLACK,
@@ -107,12 +104,8 @@ fun GlassTextField(
     val accentColor = if (isError) ConstColours.ERROR_RED else textColor
     val currentBorderColor = if (isFocused) accentColor else accentColor.copy(alpha = 0.6f)
 
-    val glassGradient = Brush.linearGradient(
-        colors = listOf(
-            textColor.copy(alpha = 0.55f),
-            textColor.copy(alpha = 0.1f)
-        )
-    )
+    val shape = RoundedCornerShape(dimensionResource(R.dimen.control_corner_radius))
+    val containerColor = textColor.copy(alpha = if (isFocused) 0.16f else 0.10f)
 
     BasicTextField(
         value = value,
@@ -131,56 +124,8 @@ fun GlassTextField(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-//                        .shadow(
-//                            elevation = if (isFocused) 12.dp else 6.dp,
-//                            shape = RoundedCornerShape(36.dp),
-//                            clip = false,
-//                            spotColor = if (isFocused) accentColor.copy(alpha = 0.3f) else Color.Black.copy(alpha = 0.4f)
-//                        )
-                        .background(glassGradient, RoundedCornerShape(36.dp))
-                        .drawBehind {
-                            val cornerRadiusPx = 36.dp.toPx()
-                            val radius = CornerRadius(cornerRadiusPx)
-
-                            drawRoundRect(
-                                brush = Brush.radialGradient(
-                                    0.0f to textColor.copy(alpha = 0.08f),
-                                    1.0f to Color.Transparent,
-                                    center = center,
-                                    radius = size.maxDimension
-                                ),
-                                cornerRadius = radius
-                            )
-
-                            drawRoundRect(
-                                brush = Brush.verticalGradient(
-                                    colors = listOf(
-                                        currentBorderColor.copy(alpha = 0.4f),
-                                        Color.Transparent
-                                    ),
-                                    startY = 0f,
-                                    endY = size.height * 0.5f
-                                ),
-                                cornerRadius = radius,
-                                style = Stroke(width = 2.dp.toPx())
-                            )
-
-                            drawRoundRect(
-                                color = textColor.copy(alpha = 0.15f),
-                                cornerRadius = radius,
-                                style = Stroke(width = 1.5.dp.toPx()),
-                            )
-                        }
-                        .border(
-                            width = 1.dp,
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    currentBorderColor.copy(alpha = 0.7f),
-                                    currentBorderColor.copy(alpha = 0.1f)
-                                )
-                            ),
-                            shape = RoundedCornerShape(36.dp)
-                        )
+                        .background(containerColor, shape)
+                        .border(width = 1.dp, color = currentBorderColor, shape = shape)
                         .padding(horizontal = 24.dp, vertical = 16.dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -194,20 +139,6 @@ fun GlassTextField(
                     }
 
                     innerTextField()
-
-                    if (isFocused) {
-                        Box(
-                            modifier = Modifier
-                                .align(Alignment.BottomCenter)
-                                .fillMaxWidth(0.4f)
-                                .height(2.dp)
-                                .background(
-                                    Brush.horizontalGradient(
-                                        listOf(Color.Transparent, accentColor.copy(alpha = 0.8f), Color.Transparent)
-                                    )
-                                )
-                        )
-                    }
                 }
 
                 if (isError && errorText != null) {

@@ -741,25 +741,7 @@ fun EditButtonAdaptive(
         containerColor = ConstColours.MAIN_BRAND_BLUE, contentColor = ConstColours.WHITE
     )
 ) {
-    Button(
-        onClick = onEditProfile,
-        colors = colors,
-        shape = RoundedCornerShape(50.dp),
-        modifier = modifier.heightIn(min = 32.dp),
-        contentPadding = PaddingValues(
-            horizontal = dimensionResource(R.dimen.small_padding), vertical = 0.dp
-        )
-    ) {
-        Icon(
-            imageVector = Icons.Filled.Edit, contentDescription = null, tint = colors.contentColor
-        )
-        Spacer(Modifier.width(dimensionResource(R.dimen.extra_small_padding)))
-        Text(
-            text = stringResource(R.string.button_edit), style = AppTextStyles.SubButtonText.copy(
-                textAlign = TextAlign.Center, color = colors.contentColor
-            )
-        )
-    }
+    EditButton(onEditProfile = onEditProfile, modifier = modifier, iconSize = 24.dp, colors = colors)
 }
 
 @Composable
@@ -774,7 +756,7 @@ fun EditButton(
     Button(
         onClick = onEditProfile,
         colors = colors,
-        shape = RoundedCornerShape(50.dp),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.control_corner_radius)),
         modifier = modifier.heightIn(min = 32.dp),
         contentPadding = PaddingValues(
             horizontal = dimensionResource(R.dimen.small_padding), vertical = 0.dp
@@ -784,14 +766,9 @@ fun EditButton(
             imageVector = Icons.Filled.Edit,
             contentDescription = null,
             modifier = Modifier.size(iconSize),
-            tint = colors.contentColor
         )
         Spacer(Modifier.width(dimensionResource(R.dimen.extra_small_padding)))
-        Text(
-            text = stringResource(R.string.button_edit), style = AppTextStyles.SubButtonText.copy(
-                textAlign = TextAlign.Center, color = colors.contentColor
-            )
-        )
+        Text(text = stringResource(R.string.button_edit), style = AppTextStyles.SubButtonText)
     }
 }
 
@@ -850,32 +827,13 @@ fun ContinueButtonAdaptive(
     ),
     backGroundColor: Color = ConstColours.MAIN_BRAND_BLUE
 ) {
-    Button(
+    AppButton(
+        text = text,
         onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
-            .background(
-                brush = Brush.linearGradient(
-                    colors = listOf(
-                        backGroundColor, backGroundColor.copy(alpha = 0.5f)
-                    )
-                ), shape = RoundedCornerShape(50.dp)
-
-            )
-            .clip(RoundedCornerShape(50.dp)),
-        shape = RoundedCornerShape(50.dp),
-        colors = colors,
-        contentPadding = PaddingValues()
-    ) {
-        Text(
-            text = text,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = AppTextStyles.ButtonText.copy(
-                textAlign = TextAlign.Center, color = colors.contentColor
-            )
-        )
-    }
+        modifier = modifier.fillMaxWidth(),
+        containerColor = backGroundColor,
+        contentColor = colors.contentColor,
+    )
 }
 
 @Composable
@@ -903,28 +861,19 @@ fun CancelButtonAdaptive(
         contentColor = ConstColours.MAIN_BRAND_BLUE,
     )
 ) {
-    OutlinedButton(
+    AppButton(
+        text = text,
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(50.dp)),
-        shape = RoundedCornerShape(50.dp),
-        colors = colors,
-        border = BorderStroke(
-            width = dimensionResource(R.dimen.thickness_divider), color = colors.contentColor
-        )
-    ) {
-        Text(
-            text = text,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = AppTextStyles.ButtonText.copy(
-                textAlign = TextAlign.Center, color = colors.contentColor
+            .border(
+                width = dimensionResource(R.dimen.thickness_divider),
+                color = colors.contentColor,
+                shape = RoundedCornerShape(dimensionResource(R.dimen.control_corner_radius)),
             ),
-            textAlign = TextAlign.Center,
-            color = colors.contentColor
-        )
-    }
+        containerColor = Color.Transparent,
+        contentColor = colors.contentColor,
+    )
 }
 
 @Composable
@@ -952,21 +901,13 @@ fun BuyButtonAdaptive(
         containerColor = ConstColours.GOLD, contentColor = ConstColours.WHITE
     )
 ) {
-    Button(
+    AppButton(
+        text = text,
         onClick = onClick,
         modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(50.dp),
-        colors = colors
-    ) {
-        Text(
-            text = text,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = AppTextStyles.ButtonText.copy(
-                textAlign = TextAlign.Center, color = colors.contentColor
-            )
-        )
-    }
+        containerColor = colors.containerColor,
+        contentColor = colors.contentColor,
+    )
 }
 
 @Composable
@@ -1203,37 +1144,20 @@ fun ThemeCard(
 fun ButtonForDeleteAdaptive(
     onClick: () -> Unit, text: String, color: Color
 ) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier,
-        shape = RoundedCornerShape(999.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = ConstColours.WHITE, contentColor = ConstColours.WHITE
-        )
-    ) {
-        Text(
-            text = text, style = MaterialTheme.typography.titleMedium, color = color
-        )
-    }
+    ButtonForDelete(onClick = onClick, text = text, color = color)
 }
 
 @Composable
 fun ButtonForDelete(
-    onClick: () -> Unit, text: String, color: Color, horizontalPadding: Dp = 22.dp
+    onClick: () -> Unit, text: String, color: Color
 ) {
-    Button(
+    AppButton(
+        text = text,
         onClick = onClick,
-        modifier = Modifier,
-        shape = RoundedCornerShape(999.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = ConstColours.WHITE, contentColor = ConstColours.WHITE
-        ),
-        contentPadding = PaddingValues(horizontal = horizontalPadding, vertical = 0.dp)
-    ) {
-        Text(
-            text = text, style = MaterialTheme.typography.titleMedium, color = color
-        )
-    }
+        containerColor = ConstColours.WHITE,
+        contentColor = color,
+        textStyle = MaterialTheme.typography.titleMedium,
+    )
 }
 
 
